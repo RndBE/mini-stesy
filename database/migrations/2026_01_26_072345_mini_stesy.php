@@ -47,7 +47,7 @@ return new class extends Migration
             $table->increments('id_user');
             $table->string('nama', 100);
             $table->string('username', 30)->unique('uq_user_username');
-            $table->string('password', 32);
+            $table->string('password', 255);
             $table->string('level_user', 20);
             $table->text('alamat');
             $table->string('telp', 25);
@@ -57,6 +57,7 @@ return new class extends Migration
             $table->integer('zoom');
             $table->string('logo', 50);
             $table->string('logo_mobile', 225);
+            $table->rememberToken();
         });
 
         Schema::create('sub_user', function (Blueprint $table) {
@@ -74,6 +75,14 @@ return new class extends Migration
             $table->foreign('id_user', 'fk_subuser_user')->references('id_user')->on('t_user')->cascadeOnUpdate()->cascadeOnDelete();
         });
 
+        Schema::create('list_das', function (Blueprint $table) {
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_general_ci';
+
+            $table->increments('id');
+            $table->string('nama_das', 225)->unique('uq_das');
+        });
+
         Schema::create('t_lokasi', function (Blueprint $table) {
             $table->charset = 'utf8';
             $table->collation = 'utf8_general_ci';
@@ -83,7 +92,10 @@ return new class extends Migration
             $table->string('latitude', 20);
             $table->string('longitude', 20);
             $table->text('alamat');
-            $table->string('das', 225);
+            // $table->string('das', 225);
+            $table->unsignedInteger('das_id');
+
+            $table->foreign('das_id', 'fk_lokasi_das')->references('id')->on('list_das')->cascadeOnUpdate()->cascadeOnDelete();
         });
 
         Schema::create('kategori_logger', function (Blueprint $table) {
@@ -91,7 +103,7 @@ return new class extends Migration
             $table->collation = 'utf8_general_ci';
 
             $table->increments('id_katlogger');
-            $table->string('nama_kategori', 30)->unique('uq_kategori_nama');
+            $table->string('nama_kategori', 191)->unique('uq_kategori_nama');
             $table->string('controller', 20);
             $table->string('tabel', 20)->unique('uq_kategori_tabel');
             $table->text('kepanjangan');
@@ -129,14 +141,6 @@ return new class extends Migration
             $table->foreign('id_kategori', 'fk_filter_kategori')->references('id_katlogger')->on('kategori_logger')->cascadeOnUpdate()->cascadeOnDelete();
         });
 
-        Schema::create('list_das', function (Blueprint $table) {
-            $table->charset = 'utf8';
-            $table->collation = 'utf8_general_ci';
-
-            $table->increments('id');
-            $table->string('nama_das', 225)->unique('uq_das');
-        });
-
         Schema::create('klasifikasi_hujan', function (Blueprint $table) {
             $table->charset = 'utf8';
             $table->collation = 'utf8_general_ci';
@@ -158,8 +162,8 @@ return new class extends Migration
             $table->increments('id');
             $table->string('id_logger', 15)->unique('uq_logger_idlogger');
             $table->unsignedInteger('user_id');
-            $table->string('nama_logger', 30);
-    
+            $table->string('nama_logger', 255);
+
             $table->string('tabel_main', 10);
             $table->integer('jeda_notif');
             $table->unsignedInteger('idlokasi')->nullable();
@@ -342,22 +346,22 @@ return new class extends Migration
             $table->foreign('id_logger', 'fk_riwayat_logger')->references('id_logger')->on('t_logger')->cascadeOnUpdate()->cascadeOnDelete();
         });
 
-        Schema::create('ci_sessions', function (Blueprint $table) {
-            $table->charset = 'utf8';
-            $table->collation = 'utf8_general_ci';
+        // Schema::create('ci_sessions', function (Blueprint $table) {
+        //     $table->charset = 'utf8';
+        //     $table->collation = 'utf8_general_ci';
 
-            $table->string('id', 128);
-            $table->string('ip_address', 45);
-            $table->unsignedInteger('timestamp')->default(0);
-            $table->binary('data');
+        //     $table->string('id', 128);
+        //     $table->string('ip_address', 45);
+        //     $table->unsignedInteger('timestamp')->default(0);
+        //     $table->binary('data');
 
-            $table->index('timestamp', 'ci_sessions_timestamp');
-        });
+        //     $table->index('timestamp', 'ci_sessions_timestamp');
+        // });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('ci_sessions');
+        // Schema::dropIfExists('ci_sessions');
         Schema::dropIfExists('t_riwayat');
         Schema::dropIfExists('t_perbaikan');
         Schema::dropIfExists('set_sinkronisasi');
@@ -370,13 +374,16 @@ return new class extends Migration
         Schema::dropIfExists('parameter_sensor');
         Schema::dropIfExists('t_logger');
         Schema::dropIfExists('klasifikasi_hujan');
-        Schema::dropIfExists('list_das');
         Schema::dropIfExists('filter');
         Schema::dropIfExists('kat_view');
         Schema::dropIfExists('kategori_logger');
+
         Schema::dropIfExists('t_lokasi');
+        Schema::dropIfExists('list_das');
+
         Schema::dropIfExists('sub_user');
         Schema::dropIfExists('t_user');
+
         Schema::dropIfExists('role_permissions');
         Schema::dropIfExists('permissions');
         Schema::dropIfExists('roles');

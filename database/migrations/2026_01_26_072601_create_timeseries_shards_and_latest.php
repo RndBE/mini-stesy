@@ -193,7 +193,7 @@ return new class extends Migration
             SELECT
               l.id_logger,
               l.nama_logger,
-              l.lokasi_logger,
+              lk.nama_lokasi AS lokasi_logger,
               l.sensor_count,
               t.waktu,
               t.sensor1, t.sensor2, t.sensor3, t.sensor4, t.sensor5,
@@ -204,6 +204,7 @@ return new class extends Migration
               NULL AS sensor18,
               NULL AS sensor19
             FROM t_logger l
+            LEFT JOIN t_lokasi lk ON lk.idlokasi = l.idlokasi
             JOIN temp_s16_latest t ON t.id_logger = l.id_logger
 
             UNION ALL
@@ -211,7 +212,7 @@ return new class extends Migration
             SELECT
               l.id_logger,
               l.nama_logger,
-              l.lokasi_logger,
+              lk.nama_lokasi AS lokasi_logger,
               l.sensor_count,
               t.waktu,
               t.sensor1, t.sensor2, t.sensor3, t.sensor4, t.sensor5,
@@ -222,6 +223,7 @@ return new class extends Migration
               t.sensor18,
               t.sensor19
             FROM t_logger l
+            LEFT JOIN t_lokasi lk ON lk.idlokasi = l.idlokasi
             JOIN temp_s19_latest t ON t.id_logger = l.id_logger;
         ");
     }
