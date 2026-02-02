@@ -23,7 +23,7 @@ class t_Lokasi extends Model
 
     public function logger()
     {
-        return $this->hasMany(t_Logger::class);
+        return $this->hasMany(t_Logger::class,'idlokasi','idlokasi');
     }
 
 }

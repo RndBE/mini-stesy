@@ -42,10 +42,10 @@
     <div class="min-h-screen flex">
         @include('partials.sidebar')
 
-        <div class="flex min-h-screen w-full flex-col">
+        <div id="mainContent" class="flex min-h-screen w-full flex-col transition-all duration-300" style="margin-left: 16rem;">
             @include('partials.topbar')
 
-            <main class="mx-auto w-full max-w-[1300px] flex-1 px-8 py-6">
+            <main class="mx-auto w-full max-w-[1300px] flex-1 px-4 sm:px-6 lg:px-8 py-6">
                 @yield('content')
             </main>
 

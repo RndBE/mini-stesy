@@ -60,4 +60,14 @@ class t_Logger extends Model
     {
         return ((int) $this->sensor_count === 19) ? $this->temp19 : $this->temp16;
     }
+
+    public function informasi()
+    {
+        return $this->hasOne(t_Informasi::class, 'logger_id', 'id_logger');
+    }
+
+    public function fotos()
+    {
+        return $this->hasMany(Foto_pos::class, 'id_logger', 'id_logger');
+    }
 }
