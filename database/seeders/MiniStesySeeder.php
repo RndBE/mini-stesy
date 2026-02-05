@@ -283,10 +283,10 @@ class MiniStesySeeder extends Seeder
         ]);
 
         DB::table('foto_pos')->insert([
-            ['id' => 1, 'id_logger' => '10001', 'url_foto' => 'pos/10001.jpg', 'foto_utama' => 1],
-            ['id' => 2, 'id_logger' => '10002', 'url_foto' => 'pos/10002.jpg', 'foto_utama' => 1],
-            ['id' => 3, 'id_logger' => '10003', 'url_foto' => 'pos/10003.jpg', 'foto_utama' => 1],
-            ['id' => 4, 'id_logger' => '10004', 'url_foto' => 'pos/10004.jpg', 'foto_utama' => 1],
+            ['id' => 1, 'id_logger' => '10001', 'url_foto' => 'pos/10001.png', 'foto_utama' => 1],
+            ['id' => 2, 'id_logger' => '10002', 'url_foto' => 'pos/10002.png', 'foto_utama' => 1],
+            ['id' => 3, 'id_logger' => '10003', 'url_foto' => 'pos/10003.png', 'foto_utama' => 1],
+            ['id' => 4, 'id_logger' => '10004', 'url_foto' => 'pos/10004.png', 'foto_utama' => 1],
         ]);
 
         DB::table('tingkat_siaga_awlr')->insert([
