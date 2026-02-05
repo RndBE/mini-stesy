@@ -529,101 +529,131 @@ class MiniStesySeeder extends Seeder
             ]);
         }
 
-        $start = Carbon::create(2026, 2, 1, 0, 0, 0);
-        $end   = Carbon::create(2026, 2, 6, 16, 0, 0);
+        $start = Carbon::create(2026, 1, 7, 0, 0, 0);
+        $end = Carbon::create(2026, 2, 5, 23, 0, 0);
 
-        $s19Bulk = [];
-        $s16Bulk = [];
+        if (Schema::hasTable('t_s19_01')) {
+            DB::table('t_s19_01')->where('id_logger', '10001')->whereBetween('waktu', [$start, $end])->delete();
+        }
 
+        if (Schema::hasTable('t_s16_01')) {
+            DB::table('t_s16_01')->where('id_logger', '10003')->whereBetween('waktu', [$start, $end])->delete();
+        }
+
+        $badDays = [];
+        $rates = [0.62, 0.68, 0.72, 0.75, 0.78, 0.82, 0.85, 0.88];
+
+        $d = $start->copy()->startOfDay();
+        $lastDay = $end->copy()->startOfDay();
+        $days = [];
+
+        while ($d <= $lastDay) {
+            $days[] = $d->format('Y-m-d');
+            $d->addDay();
+        }
+
+        shuffle($days);
+        $pick = min(10, count($days));
+        for ($i = 0; $i < $pick; $i++) {
+            $badDays[$days[$i]] = $rates[$i % count($rates)];
+        }
+
+        $this->seedS19Logger10001($start, $end, $badDays);
+        $this->seedS16Logger10003($start, $end, $badDays);
+    }
+
+    private function seedS19Logger10001(Carbon $start, Carbon $end, array $badDays): void
+    {
+        $intervalMinutes = 10;
+        $bulk = [];
         $current = $start->copy();
 
         while ($current <= $end) {
+            $dayKey = $current->format('Y-m-d');
+            $keepRate = $badDays[$dayKey] ?? 1.0;
 
-            $time = $current->format('Y-m-d H:i:s');
+            if ($keepRate >= 1.0 || (mt_rand(1, 10000) / 10000) <= $keepRate) {
+                $time = $current->format('Y-m-d H:i:s');
 
-            // ==== LOGGER 10001 (S19) ====
-            $s19Bulk[] = [
-                'id_logger' => '10001',
-                'waktu' => $time,
-                'sensor1' => rand(90, 110) / 10,
-                'sensor2' => rand(90, 110) / 10,
-                'sensor3' => rand(90, 110) / 10,
-                'sensor4' => rand(120, 130) / 10,
-                'sensor5' => rand(70, 90) / 10,
-                'sensor6' => rand(70, 90) / 10,
-                'sensor7' => rand(70, 90) / 10,
-                'sensor8' => rand(70, 90) / 10,
-                'sensor9' => rand(70, 90) / 10,
-                'sensor10' => rand(25, 32),
-                'sensor11' => rand(70, 90) / 10,
-                'sensor12' => rand(0, 5) / 10,
-                'sensor13' => rand(70, 90) / 10,
-                'sensor14' => rand(110, 150), // TMA
-                'sensor15' => rand(70, 90) / 10,
-                'sensor16' => rand(70, 90) / 10,
-                'sensor17' => rand(70, 90) / 10,
-                'sensor18' => rand(70, 90) / 10,
-                'sensor19' => rand(70, 90) / 10,
-            ];
+                $bulk[] = [
+                    'id_logger' => '10001',
+                    'waktu' => $time,
+                    'sensor1' => mt_rand(90, 110) / 10,
+                    'sensor2' => mt_rand(90, 110) / 10,
+                    'sensor3' => mt_rand(90, 110) / 10,
+                    'sensor4' => mt_rand(120, 130) / 10,
+                    'sensor5' => mt_rand(70, 90) / 10,
+                    'sensor6' => mt_rand(70, 90) / 10,
+                    'sensor7' => mt_rand(70, 90) / 10,
+                    'sensor8' => mt_rand(70, 90) / 10,
+                    'sensor9' => mt_rand(70, 90) / 10,
+                    'sensor10' => mt_rand(25, 32),
+                    'sensor11' => mt_rand(70, 90) / 10,
+                    'sensor12' => mt_rand(0, 5) / 10,
+                    'sensor13' => mt_rand(70, 90) / 10,
+                    'sensor14' => mt_rand(1100, 1500) / 10,
+                    'sensor15' => mt_rand(70, 90) / 10,
+                    'sensor16' => mt_rand(70, 90) / 10,
+                    'sensor17' => mt_rand(70, 90) / 10,
+                    'sensor18' => mt_rand(70, 90) / 10,
+                    'sensor19' => mt_rand(70, 90) / 10,
+                ];
 
-            // ==== LOGGER 10003 (S16) ====
-            $s16Bulk[] = [
-                'id_logger' => '10003',
-                'waktu' => $time,
-                'sensor1' => rand(1, 5) / 10,
-                'sensor2' => rand(1, 5) / 10,
-                'sensor3' => rand(1, 5) / 10,
-                'sensor4' => rand(1, 5) / 10,
-                'sensor5' => rand(60, 90) / 10,
-                'sensor6' => rand(60, 90) / 10,
-                'sensor7' => rand(60, 90) / 10,
-                'sensor8' => rand(120, 130) / 10,
-                'sensor9' => rand(60, 90) / 10,
-                'sensor10' => rand(60, 90) / 10,
-                'sensor11' => rand(25, 32),
-                'sensor12' => rand(0, 3) / 10,
-                'sensor13' => rand(60, 90) / 10,
-                'sensor14' => rand(130, 170), // TMA
-                'sensor15' => rand(60, 90) / 10,
-                'sensor16' => rand(60, 90) / 10,
-            ];
-
-            // Insert per 500 rows biar gak berat
-            if (count($s19Bulk) >= 500) {
-                DB::table('t_s19_01')->insert($s19Bulk);
-                $s19Bulk = [];
+                if (count($bulk) >= 500) {
+                    DB::table('t_s19_01')->insert($bulk);
+                    $bulk = [];
+                }
             }
 
-            if (count($s16Bulk) >= 500) {
-                DB::table('t_s16_01')->insert($s16Bulk);
-                $s16Bulk = [];
-            }
-
-            $current->addMinute();
+            $current->addMinutes($intervalMinutes);
         }
 
-        // Insert sisa
-        if (!empty($s19Bulk)) DB::table('t_s19_01')->insert($s19Bulk);
-        if (!empty($s16Bulk)) DB::table('t_s16_01')->insert($s16Bulk);
+        if (!empty($bulk)) DB::table('t_s19_01')->insert($bulk);
+    }
 
-        $latestTime = $end->format('Y-m-d H:i:s');
+    private function seedS16Logger10003(Carbon $start, Carbon $end, array $badDays): void
+    {
+        $intervalMinutes = 15;
+        $bulk = [];
+        $current = $start->copy();
 
-        DB::table('temp_s19_latest')->updateOrInsert(
-            ['id_logger' => '10001'],
-            [
-                'waktu' => $latestTime,
-                'sensor14' => rand(110, 150),
-                'updated_at' => now()
-            ]
-        );
+        while ($current <= $end) {
+            $dayKey = $current->format('Y-m-d');
+            $keepRate = $badDays[$dayKey] ?? 1.0;
 
-        DB::table('temp_s16_latest')->updateOrInsert(
-            ['id_logger' => '10003'],
-            [
-                'waktu' => $latestTime,
-                'sensor14' => rand(130, 170),
-                'updated_at' => now()
-            ]
-        );
+            if ($keepRate >= 1.0 || (mt_rand(1, 10000) / 10000) <= $keepRate) {
+                $time = $current->format('Y-m-d H:i:s');
+
+                $bulk[] = [
+                    'id_logger' => '10003',
+                    'waktu' => $time,
+                    'sensor1' => mt_rand(1, 5) / 10,
+                    'sensor2' => mt_rand(1, 5) / 10,
+                    'sensor3' => mt_rand(1, 5) / 10,
+                    'sensor4' => mt_rand(1, 5) / 10,
+                    'sensor5' => mt_rand(60, 90) / 10,
+                    'sensor6' => mt_rand(60, 90) / 10,
+                    'sensor7' => mt_rand(60, 90) / 10,
+                    'sensor8' => mt_rand(120, 130) / 10,
+                    'sensor9' => mt_rand(60, 90) / 10,
+                    'sensor10' => mt_rand(60, 90) / 10,
+                    'sensor11' => mt_rand(25, 32),
+                    'sensor12' => mt_rand(0, 3) / 10,
+                    'sensor13' => mt_rand(60, 90) / 10,
+                    'sensor14' => mt_rand(1300, 1700) / 10,
+                    'sensor15' => mt_rand(60, 90) / 10,
+                    'sensor16' => mt_rand(60, 90) / 10,
+                ];
+
+                if (count($bulk) >= 500) {
+                    DB::table('t_s16_01')->insert($bulk);
+                    $bulk = [];
+                }
+            }
+
+            $current->addMinutes($intervalMinutes);
+        }
+
+        if (!empty($bulk)) DB::table('t_s16_01')->insert($bulk);
     }
 }

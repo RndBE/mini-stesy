@@ -52,44 +52,46 @@ class RealtimeController extends Controller
 
     public function getData($id)
     {
-        // 1. Fetch Device/Logger using Query Builder (Raw SQL equivalent)
-        $device = DB::table('t_logger')
-            ->where('id_logger', $id)
-            ->first();
+        $device = DB::table('t_logger')->where('id_logger', $id)->first();
 
         if (!$device) {
             return response()->json(['success' => false, 'message' => 'Device not found'], 404);
         }
 
-        // 2. Fetch Parameters using Query Builder
-        $params = DB::table('parameter_sensor')
-            ->where('logger_id', $id)
-            ->get();
+        $params = DB::table('parameter_sensor')->where('logger_id', $id)->get();
 
-        // 3. Determine table based on sensor_count logic
         $tableName = ((int)$device->sensor_count === 19) ? 't_s19_01' : 't_s16_01';
 
+        $start = Carbon::today();
+        $end = now();
+
         try {
-            // 4. Fetch Sensor Data
             $data = DB::table($tableName)
                 ->where('id_logger', $id)
+                ->whereBetween('waktu', [$start, $end])
                 ->orderBy('waktu', 'desc')
-                ->limit(60)
+                ->limit(2000)
                 ->get();
+
+            $lastUpdate = $data->first()->waktu ?? null;
 
             return response()->json([
                 'success' => true,
-                'device'  => $device,
-                'params'  => $params,
-                'data'    => $data
+                'device' => $device,
+                'params' => $params,
+                'data' => $data,
+                'last_update' => $lastUpdate,
+                'today' => $start->format('Y-m-d')
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Data error: ' . $e->getMessage(),
-                'device'  => $device,
-                'params'  => $params,
-                'data'    => []
+                'device' => $device,
+                'params' => $params,
+                'data' => [],
+                'last_update' => null,
+                'today' => $start->format('Y-m-d')
             ]);
         }
     }

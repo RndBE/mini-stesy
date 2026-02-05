@@ -365,7 +365,7 @@
                         <div class="sidebar-item mb-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md"
                             onclick="focusLogger({{ $point['lat'] }}, {{ $point['lng'] }}, '{{ $point['id_logger'] }}')">
 
-                            
+
                             <div class="flex items-start justify-between mb-2">
                                 <div>
                                     <div
@@ -683,7 +683,7 @@
                         <button class="popup-btn popup-btn-outline" onclick="window.open('https://www.google.com/maps?q=${p.lat},${p.lng}', '_blank')">
                             <span>✈️</span> Menuju Lokasi
                         </button>
-                        <button class="popup-btn popup-btn-solid" onclick="window.location.href='/peta/analisa/${p.id_logger}'">
+                        <button class="popup-btn popup-btn-solid" onclick="window.location.href='/analisa/${p.id_logger}'">
                             <span>📊</span> Analisa Data
                         </button>
                     </div>

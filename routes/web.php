@@ -4,6 +4,9 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\PetaController;
+use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\RealtimeController;
+use App\Http\Controllers\AnalisaController;
 use Illuminate\Support\Facades\Http;
 
 // Route::get('/', function () {
@@ -22,19 +25,21 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
 
     Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda');
-    Route::get('/peta-lokasi', [App\Http\Controllers\PetaController::class, 'index'])->name('peta.lokasi');
-    Route::get('/peta/analisa/{id_logger}', [PetaController::class, 'analisa'])->name('peta.analisa');
-    Route::get('/peta/data-masuk/{id_logger}', [PetaController::class, 'getDataMasuk'])->name('peta.dataMasuk');
-    Route::get('/api/peta/data/{id_logger}', [PetaController::class, 'getChartData'])->name('peta.data');
-    Route::get('/peta/export/{id_logger}', [PetaController::class, 'exportExcel'])->name('peta.export');
-    Route::get('/pengaturan-device', [App\Http\Controllers\DeviceController::class, 'index'])->name('device.index');
-    Route::get('/data-perangkat', [App\Http\Controllers\DeviceController::class, 'dataPerangkat'])->name('device.data'); // New Route
-    Route::put('/pengaturan-device/{id}', [App\Http\Controllers\DeviceController::class, 'update'])->name('device.update');
-    Route::put('/data-perangkat/{id}', [App\Http\Controllers\DeviceController::class, 'updateDataPerangkat'])->name('device.updateDataPerangkat');
+    Route::get('/peta-lokasi', [PetaController::class, 'index'])->name('peta.lokasi');
 
-    // Realtime Monitoring
-    Route::get('/realtime-monitoring', [App\Http\Controllers\RealtimeController::class, 'index'])->name('realtime.index');
-    Route::get('/realtime-monitoring/data/{id}', [App\Http\Controllers\RealtimeController::class, 'getData'])->name('realtime.data');
+
+    Route::get('/analisa/{id_logger}', [AnalisaController::class, 'index'])->name('analisa.index');
+    Route::get('/analisa/data-masuk/{id_logger}', [AnalisaController::class, 'getDataMasuk'])->name('analisa.dataMasuk');
+    Route::get('/api/analisa/data/{id_logger}', [AnalisaController::class, 'getChartData'])->name('analisa.data');
+    Route::get('/analisa/export/{id_logger}', [AnalisaController::class, 'exportExcel'])->name('analisa.export');
+
+    Route::get('/pengaturan-device', [DeviceController::class, 'index'])->name('device.index');
+    Route::get('/data-perangkat', [DeviceController::class, 'dataPerangkat'])->name('device.data'); // New Route
+    Route::put('/pengaturan-device/{id}', [DeviceController::class, 'update'])->name('device.update');
+    Route::put('/data-perangkat/{id}', [DeviceController::class, 'updateDataPerangkat'])->name('device.updateDataPerangkat');
+
+    Route::get('/realtime-monitoring', [RealtimeController::class, 'index'])->name('realtime.index');
+    Route::get('/realtime-monitoring/data/{id}', [RealtimeController::class, 'getData'])->name('realtime.data');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
