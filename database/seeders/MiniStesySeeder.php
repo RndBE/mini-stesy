@@ -21,6 +21,7 @@ class MiniStesySeeder extends Seeder
 
         DB::table('sub_user')->truncate();
         DB::table('t_user')->truncate();
+        if (Schema::hasTable('instansi')) DB::table('instansi')->truncate();
 
         DB::table('kat_view')->truncate();
         DB::table('filter')->truncate();
@@ -59,19 +60,50 @@ class MiniStesySeeder extends Seeder
             ['id' => 3, 'role_name' => 'user'],
         ]);
 
-        DB::table('permissions')->insert([
-            ['id' => 1, 'permission_name' => 'view_beranda'],
-            ['id' => 2, 'permission_name' => 'view_peta_lokasi'],
-            ['id' => 3, 'permission_name' => 'logout'],
-            ['id' => 4, 'permission_name' => 'manage_logger'],
-            ['id' => 5, 'permission_name' => 'manage_user'],
-        ]);
+        $permissions = [
+            ['id' => 1, 'permission_name' => 'view_dashboard'],
+            ['id' => 2, 'permission_name' => 'view_beranda'],
+            ['id' => 3, 'permission_name' => 'view_peta_lokasi'],
+            ['id' => 4, 'permission_name' => 'view_realtime'],
+            ['id' => 5, 'permission_name' => 'view_device'],
+            ['id' => 6, 'permission_name' => 'manage_device'],
+            ['id' => 7, 'permission_name' => 'view_data_perangkat'],
+            ['id' => 8, 'permission_name' => 'manage_data_perangkat'],
+            ['id' => 9, 'permission_name' => 'manage_instansi'],
+            ['id' => 10, 'permission_name' => 'view_profile'],
+            ['id' => 11, 'permission_name' => 'manage_profile'],
+            ['id' => 12, 'permission_name' => 'logout'],
+            ['id' => 13, 'permission_name' => 'manage_logger'],
+            ['id' => 14, 'permission_name' => 'manage_user'],
+            ['id' => 15, 'permission_name' => 'manage_rbac'],
+        ];
+        DB::table('permissions')->insert($permissions);
 
         $rp = [];
-        foreach ([1, 2, 3, 4, 5] as $pid) $rp[] = ['role_id' => 1, 'permission_id' => $pid];
-        foreach ([1, 2, 3, 4] as $pid) $rp[] = ['role_id' => 2, 'permission_id' => $pid];
-        foreach ([1, 2, 3] as $pid) $rp[] = ['role_id' => 3, 'permission_id' => $pid];
+        $allPermissionIds = collect($permissions)->pluck('id')->all();
+        foreach ($allPermissionIds as $pid) $rp[] = ['role_id' => 1, 'permission_id' => $pid];
+        foreach ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15] as $pid) $rp[] = ['role_id' => 2, 'permission_id' => $pid];
+        foreach ([1, 2, 3, 4, 5, 7, 10, 11, 12] as $pid) $rp[] = ['role_id' => 3, 'permission_id' => $pid];
         DB::table('role_permissions')->insert($rp);
+
+        $instansiBeaconId = null;
+        $instansiContohId = null;
+        if (Schema::hasTable('instansi')) {
+            $instansiBeaconId = DB::table('instansi')->insertGetId([
+                'nama' => 'Beacon Engineering',
+                'alamat' => 'Kantor Pusat',
+                'telp' => '081234567890',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $instansiContohId = DB::table('instansi')->insertGetId([
+                'nama' => 'Instansi Contoh',
+                'alamat' => 'Kantor Cabang',
+                'telp' => '081200000000',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         DB::table('t_user')->insert([
             [
@@ -83,6 +115,7 @@ class MiniStesySeeder extends Seeder
                 'alamat' => 'Kantor Pusat',
                 'telp' => '081234567890',
                 'instansi' => 'Beacon Engineering',
+                'instansi_id' => $instansiBeaconId,
                 'latitude' => '-7.797068',
                 'longitude' => '110.370529',
                 'zoom' => 11,
@@ -98,6 +131,7 @@ class MiniStesySeeder extends Seeder
                 'alamat' => 'Kantor Cabang',
                 'telp' => '081200000000',
                 'instansi' => 'Instansi Contoh',
+                'instansi_id' => $instansiContohId,
                 'latitude' => '-7.780000',
                 'longitude' => '110.360000',
                 'zoom' => 11,
@@ -151,10 +185,10 @@ class MiniStesySeeder extends Seeder
         ]);
 
         DB::table('t_logger')->insert([
-            ['id' => 1, 'id_logger' => '10001', 'user_id' => 1, 'nama_logger' => 'AWLR Seturan', 'tabel_main' => 't_s19_01', 'jeda_notif' => 10, 'idlokasi' => 1, 'id_katlogger' => 1, 'sensor_count' => 19],
-            ['id' => 2, 'id_logger' => '10002', 'user_id' => 1, 'nama_logger' => 'ARR Pogung', 'tabel_main' => 't_s16_01', 'jeda_notif' => 10, 'idlokasi' => 2, 'id_katlogger' => 2, 'sensor_count' => 16],
-            ['id' => 3, 'id_logger' => '10003', 'user_id' => 1, 'nama_logger' => 'AWLR Sinduadi', 'tabel_main' => 't_s16_01', 'jeda_notif' => 15, 'idlokasi' => 3, 'id_katlogger' => 1, 'sensor_count' => 16],
-            ['id' => 4, 'id_logger' => '10004', 'user_id' => 2, 'nama_logger' => 'ARR Bantar', 'tabel_main' => 't_s19_01', 'jeda_notif' => 20, 'idlokasi' => 4, 'id_katlogger' => 2, 'sensor_count' => 19],
+            ['id' => 1, 'id_logger' => '10001', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'AWLR Seturan', 'tabel_main' => 't_s19_01', 'jeda_notif' => 10, 'idlokasi' => 1, 'id_katlogger' => 1, 'sensor_count' => 19],
+            ['id' => 2, 'id_logger' => '10002', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'ARR Pogung', 'tabel_main' => 't_s16_01', 'jeda_notif' => 10, 'idlokasi' => 2, 'id_katlogger' => 2, 'sensor_count' => 16],
+            ['id' => 3, 'id_logger' => '10003', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'AWLR Sinduadi', 'tabel_main' => 't_s16_01', 'jeda_notif' => 15, 'idlokasi' => 3, 'id_katlogger' => 1, 'sensor_count' => 16],
+            ['id' => 4, 'id_logger' => '10004', 'instansi_id' => $instansiContohId, 'nama_logger' => 'ARR Bantar', 'tabel_main' => 't_s19_01', 'jeda_notif' => 20, 'idlokasi' => 4, 'id_katlogger' => 2, 'sensor_count' => 19],
         ]);
 
         DB::table('parameter_sensor')->insert([

@@ -15,6 +15,7 @@ class BerandaController extends Controller
     public function index()
     {
         $loggers = t_Logger::query()
+            ->forUser(auth()->user())
             ->with(['lokasi', 'kategori', 'jiat', 'params', 'temp16', 'temp19'])
             ->orderBy('nama_logger')
             ->get()

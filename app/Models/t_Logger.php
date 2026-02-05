@@ -12,7 +12,7 @@ class t_Logger extends Model
 
     protected $fillable = [
         'id_logger',
-        'user_id',
+        'instansi_id',
         'nama_logger',
         'tabel_main',
         'jeda_notif',
@@ -21,9 +21,22 @@ class t_Logger extends Model
         'sensor_count'
     ];
 
-    public function user()
+    public function instansi()
     {
-        return $this->belongsTo(t_User::class, 'user_id', 'id_user');
+        return $this->belongsTo(Instansi::class, 'instansi_id', 'id');
+    }
+
+    public function scopeForUser($query, $user)
+    {
+        if (!$user) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if ($user->level_user === 'superadmin') {
+            return $query;
+        }
+
+        return $query->where('instansi_id', $user->instansi_id);
     }
 
     public function lokasi()

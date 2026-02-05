@@ -16,6 +16,7 @@ class DeviceController extends Controller
     public function index()
     {
         $devices = t_Logger::query()
+            ->forUser(auth()->user())
             ->with(['lokasi', 'params', 'jiat'])
             ->orderBy('id_logger')
             ->get()
@@ -50,6 +51,7 @@ class DeviceController extends Controller
     public function dataPerangkat()
     {
         $devices = t_Logger::query()
+            ->forUser(auth()->user())
             ->with(['lokasi', 'params', 'jiat', 'kategori', 'informasi'])
             ->orderBy('id_logger')
             ->get()
@@ -105,7 +107,10 @@ class DeviceController extends Controller
         ]);
 
         //CARI LOGGER
-        $logger = t_Logger::where('id_logger', $id)->firstOrFail();
+        $logger = t_Logger::query()
+            ->forUser(auth()->user())
+            ->where('id_logger', $id)
+            ->firstOrFail();
 
         //UPDATE DATA UTAMA
         $logger->nama_logger   = $request->nama_logger;
@@ -150,7 +155,9 @@ class DeviceController extends Controller
         // dd($request->all());
 
         // Ambil logger + semua relasi yg dibutuhkan
-        $logger = t_Logger::with(['lokasi', 'jiat', 'params'])
+        $logger = t_Logger::query()
+            ->forUser(auth()->user())
+            ->with(['lokasi', 'jiat', 'params'])
             ->where('id_logger', $id)
             ->firstOrFail();
 

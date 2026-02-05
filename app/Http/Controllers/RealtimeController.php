@@ -18,6 +18,7 @@ class RealtimeController extends Controller
         //     'devices' => $devices
         // ]);
         $devices = t_Logger::query()
+            ->forUser(auth()->user())
             ->with(['lokasi', 'kategori', 'jiat', 'params', 'temp16', 'temp19'])
             ->orderBy('nama_logger')
             ->get()
@@ -52,7 +53,13 @@ class RealtimeController extends Controller
 
     public function getData($id)
     {
-        $device = DB::table('t_logger')->where('id_logger', $id)->first();
+        // 1. Fetch Device/Logger using Query Builder (Raw SQL equivalent)
+        $user = auth()->user();
+        $deviceQuery = DB::table('t_logger')->where('id_logger', $id);
+        if ($user && $user->level_user !== 'superadmin') {
+            $deviceQuery->where('instansi_id', $user->instansi_id);
+        }
+        $device = $deviceQuery->first();
 
         if (!$device) {
             return response()->json(['success' => false, 'message' => 'Device not found'], 404);

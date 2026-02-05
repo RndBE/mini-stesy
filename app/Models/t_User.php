@@ -21,7 +21,9 @@ class t_User extends Authenticatable
         'alamat',
         'telp',
         'instansi',
+        'instansi_id',
         'latitude',
+        'longitude',
         'longtitude',
         'logo',
         'logo_mobile'
@@ -45,6 +47,28 @@ class t_User extends Authenticatable
 
     public function logger()
     {
-        return $this->hasMany(t_Logger::class);
+        return $this->hasMany(t_Logger::class, 'instansi_id', 'instansi_id');
+    }
+
+    public function instansi()
+    {
+        return $this->belongsTo(Instansi::class, 'instansi_id', 'id');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'level_user', 'role_name');
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        if ($this->level_user === 'superadmin') {
+            return true;
+        }
+
+        $this->loadMissing('role.permissions');
+
+        return $this->role
+            && $this->role->permissions->contains('permission_name', $permission);
     }
 }
