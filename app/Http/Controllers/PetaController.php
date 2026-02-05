@@ -566,11 +566,14 @@ class PetaController extends Controller
         // Get data for last 30 days
         $startDate = Carbon::now()->subDays(29)->format('Y-m-d');
 
+        $nowTs = Carbon::now();
+
         $data = $query->select(
             DB::raw('DATE(waktu) as date'),
             DB::raw("COUNT(DISTINCT DATE_FORMAT(waktu, '%Y-%m-%d %H:%i')) as count")
         )
             ->where('waktu', '>=', $startDate . ' 00:00:00')
+            ->where('waktu', '<=', $nowTs)
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
@@ -583,11 +586,9 @@ class PetaController extends Controller
         $dbData = $data->pluck('count', 'date')->toArray();
         $todayStr = Carbon::now()->format('Y-m-d');
 
-        $todayStr = Carbon::now()->format('Y-m-d');
-
         while ($current <= $now) {
             $dateStr = $current->format('Y-m-d');
-            $count = (int) ($dbData[$dateStr] ?? 0);
+            $count = (int)($dbData[$dateStr] ?? 0);
 
             if ($dateStr === $todayStr) {
                 $minutesSoFar = Carbon::now()->diffInMinutes(Carbon::today());
@@ -597,29 +598,20 @@ class PetaController extends Controller
                 if ($expectedSoFar < 1) $expectedSoFar = 1;
 
                 $percentage = round(($count / $expectedSoFar) * 100, 2);
-                if ($percentage > 100) $percentage = 100;
-
-                $result[] = [
-                    'date' => $dateStr,
-                    'count' => $count,
-                    'percentage' => $percentage,
-                    'debug_minutes_so_far' => $minutesSoFar,
-                    'debug_expected_so_far' => $expectedSoFar
-                ];
             } else {
                 $percentage = ($count > 0) ? round(($count / $expectedPerDay) * 100, 2) : 0;
-                if ($percentage > 100) $percentage = 100;
-
-                $result[] = [
-                    'date' => $dateStr,
-                    'count' => $count,
-                    'percentage' => $percentage
-                ];
             }
+
+            if ($percentage > 100) $percentage = 100;
+
+            $result[] = [
+                'date' => $dateStr,
+                'count' => $count,
+                'percentage' => $percentage
+            ];
 
             $current->addDay();
         }
-
 
 
         return response()->json($result);

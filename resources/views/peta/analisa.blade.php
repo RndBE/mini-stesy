@@ -768,7 +768,7 @@
                             backgroundColor: 'rgba(67,56,202,0.1)',
                             tension: 0.4,
                             cubicInterpolationMode: 'monotone', // Spline effect
-                            fill: false,
+                            fill: true,
                             borderWidth: 2,
                             borderDash: [5, 5],
                             pointRadius: 0
@@ -831,17 +831,91 @@
                 });
         }
 
+        function parseLabelToMinutes(label) {
+            const s = String(label ?? '').trim();
+            if (!s) return null;
+
+            let m = s.match(/(\d{1,2})[:.](\d{2})(?::\d{2})?/);
+            if (m) return (Number(m[1]) * 60) + Number(m[2]);
+
+            m = s.match(/\b(\d{1,2})\s*[:.]\s*00\b/);
+            if (m) return Number(m[1]) * 60;
+
+            m = s.match(/\b(\d{1,2})\b/);
+            if (m && s.length <= 2) return Number(m[1]) * 60;
+
+            return null;
+        }
+
+        function filterSeriesToNowIfToday(labels, ...series) {
+            const el = document.getElementById('dateInput');
+            const selectedDate = el ? el.value : '';
+            const now = new Date();
+            const today = now.toISOString().slice(0, 10);
+
+            if (!selectedDate || selectedDate !== today) return {
+                labels,
+                series
+            };
+
+            const nowMin = (now.getHours() * 60) + now.getMinutes();
+
+            let idx = -1;
+            for (let i = 0; i < (labels || []).length; i++) {
+                const t = parseLabelToMinutes(labels[i]);
+                if (t === null) continue;
+                if (t <= nowMin) idx = i;
+            }
+
+            if (idx < 0) idx = 0;
+
+            return {
+                labels: (labels || []).slice(0, idx + 1),
+                series: series.map(arr => (arr || []).slice(0, idx + 1))
+            };
+        }
+
+
         function updateChart(data) {
             if (!chart) return;
 
-            chart.data.labels = data.labels;
-            chart.data.datasets[0].data = data.chartData || []; // Rerata
-            chart.data.datasets[1].data = data.minData || []; // Minimum
-            chart.data.datasets[2].data = data.maxData || []; // Maksimum
+            const labelsRaw = data.labels || [];
+            const avgRaw = data.chartData || [];
+            const minRaw = data.minData || [];
+            const maxRaw = data.maxData || [];
 
+            const range = document.querySelector('input[name="range"]:checked')?.value;
+
+            if (range === 'day') {
+                const f = filterSeriesToNowIfToday(labelsRaw, avgRaw, minRaw, maxRaw);
+                chart.data.labels = f.labels;
+                chart.data.datasets[0].data = f.series[0];
+                chart.data.datasets[1].data = f.series[1];
+                chart.data.datasets[2].data = f.series[2];
+            } else {
+                chart.data.labels = labelsRaw;
+                chart.data.datasets[0].data = avgRaw;
+                chart.data.datasets[1].data = minRaw;
+                chart.data.datasets[2].data = maxRaw;
+            }
 
             chart.update();
         }
+
+
+
+
+        // function updateChart(data) {
+        //     if (!chart) return;
+
+        //     chart.data.labels = data.labels;
+        //     chart.data.datasets[0].data = data.chartData || []; // Rerata
+        //     chart.data.datasets[1].data = data.minData || []; // Minimum
+        //     chart.data.datasets[2].data = data.maxData || []; // Maksimum
+
+
+        //     chart.update();
+        // }
 
         function updateTable(data) {
             const tbody = document.getElementById('dataTableBody');
