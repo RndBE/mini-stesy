@@ -195,8 +195,8 @@ class MiniStesySeeder extends Seeder
                 'nosell' => '-',
                 'nama_pic' => 'PIC 1',
                 'no_pic' => '081234000001',
-                'tanggal_pemasangan' => '2025-01-01',
-                'garansi' => '12',
+                'tanggal_pemasangan' => '2026-01-01',
+                'garansi' => '2027-01-01',
                 'awal_kontrak' => '2025-01-01',
                 'imei' => '123456789012345',
                 'gps1' => '-',
@@ -217,8 +217,8 @@ class MiniStesySeeder extends Seeder
                 'nosell' => '-',
                 'nama_pic' => 'PIC 2',
                 'no_pic' => '081234000002',
-                'tanggal_pemasangan' => '2025-01-02',
-                'garansi' => '12',
+                'tanggal_pemasangan' => '2026-01-02',
+                'garansi' => '2027-01-02',
                 'awal_kontrak' => '2025-01-02',
                 'imei' => '123456789012346',
                 'gps1' => '-',
@@ -239,8 +239,8 @@ class MiniStesySeeder extends Seeder
                 'nosell' => '-',
                 'nama_pic' => 'PIC 3',
                 'no_pic' => '081234000003',
-                'tanggal_pemasangan' => '2025-01-03',
-                'garansi' => '12',
+                'tanggal_pemasangan' => '2026-01-03',
+                'garansi' => '2027-01-03',
                 'awal_kontrak' => '2025-01-03',
                 'imei' => '123456789012347',
                 'gps1' => '-',
@@ -261,8 +261,8 @@ class MiniStesySeeder extends Seeder
                 'nosell' => '-',
                 'nama_pic' => 'PIC 4',
                 'no_pic' => '081234000004',
-                'tanggal_pemasangan' => '2025-01-04',
-                'garansi' => '12',
+                'tanggal_pemasangan' => '2026-01-04',
+                'garansi' => '2027-01-04',
                 'awal_kontrak' => '2025-01-04',
                 'imei' => '123456789012348',
                 'gps1' => '-',
@@ -528,5 +528,102 @@ class MiniStesySeeder extends Seeder
                 ],
             ]);
         }
+
+        $start = Carbon::create(2026, 2, 1, 0, 0, 0);
+        $end   = Carbon::create(2026, 2, 6, 16, 0, 0);
+
+        $s19Bulk = [];
+        $s16Bulk = [];
+
+        $current = $start->copy();
+
+        while ($current <= $end) {
+
+            $time = $current->format('Y-m-d H:i:s');
+
+            // ==== LOGGER 10001 (S19) ====
+            $s19Bulk[] = [
+                'id_logger' => '10001',
+                'waktu' => $time,
+                'sensor1' => rand(90, 110) / 10,
+                'sensor2' => rand(90, 110) / 10,
+                'sensor3' => rand(90, 110) / 10,
+                'sensor4' => rand(120, 130) / 10,
+                'sensor5' => rand(70, 90) / 10,
+                'sensor6' => rand(70, 90) / 10,
+                'sensor7' => rand(70, 90) / 10,
+                'sensor8' => rand(70, 90) / 10,
+                'sensor9' => rand(70, 90) / 10,
+                'sensor10' => rand(25, 32),
+                'sensor11' => rand(70, 90) / 10,
+                'sensor12' => rand(0, 5) / 10,
+                'sensor13' => rand(70, 90) / 10,
+                'sensor14' => rand(110, 150), // TMA
+                'sensor15' => rand(70, 90) / 10,
+                'sensor16' => rand(70, 90) / 10,
+                'sensor17' => rand(70, 90) / 10,
+                'sensor18' => rand(70, 90) / 10,
+                'sensor19' => rand(70, 90) / 10,
+            ];
+
+            // ==== LOGGER 10003 (S16) ====
+            $s16Bulk[] = [
+                'id_logger' => '10003',
+                'waktu' => $time,
+                'sensor1' => rand(1, 5) / 10,
+                'sensor2' => rand(1, 5) / 10,
+                'sensor3' => rand(1, 5) / 10,
+                'sensor4' => rand(1, 5) / 10,
+                'sensor5' => rand(60, 90) / 10,
+                'sensor6' => rand(60, 90) / 10,
+                'sensor7' => rand(60, 90) / 10,
+                'sensor8' => rand(120, 130) / 10,
+                'sensor9' => rand(60, 90) / 10,
+                'sensor10' => rand(60, 90) / 10,
+                'sensor11' => rand(25, 32),
+                'sensor12' => rand(0, 3) / 10,
+                'sensor13' => rand(60, 90) / 10,
+                'sensor14' => rand(130, 170), // TMA
+                'sensor15' => rand(60, 90) / 10,
+                'sensor16' => rand(60, 90) / 10,
+            ];
+
+            // Insert per 500 rows biar gak berat
+            if (count($s19Bulk) >= 500) {
+                DB::table('t_s19_01')->insert($s19Bulk);
+                $s19Bulk = [];
+            }
+
+            if (count($s16Bulk) >= 500) {
+                DB::table('t_s16_01')->insert($s16Bulk);
+                $s16Bulk = [];
+            }
+
+            $current->addMinute();
+        }
+
+        // Insert sisa
+        if (!empty($s19Bulk)) DB::table('t_s19_01')->insert($s19Bulk);
+        if (!empty($s16Bulk)) DB::table('t_s16_01')->insert($s16Bulk);
+
+        $latestTime = $end->format('Y-m-d H:i:s');
+
+        DB::table('temp_s19_latest')->updateOrInsert(
+            ['id_logger' => '10001'],
+            [
+                'waktu' => $latestTime,
+                'sensor14' => rand(110, 150),
+                'updated_at' => now()
+            ]
+        );
+
+        DB::table('temp_s16_latest')->updateOrInsert(
+            ['id_logger' => '10003'],
+            [
+                'waktu' => $latestTime,
+                'sensor14' => rand(130, 170),
+                'updated_at' => now()
+            ]
+        );
     }
 }

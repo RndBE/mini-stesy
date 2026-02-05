@@ -38,15 +38,23 @@
 <html lang="en">
 @include('partials.head')
 
-<body class="bg-slate-50">
+<body class="bg-slate-50" x-data="{ pageTitle: '{{ $title ?? 'Beranda' }}' }">
     <div class="min-h-screen flex">
         @include('partials.sidebar')
 
-        <div id="mainContent" class="flex min-h-screen w-full flex-col transition-all duration-300" style="margin-left: 16rem;">
+        <div id="mainContent" class="flex min-h-screen w-full flex-col transition-all duration-300"
+            style="margin-left: 16rem;">
             @include('partials.topbar')
 
-            <main class="mx-auto w-full max-w-[1300px] flex-1 px-4 sm:px-6 lg:px-8 py-6">
+            {{-- <main class="mx-auto w-full max-w-[1300px] flex-1 px-4 sm:px-6 lg:px-8 py-6">
                 @yield('content')
+            </main> --}}
+            <main class="flex-1 min-h-[calc(100vh-5rem)] min-w-0">
+                <div class="p-4 sm:p-6 bg-white min-h-[calc(100vh-5rem)] min-w-0 overflow-x-hidden">
+                    <div class="w-full max-w-full">
+                        @yield('content')
+                    </div>
+                </div>
             </main>
 
             @include('partials.footer')

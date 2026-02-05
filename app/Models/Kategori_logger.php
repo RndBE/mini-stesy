@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Kategori_logger extends Model
 {
     protected $table = 'kategori_logger';
+    protected $primaryKey = 'id_katlogger';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'nama_kategori',
@@ -20,6 +23,6 @@ class Kategori_logger extends Model
 
     public function logger()
     {
-        return $this->hasMany(t_Logger::class);
+        return $this->hasMany(t_Logger::class, 'id_katlogger', 'id_katlogger');
     }
 }

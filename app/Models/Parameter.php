@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Parameter extends Model
 {
     protected $table= 'parameter_sensor';
+    protected $primaryKey = 'id_param';   // 🔥 ini kuncinya
+    public $incrementing = false;          // karena bukan auto increment
+    protected $keyType = 'int';
+
+    public $timestamps = false;
 
     protected $fillable = [
         'logger_id',

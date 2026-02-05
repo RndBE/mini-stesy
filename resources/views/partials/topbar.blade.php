@@ -1,7 +1,9 @@
 <header class="flex items-center justify-between border-b border-slate-200 bg-white p-4">
-    <div class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
-            @yield('page_title', 'Beranda')
-        </div>
+    {{-- <div class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
+        @yield('page_title', 'Beranda')
+    </div> --}}
+    <div class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900" x-text="pageTitle">
+    </div>
     <div class="flex items-center gap-3 sm:gap-6">
         <div class="text-right hidden sm:block">
             <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">

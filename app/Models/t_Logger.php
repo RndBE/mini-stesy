@@ -70,4 +70,14 @@ class t_Logger extends Model
     {
         return $this->hasMany(Foto_pos::class, 'id_logger', 'id_logger');
     }
+
+    public function s16data()
+    {
+        return $this->hasMany(T_s16::class, 'id_logger', 'id_logger');
+    }
+
+    public function s19data()
+    {
+        return $this->hasMany(T_s19::class, 'id_logger', 'id_logger');
+    }
 }

@@ -32,10 +32,11 @@ class BerandaController extends Controller
                 $isActive = false;
 
                 if ($latestWaktu) {
-                    $isActive = Carbon::parse($latestWaktu)->isToday();
+                    // $isActive = Carbon::parse($latestWaktu)->isToday();
+                    $isActive = Carbon::parse($latestWaktu)->diffInMinutes(now());
                 }
 
-                $lg->status_logger = $isActive ? 'online' : 'offline';
+                $lg->status_logger = $isActive < 120 ? 'online' : 'offline';
                 $lg->latest_waktu  = $latestWaktu;
 
                 return $lg;

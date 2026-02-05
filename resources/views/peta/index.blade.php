@@ -365,6 +365,7 @@
                         <div class="sidebar-item mb-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md"
                             onclick="focusLogger({{ $point['lat'] }}, {{ $point['lng'] }}, '{{ $point['id_logger'] }}')">
 
+                            
                             <div class="flex items-start justify-between mb-2">
                                 <div>
                                     <div
@@ -643,6 +644,8 @@
                 const marker = L.marker([p.lat, p.lng]).addTo(map);
 
                 const statusText = p.status === 'online' ? 'Koneksi Terhubung' : 'Koneksi Terputus';
+                const warna = p.status === 'online' ? 'text-green-500' : 'text-red-500';
+                const dot = p.status === 'online' ? 'text-green-500' : 'text-red-500';
 
                 marker.bindPopup(`
                     <div class="popup-header">
@@ -665,8 +668,8 @@
                         </div>
                         <div class="popup-info-row">
                             <span class="popup-label">STATUS KONEKSI</span>
-                            <span class="status-online">
-                                <span class="status-dot"></span>
+                            <span class="${warna}">
+                                <span class="h-2 w-2 rounded-full ${dot}"></span>
                                 ${statusText}
                             </span>
                         </div>

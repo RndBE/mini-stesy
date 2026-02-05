@@ -3,7 +3,8 @@
     <div class="flex h-full flex-col">
         <div class="flex items-center justify-between px-6 py-5">
             <div class="flex items-center gap-3">
-                <img src="{{ asset('images/beacon-logo.png') }}" alt="Beacon Engineering" class="h-full w-auto sidebar-logo">
+                <img src="{{ asset('images/beacon-logo.png') }}" alt="Beacon Engineering"
+                    class="h-full w-auto sidebar-logo">
                 <div
                     class="ml-auto flex items-center justify-center rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-500 sidebar-icon">
                     ☐
@@ -14,37 +15,65 @@
         <nav class="px-3 sidebar-nav">
             <div class="space-y-1">
                 <a href="{{ route('beranda') }}"
-                    class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('beranda') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                    <span class="sidebar-text">Beranda</span>
-                    {{-- <span
-                        class="text-[11px] {{ request()->routeIs('beranda') ? 'text-white/70' : 'text-slate-400' }}">/beranda</span> --}}
+                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('beranda') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span class="sidebar-text truncate">Beranda</span>
                 </a>
 
                 <a href="{{ route('peta.lokasi') }}"
-                    class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('peta.lokasi') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                    <span class="sidebar-text">Peta Lokasi</span>
-                    {{-- <span
-                        class="text-[11px] {{ request()->routeIs('peta.lokasi') ? 'text-white/70' : 'text-slate-400' }}">/peta</span> --}}
+                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('peta.lokasi') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                    <span class="sidebar-text truncate">Peta Lokasi</span>
                 </a>
 
-                <a href="#"
-                    class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
-                    <span class="sidebar-text">Realtime Monitoring</span>
+                <a href="{{ route('realtime.index') }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('realtime.index') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+                    </svg>
+                    <span class="sidebar-text truncate">Realtime Monitoring</span>
                 </a>
 
-                <a href="#"
-                    class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
-                    <span class="sidebar-text">Data Perangkat</span>
+                <a href="{{ route('device.data') }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('device.data') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="sidebar-text truncate">Data Perangkat</span>
                 </a>
 
                 <a href="{{ route('device.index') }}"
-                    class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('device.index') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                    <span class="sidebar-text">Pengaturan Device</span>
+                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('device.index') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span class="sidebar-text truncate">Pengaturan Device</span>
                 </a>
 
                 <a href="#"
-                    class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
-                    <span class="sidebar-text">Unduh Aplikasi</span>
+                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    <span class="sidebar-text truncate">Unduh Aplikasi</span>
                 </a>
             </div>
         </nav>
@@ -53,68 +82,106 @@
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
-                    class="w-full rounded-xl px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100">
-                    <span class="sidebar-text">Logout</span>
+                    class="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span class="sidebar-text truncate">Logout</span>
                 </button>
             </form>
 
-            <div class="mt-4 px-3 text-[11px] text-slate-400 sidebar-footer">© Beacon Engineering {{ now()->year }}</div>
+            <div class="mt-4 px-3 text-[11px] text-slate-400 sidebar-footer">© Beacon Engineering {{ now()->year }}
+            </div>
         </div>
     </div>
 </aside>
 
 <!-- Toggle Button (Fixed position, always visible) -->
 <button onclick="toggleMainSidebar()" id="sidebarToggleBtn"
-    class="fixed bottom-5 left-64 z-50 flex h-10 w-10 items-center justify-center rounded-r-lg bg-slate-900 text-white hover:bg-slate-800 transition-all duration-300">
+    class="fixed bottom-5 left-64 z-50 flex h-10 w-10 items-center justify-center rounded-r-lg bg-slate-300 text-white hover:bg-slate-200 transition-all duration-300">
     <svg id="toggleIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
     </svg>
 </button>
 
 <style>
-    #mainSidebar.collapsed {
-        transform: translateX(-100%);
-    }
 
-    #mainSidebar.collapsed ~ #sidebarToggleBtn {
-        left: 0 !important;
-    }
+/* Mobile responsive */
+@media (max-width: 768px) {
+#mainSidebar {
+transform: translateX(-100%);
+width: 16rem; /* Restore full width on mobile when open */
+}
 
-    #mainSidebar:not(.collapsed) ~ #sidebarToggleBtn {
-        left: 16rem;
-    }
+#mainSidebar.collapsed {
+transform: translateX(-100%);
+width: 16rem;
+}
 
-    /* Mobile responsive */
-    @media (max-width: 768px) {
-        #mainSidebar {
-            transform: translateX(-100%);
-        }
+#mainSidebar:not(.collapsed) {
+transform: translateX(0);
+z-index: 1000;
+}
 
-        #mainSidebar:not(.collapsed) {
-            transform: translateX(0);
-            z-index: 1000;
-        }
+#sidebarToggleBtn {
+left: 0 !important;
+}
 
-        #sidebarToggleBtn {
-            left: 0 !important;
-        }
+#mainSidebar:not(.collapsed) ~ #sidebarToggleBtn {
+left: 16rem !important;
+}
 
-        #mainSidebar:not(.collapsed) ~ #sidebarToggleBtn {
-            left: 16rem !important;
-        }
+/* Overlay when sidebar is open on mobile */
+#mainSidebar:not(.collapsed)::before {
+content: '';
+position: fixed;
+top: 0;
+left: 16rem;
+right: 0;
+bottom: 0;
+background: rgba(0, 0, 0, 0.5);
+z-index: -1;
+}
+}
 
-        /* Overlay when sidebar is open on mobile */
-        #mainSidebar:not(.collapsed)::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 16rem;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: -1;
-        }
-    }
+/* Desktop styles for collapsed state */
+@media (min-width: 769px) {
+#mainSidebar.collapsed {
+width: 5rem; /* Mini sidebar width */
+transform: none;
+}
+
+#mainSidebar.collapsed .sidebar-text,
+#mainSidebar.collapsed .sidebar-logo,
+#mainSidebar.collapsed .sidebar-footer,
+#mainSidebar.collapsed .sidebar-icon {
+display: none; /* Hide text and other elements */
+}
+
+#mainSidebar.collapsed .sidebar-nav a {
+justify-content: center; /* Center icons */
+padding-left: 0;
+padding-right: 0;
+}
+
+#mainSidebar.collapsed .sidebar-nav a span.text-\[11px\] {
+display: none;
+}
+
+#mainSidebar.collapsed ~ #sidebarToggleBtn {
+left: 5rem !important; /* Adjust toggle button position */
+}
+
+/* Center brand icon if needed or hide header content strictly */
+#mainSidebar.collapsed .px-6.py-5 {
+justify-content: center;
+padding: 1.25rem 0;
+}
+
+/* Show a small logo or icon when collapsed if available, else standard logo hidden */
+}
 </style>
 
 <script>
@@ -127,14 +194,16 @@
         sidebar.classList.toggle('collapsed');
 
         if (sidebar.classList.contains('collapsed')) {
-            // Sidebar collapsed - show open icon (pointing right)
-            icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />';
+            // Sidebar collapsed
+            icon.innerHTML =
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />';
             if (mainContent && !isMobile) {
-                mainContent.style.marginLeft = '0';
+                mainContent.style.marginLeft = '5rem'; // Match mini width
             }
         } else {
-            // Sidebar expanded - show close icon (pointing left)
-            icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />';
+            // Sidebar expanded
+            icon.innerHTML =
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />';
             if (mainContent && !isMobile) {
                 mainContent.style.marginLeft = '16rem';
             }
@@ -149,10 +218,11 @@
         const isMobile = window.innerWidth <= 768;
         const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
 
-        // On mobile, always start collapsed
+        const sidebar = document.getElementById('mainSidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        // On mobile, always start collapsed (hidden)
         if (isMobile) {
-            const sidebar = document.getElementById('mainSidebar');
-            const mainContent = document.getElementById('mainContent');
             if (sidebar && !sidebar.classList.contains('collapsed')) {
                 sidebar.classList.add('collapsed');
             }
@@ -160,7 +230,13 @@
                 mainContent.style.marginLeft = '0';
             }
         } else if (isCollapsed) {
-            toggleMainSidebar();
+            // Desktop and saved as collapsed
+            if (sidebar) sidebar.classList.add('collapsed');
+            // Manually set icon and margin here to sync
+            const icon = document.getElementById('toggleIcon');
+            if (icon) icon.innerHTML =
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />';
+            if (mainContent) mainContent.style.marginLeft = '5rem';
         }
     });
 
@@ -172,8 +248,12 @@
 
         if (isMobile && mainContent) {
             mainContent.style.marginLeft = '0';
-        } else if (!isMobile && mainContent && !sidebar.classList.contains('collapsed')) {
-            mainContent.style.marginLeft = '16rem';
+        } else if (!isMobile && mainContent) {
+            if (sidebar.classList.contains('collapsed')) {
+                mainContent.style.marginLeft = '5rem';
+            } else {
+                mainContent.style.marginLeft = '16rem';
+            }
         }
     });
 </script>
