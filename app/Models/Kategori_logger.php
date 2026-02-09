@@ -25,4 +25,9 @@ class Kategori_logger extends Model
     {
         return $this->hasMany(t_Logger::class, 'id_katlogger', 'id_katlogger');
     }
+
+    public function thresholds()
+    {
+        return $this->hasMany(KlasifikasiThreshold::class, 'id_kategori', 'id_katlogger');
+    }
 }

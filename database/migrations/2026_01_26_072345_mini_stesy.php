@@ -141,20 +141,6 @@ return new class extends Migration
             $table->foreign('id_kategori', 'fk_filter_kategori')->references('id_katlogger')->on('kategori_logger')->cascadeOnUpdate()->cascadeOnDelete();
         });
 
-        Schema::create('klasifikasi_hujan', function (Blueprint $table) {
-            $table->charset = 'utf8';
-            $table->collation = 'utf8_general_ci';
-
-            $table->increments('id_klasifikasi');
-            $table->string('waktuper', 10);
-            $table->integer('hijau');
-            $table->string('biru', 5);
-            $table->integer('biru_tua');
-            $table->integer('kuning');
-            $table->integer('oranye');
-            $table->integer('merah');
-        });
-
         Schema::create('t_logger', function (Blueprint $table) {
             $table->charset = 'utf8';
             $table->collation = 'utf8_general_ci';
@@ -178,6 +164,26 @@ return new class extends Migration
             $table->foreign('user_id', 'fk_logger_user')->references('id_user')->on('t_user')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('idlokasi', 'fk_logger_lokasi')->references('idlokasi')->on('t_lokasi')->cascadeOnUpdate()->nullOnDelete();
             $table->foreign('id_katlogger', 'fk_logger_kat')->references('id_katlogger')->on('kategori_logger')->cascadeOnUpdate()->nullOnDelete();
+        });
+
+        Schema::create('klasifikasi_hujan', function (Blueprint $table) {
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_general_ci';
+
+            $table->increments('id_klasifikasi');
+            $table->string('logger_id', 15);
+            $table->string('waktu', 10);
+            $table->string('debit_air',255);
+            $table->string('intensitas', 255);
+            // $table->integer('hijau');
+            // $table->string('biru', 5);
+            // $table->integer('biru_tua');
+            // $table->integer('kuning');
+            // $table->integer('oranye');
+            // $table->integer('merah');
+
+            $table->index('logger_id', 'idx_klasifikasi_hujan_logger');
+            $table->foreign('logger_id', 'fk_klasifikasi_hujan_logger')->references('id_logger')->on('t_logger')->cascadeOnUpdate()->cascadeOnDelete();
         });
 
         Schema::create('parameter_sensor', function (Blueprint $table) {
@@ -372,8 +378,8 @@ return new class extends Migration
         Schema::dropIfExists('jiat_data');
         Schema::dropIfExists('t_informasi');
         Schema::dropIfExists('parameter_sensor');
-        Schema::dropIfExists('t_logger');
         Schema::dropIfExists('klasifikasi_hujan');
+        Schema::dropIfExists('t_logger');
         Schema::dropIfExists('filter');
         Schema::dropIfExists('kat_view');
         Schema::dropIfExists('kategori_logger');

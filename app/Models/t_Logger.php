@@ -93,4 +93,9 @@ class t_Logger extends Model
     {
         return $this->hasMany(T_s19::class, 'id_logger', 'id_logger');
     }
+
+    public function klasifikasiHujan()
+    {
+        return $this->hasOne(Klasifikasi_hujan::class, 'logger_id', 'id_logger');
+    }
 }
