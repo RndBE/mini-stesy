@@ -20,9 +20,14 @@ class UserController extends Controller
         }
         $users = $query->get();
 
+        $roles = Role::query()->orderBy('role_name')->get();
+        $instansi = Instansi::query()->orderBy('nama')->get();
+
         return view('users.index', [
             'title' => 'User',
             'users' => $users,
+            'roles' => $roles,
+            'instansi' => $instansi,
         ]);
     }
 
@@ -89,25 +94,33 @@ class UserController extends Controller
             'logo_mobile' => $logoMobilePath,
         ]);
 
+        // Return JSON for AJAX
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User berhasil ditambahkan.',
+            ]);
+        }
+
         return redirect()->route('users.index')
             ->with('success', 'User berhasil ditambahkan.');
     }
 
     public function edit(t_User $user)
     {
+        // Redirect to index for modal-based editing
+        return redirect()->route('users.index');
+    }
+
+    public function show(t_User $user)
+    {
         $currentUser = auth()->user();
         if ($currentUser && $currentUser->level_user !== 'superadmin' && $user->instansi_id !== $currentUser->instansi_id) {
             abort(403);
         }
-        $roles = Role::query()->orderBy('role_name')->get();
-        $instansi = Instansi::query()->orderBy('nama')->get();
 
-        return view('users.edit', [
-            'title' => 'Edit User',
+        return response()->json([
             'user' => $user,
-            'roles' => $roles,
-            'instansi' => $instansi,
-            'currentUser' => $currentUser,
         ]);
     }
 
@@ -178,6 +191,14 @@ class UserController extends Controller
 
         $user->update($payload);
 
+        // Return JSON for AJAX
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User berhasil diperbarui.',
+            ]);
+        }
+
         return redirect()->route('users.index')
             ->with('success', 'User berhasil diperbarui.');
     }
@@ -189,6 +210,14 @@ class UserController extends Controller
             abort(403);
         }
         $user->delete();
+
+        // Return JSON for AJAX
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User berhasil dihapus.',
+            ]);
+        }
 
         return redirect()->route('users.index')
             ->with('success', 'User berhasil dihapus.');

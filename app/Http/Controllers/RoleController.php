@@ -15,9 +15,12 @@ class RoleController extends Controller
             ->orderBy('role_name')
             ->get();
 
+        $permissions = Permission::query()->orderBy('permission_name')->get();
+
         return view('rbac.roles.index', [
             'title' => 'Roles',
             'roles' => $roles,
+            'permissions' => $permissions,
         ]);
     }
 
@@ -25,8 +28,14 @@ class RoleController extends Controller
     {
         $permissions = Permission::query()->orderBy('permission_name')->get();
 
-        return view('rbac.roles.create', [
-            'title' => 'Tambah Role',
+        // Return JSON for AJAX or view for direct access
+        if (request()->wantsJson()) {
+            return response()->json(['permissions' => $permissions]);
+        }
+
+        return view('rbac.roles.index', [
+            'title' => 'Roles',
+            'roles' => Role::withCount('permissions')->orderBy('role_name')->get(),
             'permissions' => $permissions,
         ]);
     }
@@ -45,21 +54,37 @@ class RoleController extends Controller
 
         $role->permissions()->sync($validated['permissions'] ?? []);
 
+        // Return JSON for AJAX
+        if ($request->wantsJson() || $request->ajax()) {
+            $role->load('permissions');
+            return response()->json([
+                'success' => true,
+                'message' => 'Role berhasil ditambahkan.',
+                'role' => $role,
+            ]);
+        }
+
         return redirect()->route('roles.index')
             ->with('success', 'Role berhasil ditambahkan.');
     }
 
-    public function edit(Role $role)
+    public function show(Role $role)
     {
+        $role->load('permissions');
         $permissions = Permission::query()->orderBy('permission_name')->get();
-        $selected = $role->permissions()->pluck('permissions.id')->all();
+        $selected = $role->permissions->pluck('id')->all();
 
-        return view('rbac.roles.edit', [
-            'title' => 'Edit Role',
+        return response()->json([
             'role' => $role,
             'permissions' => $permissions,
             'selected' => $selected,
         ]);
+    }
+
+    public function edit(Role $role)
+    {
+        // Redirect to index for modal-based editing
+        return redirect()->route('roles.index');
     }
 
     public function update(Request $request, Role $role)
@@ -76,6 +101,16 @@ class RoleController extends Controller
 
         $role->permissions()->sync($validated['permissions'] ?? []);
 
+        // Return JSON for AJAX
+        if ($request->wantsJson() || $request->ajax()) {
+            $role->load('permissions');
+            return response()->json([
+                'success' => true,
+                'message' => 'Role berhasil diperbarui.',
+                'role' => $role,
+            ]);
+        }
+
         return redirect()->route('roles.index')
             ->with('success', 'Role berhasil diperbarui.');
     }
@@ -84,6 +119,14 @@ class RoleController extends Controller
     {
         $role->permissions()->detach();
         $role->delete();
+
+        // Return JSON for AJAX
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Role berhasil dihapus.',
+            ]);
+        }
 
         return redirect()->route('roles.index')
             ->with('success', 'Role berhasil dihapus.');

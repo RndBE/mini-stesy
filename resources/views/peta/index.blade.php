@@ -54,14 +54,12 @@
         .settings-modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
             z-index: 2000;
             align-items: center;
             justify-content: center;
+            padding: 16px;
         }
 
         .settings-modal-overlay.show {
@@ -69,13 +67,17 @@
         }
 
         .settings-modal {
-            background: white;
+            background: #fff;
             border-radius: 12px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+            width: min(1100px, 96vw);
+            height: min(90vh, 900px);
+
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+
+            display: flex;
+            flex-direction: column;
         }
 
         .modal-header {
@@ -104,6 +106,28 @@
 
         .modal-body {
             padding: 24px;
+            overflow: auto;
+            flex: 1;
+        }
+
+        .modal-body.modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 16px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .modal-body.modal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
         }
 
         .modal-section {
@@ -357,15 +381,30 @@
             <div class="flex w-80 flex-col border-l border-slate-200 bg-white">
                 <div class="border-b border-slate-200 p-4">
                     <h3 class="font-semibold text-slate-900">Daftar Logger</h3>
-                    <p class="text-xs text-slate-500">{{ count($points) }} logger terdeteksi</p>
+                    <p class="text-xs text-slate-500" id="loggerCount">{{ count($points) }} logger terdeteksi</p>
+                </div>
+
+                {{-- Search Input --}}
+                <div class="p-4 border-b border-slate-200">
+                    <div class="relative">
+                        <input type="text" id="searchLogger" placeholder="Cari logger..."
+                            class="w-full px-4 py-2 pl-10 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <svg class="absolute left-3 top-2.5 h-5 w-5 text-slate-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
                 </div>
 
                 <div class="flex-1 overflow-y-auto sidebar-scroll p-2" id="loggerList">
                     @forelse ($points as $point)
                         <div class="sidebar-item mb-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md"
+                            data-kategori="{{ $point['kategori'] }}" data-status="{{ $point['status'] }}"
+                            data-arr-state="{{ $point['arr_state'] ?? '' }}"
+                            data-logger-name="{{ strtolower($point['nama_logger']) }}"
+                            data-logger-id="{{ strtolower($point['id_logger']) }}"
                             onclick="focusLogger({{ $point['lat'] }}, {{ $point['lng'] }}, '{{ $point['id_logger'] }}')">
-
-
                             <div class="flex items-start justify-between mb-2">
                                 <div>
                                     <div
@@ -382,7 +421,7 @@
                                     </div>
                                 </div>
                                 <div class="text-xs text-slate-400">
-                                    {{ substr($point['id_logger'], -4) }}
+                                    {{ substr($point['id_logger'], -5) }}
                                 </div>
                             </div>
                             <div class="text-center my-3">
@@ -440,50 +479,65 @@
                 <div>
                     <h3 class="font-semibold text-sm mb-4">FILTER PETA</h3>
 
-                    <!-- ARR -->
+                    {{-- ARR --}}
+                    @php
+                        $arrThresholds = $thresholds['ARR'] ?? collect();
+                    @endphp
+                    @if($arrThresholds->isNotEmpty())
                     <div class="border rounded-xl p-4 mb-4">
                         <label class="flex items-center gap-2 font-semibold mb-3">
-                            <input type="checkbox" checked class="accent-indigo-600"> ARR (Automatic Rain Recorder)
+                            <input type="checkbox" id="filterARR" checked class="accent-indigo-600"> ARR (Automatic Rain
+                            Recorder)
                         </label>
 
                         <div class="grid grid-cols-2 gap-2 text-sm">
-                            <label class="flex items-center gap-2"><input type="checkbox" checked> <span
-                                    class="h-3 w-3 rounded-full bg-green-500"></span> Tidak Hujan (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox" checked> <span
-                                    class="h-3 w-3 rounded-full bg-sky-300"></span> Hujan Sangat Ringan (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox" checked> <span
-                                    class="h-3 w-3 rounded-full bg-blue-500"></span> Hujan Ringan (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox" checked> <span
-                                    class="h-3 w-3 rounded-full bg-yellow-400"></span> Hujan Sedang (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox" checked> <span
-                                    class="h-3 w-3 rounded-full bg-orange-500"></span> Hujan Lebat (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox" checked> <span
-                                    class="h-3 w-3 rounded-full bg-red-500"></span> Hujan Sangat Lebat (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox" checked> <span
-                                    class="h-3 w-3 rounded-full bg-amber-700"></span> Perbaikan (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox" checked> <span
-                                    class="h-3 w-3 rounded-full bg-black"></span> Koneksi Terputus (0)</label>
+                            @foreach ($arrThresholds->sortBy('sort_order') as $threshold)
+                                @php
+                                    $count = collect($points)
+                                        ->where('kategori', 'ARR')
+                                        ->where('arr_state', $threshold->state_key)
+                                        ->count();
+                                @endphp
+                                <label class="flex items-center gap-2">
+                                    <input type="checkbox" id="filterARR_{{ $threshold->state_key }}" checked>
+                                    <span class="h-3 w-3 rounded-full" style="background-color: {{ $threshold->color_hex }}"></span>
+                                    {{ $threshold->state_label }} ({{ $count }})
+                                </label>
+                            @endforeach
                         </div>
+
                     </div>
+                    @endif
 
                     <!-- AWLR -->
+                    @php
+                        $awlrOnline = collect($points)->where('kategori', 'AWLR')->where('status', 'online')->count();
+                        $awlrOffline = collect($points)->where('kategori', 'AWLR')->where('status', 'offline')->count();
+                    @endphp
                     <div class="border rounded-xl p-4 mb-4">
                         <label class="flex items-center gap-2 font-semibold mb-3">
-                            <input type="checkbox" checked class="accent-indigo-600"> AWLR (Automatic Water Level Recorder)
+                            <input type="checkbox" id="filterAWLR" checked class="accent-indigo-600"> AWLR (Automatic
+                            Water
+                            Level Recorder)
                         </label>
 
                         <div class="flex gap-6 text-sm">
-                            <label class="flex items-center gap-2"><input type="checkbox" checked> <span
-                                    class="h-3 w-3 rounded-full bg-green-500"></span> Koneksi Terhubung (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox" checked> <span
-                                    class="h-3 w-3 rounded-full bg-black"></span> Koneksi Terputus (0)</label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWLR_online" checked> <span
+                                    class="h-3 w-3 rounded-full bg-green-500"></span> Koneksi Terhubung
+                                ({{ $awlrOnline }})</label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWLR_offline" checked> <span
+                                    class="h-3 w-3 rounded-full bg-black"></span> Koneksi Terputus
+                                ({{ $awlrOffline }})</label>
                         </div>
                     </div>
 
                     <!-- AWR -->
                     <div class="border rounded-xl p-4">
                         <label class="flex items-center gap-2 font-semibold mb-3">
-                            <input type="checkbox" class="accent-indigo-600"> AWR (Automatic Weather Recorder)
+                            <input type="checkbox" id="filterAWR" class="accent-indigo-600"> AWR (Automatic Weather
+                            Recorder)
                         </label>
 
                         <div class="grid grid-cols-2 gap-2 text-sm">
@@ -561,9 +615,11 @@
 
 @push('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script>
         const points = @json($points);
         const markers = {};
+        const markerStore = {};
 
         const fallback = [-7.79558, 110.36949];
         const first = points.length ? [points[0].lat, points[0].lng] : fallback;
@@ -590,110 +646,311 @@
             subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
         });
 
-        // Layer references
         const layers = {
-            'normal': googleStreets,
-            'hybrid': googleHybrid,
-            'satelit': googleSat,
-            'terrain': googleTerrain
+            normal: googleStreets,
+            hybrid: googleHybrid,
+            satelit: googleSat,
+            terrain: googleTerrain
         };
-
         let currentLayer = 'normal';
 
-        // Modal control
         const settingsBtn = document.getElementById('mapSettingsBtn');
         const settingsModal = document.getElementById('settingsModal');
 
-        settingsBtn.addEventListener('click', function() {
-            settingsModal.classList.add('show');
-        });
+        if (settingsBtn && settingsModal) {
+            settingsBtn.addEventListener('click', () => settingsModal.classList.add('show'));
+            settingsModal.addEventListener('click', e => {
+                if (e.target === settingsModal) closeSettingsModal();
+            });
+        }
 
-        // Close modal when clicking overlay
-        settingsModal.addEventListener('click', function(e) {
-            if (e.target === settingsModal) {
-                closeSettingsModal();
-            }
-        });
-
-        // Close modal function
         window.closeSettingsModal = function() {
-            settingsModal.classList.remove('show');
+            settingsModal?.classList.remove('show');
         };
 
-        // Apply settings function
         window.applySettings = function() {
-            const selectedLayer = document.querySelector('input[name="mapType"]:checked').value;
-
-            // Remove current layer
-            if (layers[currentLayer]) {
-                map.removeLayer(layers[currentLayer]);
-            }
-
-            // Add new layer
+            const selectedLayer = document.querySelector('input[name="mapType"]:checked')?.value || 'normal';
+            if (layers[currentLayer]) map.removeLayer(layers[currentLayer]);
             if (layers[selectedLayer]) {
                 layers[selectedLayer].addTo(map);
                 currentLayer = selectedLayer;
             }
-
-            // Close modal
             closeSettingsModal();
         };
 
+        const groupARR = L.layerGroup().addTo(map);
+        const groupAWLR = L.layerGroup().addTo(map);
+        const groupAWR = L.layerGroup().addTo(map);
+
+        function getGroupByKategori(kat) {
+            const k = String(kat || '').toUpperCase();
+            if (k === 'ARR') return groupARR;
+            if (k === 'AWLR') return groupAWLR;
+            if (k === 'AWR') return groupAWR;
+            return null;
+        }
+
+        function awlrIcon(status) {
+            const fill = (String(status).toLowerCase() === 'online') ? '#16a34a' : '#000000';
+            const base = '/icons/awlr/';
+            const map = {
+                'online': 'online.svg',
+                'offline': 'offline.svg'
+            };
+            const file = map[String(status).toLowerCase()] || map['offline'];
+
+            return L.divIcon({
+                className: '',
+                html: `<img src="${base}${file}" width="52" height="72" />`,
+                iconSize: [52, 72],
+                iconAnchor: [26, 70],
+                popupAnchor: [0, -62]
+            });
+        }
+
+        function arrIcon(arrState) {
+            const k = String(arrState || '').toLowerCase();
+            const base = '/icons/arr/';
+
+            const map = {
+                'tidak_hujan': 'tidak_hujan.svg',
+                'koneksi_terputus': 'koneksi_terputus.svg',
+                'perbaikan': 'perbaikan.svg',
+                'hujan_sangat_lebat': 'hujan_sangat_lebat.svg',
+                'hujan_lebat': 'hujan_lebat.svg',
+                'hujan_sedang': 'hujan_sedang.svg',
+                'hujan_ringan': 'hujan_ringan.svg',
+                'hujan_sangat_ringan': 'hujan_sangat_ringan.svg'
+            };
+
+            const file = map[k] || map['tidak_hujan'];
+
+            return L.icon({
+                iconUrl: base + file,
+                iconSize: [44, 54],
+                iconAnchor: [22, 54],
+                popupAnchor: [0, -54]
+            });
+        }
+
+        function arrLabel(state) {
+            const k = String(state || '').toLowerCase();
+            const map = {
+                'tidak_hujan': 'Tidak Hujan',
+                'koneksi_terputus': 'Koneksi Terputus',
+                'perbaikan': 'Perbaikan',
+                'hujan_sangat_ringan': 'Hujan Sangat Ringan',
+                'hujan_ringan': 'Hujan Ringan',
+                'hujan_sedang': 'Hujan Sedang',
+                'hujan_lebat': 'Hujan Lebat',
+                'hujan_sangat_lebat': 'Hujan Sangat Lebat'
+            };
+            return map[k] || 'Tidak Hujan';
+        }
+
         points.forEach(p => {
-            if (p.lat && p.lng) {
-                const marker = L.marker([p.lat, p.lng]).addTo(map);
+            if (!p.lat || !p.lng) return;
 
-                const statusText = p.status === 'online' ? 'Koneksi Terhubung' : 'Koneksi Terputus';
-                const warna = p.status === 'online' ? 'text-green-500' : 'text-red-500';
-                const dot = p.status === 'online' ? 'text-green-500' : 'text-red-500';
+            const marker = L.marker([p.lat, p.lng]);
+            const kategori = String(p.kategori || '').toUpperCase();
+            const status = String(p.status || '').toLowerCase();
 
-                marker.bindPopup(`
-                    <div class="popup-header">
-                        <div class="popup-title">${p.nama_logger}</div>
-                        <div class="popup-close" onclick="document.querySelector('.leaflet-popup-close-button').click()">×</div>
+            const statusText = p.status === 'online' ? 'Koneksi Terhubung' : 'Koneksi Terputus';
+            const warna = p.status === 'online' ? 'text-green-500' : 'text-red-500';
+            const dot = p.status === 'online' ? 'bg-green-500' : 'bg-red-500';
+
+            const arrMonitoringRow = (kategori === 'ARR') ?
+                `
+                    <div class="popup-info-row">
+                        <span class="popup-label">STATUS PEMANTAUAN</span>
+                        <span class="popup-value">${arrLabel(p.arr_state)}</span>
                     </div>
+                ` :
+                '';
 
-                    <div class="popup-body">
-                        <div class="popup-info-row">
-                            <span class="popup-label">LATITUDE</span>
-                            <span class="popup-value">${p.lat}</span>
-                        </div>
-                        <div class="popup-info-row">
-                            <span class="popup-label">LONGITUDE</span>
-                            <span class="popup-value">${p.lng}</span>
-                        </div>
-                        <div class="popup-info-row">
-                            <span class="popup-label">KEDALAMAN SUMUR</span>
-                            <span class="popup-value">${p.kedalaman_sumur ? p.kedalaman_sumur + ' m' : '-'}</span>
-                        </div>
-                        <div class="popup-info-row">
-                            <span class="popup-label">STATUS KONEKSI</span>
-                            <span class="${warna}">
-                                <span class="h-2 w-2 rounded-full ${dot}"></span>
-                                ${statusText}
-                            </span>
-                        </div>
-                        <div class="popup-info-row">
-                            <span class="popup-label">STATUS SD CARD</span>
-                            <span class="popup-value">OK</span>
-                        </div>
-                    </div>
+            marker.bindPopup(`
+                <div class="popup-header">
+                <div class="popup-title">${p.nama_logger}</div>
+                <div class="popup-close" onclick="document.querySelector('.leaflet-popup-close-button')?.click()">×</div>
+                </div>
 
-                    <div class="popup-buttons">
-                        <button class="popup-btn popup-btn-outline" onclick="window.open('https://www.google.com/maps?q=${p.lat},${p.lng}', '_blank')">
-                            <span>✈️</span> Menuju Lokasi
-                        </button>
-                        <button class="popup-btn popup-btn-solid" onclick="window.location.href='/analisa/${p.id_logger}'">
-                            <span>📊</span> Analisa Data
-                        </button>
-                    </div>
-                `, {
-                    maxWidth: 320,
-                    className: 'custom-popup'
-                });
-                markers[p.id_logger] = marker;
+                <div class="popup-body">
+                <div class="popup-info-row">
+                    <span class="popup-label">LATITUDE</span>
+                    <span class="popup-value">${p.lat}</span>
+                </div>
+                <div class="popup-info-row">
+                    <span class="popup-label">LONGITUDE</span>
+                    <span class="popup-value">${p.lng}</span>
+                </div>
+                <div class="popup-info-row">
+                    <span class="popup-label">KEDALAMAN SUMUR</span>
+                    <span class="popup-value">${p.kedalaman_sumur ? p.kedalaman_sumur + ' m' : '-'}</span>
+                </div>
+                <div class="popup-info-row">
+                    <span class="popup-label">STATUS KONEKSI</span>
+                    <span class="${warna}" style="display:inline-flex;align-items:center;gap:6px;">
+                    <span class="h-2 w-2 rounded-full ${dot}"></span>
+                    ${statusText}
+                    </span>
+                </div>
+
+                ${arrMonitoringRow}
+
+                <div class="popup-info-row">
+                    <span class="popup-label">STATUS SD CARD</span>
+                    <span class="popup-value">OK</span>
+                </div>
+                </div>
+
+                <div class="popup-buttons">
+                <button class="popup-btn popup-btn-outline" onclick="window.open('https://www.google.com/maps?q=${p.lat},${p.lng}', '_blank')">
+                    <span>✈️</span> Menuju Lokasi
+                </button>
+                <button class="popup-btn popup-btn-solid" onclick="window.location.href='/analisa/${p.id_logger}'">
+                    <span>📊</span> Analisa Data
+                </button>
+                </div>
+            `, {
+                maxWidth: 320,
+                className: 'custom-popup'
+            });
+
+            const g = getGroupByKategori(p.kategori);
+            if (g) g.addLayer(marker);
+            else marker.addTo(map);
+
+            markers[p.id_logger] = marker;
+            markerStore[p.id_logger] = {
+                marker,
+                kategori,
+                status,
+                arr_state: String(p.arr_state || '').toLowerCase()
+            };
+
+            // if (String(p.kategori || '').toUpperCase() === 'AWLR') {
+            //     markers[p.id_logger].setIcon(awlrIcon(p.status));
+            // }
+            if (kategori === 'AWLR') {
+                marker.setIcon(awlrIcon(status));
+            }
+
+            if (kategori === 'ARR') {
+                marker.setIcon(arrIcon(p.arr_state));
             }
         });
+
+        function applyKategoriFilter() {
+            const showARR = document.getElementById('filterARR')?.checked ?? true;
+            const showAWLR = document.getElementById('filterAWLR')?.checked ?? true;
+            const showAWR = document.getElementById('filterAWR')?.checked ?? true;
+
+            const showAWLRonline = document.getElementById('filterAWLR_online')?.checked ?? true;
+            const showAWLRoffline = document.getElementById('filterAWLR_offline')?.checked ?? true;
+
+            const arrStates = [
+                'tidak_hujan',
+                'hujan_sangat_ringan',
+                'hujan_ringan',
+                'hujan_sedang',
+                'hujan_lebat',
+                'hujan_sangat_lebat',
+                'perbaikan',
+                'koneksi_terputus'
+            ];
+
+            const showArrStates = {};
+            arrStates.forEach(st => {
+                const cb = document.getElementById(`filterARR_${st}`);
+                showArrStates[st] = cb ? cb.checked : true;
+            });
+
+            Object.values(markerStore).forEach(o => {
+                if (!o?.marker) return;
+
+                let visible = true;
+
+                if (o.kategori === 'ARR') {
+                    if (!showARR) visible = false;
+                    else {
+                        const st = String(o.arr_state || 'tidak_hujan').toLowerCase();
+                        visible = showArrStates[st] ?? true;
+                    }
+                } else if (o.kategori === 'AWR') {
+                    visible = showAWR;
+                } else if (o.kategori === 'AWLR') {
+                    if (!showAWLR) visible = false;
+                    else if (String(o.status || '').toLowerCase() === 'online') visible = showAWLRonline;
+                    else if (String(o.status || '').toLowerCase() === 'offline') visible = showAWLRoffline;
+                    else visible = true;
+                }
+
+                if (visible) {
+                    if (!map.hasLayer(o.marker)) o.marker.addTo(map);
+                } else {
+                    if (map.hasLayer(o.marker)) map.removeLayer(o.marker);
+                }
+            });
+
+            document.querySelectorAll('.sidebar-item').forEach(el => {
+                const k = String(el.dataset.kategori || '').toUpperCase();
+                const s = String(el.dataset.status || '').toLowerCase();
+                const st = String(el.dataset.arrState || el.dataset.arr_state || '').toLowerCase();
+
+                let visible = true;
+
+                if (k === 'ARR') {
+                    if (!showARR) visible = false;
+                    else visible = showArrStates[st || 'tidak_hujan'] ?? true;
+                } else if (k === 'AWR') {
+                    visible = showAWR;
+                } else if (k === 'AWLR') {
+                    if (!showAWLR) visible = false;
+                    else if (s === 'online') visible = showAWLRonline;
+                    else if (s === 'offline') visible = showAWLRoffline;
+                    else visible = true;
+                }
+
+                // Mark visibility state for search integration
+                el.setAttribute('data-filter-visible', visible ? 'true' : 'false');
+                el.style.display = visible ? '' : 'none';
+            });
+
+            // Update logger count
+            const visibleCount = Array.from(document.querySelectorAll('.sidebar-item')).filter(
+                item => item.style.display !== 'none'
+            ).length;
+            document.getElementById('loggerCount').textContent = `${visibleCount} logger terdeteksi`;
+
+            setTimeout(() => map.invalidateSize(), 0);
+        }
+
+        [
+            'filterARR',
+            'filterAWLR',
+            'filterAWR',
+            'filterAWLR_online',
+            'filterAWLR_offline',
+            'filterARR_tidak_hujan',
+            'filterARR_hujan_sangat_ringan',
+            'filterARR_hujan_ringan',
+            'filterARR_hujan_sedang',
+            'filterARR_hujan_lebat',
+            'filterARR_hujan_sangat_lebat',
+            'filterARR_perbaikan',
+            'filterARR_koneksi_terputus'
+        ].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', applyKategoriFilter);
+        });
+
+        applyKategoriFilter();
+
+
+        applyKategoriFilter();
+        setTimeout(() => map.invalidateSize(), 500);
+        window.addEventListener('resize', () => map.invalidateSize());
+
 
         window.focusLogger = function(lat, lng, id) {
             if (!lat || !lng) return;
@@ -704,12 +961,74 @@
             if (markers[id]) markers[id].openPopup();
         };
 
-        document.getElementById('searchLogger').addEventListener('keyup', function(e) {
-            const searchText = e.target.value.toLowerCase();
+        // Logger Search Functionality
+        const searchInput = document.getElementById('searchLogger');
+        const loggerCountEl = document.getElementById('loggerCount');
+        const totalLoggers = {{ count($points) }};
+
+        searchInput.addEventListener('input', function(e) {
+            const searchText = e.target.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            if (searchText === '') {
+                // Reset: re-apply category filters to restore proper display
+                applyKategoriFilter();
+                return; // Exit early, applyKategoriFilter already updates counter
+            }
+
             document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.style.display = item.innerText.toLowerCase().includes(searchText) ? 'flex' : 'none';
+                const loggerName = item.getAttribute('data-logger-name') || '';
+                const loggerId = item.getAttribute('data-logger-id') || '';
+
+                // Check if search text matches name or ID
+                const matchesSearch = loggerName.includes(searchText) || loggerId.includes(searchText);
+
+                // Check if item is currently visible (not hidden by filters)
+                const wasVisibleByFilter = item.getAttribute('data-filter-visible') !== 'false';
+
+                // Show only if matches search AND was visible by filter
+                if (matchesSearch && wasVisibleByFilter) {
+                    item.style.display = '';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
             });
+
+            // Update counter
+            loggerCountEl.textContent = `${visibleCount} dari ${totalLoggers} logger ditemukan`;
         });
+
+        // Update the applyKategoriFilter to reset search when filters change
+        const originalApplyFilter = applyKategoriFilter;
+        applyKategoriFilter = function() {
+            originalApplyFilter();
+
+            // Re-apply search filter after category filter
+            const searchText = searchInput.value.toLowerCase().trim();
+            if (searchText !== '') {
+                let visibleCount = 0;
+                document.querySelectorAll('.sidebar-item').forEach(item => {
+                    const loggerName = item.getAttribute('data-logger-name') || '';
+                    const loggerId = item.getAttribute('data-logger-id') || '';
+                    const matchesSearch = loggerName.includes(searchText) || loggerId.includes(searchText);
+
+                    if (!matchesSearch && item.style.display !== 'none') {
+                        item.style.display = 'none';
+                    }
+
+                    if (item.style.display !== 'none') {
+                        visibleCount++;
+                    }
+                });
+                loggerCountEl.textContent = `${visibleCount} dari ${totalLoggers} logger ditemukan`;
+            } else {
+                const visibleCount = Array.from(document.querySelectorAll('.sidebar-item')).filter(
+                    item => item.style.display !== 'none'
+                ).length;
+                loggerCountEl.textContent = `${visibleCount} logger terdeteksi`;
+            }
+        };
 
         setTimeout(() => map.invalidateSize(), 500);
         window.addEventListener('resize', () => map.invalidateSize());

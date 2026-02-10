@@ -33,18 +33,32 @@ class PermissionController extends Controller
             'permission_name' => 'required|string|max:100|unique:permissions,permission_name',
         ]);
 
-        Permission::create($validated);
+        $permission = Permission::create($validated);
+
+        // Return JSON for AJAX
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Permission berhasil ditambahkan.',
+                'permission' => $permission,
+            ]);
+        }
 
         return redirect()->route('permissions.index')
             ->with('success', 'Permission berhasil ditambahkan.');
     }
 
-    public function edit(Permission $permission)
+    public function show(Permission $permission)
     {
-        return view('rbac.permissions.edit', [
-            'title' => 'Edit Permission',
+        return response()->json([
             'permission' => $permission,
         ]);
+    }
+
+    public function edit(Permission $permission)
+    {
+        // Redirect to index for modal-based editing
+        return redirect()->route('permissions.index');
     }
 
     public function update(Request $request, Permission $permission)
@@ -55,6 +69,15 @@ class PermissionController extends Controller
 
         $permission->update($validated);
 
+        // Return JSON for AJAX
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Permission berhasil diperbarui.',
+                'permission' => $permission,
+            ]);
+        }
+
         return redirect()->route('permissions.index')
             ->with('success', 'Permission berhasil diperbarui.');
     }
@@ -63,6 +86,14 @@ class PermissionController extends Controller
     {
         $permission->roles()->detach();
         $permission->delete();
+
+        // Return JSON for AJAX
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Permission berhasil dihapus.',
+            ]);
+        }
 
         return redirect()->route('permissions.index')
             ->with('success', 'Permission berhasil dihapus.');
