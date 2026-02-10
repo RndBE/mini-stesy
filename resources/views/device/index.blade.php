@@ -32,7 +32,7 @@
         <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
-                    <thead class="bg-slate-100 text-xs font-semibold uppercase text-slate-700">
+                    <thead class="bg-neutral-200 text-xs font-semibold uppercase text-neutral-950">
                         <tr>
                             <th scope="col" class="px-6 py-4">No</th>
                             <th scope="col" class="px-6 py-4">ID Logger</th>

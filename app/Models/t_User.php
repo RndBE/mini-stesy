@@ -25,6 +25,7 @@ class t_User extends Authenticatable
         'latitude',
         'longitude',
         'longtitude',
+        'zoom',
         'logo',
         'logo_mobile'
     ];

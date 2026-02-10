@@ -69,7 +69,8 @@ class RealtimeController extends Controller
 
         $tableName = ((int)$device->sensor_count === 19) ? 't_s19_01' : 't_s16_01';
 
-        $start = Carbon::today();
+        // Get data from last 60 minutes
+        $start = now()->subMinutes(60);
         $end = now();
 
         try {

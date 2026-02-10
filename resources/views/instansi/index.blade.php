@@ -26,7 +26,7 @@
         <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
-                    <thead class="bg-slate-100 text-xs font-semibold uppercase text-slate-700">
+                    <thead class="bg-neutral-200 text-xs font-semibold uppercase text-neutral-950">
                         <tr>
                             <th scope="col" class="px-6 py-4">No</th>
                             <th scope="col" class="px-6 py-4">Nama</th>
@@ -50,18 +50,17 @@
                                 <td class="whitespace-nowrap px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
                                         <button @click="openEditModal({{ json_encode($row) }})"
-                                            class="inline-flex items-center rounded-md border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">
-                                            Edit
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 text-slate-950 hover:bg-slate-200 transition-colors" title="Edit">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
                                         </button>
-                                        <form action="{{ route('instansi.destroy', $row) }}" method="POST"
-                                            onsubmit="return confirm('Hapus instansi ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="inline-flex items-center rounded-md border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50">
-                                                Hapus
-                                            </button>
-                                        </form>
+                                        <button @click="openDeleteModal({{ $row->id }}, '{{ $row->nama }}')"
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-slate-950 hover:bg-red-200 transition-colors" title="Hapus">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -165,6 +164,59 @@
         </div>
 
 
+        {{-- Delete Confirmation Modal --}}
+        <div x-cloak x-show="showDeleteModal" class="fixed inset-0 z-50" role="dialog" aria-modal="true"
+            @keydown.escape.window="closeDeleteModal()">
+
+            <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-gray-500/75" @click="closeDeleteModal()"></div>
+
+            <div class="fixed inset-0 flex items-center justify-center p-4">
+                <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                    class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden" @click.stop>
+
+                    <div class="px-6 py-5 border-b border-slate-200">
+                        <div class="flex items-center gap-3">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">Konfirmasi Hapus</h3>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-4">
+                        <p class="text-sm text-slate-600">
+                            Apakah Anda yakin ingin menghapus instansi
+                            <span class="font-semibold text-slate-900" x-text="deleteData.name"></span>?
+                        </p>
+                        <p class="mt-2 text-sm text-red-600 font-medium">
+                            Tindakan ini tidak dapat dibatalkan.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
+                        <button type="button" @click="closeDeleteModal()"
+                            class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition-colors">
+                            Batal
+                        </button>
+                        <button type="button" @click="confirmDelete()"
+                            class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors">
+                            Hapus
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Edit Modal --}}
         <div x-cloak x-show="showEditModal" class="fixed inset-0 z-50" aria-labelledby="modal-title"
             role="dialog" aria-modal="true" @keydown.escape.window="closeEditModal()">
@@ -259,11 +311,16 @@
             return {
                 showCreateModal: false,
                 showEditModal: false,
+                showDeleteModal: false,
                 editData: {
                     id: null,
                     nama: '',
                     alamat: '',
                     telp: ''
+                },
+                deleteData: {
+                    id: null,
+                    name: ''
                 },
 
                 openCreateModal() {
@@ -292,6 +349,37 @@
                         alamat: '',
                         telp: ''
                     };
+                },
+
+                openDeleteModal(id, name) {
+                    this.deleteData = { id, name };
+                    this.showDeleteModal = true;
+                },
+
+                closeDeleteModal() {
+                    this.showDeleteModal = false;
+                    this.deleteData = { id: null, name: '' };
+                },
+
+                confirmDelete() {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/instansi/${this.deleteData.id}`;
+
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
+                    form.appendChild(csrfToken);
+
+                    const methodField = document.createElement('input');
+                    methodField.type = 'hidden';
+                    methodField.name = '_method';
+                    methodField.value = 'DELETE';
+                    form.appendChild(methodField);
+
+                    document.body.appendChild(form);
+                    form.submit();
                 }
             }
         }

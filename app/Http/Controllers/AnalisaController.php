@@ -109,6 +109,14 @@ class AnalisaController extends Controller
             if ($range === 'day') $displayDate = date('d F Y', strtotime($date));
             elseif ($range === 'month') $displayDate = date('F Y', strtotime($date));
             elseif ($range === 'year') $displayDate = date('Y', strtotime($date));
+            elseif ($range === 'custom') {
+                $dateRange = explode(',', $date);
+                if (count($dateRange) === 2) {
+                    $start = date('d F Y H:i', strtotime(trim($dateRange[0])));
+                    $end = date('d F Y H:i', strtotime(trim($dateRange[1])));
+                    $displayDate = "$start - $end";
+                }
+            }
 
             fputcsv($file, ['NAMA LOGGER', '', ': ', $loggerName]);
             fputcsv($file, ['PARAMETER', '', ': ', $paramName]);
@@ -203,6 +211,14 @@ class AnalisaController extends Controller
                 ->whereMonth($timeColumn, date('m', strtotime($date)));
         } elseif ($range === 'year') {
             $query->whereYear($timeColumn, date('Y', strtotime($date)));
+        } elseif ($range === 'custom') {
+            // Handle custom range: date comes as "startDateTime,endDateTime"
+            $dateRange = explode(',', $date);
+            if (count($dateRange) === 2) {
+                $startDateTime = trim($dateRange[0]);
+                $endDateTime = trim($dateRange[1]);
+                $query->whereBetween($timeColumn, [$startDateTime, $endDateTime]);
+            }
         }
 
         // Optimasi: Select hanya kolom yang dibutuhkan
@@ -293,6 +309,46 @@ class AnalisaController extends Controller
 
                     $tableData[] = [
                         'waktu'   => "Tanggal $i",
+                        'rerata'  => null,
+                        'minimum' => null,
+                        'maksimum' => null,
+                    ];
+                }
+            }
+
+        }
+        else if ($range === 'custom') { // CUSTOM RANGE
+
+            // For custom range, show data grouped by date (day)
+            $grouped = $data->groupBy(function ($item) use ($timeColumn) {
+                return date('Y-m-d', strtotime($item->{$timeColumn}));
+            });
+
+            foreach ($grouped as $dateKey => $dateData) {
+                $labels[] = date('d M Y', strtotime($dateKey));
+
+                if ($dateData->isNotEmpty()) {
+                    $avg = $dateData->avg($column);
+                    $min = $dateData->min($column);
+                    $max = $dateData->max($column);
+
+                    $values[] = round($avg, 2);
+                    $minValues[] = round($min, 2);
+                    $maxValues[] = round($max, 2);
+
+                    $tableData[] = [
+                        'waktu'   => date('d M Y', strtotime($dateKey)),
+                        'rerata'  => round($avg, 2),
+                        'minimum' => round($min, 2),
+                        'maksimum' => round($max, 2),
+                    ];
+                } else {
+                    $values[] = null;
+                    $minValues[] = null;
+                    $maxValues[] = null;
+
+                    $tableData[] = [
+                        'waktu'   => date('d M Y', strtotime($dateKey)),
                         'rerata'  => null,
                         'minimum' => null,
                         'maksimum' => null,
@@ -420,20 +476,8 @@ class AnalisaController extends Controller
             }
         }
 
-        // Calculate expected data count per day
-        $intervalMinutes = 5; // Default
-        if ($logger->jeda_notif) {
-            // Handle "00:05:00" format or integer minutes
-            if (str_contains($logger->jeda_notif, ':')) {
-                $parts = explode(':', $logger->jeda_notif);
-                $intervalMinutes = ($parts[0] * 60) + $parts[1] + ($parts[2] / 60);
-            } else {
-                $intervalMinutes = (int) $logger->jeda_notif;
-            }
-        }
-        if ($intervalMinutes <= 0) $intervalMinutes = 5;
-
-        $expectedPerDay = 1440 / $intervalMinutes;
+        // Expected complete data per day is always 1440 (1 record per minute)
+        $expectedPerDay = 1440;
 
         // Get data for last 30 days
         $startDate = Carbon::now()->subDays(29)->format('Y-m-d');
@@ -466,10 +510,7 @@ class AnalisaController extends Controller
                 $minutesSoFar = Carbon::now()->diffInMinutes(Carbon::today());
                 if ($minutesSoFar < 1) $minutesSoFar = 1;
 
-                $expectedSoFar = $minutesSoFar / $intervalMinutes;
-                if ($expectedSoFar < 1) $expectedSoFar = 1;
-
-                $percentage = round(($count / $expectedSoFar) * 100, 2);
+                $percentage = round(($count / $minutesSoFar) * 100, 2);
             } else {
                 $percentage = ($count > 0) ? round(($count / $expectedPerDay) * 100, 2) : 0;
             }

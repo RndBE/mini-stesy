@@ -13,11 +13,12 @@
             class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
             <div class="flex items-center gap-4">
                 <div class="p-2 bg-indigo-100 rounded-lg text-indigo-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    <img src="{{ asset('logo/logo-awlr.svg') }}" alt="Logo" class="w-6 h-6">
+                    {{-- <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
+                    </svg> --}}
                 </div>
                 <div>
                     {{-- <h1 class="text-xl font-bold text-slate-800" x-text="selectedDeviceName || 'Pilih Pos'"></h1> --}}
@@ -88,17 +89,17 @@
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left text-slate-600">
-                    <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-xs">
+                    <thead class="bg-neutral-200 text-neutral-950 font-semibold uppercase text-xs">
                         <tr>
-                            <th class="px-6 py-3">Waktu</th>
-                            <th class="px-6 py-3 text-right">Nilai</th>
+                            <th class="px-6 py-3 text-center">Waktu</th>
+                            <th class="px-6 py-3 text-center">Nilai</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
                         <template x-for="row in dataHistory" :key="row.waktu">
                             <tr class="hover:bg-slate-50">
-                                <td class="px-6 py-4" x-text="row.waktu"></td>
-                                <td class="px-6 py-4 text-right font-medium text-slate-900"
+                                <td class="px-6 py-4 text-center text-slate-900" x-text="row.waktu"></td>
+                                <td class="px-6 py-4 text-center font-medium text-slate-900"
                                     x-text="row.value + ' ' + getUnit()"></td>
                             </tr>
                         </template>
@@ -205,9 +206,18 @@
                         let chartData = [];
 
                         if (this.rawData.length > 0) {
+                            // Get the most recent timestamp
+                            const latestTime = moment(this.rawData[0].waktu);
+                            const sixtyMinutesAgo = latestTime.clone().subtract(60, 'minutes');
+
+                            // Filter data to only show last 60 minutes from the latest update
+                            const filtered60Min = this.rawData.filter(d => {
+                                const dataTime = moment(d.waktu);
+                                return dataTime.isSameOrAfter(sixtyMinutesAgo) && dataTime.isSameOrBefore(latestTime);
+                            });
+
                             // Sort ascending for chart
-                            const sortedDocs = [...this.rawData].sort((a, b) => new Date(a.waktu) - new Date(b
-                                .waktu));
+                            const sortedDocs = [...filtered60Min].sort((a, b) => new Date(a.waktu) - new Date(b.waktu));
                             chartLabels = sortedDocs.map(d => moment(d.waktu).format('HH:mm'));
 
                             chartData = sortedDocs.map(d => {

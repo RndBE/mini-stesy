@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Parameter_sensor extends Model
 {
+    protected $table = 'parameter_sensor';
+    protected $primaryKey = 'id_param';
+    public $timestamps = false;
+
     protected $fillable = [
         'logger_id',
         'nama_parameter',

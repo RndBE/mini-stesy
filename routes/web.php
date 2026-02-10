@@ -11,6 +11,8 @@ use App\Http\Controllers\InstansiController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\DataMasukController;
 use Illuminate\Support\Facades\Http;
 
 // Route::get('/', function () {
@@ -41,6 +43,11 @@ Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
     Route::get('/analisa/export/{id_logger}', [AnalisaController::class, 'exportExcel'])->name('analisa.export');
 });
 
+Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
+    Route::get('/data-masuk', [DataMasukController::class, 'index'])->name('data-masuk.index');
+    Route::get('/api/data-masuk', [DataMasukController::class, 'getData'])->name('data-masuk.api');
+});
+
 Route::middleware(['auth', 'permission:view_device'])->get('/pengaturan-device', [DeviceController::class, 'index'])->name('device.index');
 Route::middleware(['auth', 'permission:manage_device'])->put('/pengaturan-device/{id}', [DeviceController::class, 'update'])->name('device.update');
 
@@ -55,14 +62,16 @@ Route::middleware(['auth', 'permission:view_realtime'])->group(function () {
 Route::middleware(['auth', 'permission:manage_instansi'])->resource('instansi', InstansiController::class)->except(['show']);
 
 Route::middleware(['auth', 'permission:manage_rbac'])->group(function () {
-    Route::resource('roles', RoleController::class)->except(['show']);
-    Route::resource('permissions', PermissionController::class)->except(['show']);
+    Route::resource('roles', RoleController::class)->except(['create', 'edit']);
+    Route::resource('permissions', PermissionController::class)->except(['create', 'edit']);
 });
 
-Route::middleware(['auth', 'permission:manage_user'])->resource('users', UserController::class)->except(['show']);
+Route::middleware(['auth', 'permission:manage_user'])->resource('users', UserController::class)->except(['create', 'edit']);
 
 Route::middleware(['auth', 'permission:view_profile'])->get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::middleware(['auth', 'permission:manage_profile'])->patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 Route::middleware(['auth', 'permission:manage_profile'])->delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+Route::middleware(['auth'])->get('/download', [DownloadController::class, 'index'])->name('download.index');
 
 require __DIR__ . '/auth.php';
