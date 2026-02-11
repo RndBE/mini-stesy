@@ -95,7 +95,7 @@
                 @endphp --}}
 
                 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                    <div class="flex items-center justify-between bg-slate-50 px-5 py-3">
+                    <div class="flex items-center justify-between bg-neutral-100 px-5 py-3">
                         <div class="flex items-center gap-2">
                             <div class="text-sm font-extrabold text-slate-900">
                                 {{ $lg->nama_logger }}

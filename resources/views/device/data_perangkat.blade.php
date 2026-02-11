@@ -53,7 +53,7 @@
                                 <td class="px-6 py-4 text-center">
                                     @permission('manage_data_perangkat')
                                         <button @click="openEditModal({{ json_encode($device) }})"
-                                            class="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-indigo-600 transition-colors">
+                                            class="rounded-lg p-2 bg-slate-100 text-slate-950 hover:bg-slate-100 hover:text-indigo-600 transition-colors">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -61,7 +61,7 @@
                                             </svg>
                                         </button>
                                     @else
-                                        <span class="text-xs text-slate-400">-</span>
+                                        <span class="text-xs bg-slate-100 text-slate-950">-</span>
                                     @endpermission
                                 </td>
                             </tr>

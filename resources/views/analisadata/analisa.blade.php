@@ -43,6 +43,10 @@
             gap: 6px;
         }
 
+        .range-input-group {
+            margin-bottom: 0;
+        }
+
         .calendar-input {
             width: 100%;
             padding: 10px;
@@ -303,8 +307,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #261cee;
-            color: rgb(255, 255, 255);
+            background: #E6E6E6;
+            color: rgb(0, 0, 0);
         }
 
         .info-panel-title {
@@ -315,7 +319,7 @@
         .info-panel-close {
             background: none;
             border: none;
-            color: white;
+            color: rgb(0, 0, 0);
             font-size: 24px;
             cursor: pointer;
             padding: 0;
@@ -391,8 +395,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #3730a3;
-            color: white;
+            background: #E6E6E6;
+            color: rgb(0, 0, 0);
         }
 
         .doc-modal-title {
@@ -403,7 +407,7 @@
         .doc-modal-close {
             background: none;
             border: none;
-            color: white;
+            color: rgb(0, 0, 0);
             font-size: 28px;
             cursor: pointer;
             padding: 0;
@@ -567,7 +571,7 @@
         {{-- LEFT SIDEBAR --}}
         <div class="sidebar-left">
             <div class="mb-4">
-                <a href="{{ route('peta.lokasi') }}" class="text-slate-600 hover:text-slate-900 text-sm">
+                <a href="{{ route('beranda') }}" class="text-slate-600 hover:text-slate-900 text-sm">
                     ← Kembali
                 </a>
             </div>
@@ -591,10 +595,31 @@
                         <label><input type="radio" name="range" value="custom"> Rentang</label>
                     </div>
 
-                    <div class="section-label">Tanggal</div>
-                    <input type="date" id="dateInput" class="calendar-input" value="{{ date('Y-m-d') }}">
+                    <!-- Tanggal untuk Hari -->
+                    <div id="rangeDay" class="range-input-group" style="display: block;">
+                        <div class="section-label">Tanggal</div>
+                        <input type="date" id="dateInput" class="calendar-input" value="{{ date('Y-m-d') }}">
+                    </div>
 
-                    {{-- <button type="button" class="btn-primary" onclick="loadData()">Tampil Data</button> --}}
+                    <!-- Bulan-Tahun untuk Bulan -->
+                    <div id="rangeMonth" class="range-input-group" style="display: none;">
+                        <div class="section-label">Bulan-Tahun</div>
+                        <input type="month" id="monthInput" class="calendar-input" value="{{ date('Y-m') }}">
+                    </div>
+
+                    <!-- Tahun untuk Tahun -->
+                    <div id="rangeYear" class="range-input-group" style="display: none;">
+                        <div class="section-label">Tahun</div>
+                        <input type="number" id="yearInput" class="calendar-input" min="2000" max="2100" value="{{ date('Y') }}">
+                    </div>
+
+                    <!-- Rentang Tanggal dan Jam -->
+                    <div id="rangeCustom" class="range-input-group" style="display: none;">
+                        <div class="section-label">Tanggal Mulai</div>
+                        <input type="datetime-local" id="startDateTime" class="calendar-input" value="{{ date('Y-m-d\TH:i') }}">
+                        <div class="section-label" style="margin-top: 12px;">Tanggal Akhir</div>
+                        <input type="datetime-local" id="endDateTime" class="calendar-input" value="{{ date('Y-m-d\TH:i') }}">
+                    </div>
                 </div>
 
                 <div class="rounded-xl border border-slate-200 bg-white p-4">
@@ -639,7 +664,7 @@
             <div class="data-table-section">
                 <div class="table-title" id="tableTitle">{{ date('F Y') }}</div>
                 <table class="data-table">
-                    <thead>
+                    <thead class="bg-neutral-300 text-neutral-950 font-semibold uppercase text-xs">
                         <tr>
                             <th>WAKTU</th>
                             <th>RERATA</th>
@@ -674,6 +699,21 @@
             // initStaticTable(); // Removed static table
             updateChartTitle(); // Set initial title
 
+            // Setup range input toggle
+            setupRangeInputs();
+
+            // Auto-select parameter from URL query string
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramFromUrl = urlParams.get('parameter');
+            if (paramFromUrl) {
+                const paramSelect = document.getElementById('parameterSelect');
+                if (paramSelect) {
+                    paramSelect.value = paramFromUrl;
+                    // Trigger change event to load data automatically
+                    loadData();
+                }
+            }
+
             // Add event listeners for dynamic title updates
             document.getElementById('dateInput').addEventListener('change', () => {
                 updateChartTitle();
@@ -681,8 +721,30 @@
                 const param = document.getElementById('parameterSelect').value;
                 if (param) loadData();
             });
+            document.getElementById('monthInput').addEventListener('change', () => {
+                updateChartTitle();
+                const param = document.getElementById('parameterSelect').value;
+                if (param) loadData();
+            });
+            document.getElementById('yearInput').addEventListener('change', () => {
+                updateChartTitle();
+                const param = document.getElementById('parameterSelect').value;
+                if (param) loadData();
+            });
+            document.getElementById('startDateTime').addEventListener('change', () => {
+                updateChartTitle();
+                const param = document.getElementById('parameterSelect').value;
+                if (param) loadData();
+            });
+            document.getElementById('endDateTime').addEventListener('change', () => {
+                updateChartTitle();
+                const param = document.getElementById('parameterSelect').value;
+                if (param) loadData();
+            });
+
             document.querySelectorAll('input[name="range"]').forEach(radio => {
                 radio.addEventListener('change', () => {
+                    toggleRangeInputs(radio.value);
                     updateChartTitle();
                     const param = document.getElementById('parameterSelect').value;
                     if (param) loadData();
@@ -694,8 +756,31 @@
             });
         });
 
+        function setupRangeInputs() {
+            // Show day input by default
+            toggleRangeInputs('day');
+        }
+
+        function toggleRangeInputs(rangeType) {
+            // Hide all range input groups
+            document.getElementById('rangeDay').style.display = 'none';
+            document.getElementById('rangeMonth').style.display = 'none';
+            document.getElementById('rangeYear').style.display = 'none';
+            document.getElementById('rangeCustom').style.display = 'none';
+
+            // Show the appropriate input group
+            if (rangeType === 'day') {
+                document.getElementById('rangeDay').style.display = 'block';
+            } else if (rangeType === 'month') {
+                document.getElementById('rangeMonth').style.display = 'block';
+            } else if (rangeType === 'year') {
+                document.getElementById('rangeYear').style.display = 'block';
+            } else if (rangeType === 'custom') {
+                document.getElementById('rangeCustom').style.display = 'block';
+            }
+        }
+
         function updateChartTitle() {
-            const dateInput = document.getElementById('dateInput').value;
             const range = document.querySelector('input[name="range"]:checked').value;
             const param = document.getElementById('parameterSelect').value;
 
@@ -703,26 +788,32 @@
                 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
             ];
 
-            const date = new Date(dateInput);
-            const day = date.getDate();
-            const month = monthNames[date.getMonth()];
-            const year = date.getFullYear();
-
             let titleText = `Rerata ${param} `;
             let tableTitleText = `Tabel Rerata ${param} `;
 
             if (range === 'day') {
+                const dateInput = document.getElementById('dateInput').value;
+                const date = new Date(dateInput);
+                const day = date.getDate();
+                const month = monthNames[date.getMonth()];
+                const year = date.getFullYear();
                 titleText += `Pada ${day} ${month} ${year}`;
                 tableTitleText += `Pada ${day} ${month} ${year}`;
             } else if (range === 'month') {
-                titleText += `Pada ${month} ${year}`;
-                tableTitleText += `Pada ${month} ${year}`;
+                const monthInput = document.getElementById('monthInput').value;
+                const [year, month] = monthInput.split('-');
+                const monthName = monthNames[parseInt(month) - 1];
+                titleText += `Pada ${monthName} ${year}`;
+                tableTitleText += `Pada ${monthName} ${year}`;
             } else if (range === 'year') {
-                titleText += `Pada Tahun ${year}`;
-                tableTitleText += `Pada Tahun ${year}`;
+                const yearInput = document.getElementById('yearInput').value;
+                titleText += `Pada Tahun ${yearInput}`;
+                tableTitleText += `Pada Tahun ${yearInput}`;
             } else if (range === 'custom') {
-                titleText += `Rentang Custom`;
-                tableTitleText += `Rentang Custom`;
+                const startDateTime = document.getElementById('startDateTime').value;
+                const endDateTime = document.getElementById('endDateTime').value;
+                titleText += `Dari ${startDateTime} hingga ${endDateTime}`;
+                tableTitleText += `Dari ${startDateTime} hingga ${endDateTime}`;
             }
 
             document.getElementById('chartTitle').textContent = titleText;
@@ -807,7 +898,21 @@
             }
 
             const range = document.querySelector('input[name="range"]:checked').value;
-            const date = document.getElementById('dateInput').value;
+            let date = '';
+
+            // Get the appropriate date value based on range type
+            if (range === 'day') {
+                date = document.getElementById('dateInput').value;
+            } else if (range === 'month') {
+                date = document.getElementById('monthInput').value;
+            } else if (range === 'year') {
+                date = document.getElementById('yearInput').value;
+            } else if (range === 'custom') {
+                // For custom range, we'll send both start and end (API needs to be updated to handle this)
+                const startDateTime = document.getElementById('startDateTime').value;
+                const endDateTime = document.getElementById('endDateTime').value;
+                date = `${startDateTime},${endDateTime}`;
+            }
 
             // Show loading state
             const originalTitle = document.getElementById('chartTitle').textContent;
@@ -846,24 +951,85 @@
             return null;
         }
 
-        function filterSeriesToNowIfToday(labels, ...series) {
-            const el = document.getElementById('dateInput');
-            const selectedDate = el ? el.value : '';
+        function isToday(dateStr) {
             const now = new Date();
             const today = now.toISOString().slice(0, 10);
+            return dateStr === today;
+        }
 
-            if (!selectedDate || selectedDate !== today) return {
-                labels,
-                series
-            };
+        function isCurrentMonth(monthStr) {
+            const now = new Date();
+            const currentMonth = now.toISOString().slice(0, 7);
+            return monthStr === currentMonth;
+        }
 
+        function isCurrentYear(yearStr) {
+            const now = new Date();
+            const currentYear = String(now.getFullYear());
+            return yearStr === currentYear;
+        }
+
+        function filterSeriesToNow(labels, range, ...series) {
+            const now = new Date();
             const nowMin = (now.getHours() * 60) + now.getMinutes();
+            const today = now.toISOString().slice(0, 10);
+            const currentMonth = now.toISOString().slice(0, 7);
+            const currentYear = String(now.getFullYear());
 
             let idx = -1;
-            for (let i = 0; i < (labels || []).length; i++) {
-                const t = parseLabelToMinutes(labels[i]);
-                if (t === null) continue;
-                if (t <= nowMin) idx = i;
+
+            if (range === 'day') {
+                const dateInput = document.getElementById('dateInput')?.value || '';
+                if (!isToday(dateInput)) {
+                    return { labels, series };
+                }
+
+                for (let i = 0; i < (labels || []).length; i++) {
+                    const t = parseLabelToMinutes(labels[i]);
+                    if (t === null) continue;
+                    if (t <= nowMin) idx = i;
+                }
+            } else if (range === 'month') {
+                const monthInput = document.getElementById('monthInput')?.value || '';
+                if (!isCurrentMonth(monthInput)) {
+                    // For past/future months, return all data (no time filtering needed)
+                    return { labels, series };
+                }
+
+                // For current month, parse day from label and filter to current day
+                const currentDay = now.getDate();
+                for (let i = 0; i < (labels || []).length; i++) {
+                    const dayStr = String(labels[i] || '').trim();
+                    // Try parsing as number (e.g., "1", "15", "28")
+                    const day = parseInt(dayStr);
+                    if (!isNaN(day) && day <= currentDay) {
+                        idx = i;
+                    }
+                }
+            } else if (range === 'year') {
+                const yearInput = document.getElementById('yearInput')?.value || '';
+                if (!isCurrentYear(yearInput)) {
+                    // For past/future years, return empty data - only current year can display data
+                    return {
+                        labels: [],
+                        series: series.map(() => [])
+                    };
+                }
+
+                // For year view, parse month from label (e.g., "Jan", "Feb", "Mar", etc.)
+                const monthNames = ['jan', 'feb', 'mar', 'apr', 'mei', 'jun', 'jul', 'agu', 'sep', 'okt', 'nov', 'des'];
+                const currentMonthNum = now.getMonth();
+                for (let i = 0; i < (labels || []).length; i++) {
+                    const labelLower = String(labels[i] || '').toLowerCase().trim();
+                    const monthIdx = monthNames.findIndex(mn => labelLower.includes(mn) || labelLower.startsWith(mn.substring(0, 3)));
+                    if (monthIdx !== -1 && monthIdx <= currentMonthNum) {
+                        idx = i;
+                    }
+                }
+            } else if (range === 'custom') {
+                // For custom range, don't filter by current time
+                // Return all data - user has already specified their own range
+                return { labels, series };
             }
 
             if (idx < 0) idx = 0;
@@ -909,25 +1075,6 @@
 
             const range = document.querySelector('input[name="range"]:checked')?.value;
 
-            if (range === 'day') {
-                if (!hasAnyDataPayload(data)) {
-                    chart.data.labels = [];
-                    chart.data.datasets[0].data = [];
-                    chart.data.datasets[1].data = [];
-                    chart.data.datasets[2].data = [];
-                    chart.update();
-                    return;
-                }
-
-                const f = filterSeriesToNowIfToday(labelsRaw, avgRaw, minRaw, maxRaw);
-                chart.data.labels = f.labels;
-                chart.data.datasets[0].data = f.series[0];
-                chart.data.datasets[1].data = f.series[1];
-                chart.data.datasets[2].data = f.series[2];
-                chart.update();
-                return;
-            }
-
             if (!hasAnyDataPayload(data)) {
                 chart.data.labels = [];
                 chart.data.datasets[0].data = [];
@@ -937,10 +1084,22 @@
                 return;
             }
 
-            chart.data.labels = labelsRaw;
-            chart.data.datasets[0].data = avgRaw;
-            chart.data.datasets[1].data = minRaw;
-            chart.data.datasets[2].data = maxRaw;
+            // For custom range, show all data without time filtering
+            if (range === 'custom') {
+                chart.data.labels = labelsRaw;
+                chart.data.datasets[0].data = avgRaw;
+                chart.data.datasets[1].data = minRaw;
+                chart.data.datasets[2].data = maxRaw;
+                chart.update();
+                return;
+            }
+
+            // For day, month, year: apply filtering based on current time
+            const f = filterSeriesToNow(labelsRaw, range, avgRaw, minRaw, maxRaw);
+            chart.data.labels = f.labels;
+            chart.data.datasets[0].data = f.series[0];
+            chart.data.datasets[1].data = f.series[1];
+            chart.data.datasets[2].data = f.series[2];
             chart.update();
         }
 
@@ -955,40 +1114,53 @@
 
             const isAllEmpty = !hasAnyDataPayload(data);
 
-            if (range === 'day') {
-                if (isAllEmpty) {
+            if (isAllEmpty) {
+                tbody.innerHTML =
+                    '<tr><td colspan="4" style="text-align:center; padding:40px; color:#9ca3af;">Tidak ada data</td></tr>';
+                return;
+            }
+
+            // For custom range and month range, don't use label filtering
+            if (range === 'custom' || range === 'month') {
+                const filtered = rows.filter(r => {
+                    if (!r) return false;
+                    const a = r.rerata;
+                    const b = r.minimum;
+                    const c = r.maksimum;
+                    return !((a == null || a === '') && (b == null || b === '') && (c == null || c === ''));
+                });
+
+                if (!filtered.length) {
                     tbody.innerHTML =
                         '<tr><td colspan="4" style="text-align:center; padding:40px; color:#9ca3af;">Tidak ada data</td></tr>';
                     return;
                 }
 
-                const f = filterSeriesToNowIfToday(labelsRaw);
-                const labels = f.labels || [];
-
-                const map = new Map();
-                for (const r of rows) {
-                    if (r && r.waktu != null) map.set(String(r.waktu), r);
-                }
-
                 let html = '';
-                for (const t of labels) {
-                    const r = map.get(String(t)) || {};
+                for (const r of filtered) {
                     html += `
-                <tr>
-                    <td>${t}</td>
-                    <td>${fmtWithUnit(r.rerata, unit)}</td>
-                    <td>${fmtWithUnit(r.minimum, unit)}</td>
-                    <td>${fmtWithUnit(r.maksimum, unit)}</td>
-                </tr>`;
+            <tr>
+                <td>${r.waktu ?? '-'}</td>
+                <td>${fmtWithUnit(r.rerata, unit)}</td>
+                <td>${fmtWithUnit(r.minimum, unit)}</td>
+                <td>${fmtWithUnit(r.maksimum, unit)}</td>
+            </tr>`;
                 }
-
-                tbody.innerHTML = html ||
-                    '<tr><td colspan="4" style="text-align:center; padding:40px; color:#9ca3af;">Tidak ada data</td></tr>';
+                tbody.innerHTML = html;
                 return;
             }
 
+            // For day, year: apply filtering based on current time
+            const f = filterSeriesToNow(labelsRaw, range);
+            const labelsFiltered = f.labels || [];
+
+            // Create a set of filtered labels for lookup
+            const labelSet = new Set(labelsFiltered);
+
+            // Filter rows based on filtered labels and valid data
             const filtered = rows.filter(r => {
-                if (!r) return false;
+                if (!r || r.waktu == null) return false;
+                if (!labelSet.has(String(r.waktu))) return false;
                 const a = r.rerata;
                 const b = r.minimum;
                 const c = r.maksimum;
@@ -1022,7 +1194,21 @@
             }
 
             const range = document.querySelector('input[name="range"]:checked').value;
-            const date = document.getElementById('dateInput').value;
+            let date = '';
+
+            // Get the appropriate date value based on range type
+            if (range === 'day') {
+                date = document.getElementById('dateInput').value;
+            } else if (range === 'month') {
+                date = document.getElementById('monthInput').value;
+            } else if (range === 'year') {
+                date = document.getElementById('yearInput').value;
+            } else if (range === 'custom') {
+                const startDateTime = document.getElementById('startDateTime').value;
+                const endDateTime = document.getElementById('endDateTime').value;
+                date = `${startDateTime},${endDateTime}`;
+            }
+
             const url = `{{ route('analisa.export', ['id_logger' => 'PLACEHOLDER']) }}`.replace('PLACEHOLDER', loggerId) +
                 `?parameter=${selectedParam}&range=${range}&date=${date}`;
 
@@ -1117,7 +1303,7 @@
                 dataMasukChartInstance = null;
             }
 
-            const barColors = (percentages || []).map(p => (Number(p) < 90 ? '#dc2626' : '#4f46e5'));
+            const barColors = (percentages || []).map(p => (Number(p) < 80 ? '#FED0D0' : '#D0EFFE'));
 
             dataMasukChartInstance = new Chart(ctx, {
                 type: 'bar',

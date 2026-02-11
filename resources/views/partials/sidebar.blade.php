@@ -38,6 +38,18 @@
                     </a>
                 @endpermission
 
+                {{--@permission('view_peta_lokasi')
+                    <a href="{{ route('data-masuk.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('data-masuk.index') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                        <span class="sidebar-text truncate">Data Masuk</span>
+                    </a>
+                @endpermission --}}
+
                 @permission('view_realtime')
                     <a href="{{ route('realtime.index') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('realtime.index') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
@@ -97,7 +109,7 @@
                             </svg>
                         </button>
 
-                        <div x-show="open" x-collapse class="space-y-1 px-2 pb-2">
+                        <div x-show="open" x-collapse x-cloak class="space-y-1 px-2 pb-2">
                             @permission('manage_instansi')
                                 <a href="{{ route('instansi.index') }}"
                                     class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('instansi.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-white' }}">
@@ -126,8 +138,8 @@
                     </div>
                 @endif
 
-                <a href="#"
-                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                <a href="{{ route('download.index') }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('download.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -167,6 +179,10 @@
 </button>
 
 <style>
+/* Hide elements until Alpine.js is ready */
+[x-cloak] {
+    display: none !important;
+}
 
 /* Mobile responsive */
 @media (max-width: 768px) {

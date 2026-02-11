@@ -950,7 +950,17 @@
         applyKategoriFilter();
         setTimeout(() => map.invalidateSize(), 500);
         window.addEventListener('resize', () => map.invalidateSize());
-
+        
+        // Listen for sidebar toggle transition to update map size faster
+        const mainContent = document.getElementById('mainContent');
+        if (mainContent) {
+            mainContent.addEventListener('transitionend', function(e) {
+                // Only trigger on margin-left transitions (sidebar toggle)
+                if (e.propertyName === 'margin-left') {
+                    map.invalidateSize();
+                }
+            });
+        }
 
         window.focusLogger = function(lat, lng, id) {
             if (!lat || !lng) return;
