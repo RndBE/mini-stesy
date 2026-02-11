@@ -17,11 +17,13 @@ class DownloadController extends Controller
                 'name' => 'Aplikasi Android',
                 'url' => 'https://mini-stesy.beacontelemetry.com/unduh/mini_stesy_1.2.0.apk',
                 'icon' => 'android',
+                'version' => '1.2.0',
             ],
             'ios' => [
                 'name' => 'Aplikasi iOS',
-                'url' => 'https://apps.apple.com/id/app/mini-stesy/id0480154441',
+                'url' => 'https://apps.apple.com/id/app/mini_stesy/id6480156441',
                 'icon' => 'apple',
+                'version' => '1.3.6',
             ],
         ];
 

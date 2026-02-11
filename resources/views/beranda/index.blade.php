@@ -65,35 +65,6 @@
                     $muted = !$isOnline;
                     $iconClass = $muted ? 'grayscale opacity-40' : '';
                 @endphp
-
-                {{-- @php
-                    $waktu = \Carbon\Carbon::parse($lg['waktu'])->format('Y-m-d H:i');
-
-                    $isOnline = $lg['status'] === 'online';
-                    $isSdOk = true; // API ini belum kirim status SD
-
-                    $timeClass = $isOnline ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700';
-                    $dotClass = $isOnline ? 'bg-emerald-500' : 'bg-rose-500';
-
-                    $badgeClass = $isOnline
-                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                        : 'border-rose-200 bg-rose-50 text-rose-700';
-
-                    $sdClass = 'border-emerald-200 bg-emerald-50 text-emerald-700';
-
-                    $statusText = $isOnline ? 'Koneksi Terhubung' : 'Koneksi Terputus';
-                    $sdText = 'OK';
-
-                    $humidity = $lg['humidity'] ?? null;
-                    $battery = $lg['battery'] ?? null;
-                    $temp = $lg['temp'] ?? null;
-
-                    $DataAir = null;
-                    $MukaAir = null;
-
-                    $muted = !$isOnline;
-                @endphp --}}
-
                 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                     <div class="flex items-center justify-between bg-neutral-100 px-5 py-3">
                         <div class="flex items-center gap-2">

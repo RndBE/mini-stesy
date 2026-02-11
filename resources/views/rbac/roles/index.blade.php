@@ -2,24 +2,34 @@
 
 @section('content')
     <div x-data="roleData()" class="space-y-6">
-        <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Role</h1>
                 <p class="text-sm text-slate-500">Kelola role dan akses permission.</p>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 @if (session('success'))
-                    <div
-                        class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-semibold shadow-sm ring-1 ring-emerald-200">
+                    <div class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-semibold shadow-sm ring-1 ring-emerald-200">
                         {{ session('success') }}
                     </div>
+                @else
+                    <div></div>
                 @endif
 
-                <button @click="openCreateModal()"
-                    class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
-                    + Tambah Role
-                </button>
+                <div class="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" x-model="searchQuery" placeholder="Cari role..."
+                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        <svg class="absolute right-3 top-2.5 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <button @click="openCreateModal()"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 whitespace-nowrap">
+                        + Tambah Role
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -35,21 +45,20 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200 bg-white">
-                        @forelse ($roles as $index => $role)
+                        <template x-for="(role, index) in filteredRoles()" :key="role.id">
                             <tr class="hover:bg-slate-50">
-                                <td class="whitespace-nowrap px-6 py-4 font-medium text-slate-900">{{ $index + 1 }}</td>
-                                <td class="whitespace-nowrap px-6 py-4 font-semibold text-slate-900">{{ $role->role_name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4">{{ $role->permissions_count }}</td>
+                                <td class="whitespace-nowrap px-6 py-4 font-medium text-slate-900" x-text="index + 1"></td>
+                                <td class="whitespace-nowrap px-6 py-4 font-semibold text-slate-900" x-text="role.role_name"></td>
+                                <td class="whitespace-nowrap px-6 py-4" x-text="role.permissions_count"></td>
                                 <td class="whitespace-nowrap px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
-                                        <button @click="openEditModal({{ $role->id }})"
+                                        <button @click="openEditModal(role.id)"
                                             class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 text-slate-950 hover:bg-slate-200 transition-colors" title="Edit">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
-                                        <button @click="deleteRole({{ $role->id }}, '{{ $role->role_name }}')"
+                                        <button @click="deleteRole(role.id, role.role_name)"
                                             class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-slate-950 hover:bg-red-200 transition-colors" title="Hapus">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -58,13 +67,14 @@
                                     </div>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="px-6 py-8 text-center text-sm text-slate-500">
-                                    Belum ada data role.
-                                </td>
-                            </tr>
-                        @endforelse
+                        </template>
+                    </tbody>
+                    <tbody class="divide-y divide-slate-200 bg-white" x-show="filteredRoles().length === 0">
+                        <tr>
+                            <td colspan="4" class="px-6 py-8 text-center text-sm text-slate-500">
+                                Belum ada data role.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -165,35 +175,36 @@
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden" @click.stop>
 
-                    <div class="px-6 py-5 border-b border-slate-200">
-                        <div class="flex items-center gap-3">
-                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="px-6 py-5">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center">
+                                <svg class="w-14 h-14 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                             </div>
-                            <h3 class="text-lg font-bold text-slate-900">Konfirmasi Hapus</h3>
+                            <h3 class="text-xl text-center font-bold text-blue-900">Hapus RBAC Role</h3>
                         </div>
                     </div>
 
-                    <div class="px-6 py-4">
-                        <p class="text-sm text-slate-600">
+                    <div class="px-6 py-3">
+                        <p class="text-sm text-center text-slate-600">
                             Apakah Anda yakin ingin menghapus role
                             <span class="font-semibold text-slate-900" x-text="deleteData.name"></span>?
                         </p>
-                        <p class="mt-2 text-sm text-red-600 font-medium">
+                        <p class="mt-2 text-sm text-center text-red-600 font-medium">
                             Tindakan ini tidak dapat dibatalkan.
                         </p>
                     </div>
 
-                    <div class="flex items-center justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
+                    <div class="flex items-center justify-center gap-3 px-6 py-4">
                         <button type="button" @click="closeDeleteModal()"
-                            class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition-colors">
+                            class="px-12 py-2 rounded-lg border border-blue-300 text-blue-700 font-semibold hover:bg-blue-100  transition-colors">
                             Batal
                         </button>
                         <button type="button" @click="confirmDelete()"
-                            class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors">
+                            class="px-12 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors">
                             Hapus
                         </button>
                     </div>
@@ -295,6 +306,8 @@
                 showCreateModal: false,
                 showEditModal: false,
                 showDeleteModal: false,
+                searchQuery: '',
+                allRoles: @json($roles),
                 createForm: {
                     role_name: '',
                     permissions: []
@@ -313,6 +326,17 @@
                 deleteData: {
                     id: null,
                     name: ''
+                },
+
+                filteredRoles() {
+                    if (!this.searchQuery.trim()) {
+                        return this.allRoles;
+                    }
+
+                    const query = this.searchQuery.toLowerCase();
+                    return this.allRoles.filter(role => {
+                        return role.role_name && role.role_name.toLowerCase().includes(query);
+                    });
                 },
 
                 openCreateModal() {

@@ -16,7 +16,7 @@
             <div class="space-y-1">
                 @permission('view_beranda')
                     <a href="{{ route('beranda') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('beranda') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('beranda') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -28,7 +28,7 @@
 
                 @permission('view_peta_lokasi')
                     <a href="{{ route('peta.lokasi') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('peta.lokasi') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('peta.lokasi') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -40,7 +40,7 @@
 
                 {{--@permission('view_peta_lokasi')
                     <a href="{{ route('data-masuk.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('data-masuk.index') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('data-masuk.index') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -52,7 +52,7 @@
 
                 @permission('view_realtime')
                     <a href="{{ route('realtime.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('realtime.index') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('realtime.index') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -64,7 +64,7 @@
 
                 @permission('view_data_perangkat')
                     <a href="{{ route('device.data') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('device.data') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('device.data') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -76,7 +76,7 @@
 
                 @permission('view_device')
                     <a href="{{ route('device.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('device.index') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('device.index') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -112,25 +112,25 @@
                         <div x-show="open" x-collapse x-cloak class="space-y-1 px-2 pb-2">
                             @permission('manage_instansi')
                                 <a href="{{ route('instansi.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('instansi.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('instansi.*') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-white' }}">
                                     <span class="sidebar-text truncate">Instansi</span>
                                 </a>
                             @endpermission
 
                             @permission('manage_rbac')
                                 <a href="{{ route('roles.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('roles.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('roles.*') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-white' }}">
                                     <span class="sidebar-text truncate">RBAC Role</span>
                                 </a>
                                 <a href="{{ route('permissions.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-white' }}">
                                     <span class="sidebar-text truncate">RBAC Permission</span>
                                 </a>
                             @endpermission
 
                             @permission('manage_user')
                                 <a href="{{ route('users.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('users.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('users.*') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-white' }}">
                                     <span class="sidebar-text truncate">User</span>
                                 </a>
                             @endpermission
@@ -139,7 +139,7 @@
                 @endif
 
                 <a href="{{ route('download.index') }}"
-                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('download.*') ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('download.*') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

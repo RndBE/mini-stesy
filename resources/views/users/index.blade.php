@@ -14,23 +14,35 @@
 
 @section('content')
     <div x-data="userData()" class="space-y-6">
-        <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">User</h1>
                 <p class="text-sm text-slate-500">Kelola data user dan role.</p>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 @if (session('success'))
-                    <div class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-semibold shadow-sm ring-1 ring-emerald-200">
+                    <div
+                        class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-semibold shadow-sm ring-1 ring-emerald-200">
                         {{ session('success') }}
                     </div>
                 @endif
 
-                <button @click="openCreateModal()"
-                    class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
-                    + Tambah User
-                </button>
+                <div class="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" x-model="searchQuery" placeholder="Cari user..."
+                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        <svg class="absolute right-3 top-2.5 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <button @click="openCreateModal()"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 whitespace-nowrap">
+                        + Tambah User
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -48,27 +60,33 @@
                             <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200 bg-white">
+                    {{-- <tbody class="divide-y divide-slate-200 bg-white">
                         @forelse ($users as $index => $user)
                             <tr class="hover:bg-slate-50">
                                 <td class="whitespace-nowrap px-6 py-4 font-medium text-slate-900">{{ $index + 1 }}</td>
-                                <td class="whitespace-nowrap px-6 py-4 font-semibold text-slate-900">{{ $user->nama }}</td>
+                                <td class="whitespace-nowrap px-6 py-4 font-semibold text-slate-900">{{ $user->nama }}
+                                </td>
                                 <td class="whitespace-nowrap px-6 py-4">{{ $user->username }}</td>
                                 <td class="whitespace-nowrap px-6 py-4">{{ $user->level_user }}</td>
-                                <td class="whitespace-nowrap px-6 py-4">{{ $user->instansi?->nama ?? $user->instansi ?? '-' }}</td>
+                                <td class="whitespace-nowrap px-6 py-4">
+                                    {{ $user->instansi?->nama ?? ($user->instansi ?? '-') }}</td>
                                 <td class="whitespace-nowrap px-6 py-4">{{ $user->telp }}</td>
                                 <td class="whitespace-nowrap px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
                                         <button @click="openEditModal({{ $user->id_user }})"
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 text-slate-950 hover:bg-slate-200 transition-colors" title="Edit">
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 text-slate-950 hover:bg-slate-200 transition-colors"
+                                            title="Edit">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
                                         <button @click="deleteUser({{ $user->id_user }}, '{{ $user->nama }}')"
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-slate-950 hover:bg-red-200 transition-colors" title="Hapus">
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-slate-950 hover:bg-red-200 transition-colors"
+                                            title="Hapus">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
                                         </button>
                                     </div>
@@ -81,6 +99,51 @@
                                 </td>
                             </tr>
                         @endforelse
+                    </tbody> --}}
+                    <tbody class="divide-y divide-slate-200 bg-white">
+                        <template x-for="(u, i) in filteredUsers()" :key="u.id_user">
+                            <tr class="hover:bg-slate-50">
+                                <td class="whitespace-nowrap px-6 py-4 font-medium text-slate-900" x-text="i + 1"></td>
+
+                                <td class="whitespace-nowrap px-6 py-4 font-semibold text-slate-900" x-text="u.nama"></td>
+
+                                <td class="whitespace-nowrap px-6 py-4" x-text="u.username"></td>
+
+                                <td class="whitespace-nowrap px-6 py-4" x-text="u.level_user"></td>
+
+                                <td class="whitespace-nowrap px-6 py-4" x-text="u.instansi || '-'"></td>
+
+                                <td class="whitespace-nowrap px-6 py-4" x-text="u.telp"></td>
+
+                                <td class="whitespace-nowrap px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button @click="openEditModal(u.id_user)"
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 text-slate-950 hover:bg-slate-200 transition-colors"
+                                            title="Edit">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+
+                                        <button @click="deleteUser(u.id_user, u.nama)"
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-slate-950 hover:bg-red-200 transition-colors"
+                                            title="Hapus">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+
+                        <tr x-show="filteredUsers().length === 0">
+                            <td colspan="7" class="px-6 py-8 text-center text-sm text-slate-500">
+                                Data tidak ditemukan.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -90,16 +153,17 @@
         <div x-show="showCreateModal" x-cloak class="fixed inset-0 z-50" role="dialog" aria-modal="true"
             @keydown.escape.window="closeCreateModal()">
 
-            <div x-show="showCreateModal" x-transition:enter="ease-in-out duration-300"
-                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
+            <div x-show="showCreateModal" x-transition:enter="ease-in-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="ease-in-out duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                 class="fixed inset-0 bg-gray-500/75" @click="closeCreateModal()"></div>
 
             <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
                 <div x-show="showCreateModal" x-transition:enter="ease-in-out duration-300"
-                    x-transition:enter-start="opacity-0 scale-95 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                    x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="ease-in-out duration-200"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden my-8" @click.stop>
 
@@ -125,24 +189,21 @@
                                     <label class="block text-sm font-semibold text-slate-900 mb-2">
                                         Nama <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" x-model="createForm.nama" required
-                                        placeholder="Nama lengkap"
+                                    <input type="text" x-model="createForm.nama" required placeholder="Nama lengkap"
                                         class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-900 mb-2">
                                         Username <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" x-model="createForm.username" required
-                                        placeholder="Username"
+                                    <input type="text" x-model="createForm.username" required placeholder="Username"
                                         class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-900 mb-2">
                                         Password <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="password" x-model="createForm.password" required
-                                        placeholder="Password"
+                                    <input type="password" x-model="createForm.password" required placeholder="Password"
                                         class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
@@ -152,18 +213,22 @@
                                     <div class="relative" @click.outside="closeCreateRoleDropdown()">
                                         <button type="button" @click="createRoleDropdownOpen = !createRoleDropdownOpen"
                                             class="w-full h-10 rounded-lg border border-slate-200 px-3 py-2 text-left text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors">
-                                            <span x-text="createForm.level_user || '-- Pilih Role --'" class="flex-1"></span>
-                                            <svg class="h-4 w-4 text-slate-500 transition-transform flex-shrink-0" :class="createRoleDropdownOpen ? 'rotate-180' : ''"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <span x-text="createForm.level_user || '-- Pilih Role --'"
+                                                class="flex-1"></span>
+                                            <svg class="h-4 w-4 text-slate-500 transition-transform flex-shrink-0"
+                                                :class="createRoleDropdownOpen ? 'rotate-180' : ''" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2">
                                                 <path d="M6 9l6 6 6-6" />
                                             </svg>
                                         </button>
                                         <div x-show="createRoleDropdownOpen" x-cloak x-transition
                                             class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
-                                            @foreach($roles as $role)
-                                                <button type="button" @click="createForm.level_user = '{{ $role->role_name }}'; createRoleDropdownOpen = false"
+                                            @foreach ($roles as $role)
+                                                <button type="button"
+                                                    @click="createForm.level_user = '{{ $role->role_name }}'; createRoleDropdownOpen = false"
                                                     class="w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 first:rounded-t-lg last:rounded-b-lg"
-                                                    :class="createForm.level_user === '{{ $role->role_name }}' ? 'bg-indigo-50 text-indigo-700 font-semibold' : ''">
+                                                    :class="createForm.level_user === '{{ $role->role_name }}' ?
+                                                        'bg-indigo-50 text-indigo-700 font-semibold' : ''">
                                                     {{ $role->role_name }}
                                                 </button>
                                             @endforeach
@@ -175,25 +240,32 @@
                                         Instansi <span class="text-red-500">*</span>
                                     </label>
                                     <div class="relative" @click.outside="closeCreateInstansiDropdown()">
-                                        <button type="button" @click="createInstansiDropdownOpen = !createInstansiDropdownOpen"
+                                        <button type="button"
+                                            @click="createInstansiDropdownOpen = !createInstansiDropdownOpen"
                                             class="w-full h-10 rounded-lg border border-slate-200 px-3 py-2 text-left text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors">
-                                            <span x-text="getInstansiLabel(createForm.instansi_id, 'create')" class="flex-1"></span>
-                                            <svg class="h-4 w-4 text-slate-500 transition-transform flex-shrink-0" :class="createInstansiDropdownOpen ? 'rotate-180' : ''"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <span x-text="getInstansiLabel(createForm.instansi_id, 'create')"
+                                                class="flex-1"></span>
+                                            <svg class="h-4 w-4 text-slate-500 transition-transform flex-shrink-0"
+                                                :class="createInstansiDropdownOpen ? 'rotate-180' : ''" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2">
                                                 <path d="M6 9l6 6 6-6" />
                                             </svg>
                                         </button>
                                         <div x-show="createInstansiDropdownOpen" x-cloak x-transition
                                             class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
-                                            <button type="button" @click="createForm.instansi_id = ''; createInstansiDropdownOpen = false"
+                                            <button type="button"
+                                                @click="createForm.instansi_id = ''; createInstansiDropdownOpen = false"
                                                 class="w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 first:rounded-t-lg"
-                                                :class="!createForm.instansi_id ? 'bg-indigo-50 text-indigo-700 font-semibold' : ''">
+                                                :class="!createForm.instansi_id ? 'bg-indigo-50 text-indigo-700 font-semibold' :
+                                                    ''">
                                                 -- Pilih Instansi --
                                             </button>
-                                            @foreach($instansi as $inst)
-                                                <button type="button" @click="createForm.instansi_id = '{{ $inst->id }}'; createInstansiDropdownOpen = false"
+                                            @foreach ($instansi as $inst)
+                                                <button type="button"
+                                                    @click="createForm.instansi_id = '{{ $inst->id }}'; createInstansiDropdownOpen = false"
                                                     class="w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 last:rounded-b-lg"
-                                                    :class="String(createForm.instansi_id) === '{{ $inst->id }}' ? 'bg-indigo-50 text-indigo-700 font-semibold' : ''">
+                                                    :class="String(createForm.instansi_id) === '{{ $inst->id }}' ?
+                                                        'bg-indigo-50 text-indigo-700 font-semibold' : ''">
                                                     {{ $inst->nama }}
                                                 </button>
                                             @endforeach
@@ -204,8 +276,7 @@
                                     <label class="block text-sm font-semibold text-slate-900 mb-2">
                                         Telepon <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" x-model="createForm.telp" required
-                                        placeholder="Nomor telepon"
+                                    <input type="text" x-model="createForm.telp" required placeholder="Nomor telepon"
                                         class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                             </div>
@@ -214,8 +285,7 @@
                                 <label class="block text-sm font-semibold text-slate-900 mb-2">
                                     Alamat <span class="text-red-500">*</span>
                                 </label>
-                                <textarea x-model="createForm.alamat" required rows="2"
-                                    placeholder="Alamat lengkap"
+                                <textarea x-model="createForm.alamat" required rows="2" placeholder="Alamat lengkap"
                                     class="w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                             </div>
 
@@ -225,8 +295,7 @@
                                         Latitude <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" x-model="createForm.latitude" required
-                                        @input="updateCreateMapFromInputs()"
-                                        placeholder="Latitude"
+                                        @input="updateCreateMapFromInputs()" placeholder="Latitude"
                                         class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
@@ -234,17 +303,15 @@
                                         Longitude <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" x-model="createForm.longitude" required
-                                        @input="updateCreateMapFromInputs()"
-                                        placeholder="Longitude"
+                                        @input="updateCreateMapFromInputs()" placeholder="Longitude"
                                         class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-900 mb-2">
                                         Zoom <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="number" x-model.number="createForm.zoom" required min="1" max="20"
-                                        @input="updateCreateMapFromInputs()"
-                                        placeholder="Zoom level"
+                                    <input type="number" x-model.number="createForm.zoom" required min="1"
+                                        max="20" @input="updateCreateMapFromInputs()" placeholder="Zoom level"
                                         class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                             </div>
@@ -255,7 +322,8 @@
                                     Pilih Lokasi di Peta
                                 </label>
                                 <div id="createMap" class="user-map border border-slate-200"></div>
-                                <p class="text-xs text-slate-500 mt-2">Klik pada peta untuk memilih koordinat, atau ketik koordinat secara manual.</p>
+                                <p class="text-xs text-slate-500 mt-2">Klik pada peta untuk memilih koordinat, atau ketik
+                                    koordinat secara manual.</p>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -264,21 +332,27 @@
                                         Logo <span class="text-red-500">*</span>
                                     </label>
                                     <div class="relative">
-                                        <input type="file" id="create_logo" @change="createForm.logo = $event.target.files[0]; previewCreateLogo()" accept="image/*" required
-                                            class="hidden">
-                                        <label for="create_logo"
-                                            @dragover.prevent="createLogoDragover = true"
+                                        <input type="file" id="create_logo"
+                                            @change="createForm.logo = $event.target.files[0]; previewCreateLogo()"
+                                            accept="image/*" required class="hidden">
+                                        <label for="create_logo" @dragover.prevent="createLogoDragover = true"
                                             @dragleave.prevent="createLogoDragover = false"
                                             @drop.prevent="handleCreateLogoDrop"
-                                            :class="createLogoDragover ? 'bg-indigo-50 border-indigo-400' : 'bg-slate-50 border-slate-200'"
+                                            :class="createLogoDragover ? 'bg-indigo-50 border-indigo-400' :
+                                                'bg-slate-50 border-slate-200'"
                                             class="flex items-center justify-center w-full px-6 py-12 border-2 border-dashed rounded-lg cursor-pointer transition-colors">
                                             <div x-show="!createLogoPreview" class="text-center">
-                                                <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                <svg class="mx-auto h-12 w-12 text-slate-400" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="1.5"
+                                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                                 </svg>
-                                                <p class="mt-2 text-sm text-slate-600">Seret file ke area ini atau klik untuk memilih file.</p>
+                                                <p class="mt-2 text-sm text-slate-600">Seret file ke area ini atau klik
+                                                    untuk memilih file.</p>
                                             </div>
-                                            <img x-show="createLogoPreview" :src="createLogoPreview" class="max-h-32 max-w-full" alt="Preview">
+                                            <img x-show="createLogoPreview" :src="createLogoPreview"
+                                                class="max-h-32 max-w-full" alt="Preview">
                                         </label>
                                     </div>
                                 </div>
@@ -287,21 +361,28 @@
                                         Logo Mobile <span class="text-red-500">*</span>
                                     </label>
                                     <div class="relative">
-                                        <input type="file" id="create_logo_mobile" @change="createForm.logo_mobile = $event.target.files[0]; previewCreateLogoMobile()" accept="image/*" required
-                                            class="hidden">
+                                        <input type="file" id="create_logo_mobile"
+                                            @change="createForm.logo_mobile = $event.target.files[0]; previewCreateLogoMobile()"
+                                            accept="image/*" required class="hidden">
                                         <label for="create_logo_mobile"
                                             @dragover.prevent="createLogoMobileDragover = true"
                                             @dragleave.prevent="createLogoMobileDragover = false"
                                             @drop.prevent="handleCreateLogoMobileDrop"
-                                            :class="createLogoMobileDragover ? 'bg-indigo-50 border-indigo-400' : 'bg-slate-50 border-slate-200'"
+                                            :class="createLogoMobileDragover ? 'bg-indigo-50 border-indigo-400' :
+                                                'bg-slate-50 border-slate-200'"
                                             class="flex items-center justify-center w-full px-6 py-12 border-2 border-dashed rounded-lg cursor-pointer transition-colors">
                                             <div x-show="!createLogoMobilePreview" class="text-center">
-                                                <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                <svg class="mx-auto h-12 w-12 text-slate-400" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="1.5"
+                                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                                 </svg>
-                                                <p class="mt-2 text-sm text-slate-600">Seret file ke area ini atau klik untuk memilih file.</p>
+                                                <p class="mt-2 text-sm text-slate-600">Seret file ke area ini atau klik
+                                                    untuk memilih file.</p>
                                             </div>
-                                            <img x-show="createLogoMobilePreview" :src="createLogoMobilePreview" class="max-h-32 max-w-full" alt="Preview">
+                                            <img x-show="createLogoMobilePreview" :src="createLogoMobilePreview"
+                                                class="max-h-32 max-w-full" alt="Preview">
                                         </label>
                                     </div>
                                 </div>
@@ -332,45 +413,48 @@
             <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                 x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 bg-gray-500/75" @click="closeDeleteModal()"></div>
+                x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500/75" @click="closeDeleteModal()">
+            </div>
 
             <div class="fixed inset-0 flex items-center justify-center p-4">
                 <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
-                    x-transition:enter-start="opacity-0 scale-95 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                    x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="ease-in-out duration-200"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden" @click.stop>
 
-                    <div class="px-6 py-5 border-b border-slate-200">
-                        <div class="flex items-center gap-3">
-                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="px-6 py-5">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center">
+                                <svg class="w-14 h-14 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                             </div>
-                            <h3 class="text-lg font-bold text-slate-900">Konfirmasi Hapus</h3>
+                            <h3 class="text-xl text-center font-bold text-blue-900">Hapus User</h3>
                         </div>
                     </div>
 
-                    <div class="px-6 py-4">
-                        <p class="text-sm text-slate-600">
+                    <div class="px-6 py-3">
+                        <p class="text-sm text-center text-slate-600">
                             Apakah Anda yakin ingin menghapus user
                             <span class="font-semibold text-slate-900" x-text="deleteData.name"></span>?
                         </p>
-                        <p class="mt-2 text-sm text-red-600 font-medium">
+                        <p class="mt-2 text-sm text-center text-red-600 font-medium">
                             Tindakan ini tidak dapat dibatalkan.
                         </p>
                     </div>
 
-                    <div class="flex items-center justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
+                    <div class="flex items-center justify-center gap-3 px-6 py-4">
                         <button type="button" @click="closeDeleteModal()"
-                            class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition-colors">
+                            class="px-12 py-2 rounded-lg border border-blue-300 text-blue-700 font-semibold hover:bg-blue-100 transition-colors">
                             Batal
                         </button>
                         <button type="button" @click="confirmDelete()"
-                            class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors">
+                            class="px-12 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors">
                             Hapus
                         </button>
                     </div>
@@ -385,13 +469,14 @@
             <div x-show="showEditModal" x-transition:enter="ease-in-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                 x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 bg-gray-500/75" @click="closeEditModal()"></div>
+                x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500/75" @click="closeEditModal()"></div>
 
             <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
                 <div x-show="showEditModal" x-transition:enter="ease-in-out duration-300"
-                    x-transition:enter-start="opacity-0 scale-95 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                    x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="ease-in-out duration-200"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden my-8" @click.stop>
 
@@ -424,16 +509,14 @@
                                         <label class="block text-sm font-semibold text-slate-900 mb-2">
                                             Nama <span class="text-red-500">*</span>
                                         </label>
-                                        <input type="text" x-model="editForm.nama" required
-                                            placeholder="Nama lengkap"
+                                        <input type="text" x-model="editForm.nama" required placeholder="Nama lengkap"
                                             class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-slate-900 mb-2">
                                             Username <span class="text-red-500">*</span>
                                         </label>
-                                        <input type="text" x-model="editForm.username" required
-                                            placeholder="Username"
+                                        <input type="text" x-model="editForm.username" required placeholder="Username"
                                             class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
@@ -451,18 +534,22 @@
                                         <div class="relative" @click.outside="closeEditRoleDropdown()">
                                             <button type="button" @click="editRoleDropdownOpen = !editRoleDropdownOpen"
                                                 class="w-full h-10 rounded-lg border border-slate-200 px-3 py-2 text-left text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors">
-                                                <span x-text="editForm.level_user || '-- Pilih Role --'" class="flex-1"></span>
-                                                <svg class="h-4 w-4 text-slate-500 transition-transform flex-shrink-0" :class="editRoleDropdownOpen ? 'rotate-180' : ''"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <span x-text="editForm.level_user || '-- Pilih Role --'"
+                                                    class="flex-1"></span>
+                                                <svg class="h-4 w-4 text-slate-500 transition-transform flex-shrink-0"
+                                                    :class="editRoleDropdownOpen ? 'rotate-180' : ''" viewBox="0 0 24 24"
+                                                    fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M6 9l6 6 6-6" />
                                                 </svg>
                                             </button>
                                             <div x-show="editRoleDropdownOpen" x-cloak x-transition
                                                 class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
-                                                @foreach($roles as $role)
-                                                    <button type="button" @click="editForm.level_user = '{{ $role->role_name }}'; editRoleDropdownOpen = false"
+                                                @foreach ($roles as $role)
+                                                    <button type="button"
+                                                        @click="editForm.level_user = '{{ $role->role_name }}'; editRoleDropdownOpen = false"
                                                         class="w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 first:rounded-t-lg last:rounded-b-lg"
-                                                        :class="editForm.level_user === '{{ $role->role_name }}' ? 'bg-indigo-50 text-indigo-700 font-semibold' : ''">
+                                                        :class="editForm.level_user === '{{ $role->role_name }}' ?
+                                                            'bg-indigo-50 text-indigo-700 font-semibold' : ''">
                                                         {{ $role->role_name }}
                                                     </button>
                                                 @endforeach
@@ -474,25 +561,33 @@
                                             Instansi <span class="text-red-500">*</span>
                                         </label>
                                         <div class="relative" @click.outside="closeEditInstansiDropdown()">
-                                            <button type="button" @click="editInstansiDropdownOpen = !editInstansiDropdownOpen"
+                                            <button type="button"
+                                                @click="editInstansiDropdownOpen = !editInstansiDropdownOpen"
                                                 class="w-full h-10 rounded-lg border border-slate-200 px-3 py-2 text-left text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors">
-                                                <span x-text="getInstansiLabel(editForm.instansi_id, 'edit')" class="flex-1"></span>
-                                                <svg class="h-4 w-4 text-slate-500 transition-transform flex-shrink-0" :class="editInstansiDropdownOpen ? 'rotate-180' : ''"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <span x-text="getInstansiLabel(editForm.instansi_id, 'edit')"
+                                                    class="flex-1"></span>
+                                                <svg class="h-4 w-4 text-slate-500 transition-transform flex-shrink-0"
+                                                    :class="editInstansiDropdownOpen ? 'rotate-180' : ''"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2">
                                                     <path d="M6 9l6 6 6-6" />
                                                 </svg>
                                             </button>
                                             <div x-show="editInstansiDropdownOpen" x-cloak x-transition
                                                 class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
-                                                <button type="button" @click="editForm.instansi_id = ''; editInstansiDropdownOpen = false"
+                                                <button type="button"
+                                                    @click="editForm.instansi_id = ''; editInstansiDropdownOpen = false"
                                                     class="w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 first:rounded-t-lg"
-                                                    :class="!editForm.instansi_id ? 'bg-indigo-50 text-indigo-700 font-semibold' : ''">
+                                                    :class="!editForm.instansi_id ?
+                                                        'bg-indigo-50 text-indigo-700 font-semibold' : ''">
                                                     -- Pilih Instansi --
                                                 </button>
-                                                @foreach($instansi as $inst)
-                                                    <button type="button" @click="editForm.instansi_id = '{{ $inst->id }}'; editInstansiDropdownOpen = false"
+                                                @foreach ($instansi as $inst)
+                                                    <button type="button"
+                                                        @click="editForm.instansi_id = '{{ $inst->id }}'; editInstansiDropdownOpen = false"
                                                         class="w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 last:rounded-b-lg"
-                                                        :class="String(editForm.instansi_id) === '{{ $inst->id }}' ? 'bg-indigo-50 text-indigo-700 font-semibold' : ''">
+                                                        :class="String(editForm.instansi_id) === '{{ $inst->id }}' ?
+                                                            'bg-indigo-50 text-indigo-700 font-semibold' : ''">
                                                         {{ $inst->nama }}
                                                     </button>
                                                 @endforeach
@@ -513,8 +608,7 @@
                                     <label class="block text-sm font-semibold text-slate-900 mb-2">
                                         Alamat <span class="text-red-500">*</span>
                                     </label>
-                                    <textarea x-model="editForm.alamat" required rows="2"
-                                        placeholder="Alamat lengkap"
+                                    <textarea x-model="editForm.alamat" required rows="2" placeholder="Alamat lengkap"
                                         class="w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                                 </div>
 
@@ -524,8 +618,7 @@
                                             Latitude <span class="text-red-500">*</span>
                                         </label>
                                         <input type="text" x-model="editForm.latitude" required
-                                            @input="updateEditMapFromInputs()"
-                                            placeholder="Latitude"
+                                            @input="updateEditMapFromInputs()" placeholder="Latitude"
                                             class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
@@ -533,17 +626,15 @@
                                             Longitude <span class="text-red-500">*</span>
                                         </label>
                                         <input type="text" x-model="editForm.longitude" required
-                                            @input="updateEditMapFromInputs()"
-                                            placeholder="Longitude"
+                                            @input="updateEditMapFromInputs()" placeholder="Longitude"
                                             class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-slate-900 mb-2">
                                             Zoom <span class="text-red-500">*</span>
                                         </label>
-                                        <input type="number" x-model.number="editForm.zoom" required min="1" max="20"
-                                            @input="updateEditMapFromInputs()"
-                                            placeholder="Zoom level"
+                                        <input type="number" x-model.number="editForm.zoom" required min="1"
+                                            max="20" @input="updateEditMapFromInputs()" placeholder="Zoom level"
                                             class="w-full h-10 rounded-lg border border-slate-200 px-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                 </div>
@@ -554,7 +645,8 @@
                                         Pilih Lokasi di Peta
                                     </label>
                                     <div id="editMap" class="user-map border border-slate-200"></div>
-                                    <p class="text-xs text-slate-500 mt-2">Klik pada peta untuk memilih koordinat, atau ketik koordinat secara manual.</p>
+                                    <p class="text-xs text-slate-500 mt-2">Klik pada peta untuk memilih koordinat, atau
+                                        ketik koordinat secara manual.</p>
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -563,21 +655,27 @@
                                             Logo (kosongkan jika tidak diubah)
                                         </label>
                                         <div class="relative">
-                                            <input type="file" id="edit_logo" @change="editForm.logo = $event.target.files[0]; previewEditLogo()" accept="image/*"
-                                                class="hidden">
-                                            <label for="edit_logo"
-                                                @dragover.prevent="editLogoDragover = true"
+                                            <input type="file" id="edit_logo"
+                                                @change="editForm.logo = $event.target.files[0]; previewEditLogo()"
+                                                accept="image/*" class="hidden">
+                                            <label for="edit_logo" @dragover.prevent="editLogoDragover = true"
                                                 @dragleave.prevent="editLogoDragover = false"
                                                 @drop.prevent="handleEditLogoDrop"
-                                                :class="editLogoDragover ? 'bg-indigo-50 border-indigo-400' : 'bg-slate-50 border-slate-200'"
+                                                :class="editLogoDragover ? 'bg-indigo-50 border-indigo-400' :
+                                                    'bg-slate-50 border-slate-200'"
                                                 class="flex items-center justify-center w-full px-6 py-12 border-2 border-dashed rounded-lg cursor-pointer transition-colors">
                                                 <div x-show="!editLogoPreview" class="text-center">
-                                                    <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                    <svg class="mx-auto h-12 w-12 text-slate-400" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="1.5"
+                                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                                     </svg>
-                                                    <p class="mt-2 text-sm text-slate-600">Seret file ke area ini atau klik untuk memilih file.</p>
+                                                    <p class="mt-2 text-sm text-slate-600">Seret file ke area ini atau klik
+                                                        untuk memilih file.</p>
                                                 </div>
-                                                <img x-show="editLogoPreview" :src="editLogoPreview" class="max-h-32 max-w-full" alt="Preview">
+                                                <img x-show="editLogoPreview" :src="editLogoPreview"
+                                                    class="max-h-32 max-w-full" alt="Preview">
                                             </label>
                                         </div>
                                     </div>
@@ -586,21 +684,28 @@
                                             Logo Mobile (kosongkan jika tidak diubah)
                                         </label>
                                         <div class="relative">
-                                            <input type="file" id="edit_logo_mobile" @change="editForm.logo_mobile = $event.target.files[0]; previewEditLogoMobile()" accept="image/*"
-                                                class="hidden">
+                                            <input type="file" id="edit_logo_mobile"
+                                                @change="editForm.logo_mobile = $event.target.files[0]; previewEditLogoMobile()"
+                                                accept="image/*" class="hidden">
                                             <label for="edit_logo_mobile"
                                                 @dragover.prevent="editLogoMobileDragover = true"
                                                 @dragleave.prevent="editLogoMobileDragover = false"
                                                 @drop.prevent="handleEditLogoMobileDrop"
-                                                :class="editLogoMobileDragover ? 'bg-indigo-50 border-indigo-400' : 'bg-slate-50 border-slate-200'"
+                                                :class="editLogoMobileDragover ? 'bg-indigo-50 border-indigo-400' :
+                                                    'bg-slate-50 border-slate-200'"
                                                 class="flex items-center justify-center w-full px-6 py-12 border-2 border-dashed rounded-lg cursor-pointer transition-colors">
                                                 <div x-show="!editLogoMobilePreview" class="text-center">
-                                                    <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                    <svg class="mx-auto h-12 w-12 text-slate-400" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="1.5"
+                                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                                     </svg>
-                                                    <p class="mt-2 text-sm text-slate-600">Seret file ke area ini atau klik untuk memilih file.</p>
+                                                    <p class="mt-2 text-sm text-slate-600">Seret file ke area ini atau klik
+                                                        untuk memilih file.</p>
                                                 </div>
-                                                <img x-show="editLogoMobilePreview" :src="editLogoMobilePreview" class="max-h-32 max-w-full" alt="Preview">
+                                                <img x-show="editLogoMobilePreview" :src="editLogoMobilePreview"
+                                                    class="max-h-32 max-w-full" alt="Preview">
                                             </label>
                                         </div>
                                     </div>
@@ -632,6 +737,7 @@
                 showCreateModal: false,
                 showEditModal: false,
                 showDeleteModal: false,
+                searchQuery: '',
                 createRoleDropdownOpen: false,
                 createInstansiDropdownOpen: false,
                 editRoleDropdownOpen: false,
@@ -700,6 +806,34 @@
                     console.log(`=== ${label} ===`);
                     console.log('Create Form:', this.createForm);
                     console.log('Edit Form:', this.editForm);
+                },
+
+                users: {!! json_encode(
+                    $users->map(
+                        fn($u) => [
+                            'id_user' => $u->id_user,
+                            'nama' => $u->nama,
+                            'username' => $u->username,
+                            'level_user' => $u->level_user,
+                            'instansi' => $u->instansi?->nama ?? ($u->instansi ?? ''),
+                            'telp' => $u->telp ?? '',
+                            'alamat' => $u->alamat ?? '',
+                        ],
+                    ),
+                ) !!},
+
+                filteredUsers() {
+                    const q = (this.searchQuery || '').toLowerCase().trim()
+                    if (!q) return this.users
+
+                    return this.users.filter(u =>
+                        (u.nama || '').toLowerCase().includes(q) ||
+                        (u.username || '').toLowerCase().includes(q) ||
+                        (u.level_user || '').toLowerCase().includes(q) ||
+                        (u.instansi || '').toLowerCase().includes(q) ||
+                        (u.telp || '').toLowerCase().includes(q) ||
+                        (u.alamat || '').toLowerCase().includes(q)
+                    )
                 },
 
                 closeCreateRoleDropdown() {
@@ -1147,7 +1281,9 @@
                             subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
                         }).addTo(this.createMap);
 
-                        this.createMarker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(this.createMap);
+                        this.createMarker = L.marker([defaultLat, defaultLng], {
+                            draggable: true
+                        }).addTo(this.createMap);
 
                         // Map click event
                         this.createMap.on('click', (e) => {
@@ -1208,7 +1344,9 @@
                             subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
                         }).addTo(this.editMap);
 
-                        this.editMarker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(this.editMap);
+                        this.editMarker = L.marker([defaultLat, defaultLng], {
+                            draggable: true
+                        }).addTo(this.editMap);
 
                         // Map click event
                         this.editMap.on('click', (e) => {
@@ -1253,13 +1391,19 @@
                 },
 
                 async deleteUser(userId, userName) {
-                    this.deleteData = { id: userId, name: userName };
+                    this.deleteData = {
+                        id: userId,
+                        name: userName
+                    };
                     this.showDeleteModal = true;
                 },
 
                 closeDeleteModal() {
                     this.showDeleteModal = false;
-                    this.deleteData = { id: null, name: '' };
+                    this.deleteData = {
+                        id: null,
+                        name: ''
+                    };
                 },
 
                 async confirmDelete() {

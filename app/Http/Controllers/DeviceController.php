@@ -91,6 +91,44 @@ class DeviceController extends Controller
         ]);
     }
 
+    public function storeDataPerangkat(Request $request)
+    {
+        // VALIDASI
+        $request->validate([
+            'nama_logger'        => 'required|string|max:255',
+            'id_katlogger'       => 'nullable|exists:kategori_logger,id_katlogger',
+            'seri'               => 'nullable|string|max:255',
+            'serial_number'      => 'nullable|string|max:255',
+            'sensor_type'        => 'nullable|string|max:255',
+            'no_hp'              => 'nullable|string|max:20',
+            'tanggal_pemasangan' => 'nullable|date',
+            'masa_garansi'       => 'nullable|date',
+            'nama_penjaga'       => 'nullable|string|max:255',
+        ]);
+
+        // BUAT DATA LOGGER BARU
+        $logger = new t_Logger();
+        $logger->nama_logger = $request->nama_logger;
+        $logger->id_katlogger = $request->id_katlogger;
+        $logger->id_instansi = auth()->user()->id_instansi;
+        $logger->save();
+
+        // BUAT DATA INFORMASI PERANGKAT
+        $informasi = new t_Informasi();
+        $informasi->id_logger = $logger->id_logger;
+        $informasi->seri_logger = $request->seri;
+        $informasi->serial_number = $request->serial_number;
+        $informasi->sensor = $request->sensor_type;
+        $informasi->no_pic = $request->no_hp;
+        $informasi->nama_pic = $request->nama_penjaga;
+        $informasi->tanggal_pemasangan = $request->tanggal_pemasangan;
+        $informasi->garansi = $request->masa_garansi;
+        $informasi->save();
+
+        // REDIRECT KE HALAMAN SEBELUMNYA
+        return back()->with('success', 'Data perangkat berhasil ditambahkan.');
+    }
+
     public function updateDataPerangkat(Request $request, $id)
     {
         // VALIDASI

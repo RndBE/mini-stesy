@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <div class="relative" x-data="{ open: false }">
+        <div class="relative z-50" x-data="{ open: false }">
             <button type="button"
                 class="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50"
                 @click="open = !open" @keydown.escape.window="open = false">

@@ -44,6 +44,7 @@ class MiniStesySeeder extends Seeder
         DB::table('t_logger')->truncate();
 
         DB::table('klasifikasi_hujan')->truncate();
+        if (Schema::hasTable('klasifikasi_threshold')) DB::table('klasifikasi_threshold')->truncate();
 
         if (Schema::hasTable('t_s19_01')) DB::table('t_s19_01')->truncate();
         if (Schema::hasTable('t_s16_01')) DB::table('t_s16_01')->truncate();
@@ -180,22 +181,111 @@ class MiniStesySeeder extends Seeder
             ['id' => 8, 'id_kategori' => 2, 'nama_filter' => 'Koneksi Terputus', 'icon' => 'arr_of'],
         ]);
 
-        DB::table('klasifikasi_hujan')->insert([
-            ['id_klasifikasi' => 1, 'waktuper' => '1jam', 'hijau' => 5, 'biru' => '10', 'biru_tua' => 20, 'kuning' => 50, 'oranye' => 80, 'merah' => 100],
-        ]);
+        // Dynamic rain classification thresholds for ARR kategori
+        $arrKategoriId = DB::table('kategori_logger')->where('nama_kategori', 'ARR')->value('id_katlogger');
+
+        if ($arrKategoriId && Schema::hasTable('klasifikasi_threshold')) {
+            DB::table('klasifikasi_threshold')->insert([
+                [
+                    'id_kategori' => $arrKategoriId,
+                    'state_key' => 'tidak_hujan',
+                    'state_label' => 'Tidak Hujan',
+                    'min_value' => null,
+                    'max_value' => 0.10,
+                    'icon_path' => '/icons/arr/tidak_hujan.svg',
+                    'color_hex' => '#22c55e',
+                    'sort_order' => 1,
+                ],
+                [
+                    'id_kategori' => $arrKategoriId,
+                    'state_key' => 'hujan_sangat_ringan',
+                    'state_label' => 'Hujan Sangat Ringan',
+                    'min_value' => 0.10,
+                    'max_value' => 1.00,
+                    'icon_path' => '/icons/arr/hujan_sangat_ringan.svg',
+                    'color_hex' => '#7dd3fc',
+                    'sort_order' => 2,
+                ],
+                [
+                    'id_kategori' => $arrKategoriId,
+                    'state_key' => 'hujan_ringan',
+                    'state_label' => 'Hujan Ringan',
+                    'min_value' => 1.00,
+                    'max_value' => 2.50,
+                    'icon_path' => '/icons/arr/hujan_ringan.svg',
+                    'color_hex' => '#3b82f6',
+                    'sort_order' => 3,
+                ],
+                [
+                    'id_kategori' => $arrKategoriId,
+                    'state_key' => 'hujan_sedang',
+                    'state_label' => 'Hujan Sedang',
+                    'min_value' => 2.50,
+                    'max_value' => 7.60,
+                    'icon_path' => '/icons/arr/hujan_sedang.svg',
+                    'color_hex' => '#eab308',
+                    'sort_order' => 4,
+                ],
+                [
+                    'id_kategori' => $arrKategoriId,
+                    'state_key' => 'hujan_lebat',
+                    'state_label' => 'Hujan Lebat',
+                    'min_value' => 7.60,
+                    'max_value' => 15.60,
+                    'icon_path' => '/icons/arr/hujan_lebat.svg',
+                    'color_hex' => '#f97316',
+                    'sort_order' => 5,
+                ],
+                [
+                    'id_kategori' => $arrKategoriId,
+                    'state_key' => 'hujan_sangat_lebat',
+                    'state_label' => 'Hujan Sangat Lebat',
+                    'min_value' => 15.60,
+                    'max_value' => null,
+                    'icon_path' => '/icons/arr/hujan_sangat_lebat.svg',
+                    'color_hex' => '#ef4444',
+                    'sort_order' => 6,
+                ],
+                [
+                    'id_kategori' => $arrKategoriId,
+                    'state_key' => 'koneksi_terputus',
+                    'state_label' => 'Koneksi Terputus',
+                    'min_value' => null,
+                    'max_value' => null,
+                    'icon_path' => '/icons/arr/koneksi_terputus.svg',
+                    'color_hex' => '#9ca3af',
+                    'sort_order' => 7,
+                ],
+            ]);
+        }
 
         DB::table('t_logger')->insert([
-            ['id' => 1, 'id_logger' => '10001', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'AWLR Seturan', 'tabel_main' => 't_s19_01', 'jeda_notif' => 10, 'idlokasi' => 1, 'id_katlogger' => 1, 'sensor_count' => 19],
-            ['id' => 2, 'id_logger' => '10002', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'ARR Pogung', 'tabel_main' => 't_s16_01', 'jeda_notif' => 10, 'idlokasi' => 2, 'id_katlogger' => 2, 'sensor_count' => 16],
-            ['id' => 3, 'id_logger' => '10003', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'AWLR Sinduadi', 'tabel_main' => 't_s16_01', 'jeda_notif' => 15, 'idlokasi' => 3, 'id_katlogger' => 1, 'sensor_count' => 16],
-            ['id' => 4, 'id_logger' => '10004', 'instansi_id' => $instansiContohId, 'nama_logger' => 'ARR Bantar', 'tabel_main' => 't_s19_01', 'jeda_notif' => 20, 'idlokasi' => 4, 'id_katlogger' => 2, 'sensor_count' => 19],
+            ['id' => 1, 'id_logger' => '10001', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'AWLR Seturan', 'tabel_main' => 't_s19_01', 'jeda_notif' => 1, 'idlokasi' => 1, 'id_katlogger' => 1, 'sensor_count' => 19],
+            ['id' => 2, 'id_logger' => '10002', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'ARR Pogung', 'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 2, 'id_katlogger' => 2, 'sensor_count' => 16],
+            ['id' => 3, 'id_logger' => '10003', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'AWLR Sinduadi', 'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 3, 'id_katlogger' => 1, 'sensor_count' => 16],
+            ['id' => 4, 'id_logger' => '10004', 'instansi_id' => $instansiContohId, 'nama_logger' => 'ARR Bantar', 'tabel_main' => 't_s19_01', 'jeda_notif' => 1, 'idlokasi' => 4, 'id_katlogger' => 2, 'sensor_count' => 19],
+        ]);
+
+        DB::table('klasifikasi_hujan')->insert([
+            ['id_klasifikasi' => 1,'logger_id'=> '10002', 'waktu' => 'perjam', 'debit_air' => 0, 'intensitas' => 'Tidak Hujan'],
+            ['id_klasifikasi' => 2,'logger_id'=> '10002', 'waktu' => 'perjam', 'debit_air' => 0.1, 'intensitas' => 'Hujan Sangat Ringan'],
+            ['id_klasifikasi' => 3,'logger_id'=> '10002', 'waktu' => 'perjam', 'debit_air' => 2.5, 'intensitas' => 'Hujan Ringan'],
+            ['id_klasifikasi' => 4,'logger_id'=> '10002', 'waktu' => 'perjam', 'debit_air' => 7.6, 'intensitas' => 'Hujan Sedang'],
+            ['id_klasifikasi' => 5,'logger_id'=> '10002', 'waktu' => 'perjam', 'debit_air' => 15.6, 'intensitas' => 'Hujan Lebat'],
+            ['id_klasifikasi' => 6,'logger_id'=> '10002', 'waktu' => 'perjam', 'debit_air' => 30.1, 'intensitas' => 'Hujan Sangat Lebat'],
+            ['id_klasifikasi' => 7,'logger_id'=> '10002', 'waktu' => 'perhari', 'debit_air' => 0, 'intensitas' => 'Tidak Hujan'],
+            ['id_klasifikasi' => 8,'logger_id'=> '10002', 'waktu' => 'perhari', 'debit_air' => 2.5, 'intensitas' => 'Hujan Sangat Ringan'],
+            ['id_klasifikasi' => 9,'logger_id'=> '10002', 'waktu' => 'perhari', 'debit_air' => 15.5, 'intensitas' => 'Hujan Ringan'],
+            ['id_klasifikasi' => 10,'logger_id'=> '10002', 'waktu' => 'perhari', 'debit_air' => 60.5, 'intensitas' => 'Hujan Sedang'],
+            ['id_klasifikasi' => 11,'logger_id'=> '10002', 'waktu' => 'perhari', 'debit_air' => 100.5, 'intensitas' => 'Hujan Lebat'],
+            ['id_klasifikasi' => 12,'logger_id'=> '10002', 'waktu' => 'perhari', 'debit_air' => 250.5, 'intensitas' => 'Hujan Sangat Lebat'],
         ]);
 
         DB::table('parameter_sensor')->insert([
             ['id_param' => 1, 'logger_id' => '10001', 'nama_parameter' => 'TMA', 'kolom_sensor' => 'sensor14', 'satuan' => 'cm', 'tipe_graf' => 'line', 'icon_app' => 'water', 'debit_awlr' => '-', 'parameter_utama' => 'tma'],
-            ['id_param' => 2, 'logger_id' => '10002', 'nama_parameter' => 'Curah Hujan', 'kolom_sensor' => 'sensor12', 'satuan' => 'mm', 'tipe_graf' => 'bar', 'icon_app' => 'rain', 'debit_awlr' => '-', 'parameter_utama' => 'hujan'],
+            ['id_param' => 2, 'logger_id' => '10002', 'nama_parameter' => 'Curah Hujan', 'kolom_sensor' => 'sensor8', 'satuan' => 'mm', 'tipe_graf' => 'bar', 'icon_app' => 'rain', 'debit_awlr' => '-', 'parameter_utama' => 'hujan'],
             ['id_param' => 3, 'logger_id' => '10003', 'nama_parameter' => 'TMA', 'kolom_sensor' => 'sensor14', 'satuan' => 'cm', 'tipe_graf' => 'line', 'icon_app' => 'water', 'debit_awlr' => '-', 'parameter_utama' => 'tma'],
-            ['id_param' => 4, 'logger_id' => '10004', 'nama_parameter' => 'Curah Hujan', 'kolom_sensor' => 'sensor12', 'satuan' => 'mm', 'tipe_graf' => 'bar', 'icon_app' => 'rain', 'debit_awlr' => '-', 'parameter_utama' => 'hujan'],
+            ['id_param' => 4, 'logger_id' => '10004', 'nama_parameter' => 'Curah Hujan', 'kolom_sensor' => 'sensor8', 'satuan' => 'mm', 'tipe_graf' => 'bar', 'icon_app' => 'rain', 'debit_awlr' => '-', 'parameter_utama' => 'hujan'],
 
             ['id_param' => 5, 'logger_id' => '10001', 'nama_parameter' => 'humidity_logger', 'kolom_sensor' => 'sensor5', 'satuan' => '%', 'tipe_graf' => 'line', 'icon_app' => 'water_percent', 'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
             ['id_param' => 6, 'logger_id' => '10001', 'nama_parameter' => 'battery_logger', 'kolom_sensor' => 'sensor4', 'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80', 'debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
@@ -564,13 +654,15 @@ class MiniStesySeeder extends Seeder
         }
 
         $start = Carbon::create(2026, 1, 7, 0, 0, 0);
-        $end = Carbon::create(2026, 2, 5, 23, 0, 0);
+        $end = Carbon::create(2026, 2, 12, 23, 0, 0);
 
         if (Schema::hasTable('t_s19_01')) {
             DB::table('t_s19_01')->where('id_logger', '10001')->whereBetween('waktu', [$start, $end])->delete();
+            DB::table('t_s19_01')->where('id_logger', '10004')->whereBetween('waktu', [$start, $end])->delete();
         }
 
         if (Schema::hasTable('t_s16_01')) {
+            DB::table('t_s16_01')->where('id_logger', '10002')->whereBetween('waktu', [$start, $end])->delete();
             DB::table('t_s16_01')->where('id_logger', '10003')->whereBetween('waktu', [$start, $end])->delete();
         }
 
@@ -594,11 +686,13 @@ class MiniStesySeeder extends Seeder
 
         $this->seedS19Logger10001($start, $end, $badDays);
         $this->seedS16Logger10003($start, $end, $badDays);
+        $this->seedS16Logger10002($start, $end, $badDays);
+        $this->seedS19Logger10004($start, $end, $badDays);
     }
 
     private function seedS19Logger10001(Carbon $start, Carbon $end, array $badDays): void
     {
-        $intervalMinutes = 10;
+        $intervalMinutes = 1;
         $bulk = [];
         $current = $start->copy();
 
@@ -647,7 +741,7 @@ class MiniStesySeeder extends Seeder
 
     private function seedS16Logger10003(Carbon $start, Carbon $end, array $badDays): void
     {
-        $intervalMinutes = 15;
+        $intervalMinutes = 1;
         $bulk = [];
         $current = $start->copy();
 
@@ -689,5 +783,110 @@ class MiniStesySeeder extends Seeder
         }
 
         if (!empty($bulk)) DB::table('t_s16_01')->insert($bulk);
+    }
+
+    private function seedS16Logger10002(Carbon $start, Carbon $end, array $badDays): void
+    {
+        $intervalMinutes = 1;
+        $bulk = [];
+        $current = $start->copy();
+
+        while ($current <= $end) {
+            $dayKey = $current->format('Y-m-d');
+            $keepRate = $badDays[$dayKey] ?? 1.0;
+
+            if ($keepRate >= 1.0 || (mt_rand(1, 10000) / 10000) <= $keepRate) {
+                $time = $current->format('Y-m-d H:i:s');
+                $hour = (int) $current->format('H');
+
+                // Rainfall pattern: higher chance during certain hours
+                $rainChance = ($hour >= 13 && $hour <= 18) ? 0.4 : 0.15;
+                $rainfall = (mt_rand(1, 100) / 100) <= $rainChance ? mt_rand(0, 150) / 10 : mt_rand(0, 5) / 100;
+
+                $bulk[] = [
+                    'id_logger' => '10002',
+                    'waktu' => $time,
+                    'sensor1' => mt_rand(10, 30) / 10,
+                    'sensor2' => mt_rand(120, 130) / 10,
+                    'sensor3' => mt_rand(65, 85) / 10,
+                    'sensor4' => mt_rand(1, 5) / 10,
+                    'sensor5' => mt_rand(1, 5) / 10,
+                    'sensor6' => mt_rand(1, 5) / 10,
+                    'sensor7' => mt_rand(1, 5) / 10,
+                    'sensor8' => $rainfall,
+                    'sensor9' => mt_rand(1, 5) / 10,
+                    'sensor10' => mt_rand(1, 5) / 10,
+                    'sensor11' => mt_rand(1, 5) / 10,
+                    'sensor12' => mt_rand(1, 5) / 10,
+                    'sensor13' => mt_rand(1, 5) / 10,
+                    'sensor14' => mt_rand(1, 5) / 10,
+                    'sensor15' => mt_rand(26, 31),
+                    'sensor16' => mt_rand(1, 5) / 10,
+                ];
+
+                if (count($bulk) >= 500) {
+                    DB::table('t_s16_01')->insert($bulk);
+                    $bulk = [];
+                }
+            }
+
+            $current->addMinutes($intervalMinutes);
+        }
+
+        if (!empty($bulk)) DB::table('t_s16_01')->insert($bulk);
+    }
+
+    private function seedS19Logger10004(Carbon $start, Carbon $end, array $badDays): void
+    {
+        $intervalMinutes = 1;
+        $bulk = [];
+        $current = $start->copy();
+
+        while ($current <= $end) {
+            $dayKey = $current->format('Y-m-d');
+            $keepRate = $badDays[$dayKey] ?? 1.0;
+
+            if ($keepRate >= 1.0 || (mt_rand(1, 10000) / 10000) <= $keepRate) {
+                $time = $current->format('Y-m-d H:i:s');
+                $hour = (int) $current->format('H');
+
+                // Rainfall pattern: higher chance during night and afternoon
+                $rainChance = ($hour >= 14 && $hour <= 19) || ($hour >= 0 && $hour <= 3) ? 0.35 : 0.12;
+                $rainfall = (mt_rand(1, 100) / 100) <= $rainChance ? mt_rand(0, 180) / 10 : mt_rand(0, 8) / 100;
+
+                $bulk[] = [
+                    'id_logger' => '10004',
+                    'waktu' => $time,
+                    'sensor1' => mt_rand(15, 35) / 10,
+                    'sensor2' => mt_rand(25, 30),
+                    'sensor3' => mt_rand(1, 5) / 10,
+                    'sensor4' => mt_rand(1, 5) / 10,
+                    'sensor5' => mt_rand(120, 128) / 10,
+                    'sensor6' => mt_rand(1, 5) / 10,
+                    'sensor7' => mt_rand(70, 82) / 10,
+                    'sensor8' => $rainfall,
+                    'sensor9' => mt_rand(1, 5) / 10,
+                    'sensor10' => mt_rand(1, 5) / 10,
+                    'sensor11' => mt_rand(1, 5) / 10,
+                    'sensor12' => mt_rand(1, 5) / 10,
+                    'sensor13' => mt_rand(1, 5) / 10,
+                    'sensor14' => mt_rand(1, 5) / 10,
+                    'sensor15' => mt_rand(1, 5) / 10,
+                    'sensor16' => mt_rand(1, 5) / 10,
+                    'sensor17' => mt_rand(1, 5) / 10,
+                    'sensor18' => mt_rand(1, 5) / 10,
+                    'sensor19' => mt_rand(1, 5) / 10,
+                ];
+
+                if (count($bulk) >= 500) {
+                    DB::table('t_s19_01')->insert($bulk);
+                    $bulk = [];
+                }
+            }
+
+            $current->addMinutes($intervalMinutes);
+        }
+
+        if (!empty($bulk)) DB::table('t_s19_01')->insert($bulk);
     }
 }

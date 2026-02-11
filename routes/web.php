@@ -52,6 +52,7 @@ Route::middleware(['auth', 'permission:view_device'])->get('/pengaturan-device',
 Route::middleware(['auth', 'permission:manage_device'])->put('/pengaturan-device/{id}', [DeviceController::class, 'update'])->name('device.update');
 
 Route::middleware(['auth', 'permission:view_data_perangkat'])->get('/data-perangkat', [DeviceController::class, 'dataPerangkat'])->name('device.data');
+Route::middleware(['auth', 'permission:manage_data_perangkat'])->post('/data-perangkat', [DeviceController::class, 'storeDataPerangkat'])->name('device.storeDataPerangkat');
 Route::middleware(['auth', 'permission:manage_data_perangkat'])->put('/data-perangkat/{id}', [DeviceController::class, 'updateDataPerangkat'])->name('device.updateDataPerangkat');
 
 Route::middleware(['auth', 'permission:view_realtime'])->group(function () {
