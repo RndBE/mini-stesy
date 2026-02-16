@@ -48,7 +48,10 @@ Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
     Route::get('/api/data-masuk', [DataMasukController::class, 'getData'])->name('data-masuk.api');
 });
 
+// Device Routes
 Route::middleware(['auth', 'permission:view_device'])->get('/pengaturan-device', [DeviceController::class, 'index'])->name('device.index');
+Route::middleware(['auth', 'permission:manage_device'])->get('/pengaturan-device/create', [DeviceController::class, 'create'])->name('device.create');
+Route::middleware(['auth', 'permission:manage_device'])->post('/pengaturan-device', [DeviceController::class, 'store'])->name('device.store');
 Route::middleware(['auth', 'permission:manage_device'])->put('/pengaturan-device/{id}', [DeviceController::class, 'update'])->name('device.update');
 
 Route::middleware(['auth', 'permission:view_data_perangkat'])->get('/data-perangkat', [DeviceController::class, 'dataPerangkat'])->name('device.data');

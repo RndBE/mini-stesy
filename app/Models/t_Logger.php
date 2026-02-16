@@ -76,7 +76,7 @@ class t_Logger extends Model
 
     public function informasi()
     {
-        return $this->hasOne(t_Informasi::class, 'logger_id', 'id_logger');
+        return $this->hasOne(t_Informasi::class, 'logger_id', 'id_logger')->latest('id_inf');
     }
 
     public function fotos()

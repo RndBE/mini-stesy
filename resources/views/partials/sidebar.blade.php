@@ -298,7 +298,7 @@
         const mainContent = document.getElementById('mainContent');
         const isMobile = window.innerWidth <= 768;
 
-        sidebar.classList.toggle('collapsed');
+        if (!sidebar || !mainContent) return;
 
         if (sidebar.classList.contains('collapsed')) {
             if (mainContent && !isMobile) {
@@ -310,25 +310,48 @@
             }
         }
 
-        // Save state to localStorage
-        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        if (isMobile) {
+            mainContent.style.paddingLeft = '0';
+        } else {
+            mainContent.style.paddingLeft = collapsed ? '5rem' : '16rem';
+        }
+
+        localStorage.setItem('sidebarCollapsed', collapsed);
     }
 
-    // Restore sidebar state on page load
     document.addEventListener('DOMContentLoaded', function() {
         const isMobile = window.innerWidth <= 768;
         const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
 
         const sidebar = document.getElementById('mainSidebar');
         const mainContent = document.getElementById('mainContent');
+        const icon = document.getElementById('toggleIcon');
 
-        // On mobile, always start collapsed (hidden)
+        if (!sidebar || !mainContent) return;
+
         if (isMobile) {
-            if (sidebar && !sidebar.classList.contains('collapsed')) {
-                sidebar.classList.add('collapsed');
+            sidebar.classList.add('collapsed');
+            mainContent.style.paddingLeft = '0';
+            if (icon) {
+                icon.innerHTML =
+                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />';
             }
-            if (mainContent) {
-                mainContent.style.marginLeft = '0';
+            return;
+        }
+
+        if (isCollapsed) {
+            sidebar.classList.add('collapsed');
+            mainContent.style.paddingLeft = '5rem';
+            if (icon) {
+                icon.innerHTML =
+                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />';
+            }
+        } else {
+            sidebar.classList.remove('collapsed');
+            mainContent.style.paddingLeft = '16rem';
+            if (icon) {
+                icon.innerHTML =
+                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />';
             }
         } else if (isCollapsed) {
             // Desktop and saved as collapsed
@@ -337,20 +360,18 @@
         }
     });
 
-    // Handle window resize
     window.addEventListener('resize', function() {
         const isMobile = window.innerWidth <= 768;
         const mainContent = document.getElementById('mainContent');
         const sidebar = document.getElementById('mainSidebar');
 
-        if (isMobile && mainContent) {
-            mainContent.style.marginLeft = '0';
-        } else if (!isMobile && mainContent) {
-            if (sidebar.classList.contains('collapsed')) {
-                mainContent.style.marginLeft = '5rem';
-            } else {
-                mainContent.style.marginLeft = '16rem';
-            }
+        if (!mainContent || !sidebar) return;
+
+        if (isMobile) {
+            mainContent.style.paddingLeft = '0';
+            sidebar.classList.add('collapsed');
+        } else {
+            mainContent.style.paddingLeft = sidebar.classList.contains('collapsed') ? '5rem' : '16rem';
         }
     });
 </script>

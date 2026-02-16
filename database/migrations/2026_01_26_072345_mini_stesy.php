@@ -93,7 +93,7 @@ return new class extends Migration
             $table->string('longitude', 20);
             $table->text('alamat');
             // $table->string('das', 225);
-            $table->unsignedInteger('das_id');
+            $table->unsignedInteger('das_id')->nullable();
 
             $table->foreign('das_id', 'fk_lokasi_das')->references('id')->on('list_das')->cascadeOnUpdate()->cascadeOnDelete();
         });
@@ -195,10 +195,10 @@ return new class extends Migration
             $table->string('nama_parameter', 25);
             $table->string('kolom_sensor', 20);
             $table->string('satuan', 15);
-            $table->string('tipe_graf', 20);
-            $table->string('icon_app', 20);
-            $table->string('debit_awlr', 15);
-            $table->string('parameter_utama', 20);
+            $table->string('tipe_graf', 20)->nullable();
+            $table->string('icon_app', 20)->nullable();
+            $table->string('debit_awlr', 15)->nullable();
+            $table->string('parameter_utama', 20)->nullable();
 
             $table->index('logger_id', 'idx_param_logger');
             $table->index('kolom_sensor', 'idx_param_kolom');
@@ -212,24 +212,24 @@ return new class extends Migration
 
             $table->increments('id_inf');
             $table->string('logger_id', 10);
-            $table->text('seri_logger');
-            $table->text('sensor');
-            $table->string('serial_number', 25);
-            $table->string('elevasi', 10);
-            $table->string('nosell', 15);
-            $table->string('nama_pic', 100);
-            $table->string('no_pic', 100);
-            $table->string('tanggal_pemasangan', 10);
-            $table->string('garansi', 10);
-            $table->string('awal_kontrak', 10);
-            $table->string('imei', 20);
-            $table->string('gps1', 30);
-            $table->string('gps2', 30);
-            $table->string('gps3', 30);
-            $table->string('ad', 10);
-            $table->string('kd', 10);
-            $table->string('mr', 10);
-            $table->string('wdt', 30);
+            $table->text('seri_logger')->nullable();
+            $table->text('sensor')->nullable();
+            $table->string('serial_number', 25)->nullable();
+            $table->string('elevasi', 10)->nullable();
+            $table->string('nosell', 15)->nullable();
+            $table->string('nama_pic', 100)->nullable();
+            $table->string('no_pic', 100)->nullable();
+            $table->string('tanggal_pemasangan', 10)->nullable();
+            $table->string('garansi', 10)->nullable();
+            $table->string('awal_kontrak', 10)->nullable();
+            $table->string('imei', 20)->nullable();
+            $table->string('gps1', 30)->nullable();
+            $table->string('gps2', 30)->nullable();
+            $table->string('gps3', 30)->nullable();
+            $table->string('ad', 10)->nullable();
+            $table->string('kd', 10)->nullable();
+            $table->string('mr', 10)->nullable();
+            $table->string('wdt', 30)->nullable();
 
             $table->index('logger_id', 'idx_info_logger');
             $table->foreign('logger_id', 'fk_info_logger')->references('id_logger')->on('t_logger')->cascadeOnUpdate()->cascadeOnDelete();

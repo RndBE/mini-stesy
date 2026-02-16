@@ -7,7 +7,7 @@
         @include('partials.sidebar')
 
         <div id="mainContent" class="flex min-h-screen w-full flex-col transition-all duration-300"
-            style="margin-left: 16rem;">
+            style="padding-left: 16rem;">
             @include('partials.topbar')
 
             {{-- <main class="mx-auto w-full max-w-[1300px] flex-1 px-4 sm:px-6 lg:px-8 py-6">
