@@ -1,25 +1,11 @@
 @extends('layouts.app')
-
 @section('title', $title)
-
 @push('head')
     <style>
         .analysis-container {
-            display: flex;
-            gap: 0;
             width: 100%;
             background: white;
-            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar-left {
-            width: 250px;
-            min-width: 250px;
-            background: #f8f9fa;
-            padding: 24px 20px;
-            border-right: 1px solid #e5e7eb;
         }
 
         .section-label {
@@ -49,11 +35,6 @@
 
         .calendar-input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
         }
 
         .btn-primary {
@@ -114,25 +95,12 @@
             background: #f9fafb;
         }
 
-        .content-main {
-            flex: 1;
-            padding: 24px 32px;
-            min-width: 0;
-        }
+        .content-main {}
 
         .page-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .header-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
         }
 
         .status-badge {
@@ -152,41 +120,23 @@
             gap: 8px;
         }
 
-        .btn-header {
-            padding: 8px 16px;
-            background: #3730a3;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-header:hover {
-            background: #312e81;
-        }
-
         .chart-section {
-            margin-bottom: 24px;
+            margin-bottom: 0;
         }
 
         .chart-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 16px;
             text-align: center;
         }
 
         .chart-wrapper {
             position: relative;
-            background: #f9fafb;
-            padding: 20px;
+            background: white;
+            padding: 0;
             border-radius: 8px;
+        }
+
+        #dataChart {
+            display: block;
         }
 
         .chart-legend {
@@ -232,7 +182,6 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
         }
 
         .data-table thead {
@@ -390,12 +339,11 @@
         }
 
         .doc-modal-header {
-            padding: 20px 24px;
+            padding: 14px 24px;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #E6E6E6;
             color: rgb(0, 0, 0);
         }
 
@@ -426,40 +374,85 @@
 
         .photo-gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
+            gap: 14px;
         }
 
-        .photo-item {
+        .photo-main {
             position: relative;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: transform 0.2s;
+            border: 1px solid #e5e7eb;
+            background: #f8fafc;
         }
 
-        .photo-item:hover {
-            transform: scale(1.05);
-        }
-
-        .photo-item img {
+        .photo-main img {
             width: 100%;
-            height: 200px;
+            height: min(58vh, 460px);
+            object-fit: contain;
+            display: block;
+            background: #f8fafc;
+        }
+
+        .photo-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 9999px;
+
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .photo-nav.prev {
+            left: 10px;
+        }
+
+        .photo-nav.next {
+            right: 10px;
+        }
+
+        .photo-counter {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            background: rgba(15, 23, 42, 0.7);
+            color: #fff;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 9999px;
+        }
+
+        .photo-thumbs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 10px;
+        }
+
+        .photo-thumb {
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 0;
+            overflow: hidden;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .photo-thumb.active {
+            border-color: #303481;
+        }
+
+        .photo-thumb img {
+            width: 100%;
+            height: 78px;
             object-fit: cover;
             display: block;
-        }
-
-        .photo-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #3730a3;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
         }
 
         .no-photos {
@@ -469,12 +462,8 @@
         }
     </style>
 @endpush
-
 @section('content')
-    <!-- Info Panel Overlay -->
     <div class="info-panel-overlay" id="infoPanelOverlay" onclick="closeInfoPanel()"></div>
-
-    <!-- Info Panel -->
     <div class="info-panel" id="infoPanel">
         <div class="info-panel-header">
             <div class="info-panel-title">Informasi Logger</div>
@@ -519,25 +508,55 @@
             </div>
         </div>
     </div>
-
-    <!-- Documentation Modal -->
     <div class="doc-modal" id="docModal" onclick="closeDocModal(event)">
         <div class="doc-modal-content" onclick="event.stopPropagation()">
             <div class="doc-modal-header">
-                <div class="doc-modal-title">Dokumentasi Foto</div>
+                <div class="doc-modal-title">Dokumentasi</div>
                 <button class="doc-modal-close" onclick="closeDocModal()">×</button>
             </div>
             <div class="doc-modal-body">
                 @if ($photos->count() > 0)
+                    @php
+                        $firstPhotoRaw = (string) ($photos->first()->url_foto ?? '');
+                        $firstPhotoUrl =
+                            str_starts_with($firstPhotoRaw, 'http://') || str_starts_with($firstPhotoRaw, 'https://')
+                                ? $firstPhotoRaw
+                                : asset(ltrim($firstPhotoRaw, '/'));
+                    @endphp
                     <div class="photo-gallery">
-                        @foreach ($photos as $photo)
-                            <div class="photo-item" onclick="window.open('{{ asset($photo->url_foto) }}', '_blank')">
-                                <img src="{{ asset($photo->url_foto) }}" alt="Dokumentasi">
-                                {{-- @if ($photo->foto_utama == 1)
-                                    <div class="photo-badge">Utama</div>
-                                @endif --}}
-                            </div>
-                        @endforeach
+                        <div class="photo-main">
+                            <img id="docMainPhoto" src="{{ $firstPhotoUrl }}" alt="Dokumentasi">
+                            <button type="button" class="photo-nav prev" onclick="prevDocPhoto(event)">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9.91675 1.16675L4.08341 7.00008L9.91675 12.8334" stroke="#303481"
+                                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                            <button type="button" class="photo-nav next text-white" onclick="nextDocPhoto(event)">
+                                <svg width="8" height="14" viewBox="0 0 8 14" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0.75 0.75L6.58333 6.58333L0.75 12.4167" stroke="#303481" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                            <div class="photo-counter" id="docPhotoCounter">1 / {{ $photos->count() }}</div>
+                        </div>
+                        <div class="photo-thumbs" id="docThumbs">
+                            @foreach ($photos as $photo)
+                                @php
+                                    $photoRaw = (string) ($photo->url_foto ?? '');
+                                    $photoUrl =
+                                        str_starts_with($photoRaw, 'http://') || str_starts_with($photoRaw, 'https://')
+                                            ? $photoRaw
+                                            : asset(ltrim($photoRaw, '/'));
+                                @endphp
+                                <button type="button" class="photo-thumb {{ $loop->first ? 'active' : '' }}"
+                                    data-src="{{ $photoUrl }}" onclick="setDocPhoto({{ $loop->index }})">
+                                    <img src="{{ $photoUrl }}" alt="Dokumentasi {{ $loop->iteration }}">
+                                </button>
+                            @endforeach
+                        </div>
                     </div>
                 @else
                     <div class="no-photos">
@@ -547,8 +566,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Data Masuk Modal -->
     <div class="doc-modal" id="dataMasukModal" onclick="closeDataMasukModal(event)">
         <div class="doc-modal-content" style="max-width: 900px;" onclick="event.stopPropagation()">
             <div class="doc-modal-header">
@@ -565,159 +582,222 @@
             </div>
         </div>
     </div>
+    <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center mb-3">
 
+            <button type="button"
+                onclick="window.history.length > 1 ? window.history.back() : window.location.href='{{ route('peta.lokasi') }}'"
+                class="inline-flex items-center justify-center" aria-label="Kembali">
+                <svg width="8" height="20" viewBox="0 0 10 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8.5 18.5L1 9.75L8.5 1" stroke="#303481" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
 
-    <div class="analysis-container">
-        {{-- LEFT SIDEBAR --}}
-        <div class="sidebar-left">
-            <div class="mb-4">
-                <a href="{{ route('beranda') }}" class="text-slate-600 hover:text-slate-900 text-sm">
-                    ← Kembali
-                </a>
-            </div>
+            <span
+                class="ms-6 w-3 h-3 rounded-full {{ $status === 'online' ? 'bg-green-500' : 'bg-red-500' }} me-4"></span>
+            <div>
+                <div class="text-lg font-bold mb-0 py-0 my-0">{{ $logger->nama_logger }}</div>
+                <div
+                    class="flex items-center gap-2 text-xs font-semibold {{ $status === 'online' ? 'text-emerald-600' : 'text-rose-600' }}">
 
-            <div class="grid grid-cols-1 gap-3">
-                <div class="rounded-xl border border-slate-200 bg-white p-4">
-                    <div class="section-label">Parameter</div>
-                    <select id="parameterSelect" class="calendar-input">
-                        <option value="">-- Pilih Parameter --</option>
-                        @foreach ($parameters as $param)
-                            <option value="{{ $param['nama_parameter'] }}" data-unit="{{ $param['satuan'] ?? '' }}">
-                                {{ $param['nama_parameter'] }}</option>
-                        @endforeach
-                    </select>
-
-                    <div class="section-label">Analisa Dalam</div>
-                    <div class="radio-options">
-                        <label><input type="radio" name="range" value="day" checked> Hari</label>
-                        <label><input type="radio" name="range" value="month"> Bulan</label>
-                        <label><input type="radio" name="range" value="year"> Tahun</label>
-                        <label><input type="radio" name="range" value="custom"> Rentang</label>
-                    </div>
-
-                    <!-- Tanggal untuk Hari -->
-                    <div id="rangeDay" class="range-input-group" style="display: block;">
-                        <div class="section-label">Tanggal</div>
-                        <input type="date" id="dateInput" class="calendar-input" value="{{ date('Y-m-d') }}">
-                    </div>
-
-                    <!-- Bulan-Tahun untuk Bulan -->
-                    <div id="rangeMonth" class="range-input-group" style="display: none;">
-                        <div class="section-label">Bulan-Tahun</div>
-                        <input type="month" id="monthInput" class="calendar-input" value="{{ date('Y-m') }}">
-                    </div>
-
-                    <!-- Tahun untuk Tahun -->
-                    <div id="rangeYear" class="range-input-group" style="display: none;">
-                        <div class="section-label">Tahun</div>
-                        <input type="number" id="yearInput" class="calendar-input" min="2000" max="2100" value="{{ date('Y') }}">
-                    </div>
-
-                    <!-- Rentang Tanggal dan Jam -->
-                    <div id="rangeCustom" class="range-input-group" style="display: none;">
-                        <div class="section-label">Tanggal Mulai</div>
-                        <input type="datetime-local" id="startDateTime" class="calendar-input" value="{{ date('Y-m-d\TH:i') }}">
-                        <div class="section-label" style="margin-top: 12px;">Tanggal Akhir</div>
-                        <input type="datetime-local" id="endDateTime" class="calendar-input" value="{{ date('Y-m-d\TH:i') }}">
-                    </div>
-                </div>
-
-                <div class="rounded-xl border border-slate-200 bg-white p-4">
-                    <button type="button" class="btn-success" onclick="downloadExcel()">
-                        📥 Download Excel
-                    </button>
-
-                    <button type="button" class="btn-outline" onclick="openDataMasukModal()">
-                        📊 Data Masuk
-                    </button>
+                    <small class="text-sm font-medium">
+                        {{ $status === 'online' ? 'Koneksi Terhubung' : 'Koneksi Terputus' }}
+                    </small>
                 </div>
             </div>
         </div>
 
-        {{-- MAIN CONTENT --}}
-        <div class="content-main">
-            <div class="page-header">
-                <div class="header-info">
-                    <h2 class="text-lg font-bold">{{ $logger->nama_logger }}</h2>
-                    <div
-                        class="flex items-center gap-2 text-xs font-semibold {{ $status === 'online' ? 'text-emerald-600' : 'text-rose-600' }}">
-                        <span
-                            class="w-2 h-2 rounded-full {{ $status === 'online' ? 'bg-green-500' : 'bg-red-500' }}"></span>
-                        <span class="text-sm font-medium">
-                            {{ $status === 'online' ? 'Koneksi Terhubung' : 'Koneksi Terputus' }}
-                        </span>
+        <div class="flex">
+            <button
+                class="bg-[#303481] items-center rounded-lg flex px-4 text-white py-3 hover:bg-[#10134B] hover:font-semibold text-sm me-3"
+                onclick="openInfoPanel()">
+                <svg class="me-2" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M10 18.3334C14.6024 18.3334 18.3334 14.6025 18.3334 10.0001C18.3334 5.39771 14.6024 1.66675 10 1.66675C5.39765 1.66675 1.66669 5.39771 1.66669 10.0001C1.66669 14.6025 5.39765 18.3334 10 18.3334Z"
+                        stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M10 13.3334V10.0001M10 6.66675H10.0083" stroke="white" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                Informasi
+            </button>
+            <button
+                class="bg-white border  items-center  border-[#303481] text-[#303481] rounded-lg flex px-4 py-3 hover:bg-[#eaebff] hover:font-semibold text-sm "
+                onclick="openDocModal()">
+                <svg width="20" height="18" viewBox="0 0 20 18" class="me-2" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M9.91667 13.5833C11.9417 13.5833 13.5833 11.9417 13.5833 9.91667C13.5833 7.89162 11.9417 6.25 9.91667 6.25C7.89162 6.25 6.25 7.89162 6.25 9.91667C6.25 11.9417 7.89162 13.5833 9.91667 13.5833Z"
+                        stroke="#303481" stroke-width="1.5" />
+                    <path
+                        d="M7.87983 17.25H11.9535C14.8144 17.25 16.2453 17.25 17.2729 16.5763C17.7164 16.2858 18.0983 15.9108 18.3967 15.4726C19.0833 14.4643 19.0833 13.059 19.0833 10.2504C19.0833 7.44171 19.0833 6.03646 18.3967 5.02813C18.0983 4.58995 17.7164 4.21491 17.2729 3.92446C16.6129 3.49088 15.7861 3.33596 14.5202 3.28096C13.9161 3.28096 13.3963 2.83179 13.2781 2.24971C13.1877 1.82334 12.9529 1.44124 12.6134 1.168C12.2738 0.894753 11.8503 0.747117 11.4145 0.750043H8.41883C7.51317 0.750043 6.73308 1.37796 6.55525 2.24971C6.437 2.83179 5.91725 3.28096 5.31317 3.28096C4.04817 3.33596 3.22133 3.49179 2.56042 3.92446C2.11724 4.21501 1.73567 4.59004 1.4375 5.02813C0.75 6.03646 0.75 7.44079 0.75 10.2504C0.75 13.06 0.75 14.4634 1.43658 15.4726C1.73358 15.909 2.11492 16.2839 2.56042 16.5763C3.588 17.25 5.01892 17.25 7.87983 17.25Z"
+                        stroke="#303481" stroke-width="1.5" />
+                    <path d="M16.3333 7.16675H15.4166" stroke="#303481" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                Dokumentasi</button>
+        </div>
+    </div>
+    <div class="analysis-container grid grid-cols-12 gap-3">
+        <div class="xl:col-span-3 2xl:col-span-2">
+            <div class="border rounded-lg px-4 py-3">
+                <div class="grid grid-cols-1 gap-3">
+                    <div class="">
+                        <div class="text-md font-semibold mb-2 ">Parameter</div>
+                        <select id="parameterSelect"
+                            class="calendar-input text-sm py-2 rounded-lg border border-slate-300 rounded-lg">
+                            <option value="">Pilih Parameter</option>
+                            @foreach ($parameters as $param)
+                                <option value="{{ $param['nama_parameter'] }}" data-unit="{{ $param['satuan'] ?? '' }}">
+                                    {{ str_replace('_', ' ', $param['nama_parameter']) }}</option>
+                            @endforeach
+                        </select>
+                        <div class="text-md font-semibold mb-2 mt-3">Analisa Dalam</div>
+                        <div class="radio-options">
+                            <label><input type="radio" name="range" value="day" checked> Hari</label>
+                            <label><input type="radio" name="range" value="month"> Bulan</label>
+                            <label><input type="radio" name="range" value="year"> Tahun</label>
+                            <label><input type="radio" name="range" value="custom"> Rentang</label>
+                        </div>
+                        <div id="rangeDay" class="range-input-group rounded-lg" style="display: block;">
+                            <div class="text-md font-semibold mb-2">Tanggal</div>
+                            <input type="date" id="dateInput"
+                                class="calendar-input text-sm py-2 rounded-lg border border-slate-300"
+                                value="{{ date('Y-m-d') }}">
+                        </div>
+                        <div id="rangeMonth" class="range-input-group" style="display: none;">
+                            <div class="text-md font-semibold mb-2">Bulan-Tahun</div>
+                            <input type="month" id="monthInput"
+                                class="calendar-input text-sm py-2 rounded-lg border border-slate-300"
+                                value="{{ date('Y-m') }}">
+                        </div>
+                        <div id="rangeYear" class="range-input-group" style="display: none;">
+                            <div class="text-md font-semibold mb-2">Tahun</div>
+                            <input type="number" id="yearInput"
+                                class="calendar-input text-sm py-2 rounded-lg border border-slate-300" min="2000"
+                                max="2100" value="{{ date('Y') }}">
+                        </div>
+                        <div id="rangeCustom" class="range-input-group" style="display: none;">
+                            <div class="text-md font-semibold mb-2">Tanggal Mulai</div>
+                            <input type="datetime-local" id="startDateTime"
+                                class="calendar-input text-sm py-2 rounded-lg border border-slate-300"
+                                value="{{ date('Y-m-d\TH:i') }}">
+                            <div class="text-md font-semibold mb-2" style="margin-top: 12px;">Tanggal Akhir</div>
+                            <input type="datetime-local" id="endDateTime"
+                                class="calendar-input text-sm py-2 rounded-lg border border-slate-300"
+                                value="{{ date('Y-m-d\TH:i') }}">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button type="button" class="btn-success" onclick="downloadExcel()">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_1023_3171)">
+                                    <path
+                                        d="M9.33333 0.666748V3.92601C9.33333 4.03301 9.35441 4.13897 9.39536 4.23782C9.4363 4.33668 9.49632 4.42651 9.57199 4.50217C9.64765 4.57783 9.73747 4.63785 9.83633 4.6788C9.93519 4.71975 10.0411 4.74082 10.1481 4.74082H13.4074"
+                                        stroke="#06C022" stroke-width="1.2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                    <path
+                                        d="M11.7778 15.3334H3.62963C3.19743 15.3334 2.78292 15.1617 2.47731 14.8561C2.17169 14.5505 2 14.136 2 13.7038V2.29638C2 1.86417 2.17169 1.44967 2.47731 1.14406C2.78292 0.838441 3.19743 0.666748 3.62963 0.666748H9.33333L13.4074 4.74082V13.7038C13.4074 14.136 13.2357 14.5505 12.9301 14.8561C12.6245 15.1617 12.21 15.3334 11.7778 15.3334Z"
+                                        stroke="#06C022" stroke-width="1.2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                    <path d="M4.44444 7.18506H10.963V12.8888H4.44444V7.18506Z" stroke="#06C022"
+                                        stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M4.44444 10.4443H10.963" stroke="#06C022" stroke-width="1.2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M6.88889 7.18506V12.8888" stroke="#06C022" stroke-width="1.2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1023_3171">
+                                        <rect width="16" height="16" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg> Download Excel
+                        </button>
+                        <button type="button" class="btn-outline" onclick="openDataMasukModal()">
+
+                            <svg width="16" height="16" viewBox="0 0 16 16" class="me-2" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_1023_3203)">
+                                    <path d="M1.71429 14.2858L14.2857 1.71436" stroke="#303481" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path
+                                        d="M13.2381 15.3333C14.3953 15.3333 15.3333 14.3952 15.3333 13.2381C15.3333 12.0809 14.3953 11.1428 13.2381 11.1428C12.0809 11.1428 11.1429 12.0809 11.1429 13.2381C11.1429 14.3952 12.0809 15.3333 13.2381 15.3333Z"
+                                        fill="#303481" stroke="#303481" stroke-width="1.2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                    <path
+                                        d="M2.76191 4.85722C3.91907 4.85722 4.85714 3.91915 4.85714 2.76199C4.85714 1.60482 3.91907 0.666748 2.76191 0.666748C1.60474 0.666748 0.666668 1.60482 0.666668 2.76199C0.666668 3.91915 1.60474 4.85722 2.76191 4.85722Z"
+                                        fill="#303481" stroke="#303481" stroke-width="1.2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1023_3203">
+                                        <rect width="16" height="16" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                            Data Masuk
+                        </button>
                     </div>
                 </div>
-                <div class="header-actions">
-                    <button class="btn-header" onclick="openInfoPanel()">📊 Informasi</button>
-                    <button class="btn-header" onclick="openDocModal()">📄 Dokumentasi</button>
-                </div>
             </div>
-
-            <div class="chart-section">
-                <div class="chart-title" id="chartTitle">{{ date('F Y') }}</div>
-                <div class="chart-wrapper">
-                    <canvas id="dataChart" height="300"></canvas>
+        </div>
+        <div class="xl:col-span-9 2xl:col-span-10">
+            <div class="border rounded-lg ">
+                <div class="chart-section ps-3 pe-3 pt-3 pb-0 mb-0">
+                    <div class="chart-title text-lg font-semibold" id="chartTitle">{{ date('F Y') }}</div>
+                    <div class="chart-wrapper mb-3 mt-2">
+                        <canvas id="dataChart" height="400"></canvas>
+                    </div>
                 </div>
-            </div>
-
-            <div class="data-table-section">
-                <div class="table-title" id="tableTitle">{{ date('F Y') }}</div>
-                <table class="data-table">
-                    <thead class="bg-neutral-300 text-neutral-950 font-semibold uppercase text-xs">
-                        <tr>
-                            <th>WAKTU</th>
-                            <th>RERATA</th>
-                            <th>MINIMUM</th>
-                            <th>MAKSIMUM</th>
-                        </tr>
-                    </thead>
-                    <tbody id="dataTableBody">
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 40px; color: #9ca3af;">
-                                Pilih parameter dan klik Tampil Data
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="data-table-section ps-3 pe-3">
+                    <div class="table-title" id="tableTitle">{{ date('F Y') }}</div>
+                    <div class=" w-full overflow-hidden rounded-lg border  border-slate-300 mb-3">
+                        <table class="data-table ">
+                            <thead class="bg-neutral-300 text-neutral-950 font-semibold uppercase text-xs">
+                                <tr>
+                                    <th>WAKTU</th>
+                                    <th>RERATA</th>
+                                    <th>MINIMUM</th>
+                                    <th>MAKSIMUM</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody" class="text-sm">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 40px; color: #9ca3af;">
+                                        Pilih parameter dan klik Tampil Data
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 @endsection
-
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script>
         let chart = null;
-
         const loggerId = '{{ $logger->id_logger }}';
-
-        // Initialize static chart on page load
         document.addEventListener('DOMContentLoaded', function() {
-            initChart(); // Init empty chart
-            // initStaticTable(); // Removed static table
-            updateChartTitle(); // Set initial title
-
-            // Setup range input toggle
+            initChart();
+            updateChartTitle();
             setupRangeInputs();
-
-            // Auto-select parameter from URL query string
             const urlParams = new URLSearchParams(window.location.search);
             const paramFromUrl = urlParams.get('parameter');
             if (paramFromUrl) {
                 const paramSelect = document.getElementById('parameterSelect');
                 if (paramSelect) {
                     paramSelect.value = paramFromUrl;
-                    // Trigger change event to load data automatically
                     loadData();
                 }
             }
-
-            // Add event listeners for dynamic title updates
             document.getElementById('dateInput').addEventListener('change', () => {
                 updateChartTitle();
-                // Optional: Auto load on date change if param selected
                 const param = document.getElementById('parameterSelect').value;
                 if (param) loadData();
             });
@@ -741,7 +821,6 @@
                 const param = document.getElementById('parameterSelect').value;
                 if (param) loadData();
             });
-
             document.querySelectorAll('input[name="range"]').forEach(radio => {
                 radio.addEventListener('change', () => {
                     toggleRangeInputs(radio.value);
@@ -750,25 +829,20 @@
                     if (param) loadData();
                 });
             });
-
             document.getElementById('parameterSelect').addEventListener('change', () => {
                 loadData();
             });
         });
 
         function setupRangeInputs() {
-            // Show day input by default
             toggleRangeInputs('day');
         }
 
         function toggleRangeInputs(rangeType) {
-            // Hide all range input groups
             document.getElementById('rangeDay').style.display = 'none';
             document.getElementById('rangeMonth').style.display = 'none';
             document.getElementById('rangeYear').style.display = 'none';
             document.getElementById('rangeCustom').style.display = 'none';
-
-            // Show the appropriate input group
             if (rangeType === 'day') {
                 document.getElementById('rangeDay').style.display = 'block';
             } else if (rangeType === 'month') {
@@ -783,14 +857,11 @@
         function updateChartTitle() {
             const range = document.querySelector('input[name="range"]:checked').value;
             const param = document.getElementById('parameterSelect').value;
-
             const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
                 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
             ];
-
             let titleText = `Rerata ${param} `;
             let tableTitleText = `Tabel Rerata ${param} `;
-
             if (range === 'day') {
                 const dateInput = document.getElementById('dateInput').value;
                 const date = new Date(dateInput);
@@ -815,7 +886,6 @@
                 titleText += `Dari ${startDateTime} hingga ${endDateTime}`;
                 tableTitleText += `Dari ${startDateTime} hingga ${endDateTime}`;
             }
-
             document.getElementById('chartTitle').textContent = titleText;
             document.getElementById('tableTitle').textContent = tableTitleText;
         }
@@ -823,9 +893,7 @@
         function initChart() {
             const canvas = document.getElementById('dataChart');
             if (!canvas) return;
-
             const ctx = canvas.getContext('2d');
-
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -836,7 +904,7 @@
                             borderColor: '#1e40af',
                             backgroundColor: 'rgba(30, 64, 175, 0.1)',
                             tension: 0.4,
-                            cubicInterpolationMode: 'monotone', // Spline effect
+                            cubicInterpolationMode: 'monotone',
                             fill: true,
                             borderWidth: 3,
                             pointRadius: 2
@@ -847,7 +915,7 @@
                             borderColor: '#60a5fa',
                             backgroundColor: 'rgba(96,165,250,0.1)',
                             tension: 0.4,
-                            cubicInterpolationMode: 'monotone', // Spline effect
+                            cubicInterpolationMode: 'monotone',
                             fill: false,
                             borderWidth: 2,
                             borderDash: [5, 5],
@@ -859,7 +927,7 @@
                             borderColor: '#4338ca',
                             backgroundColor: 'rgba(67,56,202,0.1)',
                             tension: 0.4,
-                            cubicInterpolationMode: 'monotone', // Spline effect
+                            cubicInterpolationMode: 'monotone',
                             fill: true,
                             borderWidth: 2,
                             borderDash: [5, 5],
@@ -891,16 +959,11 @@
 
         function loadData() {
             const selectedParam = document.getElementById('parameterSelect').value;
-
             if (!selectedParam) {
-                // Alert handled by select change or initial state
                 return;
             }
-
             const range = document.querySelector('input[name="range"]:checked').value;
             let date = '';
-
-            // Get the appropriate date value based on range type
             if (range === 'day') {
                 date = document.getElementById('dateInput').value;
             } else if (range === 'month') {
@@ -908,23 +971,18 @@
             } else if (range === 'year') {
                 date = document.getElementById('yearInput').value;
             } else if (range === 'custom') {
-                // For custom range, we'll send both start and end (API needs to be updated to handle this)
                 const startDateTime = document.getElementById('startDateTime').value;
                 const endDateTime = document.getElementById('endDateTime').value;
                 date = `${startDateTime},${endDateTime}`;
             }
-
-            // Show loading state
             const originalTitle = document.getElementById('chartTitle').textContent;
             document.getElementById('chartTitle').textContent = 'Memuat data...';
-
             fetch(`{{ route('analisa.data', ':id') }}`.replace(':id', loggerId) +
                     `?parameter=${selectedParam}&range=${range}&date=${date}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('chartTitle').textContent = originalTitle; // Restore title or update
-                    updateChartTitle(); // update with correct param name
-
+                    document.getElementById('chartTitle').textContent = originalTitle;
+                    updateChartTitle();
                     updateChart(data);
                     updateTable(data);
                 })
@@ -938,16 +996,12 @@
         function parseLabelToMinutes(label) {
             const s = String(label ?? '').trim();
             if (!s) return null;
-
             let m = s.match(/(\d{1,2})[:.](\d{2})(?::\d{2})?/);
             if (m) return (Number(m[1]) * 60) + Number(m[2]);
-
             m = s.match(/\b(\d{1,2})\s*[:.]\s*00\b/);
             if (m) return Number(m[1]) * 60;
-
             m = s.match(/\b(\d{1,2})\b/);
             if (m && s.length <= 2) return Number(m[1]) * 60;
-
             return null;
         }
 
@@ -975,15 +1029,15 @@
             const today = now.toISOString().slice(0, 10);
             const currentMonth = now.toISOString().slice(0, 7);
             const currentYear = String(now.getFullYear());
-
             let idx = -1;
-
             if (range === 'day') {
                 const dateInput = document.getElementById('dateInput')?.value || '';
                 if (!isToday(dateInput)) {
-                    return { labels, series };
+                    return {
+                        labels,
+                        series
+                    };
                 }
-
                 for (let i = 0; i < (labels || []).length; i++) {
                     const t = parseLabelToMinutes(labels[i]);
                     if (t === null) continue;
@@ -992,15 +1046,14 @@
             } else if (range === 'month') {
                 const monthInput = document.getElementById('monthInput')?.value || '';
                 if (!isCurrentMonth(monthInput)) {
-                    // For past/future months, return all data (no time filtering needed)
-                    return { labels, series };
+                    return {
+                        labels,
+                        series
+                    };
                 }
-
-                // For current month, parse day from label and filter to current day
                 const currentDay = now.getDate();
                 for (let i = 0; i < (labels || []).length; i++) {
                     const dayStr = String(labels[i] || '').trim();
-                    // Try parsing as number (e.g., "1", "15", "28")
                     const day = parseInt(dayStr);
                     if (!isNaN(day) && day <= currentDay) {
                         idx = i;
@@ -1009,31 +1062,28 @@
             } else if (range === 'year') {
                 const yearInput = document.getElementById('yearInput')?.value || '';
                 if (!isCurrentYear(yearInput)) {
-                    // For past/future years, return empty data - only current year can display data
                     return {
                         labels: [],
                         series: series.map(() => [])
                     };
                 }
-
-                // For year view, parse month from label (e.g., "Jan", "Feb", "Mar", etc.)
                 const monthNames = ['jan', 'feb', 'mar', 'apr', 'mei', 'jun', 'jul', 'agu', 'sep', 'okt', 'nov', 'des'];
                 const currentMonthNum = now.getMonth();
                 for (let i = 0; i < (labels || []).length; i++) {
                     const labelLower = String(labels[i] || '').toLowerCase().trim();
-                    const monthIdx = monthNames.findIndex(mn => labelLower.includes(mn) || labelLower.startsWith(mn.substring(0, 3)));
+                    const monthIdx = monthNames.findIndex(mn => labelLower.includes(mn) || labelLower.startsWith(mn
+                        .substring(0, 3)));
                     if (monthIdx !== -1 && monthIdx <= currentMonthNum) {
                         idx = i;
                     }
                 }
             } else if (range === 'custom') {
-                // For custom range, don't filter by current time
-                // Return all data - user has already specified their own range
-                return { labels, series };
+                return {
+                    labels,
+                    series
+                };
             }
-
             if (idx < 0) idx = 0;
-
             return {
                 labels: (labels || []).slice(0, idx + 1),
                 series: series.map(arr => (arr || []).slice(0, idx + 1))
@@ -1067,14 +1117,11 @@
 
         function updateChart(data) {
             if (!chart) return;
-
             const labelsRaw = data.labels || [];
             const avgRaw = data.chartData || [];
             const minRaw = data.minData || [];
             const maxRaw = data.maxData || [];
-
             const range = document.querySelector('input[name="range"]:checked')?.value;
-
             if (!hasAnyDataPayload(data)) {
                 chart.data.labels = [];
                 chart.data.datasets[0].data = [];
@@ -1083,8 +1130,6 @@
                 chart.update();
                 return;
             }
-
-            // For custom range, show all data without time filtering
             if (range === 'custom') {
                 chart.data.labels = labelsRaw;
                 chart.data.datasets[0].data = avgRaw;
@@ -1093,8 +1138,6 @@
                 chart.update();
                 return;
             }
-
-            // For day, month, year: apply filtering based on current time
             const f = filterSeriesToNow(labelsRaw, range, avgRaw, minRaw, maxRaw);
             chart.data.labels = f.labels;
             chart.data.datasets[0].data = f.series[0];
@@ -1106,21 +1149,16 @@
         function updateTable(data) {
             const tbody = document.getElementById('dataTableBody');
             if (!tbody) return;
-
             const range = document.querySelector('input[name="range"]:checked')?.value;
             const rows = Array.isArray(data.tableData) ? data.tableData : [];
             const labelsRaw = Array.isArray(data.labels) ? data.labels : [];
             const unit = getSelectedUnit();
-
             const isAllEmpty = !hasAnyDataPayload(data);
-
             if (isAllEmpty) {
                 tbody.innerHTML =
                     '<tr><td colspan="4" style="text-align:center; padding:40px; color:#9ca3af;">Tidak ada data</td></tr>';
                 return;
             }
-
-            // For custom range and month range, don't use label filtering
             if (range === 'custom' || range === 'month') {
                 const filtered = rows.filter(r => {
                     if (!r) return false;
@@ -1129,13 +1167,11 @@
                     const c = r.maksimum;
                     return !((a == null || a === '') && (b == null || b === '') && (c == null || c === ''));
                 });
-
                 if (!filtered.length) {
                     tbody.innerHTML =
                         '<tr><td colspan="4" style="text-align:center; padding:40px; color:#9ca3af;">Tidak ada data</td></tr>';
                     return;
                 }
-
                 let html = '';
                 for (const r of filtered) {
                     html += `
@@ -1149,15 +1185,9 @@
                 tbody.innerHTML = html;
                 return;
             }
-
-            // For day, year: apply filtering based on current time
             const f = filterSeriesToNow(labelsRaw, range);
             const labelsFiltered = f.labels || [];
-
-            // Create a set of filtered labels for lookup
             const labelSet = new Set(labelsFiltered);
-
-            // Filter rows based on filtered labels and valid data
             const filtered = rows.filter(r => {
                 if (!r || r.waktu == null) return false;
                 if (!labelSet.has(String(r.waktu))) return false;
@@ -1166,13 +1196,11 @@
                 const c = r.maksimum;
                 return !((a == null || a === '') && (b == null || b === '') && (c == null || c === ''));
             });
-
             if (!filtered.length) {
                 tbody.innerHTML =
                     '<tr><td colspan="4" style="text-align:center; padding:40px; color:#9ca3af;">Tidak ada data</td></tr>';
                 return;
             }
-
             let html = '';
             for (const r of filtered) {
                 html += `
@@ -1192,11 +1220,8 @@
                 alert('Pilih parameter terlebih dahulu');
                 return;
             }
-
             const range = document.querySelector('input[name="range"]:checked').value;
             let date = '';
-
-            // Get the appropriate date value based on range type
             if (range === 'day') {
                 date = document.getElementById('dateInput').value;
             } else if (range === 'month') {
@@ -1208,14 +1233,11 @@
                 const endDateTime = document.getElementById('endDateTime').value;
                 date = `${startDateTime},${endDateTime}`;
             }
-
             const url = `{{ route('analisa.export', ['id_logger' => 'PLACEHOLDER']) }}`.replace('PLACEHOLDER', loggerId) +
                 `?parameter=${selectedParam}&range=${range}&date=${date}`;
-
             window.location.href = url;
         }
 
-        // Info Panel Functions
         function openInfoPanel() {
             document.getElementById('infoPanel').classList.add('show');
             document.getElementById('infoPanelOverlay').classList.add('show');
@@ -1226,9 +1248,54 @@
             document.getElementById('infoPanelOverlay').classList.remove('show');
         }
 
-        // Documentation Modal Functions
+        let docPhotoUrls = [];
+        let docPhotoIndex = 0;
+
+        function updateDocPhoto(index) {
+            if (!docPhotoUrls.length) return;
+
+            docPhotoIndex = (index + docPhotoUrls.length) % docPhotoUrls.length;
+
+            const mainPhoto = document.getElementById('docMainPhoto');
+            if (mainPhoto) {
+                mainPhoto.src = docPhotoUrls[docPhotoIndex];
+            }
+
+            const counter = document.getElementById('docPhotoCounter');
+            if (counter) {
+                counter.textContent = `${docPhotoIndex + 1} / ${docPhotoUrls.length}`;
+            }
+
+            document.querySelectorAll('#docThumbs .photo-thumb').forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === docPhotoIndex);
+            });
+        }
+
+        function initDocGallery() {
+            const thumbs = Array.from(document.querySelectorAll('#docThumbs .photo-thumb'));
+            docPhotoUrls = thumbs.map(t => t.dataset.src).filter(Boolean);
+            if (!docPhotoUrls.length) return;
+            updateDocPhoto(docPhotoIndex);
+        }
+
+        function setDocPhoto(index) {
+            updateDocPhoto(Number(index) || 0);
+        }
+
+        function prevDocPhoto(event) {
+            event?.stopPropagation();
+            updateDocPhoto(docPhotoIndex - 1);
+        }
+
+        function nextDocPhoto(event) {
+            event?.stopPropagation();
+            updateDocPhoto(docPhotoIndex + 1);
+        }
+
         function openDocModal() {
             document.getElementById('docModal').classList.add('show');
+            docPhotoIndex = 0;
+            initDocGallery();
         }
 
         function closeDocModal(event) {
@@ -1237,8 +1304,6 @@
             }
             document.getElementById('docModal').classList.remove('show');
         }
-
-        // Auto-refresh every hour
         setInterval(() => {
             const selectedParam = document.getElementById('parameterSelect').value;
             if (selectedParam) {
@@ -1246,7 +1311,6 @@
             }
         }, 3600000);
     </script>
-
     <script>
         let dataMasukChartInstance = null;
 
@@ -1259,11 +1323,9 @@
             if (event && event.target.id !== 'dataMasukModal') return;
             document.getElementById('dataMasukModal').classList.remove('show');
         }
-
         async function loadDataMasuk() {
             const loading = document.getElementById('dataMasukLoading');
             loading.style.display = 'block';
-
             try {
                 const url = `{{ route('analisa.dataMasuk', ':id') }}`.replace(':id', loggerId);
                 const res = await fetch(url, {
@@ -1271,18 +1333,14 @@
                         'Accept': 'application/json'
                     }
                 });
-
                 if (!res.ok) {
                     const txt = await res.text();
                     throw new Error(`HTTP ${res.status} - ${txt.slice(0, 200)}`);
                 }
-
                 const rows = await res.json();
-
                 const labels = (rows || []).map(r => r.date);
                 const counts = (rows || []).map(r => Number(r.count || 0));
                 const percentages = (rows || []).map(r => Number(r.percentage || 0));
-
                 loading.style.display = 'none';
                 renderDataMasukChart(labels, counts, percentages);
             } catch (err) {
@@ -1295,16 +1353,12 @@
         function renderDataMasukChart(labels, counts, percentages) {
             const canvas = document.getElementById('dataMasukChart');
             if (!canvas) return;
-
             const ctx = canvas.getContext('2d');
-
             if (dataMasukChartInstance) {
                 dataMasukChartInstance.destroy();
                 dataMasukChartInstance = null;
             }
-
             const barColors = (percentages || []).map(p => (Number(p) < 80 ? '#FED0D0' : '#D0EFFE'));
-
             dataMasukChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {

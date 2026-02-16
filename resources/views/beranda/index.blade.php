@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="space-y-5">
-        <div class="text-sm font-extrabold text-slate-900">AWLR (Automatic Water Level Recorder)</div>
+        <div class="text font-extrabold text-slate-900">AWLR (Automatic Water Level Recorder)</div>
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
             @foreach ($loggers as $lg)
                 @php
@@ -133,8 +133,8 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-4 p-5 md:grid-cols-2">
-                        <div class="space-y-3">
+                    <div class="grid grid-cols-12 gap-4 p-5 md:grid-cols-12">
+                        <div class="col-span-8 space-y-3">
                             <div class="flex items-center justify-between">
                                 <div class="text-xs font-bold text-slate-700">Data Sumur</div>
                                 <div
@@ -292,17 +292,7 @@
                             </div>
                         </div>
 
-                        <div class="space-y-3">
-
-                            <div class="rounded-xl border border-slate-200 bg-white p-4">
-                                <div class="text-[11px] font-semibold text-slate-500">Lokasi</div>
-                                <div class="mt-1 text-sm font-semibold text-slate-900">
-                                    {{ $lg->lokasi->nama_lokasi ?? '-' }}
-                                </div>
-                                <div class="mt-1 text-xs text-slate-500">
-                                    DAS: {{ $lg->lokasi?->das?->nama_das ?? '-' }}
-                                </div>
-                            </div>
+                        <div class="col-span-4 space-y-3">
 
                             <div class="grid grid-cols-1 gap-3">
                                 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"

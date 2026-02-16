@@ -2,21 +2,18 @@
 <aside id="mainSidebar" class="fixed top-0 left-0 z-40 w-64 h-full transition-all duration-300 bg-white border-r">
     <div class="flex h-full flex-col">
         <div class="flex items-center justify-between px-6 py-5">
-            <div class="flex items-center gap-3">
-                <img src="{{ asset('images/beacon-logo.png') }}" alt="Beacon Engineering"
-                    class="h-full w-auto sidebar-logo">
-                <div
-                    class="ml-auto flex items-center justify-center rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-500 sidebar-icon">
-                    ☐
-                </div>
-            </div>
+            <img src="{{ asset('images/beacon-logo.png') }}" alt="Beacon Engineering" class="h-full w-auto sidebar-logo">
+            <button type="button" onclick="toggleMainSidebar()" aria-label="Toggle sidebar"
+                class="ml-auto flex items-center justify-center rounded-md  text-slate-500 sidebar-icon hover:bg-slate-100">
+                <img src="{{ asset('images/sidebar.svg') }}" alt="" class="h-5 w-5">
+            </button>
         </div>
 
         <nav class="px-3 sidebar-nav">
-            <div class="space-y-1">
+            <div class="space-y-2">
                 @permission('view_beranda')
                     <a href="{{ route('beranda') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('beranda') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('beranda') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -28,7 +25,7 @@
 
                 @permission('view_peta_lokasi')
                     <a href="{{ route('peta.lokasi') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('peta.lokasi') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('peta.lokasi') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -38,21 +35,9 @@
                     </a>
                 @endpermission
 
-                {{--@permission('view_peta_lokasi')
-                    <a href="{{ route('data-masuk.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('data-masuk.index') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
-                        <span class="sidebar-text truncate">Data Masuk</span>
-                    </a>
-                @endpermission --}}
-
                 @permission('view_realtime')
                     <a href="{{ route('realtime.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('realtime.index') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('realtime.index') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -64,7 +49,7 @@
 
                 @permission('view_data_perangkat')
                     <a href="{{ route('device.data') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('device.data') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('device.data') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -76,7 +61,7 @@
 
                 @permission('view_device')
                     <a href="{{ route('device.index') }}"
-                        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('device.index') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('device.index') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -88,12 +73,23 @@
                     </a>
                 @endpermission
 
-                @if (auth()->check() && (auth()->user()->hasPermission('manage_instansi') || auth()->user()->hasPermission('manage_rbac') || auth()->user()->hasPermission('manage_user')))
-                    <div x-data="{ open: {{ request()->routeIs('instansi.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('users.*') ? 'true' : 'false' }} }"
-                        class="rounded-xl border border-slate-200 bg-slate-50/60">
-                        <button type="button" @click="open = !open"
-                            class="flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
-                            <span class="flex items-center gap-3">
+                @if (auth()->check() &&
+                        (auth()->user()->hasPermission('manage_instansi') ||
+                            auth()->user()->hasPermission('manage_rbac') ||
+                            auth()->user()->hasPermission('manage_user')))
+                    <div x-data="{ open: {{ request()->routeIs('instansi.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('users.*') ? 'true' : 'false' }} }" class="rounded-xl border border-slate-200 bg-slate-50/60">
+                        <button type="button"
+                            @click="
+                                const sidebar = document.getElementById('mainSidebar');
+                                if (sidebar && sidebar.classList.contains('collapsed')) {
+                                    toggleMainSidebar();
+                                    open = true;
+                                } else {
+                                    open = !open;
+                                }
+                            "
+                            class="sidebar-parent-btn flex w-full items-center justify-between gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                            <span class="sidebar-parent-label flex items-center gap-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -103,8 +99,9 @@
                                 </svg>
                                 <span class="sidebar-text truncate">Master</span>
                             </span>
-                            <svg class="h-4 w-4 text-slate-500 transition-transform" :class="open ? 'rotate-180' : ''"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg class="sidebar-parent-chevron h-4 w-4 text-slate-500 transition-transform"
+                                :class="open ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
                                 <path d="M6 9l6 6 6-6" />
                             </svg>
                         </button>
@@ -112,25 +109,25 @@
                         <div x-show="open" x-collapse x-cloak class="space-y-1 px-2 pb-2">
                             @permission('manage_instansi')
                                 <a href="{{ route('instansi.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('instansi.*') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('instansi.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     <span class="sidebar-text truncate">Instansi</span>
                                 </a>
                             @endpermission
 
                             @permission('manage_rbac')
                                 <a href="{{ route('roles.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('roles.*') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('roles.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     <span class="sidebar-text truncate">RBAC Role</span>
                                 </a>
                                 <a href="{{ route('permissions.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     <span class="sidebar-text truncate">RBAC Permission</span>
                                 </a>
                             @endpermission
 
                             @permission('manage_user')
                                 <a href="{{ route('users.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('users.*') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('users.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     <span class="sidebar-text truncate">User</span>
                                 </a>
                             @endpermission
@@ -139,7 +136,7 @@
                 @endif
 
                 <a href="{{ route('download.index') }}"
-                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('download.*') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('download.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -170,116 +167,144 @@
     </div>
 </aside>
 
-<!-- Toggle Button (Fixed position, always visible) -->
-<button onclick="toggleMainSidebar()" id="sidebarToggleBtn"
-    class="fixed bottom-5 left-64 z-50 flex h-10 w-10 items-center justify-center rounded-r-lg bg-slate-300 text-white hover:bg-slate-200 transition-all duration-300">
-    <svg id="toggleIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-    </svg>
-</button>
-
 <style>
-/* Hide elements until Alpine.js is ready */
-[x-cloak] {
-    display: none !important;
-}
+    /* Hide elements until Alpine.js is ready */
+    [x-cloak] {
+        display: none !important;
+    }
 
-/* Mobile responsive */
-@media (max-width: 768px) {
-#mainSidebar {
-transform: translateX(-100%);
-width: 16rem; /* Restore full width on mobile when open */
-}
+    #mainSidebar.collapsed .sidebar-icon {
+        margin-left: 0 !important;
+    }
 
-#mainSidebar.collapsed {
-transform: translateX(-100%);
-width: 16rem;
-}
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        #mainSidebar {
+            transform: translateX(0);
+            width: 16rem;
+        }
 
-#mainSidebar:not(.collapsed) {
-transform: translateX(0);
-z-index: 1000;
-}
+        #mainSidebar.collapsed {
+            transform: translateX(calc(-100% + 3rem));
+            width: 16rem;
+        }
 
-#sidebarToggleBtn {
-left: 0 !important;
-}
+        #mainSidebar:not(.collapsed) {
+            transform: translateX(0);
+            z-index: 1000;
+        }
 
-#mainSidebar:not(.collapsed) ~ #sidebarToggleBtn {
-left: 16rem !important;
-}
+        #mainSidebar.collapsed .sidebar-text,
+        #mainSidebar.collapsed .sidebar-logo,
+        #mainSidebar.collapsed .sidebar-footer {
+            display: none;
+        }
 
-/* Overlay when sidebar is open on mobile */
-#mainSidebar:not(.collapsed)::before {
-content: '';
-position: fixed;
-top: 0;
-left: 16rem;
-right: 0;
-bottom: 0;
-background: rgba(0, 0, 0, 0.5);
-z-index: -1;
-}
-}
+        #mainSidebar.collapsed .sidebar-nav a {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
 
-/* Desktop styles for collapsed state */
-@media (min-width: 769px) {
-#mainSidebar.collapsed {
-width: 5rem; /* Mini sidebar width */
-transform: none;
-}
+        #mainSidebar.collapsed .sidebar-nav a span.text-\[11px\] {
+            display: none;
+        }
 
-#mainSidebar.collapsed .sidebar-text,
-#mainSidebar.collapsed .sidebar-logo,
-#mainSidebar.collapsed .sidebar-footer,
-#mainSidebar.collapsed .sidebar-icon {
-display: none; /* Hide text and other elements */
-}
+        #mainSidebar.collapsed .sidebar-parent-btn {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
 
-#mainSidebar.collapsed .sidebar-nav a {
-justify-content: center; /* Center icons */
-padding-left: 0;
-padding-right: 0;
-}
+        #mainSidebar.collapsed .sidebar-parent-label {
+            gap: 0;
+        }
 
-#mainSidebar.collapsed .sidebar-nav a span.text-\[11px\] {
-display: none;
-}
+        #mainSidebar.collapsed .sidebar-parent-chevron {
+            display: none;
+        }
 
-#mainSidebar.collapsed ~ #sidebarToggleBtn {
-left: 5rem !important; /* Adjust toggle button position */
-}
+        #mainSidebar.collapsed .px-6.py-5 {
+            justify-content: center;
+            padding: 1.25rem 0;
+        }
 
-/* Center brand icon if needed or hide header content strictly */
-#mainSidebar.collapsed .px-6.py-5 {
-justify-content: center;
-padding: 1.25rem 0;
-}
+        /* Overlay when sidebar is open on mobile */
+        #mainSidebar:not(.collapsed)::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 16rem;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+    }
 
-/* Show a small logo or icon when collapsed if available, else standard logo hidden */
-}
+    /* Desktop styles for collapsed state */
+    @media (min-width: 769px) {
+        #mainSidebar.collapsed {
+            width: 5rem;
+            /* Mini sidebar width */
+            transform: none;
+        }
+
+        #mainSidebar.collapsed .sidebar-text,
+        #mainSidebar.collapsed .sidebar-logo,
+        #mainSidebar.collapsed .sidebar-footer {
+            display: none;
+            /* Hide text and other elements */
+        }
+
+        #mainSidebar.collapsed .sidebar-nav a {
+            justify-content: center;
+            /* Center icons */
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        #mainSidebar.collapsed .sidebar-nav a span.text-\[11px\] {
+            display: none;
+        }
+
+        #mainSidebar.collapsed .sidebar-parent-btn {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        #mainSidebar.collapsed .sidebar-parent-label {
+            gap: 0;
+        }
+
+        #mainSidebar.collapsed .sidebar-parent-chevron {
+            display: none;
+        }
+
+        /* Center brand icon if needed or hide header content strictly */
+        #mainSidebar.collapsed .px-6.py-5 {
+            justify-content: center;
+            padding: 1.25rem 0;
+        }
+
+        /* Show a small logo or icon when collapsed if available, else standard logo hidden */
+    }
 </style>
 
 <script>
     function toggleMainSidebar() {
         const sidebar = document.getElementById('mainSidebar');
-        const icon = document.getElementById('toggleIcon');
         const mainContent = document.getElementById('mainContent');
         const isMobile = window.innerWidth <= 768;
 
         sidebar.classList.toggle('collapsed');
 
         if (sidebar.classList.contains('collapsed')) {
-            // Sidebar collapsed
-            icon.innerHTML =
-                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />';
             if (mainContent && !isMobile) {
                 mainContent.style.marginLeft = '5rem'; // Match mini width
             }
         } else {
-            // Sidebar expanded
-            icon.innerHTML =
-                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />';
             if (mainContent && !isMobile) {
                 mainContent.style.marginLeft = '16rem';
             }
@@ -308,10 +333,6 @@ padding: 1.25rem 0;
         } else if (isCollapsed) {
             // Desktop and saved as collapsed
             if (sidebar) sidebar.classList.add('collapsed');
-            // Manually set icon and margin here to sync
-            const icon = document.getElementById('toggleIcon');
-            if (icon) icon.innerHTML =
-                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />';
             if (mainContent) mainContent.style.marginLeft = '5rem';
         }
     });

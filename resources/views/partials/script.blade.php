@@ -1,6 +1,6 @@
 <script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
 
-<script>
+<!-- <script>
     const MQTTbroker = 'mqtt.beacontelemetry.com'
     const MQTTport = 8083
     const MQTTuser = 'userlog'
@@ -44,6 +44,6 @@
     }
 
     function onConnectionLost(responseObject) {}
-</script>
+</script> -->
 
 @stack('scripts')
