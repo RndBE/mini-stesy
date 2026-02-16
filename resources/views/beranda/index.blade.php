@@ -293,17 +293,6 @@
                         </div>
 
                         <div class="space-y-3">
-
-                            <div class="rounded-xl border border-slate-200 bg-white p-4">
-                                <div class="text-[11px] font-semibold text-slate-500">Lokasi</div>
-                                <div class="mt-1 text-sm font-semibold text-slate-900">
-                                    {{ $lg->lokasi->nama_lokasi ?? '-' }}
-                                </div>
-                                <div class="mt-1 text-xs text-slate-500">
-                                    DAS: {{ $lg->lokasi?->das?->nama_das ?? '-' }}
-                                </div>
-                            </div>
-
                             <div class="grid grid-cols-1 gap-3">
                                 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
                                     class="block rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition-all hover:shadow-md hover:border-blue-300">

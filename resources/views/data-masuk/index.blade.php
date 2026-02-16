@@ -3,10 +3,10 @@
 @section('content')
     <div x-data="dataMasukManager()" class="space-y-6">
         <!-- Header -->
-        <div class="mb-8">
+        {{-- <div class="mb-8">
             <h1 class="text-3xl font-bold text-slate-900">Data Masuk</h1>
             <p class="text-slate-500 mt-2">Kelola dan lihat data sensor logger sesuai tanggal yang dipilih</p>
-        </div>
+        </div> --}}
 
         <!-- Filter Section -->
         <div class="overflow-visible rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-8">

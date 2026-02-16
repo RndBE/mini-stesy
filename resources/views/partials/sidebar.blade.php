@@ -38,7 +38,7 @@
                     </a>
                 @endpermission
 
-                {{--@permission('view_peta_lokasi')
+                {{-- @permission('view_peta_lokasi')
                     <a href="{{ route('data-masuk.index') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('data-masuk.index') ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
@@ -88,9 +88,11 @@
                     </a>
                 @endpermission
 
-                @if (auth()->check() && (auth()->user()->hasPermission('manage_instansi') || auth()->user()->hasPermission('manage_rbac') || auth()->user()->hasPermission('manage_user')))
-                    <div x-data="{ open: {{ request()->routeIs('instansi.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('users.*') ? 'true' : 'false' }} }"
-                        class="rounded-xl border border-slate-200 bg-slate-50/60">
+                @if (auth()->check() &&
+                        (auth()->user()->hasPermission('manage_instansi') ||
+                            auth()->user()->hasPermission('manage_rbac') ||
+                            auth()->user()->hasPermission('manage_user')))
+                    <div x-data="{ open: {{ request()->routeIs('instansi.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('users.*') ? 'true' : 'false' }} }" class="rounded-xl border border-slate-200 bg-slate-50/60">
                         <button type="button" @click="open = !open"
                             class="flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
                             <span class="flex items-center gap-3">
@@ -179,85 +181,90 @@
 </button>
 
 <style>
-/* Hide elements until Alpine.js is ready */
-[x-cloak] {
-    display: none !important;
-}
+    /* Hide elements until Alpine.js is ready */
+    [x-cloak] {
+        display: none !important;
+    }
 
-/* Mobile responsive */
-@media (max-width: 768px) {
-#mainSidebar {
-transform: translateX(-100%);
-width: 16rem; /* Restore full width on mobile when open */
-}
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        #mainSidebar {
+            transform: translateX(-100%);
+            width: 16rem;
+            /* Restore full width on mobile when open */
+        }
 
-#mainSidebar.collapsed {
-transform: translateX(-100%);
-width: 16rem;
-}
+        #mainSidebar.collapsed {
+            transform: translateX(-100%);
+            width: 16rem;
+        }
 
-#mainSidebar:not(.collapsed) {
-transform: translateX(0);
-z-index: 1000;
-}
+        #mainSidebar:not(.collapsed) {
+            transform: translateX(0);
+            z-index: 1000;
+        }
 
-#sidebarToggleBtn {
-left: 0 !important;
-}
+        #sidebarToggleBtn {
+            left: 0 !important;
+        }
 
-#mainSidebar:not(.collapsed) ~ #sidebarToggleBtn {
-left: 16rem !important;
-}
+        #mainSidebar:not(.collapsed)~#sidebarToggleBtn {
+            left: 16rem !important;
+        }
 
-/* Overlay when sidebar is open on mobile */
-#mainSidebar:not(.collapsed)::before {
-content: '';
-position: fixed;
-top: 0;
-left: 16rem;
-right: 0;
-bottom: 0;
-background: rgba(0, 0, 0, 0.5);
-z-index: -1;
-}
-}
+        /* Overlay when sidebar is open on mobile */
+        #mainSidebar:not(.collapsed)::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 16rem;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+    }
 
-/* Desktop styles for collapsed state */
-@media (min-width: 769px) {
-#mainSidebar.collapsed {
-width: 5rem; /* Mini sidebar width */
-transform: none;
-}
+    /* Desktop styles for collapsed state */
+    @media (min-width: 769px) {
+        #mainSidebar.collapsed {
+            width: 5rem;
+            /* Mini sidebar width */
+            transform: none;
+        }
 
-#mainSidebar.collapsed .sidebar-text,
-#mainSidebar.collapsed .sidebar-logo,
-#mainSidebar.collapsed .sidebar-footer,
-#mainSidebar.collapsed .sidebar-icon {
-display: none; /* Hide text and other elements */
-}
+        #mainSidebar.collapsed .sidebar-text,
+        #mainSidebar.collapsed .sidebar-logo,
+        #mainSidebar.collapsed .sidebar-footer,
+        #mainSidebar.collapsed .sidebar-icon {
+            display: none;
+            /* Hide text and other elements */
+        }
 
-#mainSidebar.collapsed .sidebar-nav a {
-justify-content: center; /* Center icons */
-padding-left: 0;
-padding-right: 0;
-}
+        #mainSidebar.collapsed .sidebar-nav a {
+            justify-content: center;
+            /* Center icons */
+            padding-left: 0;
+            padding-right: 0;
+        }
 
-#mainSidebar.collapsed .sidebar-nav a span.text-\[11px\] {
-display: none;
-}
+        #mainSidebar.collapsed .sidebar-nav a span.text-\[11px\] {
+            display: none;
+        }
 
-#mainSidebar.collapsed ~ #sidebarToggleBtn {
-left: 5rem !important; /* Adjust toggle button position */
-}
+        #mainSidebar.collapsed~#sidebarToggleBtn {
+            left: 5rem !important;
+            /* Adjust toggle button position */
+        }
 
-/* Center brand icon if needed or hide header content strictly */
-#mainSidebar.collapsed .px-6.py-5 {
-justify-content: center;
-padding: 1.25rem 0;
-}
+        /* Center brand icon if needed or hide header content strictly */
+        #mainSidebar.collapsed .px-6.py-5 {
+            justify-content: center;
+            padding: 1.25rem 0;
+        }
 
-/* Show a small logo or icon when collapsed if available, else standard logo hidden */
-}
+        /* Show a small logo or icon when collapsed if available, else standard logo hidden */
+    }
 </style>
 
 <script>
@@ -267,69 +274,75 @@ padding: 1.25rem 0;
         const mainContent = document.getElementById('mainContent');
         const isMobile = window.innerWidth <= 768;
 
-        sidebar.classList.toggle('collapsed');
+        if (!sidebar || !mainContent) return;
 
-        if (sidebar.classList.contains('collapsed')) {
-            // Sidebar collapsed
-            icon.innerHTML =
-                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />';
-            if (mainContent && !isMobile) {
-                mainContent.style.marginLeft = '5rem'; // Match mini width
-            }
-        } else {
-            // Sidebar expanded
-            icon.innerHTML =
+        sidebar.classList.toggle('collapsed');
+        const collapsed = sidebar.classList.contains('collapsed');
+
+        if (icon) {
+            icon.innerHTML = collapsed ?
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />' :
                 '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />';
-            if (mainContent && !isMobile) {
-                mainContent.style.marginLeft = '16rem';
-            }
         }
 
-        // Save state to localStorage
-        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        if (isMobile) {
+            mainContent.style.paddingLeft = '0';
+        } else {
+            mainContent.style.paddingLeft = collapsed ? '5rem' : '16rem';
+        }
+
+        localStorage.setItem('sidebarCollapsed', collapsed);
     }
 
-    // Restore sidebar state on page load
     document.addEventListener('DOMContentLoaded', function() {
         const isMobile = window.innerWidth <= 768;
         const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
 
         const sidebar = document.getElementById('mainSidebar');
         const mainContent = document.getElementById('mainContent');
+        const icon = document.getElementById('toggleIcon');
 
-        // On mobile, always start collapsed (hidden)
+        if (!sidebar || !mainContent) return;
+
         if (isMobile) {
-            if (sidebar && !sidebar.classList.contains('collapsed')) {
-                sidebar.classList.add('collapsed');
+            sidebar.classList.add('collapsed');
+            mainContent.style.paddingLeft = '0';
+            if (icon) {
+                icon.innerHTML =
+                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />';
             }
-            if (mainContent) {
-                mainContent.style.marginLeft = '0';
+            return;
+        }
+
+        if (isCollapsed) {
+            sidebar.classList.add('collapsed');
+            mainContent.style.paddingLeft = '5rem';
+            if (icon) {
+                icon.innerHTML =
+                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />';
             }
-        } else if (isCollapsed) {
-            // Desktop and saved as collapsed
-            if (sidebar) sidebar.classList.add('collapsed');
-            // Manually set icon and margin here to sync
-            const icon = document.getElementById('toggleIcon');
-            if (icon) icon.innerHTML =
-                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />';
-            if (mainContent) mainContent.style.marginLeft = '5rem';
+        } else {
+            sidebar.classList.remove('collapsed');
+            mainContent.style.paddingLeft = '16rem';
+            if (icon) {
+                icon.innerHTML =
+                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />';
+            }
         }
     });
 
-    // Handle window resize
     window.addEventListener('resize', function() {
         const isMobile = window.innerWidth <= 768;
         const mainContent = document.getElementById('mainContent');
         const sidebar = document.getElementById('mainSidebar');
 
-        if (isMobile && mainContent) {
-            mainContent.style.marginLeft = '0';
-        } else if (!isMobile && mainContent) {
-            if (sidebar.classList.contains('collapsed')) {
-                mainContent.style.marginLeft = '5rem';
-            } else {
-                mainContent.style.marginLeft = '16rem';
-            }
+        if (!mainContent || !sidebar) return;
+
+        if (isMobile) {
+            mainContent.style.paddingLeft = '0';
+            sidebar.classList.add('collapsed');
+        } else {
+            mainContent.style.paddingLeft = sidebar.classList.contains('collapsed') ? '5rem' : '16rem';
         }
     });
 </script>

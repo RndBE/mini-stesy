@@ -9,6 +9,8 @@ class Parameter_sensor extends Model
     protected $table = 'parameter_sensor';
     protected $primaryKey = 'id_param';
     public $timestamps = false;
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'logger_id',
