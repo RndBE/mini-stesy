@@ -293,30 +293,31 @@
 </style>
 
 <script>
-    function toggleMainSidebar() {
+    function applySidebarLayout() {
         const sidebar = document.getElementById('mainSidebar');
         const mainContent = document.getElementById('mainContent');
         const isMobile = window.innerWidth <= 768;
 
         if (!sidebar || !mainContent) return;
 
-        if (sidebar.classList.contains('collapsed')) {
-            if (mainContent && !isMobile) {
-                mainContent.style.marginLeft = '5rem'; // Match mini width
-            }
-        } else {
-            if (mainContent && !isMobile) {
-                mainContent.style.marginLeft = '16rem';
-            }
-        }
+        mainContent.style.paddingLeft = '0';
 
         if (isMobile) {
-            mainContent.style.paddingLeft = '0';
-        } else {
-            mainContent.style.paddingLeft = collapsed ? '5rem' : '16rem';
+            mainContent.style.marginLeft = '0';
+            return;
         }
 
-        localStorage.setItem('sidebarCollapsed', collapsed);
+        mainContent.style.marginLeft = sidebar.classList.contains('collapsed') ? '5rem' : '16rem';
+    }
+
+    function toggleMainSidebar() {
+        const sidebar = document.getElementById('mainSidebar');
+        const mainContent = document.getElementById('mainContent');
+        if (!sidebar || !mainContent) return;
+
+        sidebar.classList.toggle('collapsed');
+        applySidebarLayout();
+        localStorage.setItem('sidebarCollapsed', String(sidebar.classList.contains('collapsed')));
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -325,53 +326,29 @@
 
         const sidebar = document.getElementById('mainSidebar');
         const mainContent = document.getElementById('mainContent');
-        const icon = document.getElementById('toggleIcon');
 
         if (!sidebar || !mainContent) return;
 
         if (isMobile) {
             sidebar.classList.add('collapsed');
-            mainContent.style.paddingLeft = '0';
-            if (icon) {
-                icon.innerHTML =
-                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />';
-            }
-            return;
-        }
-
-        if (isCollapsed) {
+        } else if (isCollapsed) {
             sidebar.classList.add('collapsed');
-            mainContent.style.paddingLeft = '5rem';
-            if (icon) {
-                icon.innerHTML =
-                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />';
-            }
         } else {
             sidebar.classList.remove('collapsed');
-            mainContent.style.paddingLeft = '16rem';
-            if (icon) {
-                icon.innerHTML =
-                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />';
-            }
-        } else if (isCollapsed) {
-            // Desktop and saved as collapsed
-            if (sidebar) sidebar.classList.add('collapsed');
-            if (mainContent) mainContent.style.marginLeft = '5rem';
         }
+
+        applySidebarLayout();
     });
 
     window.addEventListener('resize', function() {
         const isMobile = window.innerWidth <= 768;
-        const mainContent = document.getElementById('mainContent');
         const sidebar = document.getElementById('mainSidebar');
-
-        if (!mainContent || !sidebar) return;
+        if (!sidebar) return;
 
         if (isMobile) {
-            mainContent.style.paddingLeft = '0';
             sidebar.classList.add('collapsed');
-        } else {
-            mainContent.style.paddingLeft = sidebar.classList.contains('collapsed') ? '5rem' : '16rem';
         }
+
+        applySidebarLayout();
     });
 </script>

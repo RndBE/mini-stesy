@@ -256,7 +256,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #E6E6E6;
             color: rgb(0, 0, 0);
         }
 
@@ -281,12 +280,6 @@
 
         .info-panel-body {
             padding: 24px;
-        }
-
-        .info-item {
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #f3f4f6;
         }
 
         .info-item:last-child {
@@ -464,45 +457,45 @@
 @endpush
 @section('content')
     <div class="info-panel-overlay" id="infoPanelOverlay" onclick="closeInfoPanel()"></div>
-    <div class="info-panel" id="infoPanel">
+    <div class="info-panel rounded-lg" id="infoPanel">
         <div class="info-panel-header">
             <div class="info-panel-title">Informasi Logger</div>
             <button class="info-panel-close" onclick="closeInfoPanel()">×</button>
         </div>
         <div class="info-panel-body">
-            <div class="info-item">
+            <div class="info-item mb-2 pb-1">
                 <div class="info-label">ID Logger</div>
                 <div class="info-value">{{ $logger->id_logger }}</div>
             </div>
-            <div class="info-item">
+            <div class="info-item mb-2 pb-1">
                 <div class="info-label">Nama Logger</div>
                 <div class="info-value">{{ $logger->nama_logger }}</div>
             </div>
-            <div class="info-item">
+            <div class="info-item mb-2 pb-1">
                 <div class="info-label">Seri Logger</div>
                 <div class="info-value">{{ $logger->informasi->seri_logger ?? '-' }}</div>
             </div>
-            <div class="info-item">
+            <div class="info-item mb-2 pb-1">
                 <div class="info-label">Sensor</div>
                 <div class="info-value">{{ $logger->sensor_count ?? '-' }}</div>
             </div>
-            <div class="info-item">
+            <div class="info-item mb-2 pb-1">
                 <div class="info-label">Serial Number</div>
                 <div class="info-value">{{ $logger->informasi->serial_number ?? '-' }}</div>
             </div>
-            <div class="info-item">
+            <div class="info-item mb-2 pb-1">
                 <div class="info-label">No. Seluler</div>
                 <div class="info-value">{{ $logger->no_seluler ?? '-' }}</div>
             </div>
-            <div class="info-item">
+            <div class="info-item mb-2 pb-1">
                 <div class="info-label">Nama Penjaga</div>
                 <div class="info-value">{{ $logger->informasi->nama_pic ?? '-' }}</div>
             </div>
-            <div class="info-item">
+            <div class="info-item mb-2 pb-1">
                 <div class="info-label">Nomor Penjaga</div>
                 <div class="info-value">{{ $logger->informasi->no_pic ?? '-' }}</div>
             </div>
-            <div class="info-item">
+            <div class="info-item mb-2 pb-1">
                 <div class="info-label">Lokasi</div>
                 <div class="info-value">{{ $logger->lokasi->nama_lokasi ?? '-' }}</div>
             </div>
@@ -588,7 +581,8 @@
             <button type="button"
                 onclick="window.history.length > 1 ? window.history.back() : window.location.href='{{ route('peta.lokasi') }}'"
                 class="inline-flex items-center justify-center" aria-label="Kembali">
-                <svg width="8" height="20" viewBox="0 0 10 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="8" height="20" viewBox="0 0 10 20" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
                     <path d="M8.5 18.5L1 9.75L8.5 1" stroke="#303481" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" />
                 </svg>
@@ -645,7 +639,7 @@
                     <div class="">
                         <div class="text-md font-semibold mb-2 ">Parameter</div>
                         <select id="parameterSelect"
-                            class="calendar-input text-sm py-2 rounded-lg border border-slate-300 rounded-lg">
+                            class="calendar-input text-sm py-2  border border-slate-300 rounded-lg">
                             <option value="">Pilih Parameter</option>
                             @foreach ($parameters as $param)
                                 <option value="{{ $param['nama_parameter'] }}" data-unit="{{ $param['satuan'] ?? '' }}">
