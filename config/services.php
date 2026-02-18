@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'awlr_forward' => [
+        'url' => env('AWLR_FORWARD_URL'),
+    ],
+
+
 ];

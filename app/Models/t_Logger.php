@@ -98,4 +98,9 @@ class t_Logger extends Model
     {
         return $this->hasOne(Klasifikasi_hujan::class, 'logger_id', 'id_logger');
     }
+
+    public function tingkatSiagaAwlr()
+    {
+        return $this->hasMany(TingkatSiagaAwlr::class, 'id_logger', 'id_logger');
+    }
 }
