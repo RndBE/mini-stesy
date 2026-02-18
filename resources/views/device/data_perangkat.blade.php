@@ -331,6 +331,21 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
                                     </div>
                                     <div>
+                                        <label for="create_nama_penjaga"
+                                            class="block text-xs font-medium text-gray-700">Nama
+                                            Penjaga</label>
+                                        <input type="text" name="nama_penjaga" id="create_nama_penjaga"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                    </div>
+                                    <div>
+                                        <label for="create_no_hp" class="block text-xs font-medium text-gray-700">No
+                                            HP</label>
+                                        <input type="text" name="no_hp" id="create_no_hp"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mt-4">
+                                    <div>
                                         <label for="create_tanggal_pemasangan"
                                             class="block text-xs font-medium text-gray-700">Tanggal Pemasangan</label>
                                         <div class="relative mt-1">
@@ -349,17 +364,12 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <label for="create_nama_penjaga"
-                                            class="block text-xs font-medium text-gray-700">Nama
-                                            Penjaga</label>
-                                        <input type="text" name="nama_penjaga" id="create_nama_penjaga"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
-                                    </div>
-                                    <div>
-                                        <label for="create_no_hp" class="block text-xs font-medium text-gray-700">No
-                                            HP</label>
-                                        <input type="text" name="no_hp" id="create_no_hp"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                        <label for="create_awal_kontrak"
+                                            class="block text-xs font-medium text-gray-700">Awal Kontrak</label>
+                                        <div class="relative mt-1">
+                                            <input type="date" name="awal_kontrak" id="create_awal_kontrak"
+                                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -507,6 +517,21 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
                                     </div>
                                     <div>
+                                        <label for="nama_penjaga" class="block text-xs font-medium text-gray-700">Nama
+                                            Penjaga</label>
+                                        <input type="text" name="nama_penjaga" id="nama_penjaga"
+                                            x-model="formData.nama_penjaga"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                    </div>
+                                    <div>
+                                        <label for="no_hp" class="block text-xs font-medium text-gray-700">No
+                                            HP</label>
+                                        <input type="text" name="no_hp" id="no_hp" x-model="formData.no_hp"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mt-4">
+                                    <div>
                                         <label for="tanggal_pemasangan"
                                             class="block text-xs font-medium text-gray-700">Tanggal Pemasangan</label>
                                         <div class="relative mt-1">
@@ -525,17 +550,13 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <label for="nama_penjaga" class="block text-xs font-medium text-gray-700">Nama
-                                            Penjaga</label>
-                                        <input type="text" name="nama_penjaga" id="nama_penjaga"
-                                            x-model="formData.nama_penjaga"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
-                                    </div>
-                                    <div>
-                                        <label for="no_hp" class="block text-xs font-medium text-gray-700">No
-                                            HP</label>
-                                        <input type="text" name="no_hp" id="no_hp" x-model="formData.no_hp"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                        <label for="awal_kontrak" class="block text-xs font-medium text-gray-700">Awal
+                                            kontrak</label>
+                                        <div class="relative mt-1">
+                                            <input type="date" name="awal_kontrak" id="awal_kontrak"
+                                                x-model="formData.awal_kontrak"
+                                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -672,6 +693,7 @@
                         nama_penjaga: '',
                         jumlah_sensor: '',
                         imei: '',
+                        awal_kontrak: '',
                     };
                     this.showCreateModal = true;
                 },
@@ -694,7 +716,8 @@
                         no_hp: device.no_hp !== '-' ? device.no_hp : '',
                         tanggal_pemasangan: device.tanggal_pemasangan || '',
                         masa_garansi: device.masa_garansi || '',
-                        nama_penjaga: device.nama_penjaga !== '-' ? device.nama_penjaga : ''
+                        nama_penjaga: device.nama_penjaga !== '-' ? device.nama_penjaga : '',
+                        awal_kontrak: device.awal_kontrak || '',
                     };
 
                     this.updateUrl = `{{ url('/data-perangkat') }}/${device.id_logger}`;

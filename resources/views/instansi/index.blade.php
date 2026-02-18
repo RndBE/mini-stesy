@@ -101,7 +101,7 @@
                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                 class="fixed inset-0 bg-gray-500/75" @click="closeCreateModal()"></div>
 
-            <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
+            <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeCreateModal()">
                 <div x-show="showCreateModal" x-transition:enter="ease-in-out duration-300"
                     x-transition:enter-start="opacity-0 scale-95 translate-y-4"
                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -193,7 +193,7 @@
                 x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500/75" @click="closeDeleteModal()">
             </div>
 
-            <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="fixed inset-0 flex items-center justify-center p-4" @click="closeDeleteModal()">
                 <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
                     x-transition:enter-start="opacity-0 scale-95 translate-y-4"
                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -249,7 +249,7 @@
                 x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500/75" @click="closeEditModal()"></div>
 
-            <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
+            <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeEditModal()">
                 <div x-show="showEditModal" x-transition:enter="ease-in-out duration-300"
                     x-transition:enter-start="opacity-0 scale-95 translate-y-4"
                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"

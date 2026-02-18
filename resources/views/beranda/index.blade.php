@@ -13,7 +13,9 @@
                     $isOnline = $lg->status_logger === 'online' ? $isOnline : false;
                     $isSdOk = (bool) ($latest?->is_sd_ok ?? true);
 
-                    $timeClass = 'bg-slate-100 text-slate-700';
+                    $timeClass = $isOnline
+                        ? 'border-emerald-200 bg-emerald-100 text-emerald-700'
+                        :'bg-slate-100 text-slate-700';
                     $dotClass = $isOnline ? 'bg-green-500' : 'bg-gray-800';
 
                     $badgeClass = $isOnline

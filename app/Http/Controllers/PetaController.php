@@ -194,7 +194,7 @@ class PetaController extends Controller
                     ->first();
 
                 $minutesDiff = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
-                $status = ($minutesDiff !== null && $minutesDiff < 120) ? 'online' : 'offline';
+                $status = ($minutesDiff !== null && $minutesDiff < 60) ? 'online' : 'offline';
 
                 $kategori = $l->kategori?->kode ?? $l->kategori?->nama_kategori ?? $l->kategori?->nama ?? null;
                 $kategori = $kategori ? strtoupper(trim($kategori)) : null;

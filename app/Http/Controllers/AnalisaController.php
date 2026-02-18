@@ -47,7 +47,7 @@ class AnalisaController extends Controller
 
         if ($lastTime) {
             $minutesDiff = Carbon::parse($lastTime)->diffInMinutes(now());
-            $status = $minutesDiff < 120 ? 'online' : 'offline';
+            $status = $minutesDiff < 60 ? 'online' : 'offline';
         }
 
         return view('analisadata.analisa', [

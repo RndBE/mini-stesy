@@ -38,7 +38,7 @@ class BerandaController extends Controller
                     $isActive = Carbon::parse($latestWaktu)->diffInMinutes(now());
                 }
 
-                $lg->status_logger = $isActive < 120 ? 'online' : 'offline';
+                $lg->status_logger = $isActive < 60 ? 'online' : 'offline';
                 $lg->latest_waktu  = $latestWaktu;
 
                 return $lg;

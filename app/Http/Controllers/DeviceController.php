@@ -284,6 +284,7 @@ class DeviceController extends Controller
                     'masa_garansi_raw' => $d->informasi ? $d->informasi->garansi : null, // Raw Y-m-d for form
                     'jumlah_sensor' => $d->sensor_count,
                     'imei' => $d->informasi ? $d->informasi->imei : null,
+                    'awal_kontrak' => $d->informasi ? $d->informasi->awal_kontrak : null,
                 ];
             });
 
@@ -315,6 +316,7 @@ class DeviceController extends Controller
             'jumlah_sensor'      => 'nullable|integer|in:16,19',
             'elevasi'            => 'nullable|string|max:10',
             'imei'               => 'nullable|string|max:100',
+            'awal_kontrak'       => 'nullable|date',
         ]);
 
         $sensorCount = (int) ($validated['jumlah_sensor'] ?? 16);
@@ -341,6 +343,7 @@ class DeviceController extends Controller
             'garansi' => $request->masa_garansi,
             'elevasi' => $request->elevasi ?? '-',
             'imei'    => $request->imei ?? '-',
+            'awal_kontrak'  => $request->awal_kontrak ?? '',
         ]);
 
 
@@ -363,6 +366,7 @@ class DeviceController extends Controller
             'elevasi'            => 'nullable|string|max:10',
             'jumlah_sensor'      => 'nullable|integer|in:16,19',
             'imei'               => 'nullable|string|max:100',
+            'awal_kontrak'       => 'nullable|date',
         ]);
 
         $logger = t_Logger::query()
@@ -396,6 +400,7 @@ class DeviceController extends Controller
         $informasi->garansi            = $validated['masa_garansi'] ?? null;
         $informasi->elevasi            = $validated['elevasi'] ?? ($informasi->elevasi ?? '-');
         $informasi->imei               = $validated['imei'] ?? '-';
+        $informasi->awal_kontrak       = $validated['awal_kontrak'] ?? null;
         $informasi->save();
 
         return back()->with('success', 'Data perangkat berhasil diperbarui.');
