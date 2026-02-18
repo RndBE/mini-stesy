@@ -13,6 +13,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DataMasukController;
+use App\Http\Controllers\TingkatSiagaAwlrController;
 use Illuminate\Support\Facades\Http;
 
 // Route::get('/', function () {
@@ -61,6 +62,8 @@ Route::middleware(['auth', 'permission:manage_data_perangkat'])->put('/data-pera
 Route::middleware(['auth', 'permission:view_realtime'])->group(function () {
     Route::get('/realtime-monitoring', [RealtimeController::class, 'index'])->name('realtime.index');
     Route::get('/realtime-monitoring/data/{id}', [RealtimeController::class, 'getData'])->name('realtime.data');
+    Route::get('/tingkat-siaga-awlr', [TingkatSiagaAwlrController::class, 'index'])->name('tingkat-siaga-awlr.index');
+    Route::put('/tingkat-siaga-awlr/{idLogger}', [TingkatSiagaAwlrController::class, 'update'])->name('tingkat-siaga-awlr.update');
 });
 
 Route::middleware(['auth', 'permission:manage_instansi'])->resource('instansi', InstansiController::class)->except(['show']);
