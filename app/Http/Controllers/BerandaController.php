@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\t_Logger;
 use Carbon\Carbon;
 use App\Services\MiniStesyApi;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Collection;
 
 class BerandaController extends Controller
 {
@@ -40,6 +43,48 @@ class BerandaController extends Controller
 
                 $lg->status_logger = $isActive < 60 ? 'online' : 'offline';
                 $lg->latest_waktu  = $latestWaktu;
+                $lg->arr_curah_hujan_perjam = null;
+                $lg->arr_curah_hujan_harian = null;
+                $lg->arr_status_perjam = null;
+                $lg->arr_status_perhari = null;
+                $lg->arr_state_perjam = null;
+                $lg->arr_state_perhari = null;
+
+                $pRain = $lg->params->first(function ($param) {
+                    $name = strtolower(trim((string) $param->nama_parameter));
+                    $utama = strtolower(trim((string) $param->parameter_utama));
+                    return str_contains($name, 'hujan')
+                        || str_contains($name, 'rain')
+                        || str_contains($utama, 'hujan')
+                        || str_contains($utama, 'rain');
+                });
+
+                $tableName = (string) ($lg->tabel_main ?? '');
+                $rainColumn = $pRain?->kolom_sensor ? (string) $pRain->kolom_sensor : null;
+
+                if ($rainColumn && $this->canQueryRainTable($tableName, $rainColumn)) {
+                    $hourStart = now()->copy()->startOfHour();
+                    $hourEnd = now()->copy()->endOfHour();
+                    $dayStart = now()->copy()->startOfDay();
+                    $dayEnd = now()->copy()->endOfDay();
+
+                    $hourlyRain = DB::table($tableName)
+                        ->where('id_logger', $lg->id_logger)
+                        ->whereBetween('waktu', [$hourStart, $hourEnd])
+                        ->sum($rainColumn);
+
+                    $dailyRain = DB::table($tableName)
+                        ->where('id_logger', $lg->id_logger)
+                        ->whereBetween('waktu', [$dayStart, $dayEnd])
+                        ->sum($rainColumn);
+
+                    $lg->arr_curah_hujan_perjam = is_numeric($hourlyRain) ? (float) $hourlyRain : null;
+                    $lg->arr_curah_hujan_harian = is_numeric($dailyRain) ? (float) $dailyRain : null;
+                    $lg->arr_status_perjam = $this->resolveRainStatus($lg->id_logger, 'perjam', $lg->arr_curah_hujan_perjam);
+                    $lg->arr_status_perhari = $this->resolveRainStatus($lg->id_logger, 'perhari', $lg->arr_curah_hujan_harian);
+                    $lg->arr_state_perjam = $this->resolveRainStateKey($lg->id_katlogger, $lg->arr_curah_hujan_perjam);
+                    $lg->arr_state_perhari = $this->resolveRainStateKey($lg->id_katlogger, $lg->arr_curah_hujan_harian);
+                }
 
                 return $lg;
             });
@@ -57,6 +102,124 @@ class BerandaController extends Controller
             'loggers' => $loggers,
             'groupedLoggers' => $groupedLoggers,
         ]);
+    }
+
+    private function canQueryRainTable(string $tableName, string $rainColumn): bool
+    {
+        if ($tableName === '' || !preg_match('/^[A-Za-z0-9_]+$/', $tableName)) {
+            return false;
+        }
+
+        if (!Schema::hasTable($tableName)) {
+            return false;
+        }
+
+        return Schema::hasColumn($tableName, 'id_logger')
+            && Schema::hasColumn($tableName, 'waktu')
+            && Schema::hasColumn($tableName, $rainColumn);
+    }
+
+    private function resolveRainStatus(string $loggerId, string $period, ?float $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $thresholds = $this->rainThresholds($loggerId, $period);
+
+        if ($thresholds->isEmpty()) {
+            return null;
+        }
+
+        $matched = null;
+
+        foreach ($thresholds as $threshold) {
+            $min = is_numeric($threshold->debit_air) ? (float) $threshold->debit_air : null;
+
+            if ($min === null) {
+                continue;
+            }
+
+            if ($value >= $min) {
+                $matched = $threshold;
+            } else {
+                break;
+            }
+        }
+
+        if ($matched) {
+            return $matched->intensitas;
+        }
+
+        return $thresholds->first()?->intensitas;
+    }
+
+    private function rainThresholds(string $loggerId, string $period): Collection
+    {
+        static $cache = [];
+        $key = $loggerId . '|' . $period;
+
+        if (!array_key_exists($key, $cache)) {
+            $cache[$key] = DB::table('klasifikasi_hujan')
+                ->where('logger_id', $loggerId)
+                ->where('waktu', $period)
+                ->get(['debit_air', 'intensitas'])
+                ->filter(fn($row) => is_numeric($row->debit_air))
+                ->sortBy(fn($row) => (float) $row->debit_air)
+                ->values();
+        }
+
+        return $cache[$key];
+    }
+
+    private function resolveRainStateKey(?int $kategoriId, ?float $value): ?string
+    {
+        if (!$kategoriId || $value === null) {
+            return null;
+        }
+
+        $thresholds = $this->kategoriThresholds($kategoriId);
+
+        if ($thresholds->isEmpty()) {
+            return null;
+        }
+
+        foreach ($thresholds as $threshold) {
+            $min = is_numeric($threshold->min_value) ? (float) $threshold->min_value : null;
+            $max = is_numeric($threshold->max_value) ? (float) $threshold->max_value : null;
+
+            // Skip non-value states such as koneksi_terputus.
+            if ($min === null && $max === null) {
+                continue;
+            }
+
+            $matchesMin = $min === null || $value >= $min;
+            $matchesMax = $max === null || $value < $max;
+
+            if ($matchesMin && $matchesMax) {
+                return $threshold->state_key;
+            }
+        }
+
+        return $thresholds
+            ->first(function ($threshold) {
+                return $threshold->min_value !== null || $threshold->max_value !== null;
+            })
+            ?->state_key;
+    }
+
+    private function kategoriThresholds(int $kategoriId): Collection
+    {
+        static $cache = [];
+
+        if (!array_key_exists($kategoriId, $cache)) {
+            $cache[$kategoriId] = DB::table('klasifikasi_threshold')
+                ->where('id_kategori', $kategoriId)
+                ->orderBy('sort_order')
+                ->get(['state_key', 'min_value', 'max_value', 'sort_order']);
+        }
+
+        return $cache[$kategoriId];
     }
     // public function index(MiniStesyApi $api)
     // {
