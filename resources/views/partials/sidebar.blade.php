@@ -77,7 +77,7 @@
                         (auth()->user()->hasPermission('manage_instansi') ||
                             auth()->user()->hasPermission('manage_rbac') ||
                             auth()->user()->hasPermission('manage_user')))
-                    <div x-data="{ open: {{ request()->routeIs('instansi.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('users.*') ? 'true' : 'false' }} }" class="rounded-xl border border-slate-200 bg-slate-50/60">
+                    <div x-data="{ open: {{ request()->routeIs('instansi.*') || request()->routeIs('kategori.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('users.*') ? 'true' : 'false' }} }" class="rounded-xl border border-slate-200 bg-slate-50/60">
                         <button type="button"
                             @click="
                                 const sidebar = document.getElementById('mainSidebar');
@@ -111,6 +111,10 @@
                                 <a href="{{ route('instansi.index') }}"
                                     class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('instansi.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     <span class="sidebar-text truncate">Instansi</span>
+                                </a>
+                                <a href="{{ route('kategori.index') }}"
+                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('kategori.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    <span class="sidebar-text truncate">Kategori Logger</span>
                                 </a>
                             @endpermission
 
@@ -180,12 +184,12 @@
     /* Mobile responsive */
     @media (max-width: 768px) {
         #mainSidebar {
-            transform: translateX(0);
+            transform: translateX(-100%);
             width: 16rem;
         }
 
         #mainSidebar.collapsed {
-            transform: translateX(calc(-100% + 3rem));
+            transform: translateX(-100%);
             width: 16rem;
         }
 
@@ -229,17 +233,6 @@
             padding: 1.25rem 0;
         }
 
-        /* Overlay when sidebar is open on mobile */
-        #mainSidebar:not(.collapsed)::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 16rem;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: -1;
-        }
     }
 
     /* Desktop styles for collapsed state */
@@ -293,6 +286,18 @@
 </style>
 
 <script>
+    function syncSidebarBackdrop() {
+        const sidebar = document.getElementById('mainSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const isMobile = window.innerWidth <= 768;
+
+        if (!sidebar || !backdrop) return;
+
+        const showBackdrop = isMobile && !sidebar.classList.contains('collapsed');
+        backdrop.classList.toggle('hidden', !showBackdrop);
+        document.body.classList.toggle('overflow-hidden', showBackdrop);
+    }
+
     function applySidebarLayout() {
         const sidebar = document.getElementById('mainSidebar');
         const mainContent = document.getElementById('mainContent');
@@ -304,16 +309,17 @@
 
         if (isMobile) {
             mainContent.style.marginLeft = '0';
+            syncSidebarBackdrop();
             return;
         }
 
         mainContent.style.marginLeft = sidebar.classList.contains('collapsed') ? '5rem' : '16rem';
+        syncSidebarBackdrop();
     }
 
     function toggleMainSidebar() {
         const sidebar = document.getElementById('mainSidebar');
-        const mainContent = document.getElementById('mainContent');
-        if (!sidebar || !mainContent) return;
+        if (!sidebar) return;
 
         sidebar.classList.toggle('collapsed');
         applySidebarLayout();
@@ -326,6 +332,7 @@
 
         const sidebar = document.getElementById('mainSidebar');
         const mainContent = document.getElementById('mainContent');
+        const backdrop = document.getElementById('sidebarBackdrop');
 
         if (!sidebar || !mainContent) return;
 
@@ -338,6 +345,16 @@
         }
 
         applySidebarLayout();
+
+        if (backdrop) {
+            backdrop.addEventListener('click', function() {
+                const isMobileNow = window.innerWidth <= 768;
+                if (!isMobileNow) return;
+
+                sidebar.classList.add('collapsed');
+                applySidebarLayout();
+            });
+        }
     });
 
     window.addEventListener('resize', function() {

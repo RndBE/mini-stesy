@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\T_s16;
-use App\Models\T_s19;
 use App\Models\t_Logger;
 use App\Models\Parameter_sensor;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Bluerhinos\phpMQTT;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DataMasukController extends Controller
 {
@@ -56,6 +56,9 @@ class DataMasukController extends Controller
             if ($loggerRow && isset($loggerRow->jumlah_sensor) && is_numeric($loggerRow->jumlah_sensor)) {
                 $sensorCount = (int) $loggerRow->jumlah_sensor;
             }
+            if (!$sensorCount && $loggerRow && isset($loggerRow->sensor_count) && is_numeric($loggerRow->sensor_count)) {
+                $sensorCount = (int) $loggerRow->sensor_count;
+            }
 
             if (!$sensorCount) {
                 $paramCount = $parameters->count();
@@ -64,27 +67,29 @@ class DataMasukController extends Controller
                 else $sensorCount = 16;
             }
 
-            $useS19 = false;
+            $tableMain = $this->resolveMainTable($loggerRow?->tabel_main, $sensorCount);
+            $useS19 = str_contains($tableMain, '19');
+            $query = DB::table($tableMain)
+                ->where('id_logger', $logger_id)
+                ->whereBetween('waktu', [$tanggalAwal, $tanggalAkhir])
+                ->orderBy('waktu', 'desc');
+            $sensorCount = $useS19 ? 19 : 16;
 
-            if ($sensorCount >= 19) {
-                $useS19 = true;
-            } else {
-                $hasS19 = T_s19::where('id_logger', $logger_id)
-                    ->whereBetween('waktu', [$tanggalAwal, $tanggalAkhir])
-                    ->exists();
-                if ($hasS19) $useS19 = true;
-            }
+            if ($query->count() === 0) {
+                $fallbackTable = $tableMain === 't_s19_01' ? 't_s16_01' : 't_s19_01';
+                if ($this->isSupportedTable($fallbackTable)) {
+                    $fallbackQuery = DB::table($fallbackTable)
+                        ->where('id_logger', $logger_id)
+                        ->whereBetween('waktu', [$tanggalAwal, $tanggalAkhir])
+                        ->orderBy('waktu', 'desc');
 
-            if ($useS19) {
-                $query = T_s19::where('id_logger', $logger_id)
-                    ->whereBetween('waktu', [$tanggalAwal, $tanggalAkhir])
-                    ->orderBy('waktu', 'desc');
-                $sensorCount = 19;
-            } else {
-                $query = T_s16::where('id_logger', $logger_id)
-                    ->whereBetween('waktu', [$tanggalAwal, $tanggalAkhir])
-                    ->orderBy('waktu', 'desc');
-                $sensorCount = 16;
+                    if ($fallbackQuery->count() > 0) {
+                        $query = $fallbackQuery;
+                        $tableMain = $fallbackTable;
+                        $useS19 = str_contains($tableMain, '19');
+                        $sensorCount = $useS19 ? 19 : 16;
+                    }
+                }
             }
 
             $columns = [];
@@ -167,17 +172,15 @@ class DataMasukController extends Controller
         if (!$sensorCount && isset($logger->jumlah_sensor) && is_numeric($logger->jumlah_sensor)) $sensorCount = (int) $logger->jumlah_sensor;
         if (!$sensorCount) $sensorCount = 16;
 
-        $useS19 = $sensorCount >= 19;
-
-        $tableMain = $useS19 ? 't_s19_01' : 't_s16_01';
-        $tableTemp = $useS19 ? 'temp_s19_latest' : 'temp_s16_latest';
+        $tableMain = $this->resolveMainTable($logger->tabel_main ?? null, $sensorCount);
+        $tableTemp = str_contains($tableMain, '19') ? 'temp_s19_latest' : 'temp_s16_latest';
 
         $row = [
             'id_logger' => $id,
             'waktu' => $waktuParsed,
         ];
 
-        $maxSensor = $useS19 ? 19 : 16;
+        $maxSensor = str_contains($tableMain, '19') ? 19 : 16;
         for ($i = 1; $i <= $maxSensor; $i++) {
             $k = 'sensor' . $i;
             $row[$k] = $request->input($k);
@@ -251,5 +254,24 @@ class DataMasukController extends Controller
                 'topic' => (string) $id,
             ],
         ]);
+    }
+
+    private function resolveMainTable(?string $tableMain, int $sensorCount): string
+    {
+        $tableMain = trim((string) $tableMain);
+        if ($this->isSupportedTable($tableMain)) {
+            return $tableMain;
+        }
+
+        return $sensorCount >= 19 ? 't_s19_01' : 't_s16_01';
+    }
+
+    private function isSupportedTable(string $tableName): bool
+    {
+        if (!in_array($tableName, ['t_s16_01', 't_s19_01'], true)) {
+            return false;
+        }
+
+        return Schema::hasTable($tableName);
     }
 }

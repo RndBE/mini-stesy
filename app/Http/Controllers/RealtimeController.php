@@ -70,19 +70,22 @@ class RealtimeController extends Controller
 
         $params = DB::table('parameter_sensor')->where('logger_id', $id)->get();
 
-        // Keep table selection aligned with DataMasukController@add_awlr2.
-        $sensorCount = null;
-        if (isset($device->sensor_count) && is_numeric($device->sensor_count)) {
-            $sensorCount = (int) $device->sensor_count;
-        }
-        if (!$sensorCount && isset($device->jumlah_sensor) && is_numeric($device->jumlah_sensor)) {
-            $sensorCount = (int) $device->jumlah_sensor;
-        }
-        if (!$sensorCount) {
-            $sensorCount = $params->count() >= 19 ? 19 : 16;
+        $tableMain = isset($device->tabel_main) ? trim((string) $device->tabel_main) : '';
+        if (!$this->isSupportedTable($tableMain)) {
+            $sensorCount = null;
+            if (isset($device->sensor_count) && is_numeric($device->sensor_count)) {
+                $sensorCount = (int) $device->sensor_count;
+            }
+            if (!$sensorCount && isset($device->jumlah_sensor) && is_numeric($device->jumlah_sensor)) {
+                $sensorCount = (int) $device->jumlah_sensor;
+            }
+            if (!$sensorCount) {
+                $sensorCount = $params->count() >= 19 ? 19 : 16;
+            }
+            $tableMain = $sensorCount >= 19 ? 't_s19_01' : 't_s16_01';
         }
 
-        $primaryTable = $sensorCount >= 19 ? 't_s19_01' : 't_s16_01';
+        $primaryTable = $tableMain;
         $fallbackTable = $primaryTable === 't_s19_01' ? 't_s16_01' : 't_s19_01';
 
         // Get data from last 60 minutes
@@ -134,5 +137,14 @@ class RealtimeController extends Controller
             ->orderBy('waktu', 'desc')
             ->limit(2000)
             ->get();
+    }
+
+    private function isSupportedTable(string $tableName): bool
+    {
+        if (!in_array($tableName, ['t_s16_01', 't_s19_01'], true)) {
+            return false;
+        }
+
+        return Schema::hasTable($tableName);
     }
 }

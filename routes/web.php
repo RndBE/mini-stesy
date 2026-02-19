@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DataMasukController;
 use App\Http\Controllers\TingkatSiagaAwlrController;
+use App\Http\Controllers\KategoriLoggerController;
 use Illuminate\Support\Facades\Http;
 
 // Route::get('/', function () {
@@ -67,6 +68,7 @@ Route::middleware(['auth', 'permission:view_realtime'])->group(function () {
 });
 
 Route::middleware(['auth', 'permission:manage_instansi'])->resource('instansi', InstansiController::class)->except(['show']);
+Route::middleware(['auth', 'permission:manage_instansi'])->resource('kategori', KategoriLoggerController::class)->except(['show', 'create', 'edit']);
 
 Route::middleware(['auth', 'permission:manage_rbac'])->group(function () {
     Route::resource('roles', RoleController::class)->except(['create', 'edit']);

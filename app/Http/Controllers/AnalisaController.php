@@ -415,7 +415,7 @@ class AnalisaController extends Controller
 
     public function dataMasuk($id_logger)
     {
-        $logger = \App\Models\t_Logger::findOrFail($id_logger);
+        $logger = \App\Models\t_Logger::where('id_logger', $id_logger)->firstOrFail();
 
         $today = now();
         $start = $today->copy()->subDays(29)->startOfDay();
@@ -425,26 +425,14 @@ class AnalisaController extends Controller
 
         for ($i = 0; $i < 30; $i++) {
             $date = $start->copy()->addDays($i);
-
-            $count16 = 0;
-            $count19 = 0;
-
-            $tableName = ((int)$logger->sensor_count === 19) ? 't_s19_01' : 't_s16_01';
-
-            if ($logger->tabel_s16) {
-                $count16 = DB::table($tableName)
-                    ->whereDate('waktu', $date)
-                    ->count();
-            }
-
-            if ($logger->tabel_s19) {
-                $count19 = DB::table($tableName)
-                    ->whereDate('waktu', $date)
-                    ->count();
-            }
+            $tableName = $logger->tabel_main ?: (((int) $logger->sensor_count === 19) ? 't_s19_01' : 't_s16_01');
+            $count = DB::table($tableName)
+                ->where('id_logger', $logger->id_logger)
+                ->whereDate('waktu', $date)
+                ->count();
 
             $labels[] = $date->format('d M');
-            $counts[] = $count16 + $count19;
+            $counts[] = $count;
         }
 
         return response()->json([

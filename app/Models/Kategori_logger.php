@@ -10,6 +10,7 @@ class Kategori_logger extends Model
     protected $primaryKey = 'id_katlogger';
     public $incrementing = true;
     protected $keyType = 'int';
+    public $timestamps = false;
 
     protected $fillable = [
         'nama_kategori',

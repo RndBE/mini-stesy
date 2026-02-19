@@ -14,13 +14,15 @@
             <div class="overflow-x-auto pb-1">
                 <div class="inline-flex min-w-max items-center gap-2 rounded-2xl bg-slate-200 p-1">
                     <button type="button" @click="selectedCategory = 'ALL'"
-                        :class="selectedCategory === 'ALL' ? 'bg-white text-slate-900 shadow-sm' : 'bg-transparent text-slate-700'"
+                        :class="selectedCategory === 'ALL' ? 'bg-white text-slate-900 shadow-sm' :
+                            'bg-transparent text-slate-700'"
                         class="rounded-xl px-5 py-2 text-sm font-semibold transition">
                         Semua Kategori
                     </button>
                     @foreach ($kategoriTabs as $tab)
                         <button type="button" @click="selectedCategory = @js($tab['key'])"
-                            :class="selectedCategory === @js($tab['key']) ? 'bg-white text-slate-900 shadow-sm' : 'bg-transparent text-slate-700'"
+                            :class="selectedCategory === @js($tab['key']) ? 'bg-white text-slate-900 shadow-sm' :
+                                'bg-transparent text-slate-700'"
                             class="rounded-xl px-5 py-2 text-sm font-semibold transition">
                             {{ $tab['label'] }}
                         </button>
@@ -35,7 +37,8 @@
                 $kategoriFullName = $loggerItems->first()?->kategori?->kepanjangan ?? $kategoriShortName;
             @endphp
 
-            <section x-show="selectedCategory === 'ALL' || selectedCategory === @js($kategoriName)" x-cloak class="space-y-3">
+            <section x-show="selectedCategory === 'ALL' || selectedCategory === @js($kategoriName)" x-cloak
+                class="space-y-3">
                 <div class="flex flex-wrap items-center justify-between">
                     <div class="text-lg text-slate-900">
                         <span class="font-bold">{{ $kategoriShortName }}</span>
@@ -55,10 +58,16 @@
                             $isOnline = $lg->status_logger === 'online' ? $isOnline : false;
                             $isSdOk = (bool) ($latest?->is_sd_ok ?? true);
 
-                            $timeClass = $isOnline ? 'border-emerald-200 bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700';
+                            $timeClass = $isOnline
+                                ? 'border-emerald-200 bg-[#DEF2E1] text-[#06C022]'
+                                : 'bg-[#E6E6E6] text-black';
                             $dotClass = $isOnline ? 'bg-green-500' : 'bg-gray-800';
-                            $badgeClass = $isOnline ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700';
-                            $sdClass = $isSdOk ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700';
+                            $badgeClass = $isOnline
+                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                : 'border-rose-200 bg-rose-50 text-rose-700';
+                            $sdClass = $isSdOk
+                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                : 'border-rose-200 bg-rose-50 text-rose-700';
                             $statusText = $isOnline ? 'Koneksi Terhubung' : 'Koneksi Terputus';
                             $sdText = $isSdOk ? 'OK' : 'Bermasalah';
 
@@ -76,22 +85,41 @@
                                 $lg->params->firstWhere('nama_parameter', 'muka_air_tanah');
                             $pRain =
                                 $lg->params->firstWhere('parameter_utama', 'hujan') ??
-                                $lg->params->firstWhere('nama_parameter', 'Curah Hujan') ??
-                                $lg->params->first(function ($param) {
-                                    $name = strtolower(trim((string) $param->nama_parameter));
-                                    $utama = strtolower(trim((string) $param->parameter_utama));
-                                    return str_contains($name, 'hujan') || str_contains($name, 'rain') || str_contains($utama, 'hujan') || str_contains($utama, 'rain');
-                                });
+                                ($lg->params->firstWhere('nama_parameter', 'Curah Hujan') ??
+                                    $lg->params->first(function ($param) {
+                                        $name = strtolower(trim((string) $param->nama_parameter));
+                                        $utama = strtolower(trim((string) $param->parameter_utama));
+                                        return str_contains($name, 'hujan') ||
+                                            str_contains($name, 'rain') ||
+                                            str_contains($utama, 'hujan') ||
+                                            str_contains($utama, 'rain');
+                                    }));
 
-                            $humidity = $latest && $pHumidity && $pHumidity->kolom_sensor ? ($latest->{$pHumidity->kolom_sensor} ?? null) : null;
-                            $battery = $latest && $pBattery && $pBattery->kolom_sensor ? ($latest->{$pBattery->kolom_sensor} ?? null) : null;
-                            $temp = $latest && $pTemp && $pTemp->kolom_sensor ? ($latest->{$pTemp->kolom_sensor} ?? null) : null;
-                            $mukaAir = $latest && $pMukaAir && $pMukaAir->kolom_sensor ? ($latest->{$pMukaAir->kolom_sensor} ?? null) : null;
-                            $curahHujan = $latest && $pRain && $pRain->kolom_sensor ? ($latest->{$pRain->kolom_sensor} ?? null) : null;
+                            $humidity =
+                                $latest && $pHumidity && $pHumidity->kolom_sensor
+                                    ? $latest->{$pHumidity->kolom_sensor} ?? null
+                                    : null;
+                            $battery =
+                                $latest && $pBattery && $pBattery->kolom_sensor
+                                    ? $latest->{$pBattery->kolom_sensor} ?? null
+                                    : null;
+                            $temp =
+                                $latest && $pTemp && $pTemp->kolom_sensor
+                                    ? $latest->{$pTemp->kolom_sensor} ?? null
+                                    : null;
+                            $mukaAir =
+                                $latest && $pMukaAir && $pMukaAir->kolom_sensor
+                                    ? $latest->{$pMukaAir->kolom_sensor} ?? null
+                                    : null;
+                            $curahHujan =
+                                $latest && $pRain && $pRain->kolom_sensor
+                                    ? $latest->{$pRain->kolom_sensor} ?? null
+                                    : null;
 
-                            $dataAir = is_numeric($lg->jiat?->kedalaman_sumur) && is_numeric($mukaAir)
-                                ? $lg->jiat?->kedalaman_sumur - $mukaAir
-                                : null;
+                            $dataAir =
+                                is_numeric($lg->jiat?->kedalaman_sumur) && is_numeric($mukaAir)
+                                    ? $lg->jiat?->kedalaman_sumur - $mukaAir
+                                    : null;
 
                             $muted = !$isOnline;
                             $iconClass = $muted ? 'grayscale opacity-40' : '';
