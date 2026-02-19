@@ -44,9 +44,18 @@ class BerandaController extends Controller
                 return $lg;
             });
 
+        $groupedLoggers = $loggers
+            ->groupBy(function ($lg) {
+                $kategori = $lg->kategori?->nama_kategori ?? $lg->kategori?->kode ?? null;
+                return $kategori ? strtoupper(trim($kategori)) : 'TANPA KATEGORI';
+            })
+            ->sortKeys()
+            ->map(fn($categoryLoggers) => $categoryLoggers->sortBy('nama_logger')->values());
+
         return view('beranda.index', [
             'title' => 'Beranda',
             'loggers' => $loggers,
+            'groupedLoggers' => $groupedLoggers,
         ]);
     }
     // public function index(MiniStesyApi $api)

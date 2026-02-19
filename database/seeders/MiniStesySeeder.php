@@ -41,6 +41,7 @@ class MiniStesySeeder extends Seeder
         DB::table('jiat_data')->truncate();
         DB::table('t_informasi')->truncate();
         DB::table('parameter_sensor')->truncate();
+        if (Schema::hasTable('parameter_groups')) DB::table('parameter_groups')->truncate();
         DB::table('t_logger')->truncate();
 
         DB::table('klasifikasi_hujan')->truncate();
@@ -163,6 +164,14 @@ class MiniStesySeeder extends Seeder
             ['id_katlogger' => 1, 'nama_kategori' => 'AWLR', 'controller' => 'awlr', 'tabel' => 't_awlr', 'kepanjangan' => 'Automatic Water Level Recorder', 'temp_data' => 'temp_s16_latest', 'icon_app' => 'awlr.png', 'view' => 1],
             ['id_katlogger' => 2, 'nama_kategori' => 'ARR', 'controller' => 'arr', 'tabel' => 't_arr', 'kepanjangan' => 'Automatic Rain Recorder', 'temp_data' => 'temp_s16_latest', 'icon_app' => 'arr.png', 'view' => 1],
         ]);
+
+        if (Schema::hasTable('parameter_groups')) {
+            DB::table('parameter_groups')->insert([
+                ['id' => 1, 'kode_group' => 'LOGGER', 'nama_group' => 'Kesehatan Logger', 'deskripsi' => 'Parameter kesehatan/performa logger seperti baterai, suhu, dan kelembaban.', 'sort_order' => 1],
+                ['id' => 2, 'kode_group' => 'ANGIN', 'nama_group' => 'Parameter Angin', 'deskripsi' => 'Parameter terkait angin seperti arah dan kecepatan.', 'sort_order' => 2],
+                ['id' => 3, 'kode_group' => 'SUMUR', 'nama_group' => 'Parameter Sumur', 'deskripsi' => 'Parameter pengukuran utama sumur/air tanah.', 'sort_order' => 3],
+            ]);
+        }
 
         DB::table('kat_view')->insert([
             ['id' => 1, 'kategori_id' => 1, 'user_id' => 1],
@@ -307,6 +316,36 @@ class MiniStesySeeder extends Seeder
             ['id_param' => 19, 'logger_id' => '10004', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor2', 'satuan' => '°C', 'tipe_graf' => 'line', 'icon_app' => 'thermometer', 'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
             ['id_param' => 20, 'logger_id' => '10004', 'nama_parameter' => 'muka_air_tanah', 'kolom_sensor' => 'sensor1', 'satuan' => 'm', 'tipe_graf' => 'line', 'icon_app' => 'waves', 'debit_awlr' => '-', 'parameter_utama' => 'muka_air_tanah'],
         ]);
+
+        if (Schema::hasTable('parameter_groups') && Schema::hasColumn('parameter_sensor', 'parameter_group_id')) {
+            $loggerGroupId = DB::table('parameter_groups')->where('kode_group', 'LOGGER')->value('id');
+            $anginGroupId = DB::table('parameter_groups')->where('kode_group', 'ANGIN')->value('id');
+            $sumurGroupId = DB::table('parameter_groups')->where('kode_group', 'SUMUR')->value('id');
+
+            if ($sumurGroupId) {
+                DB::table('parameter_sensor')->update(['parameter_group_id' => $sumurGroupId]);
+            }
+
+            if ($loggerGroupId) {
+                DB::table('parameter_sensor')
+                    ->whereRaw('LOWER(COALESCE(nama_parameter, "")) LIKE ?', ['%battery%'])
+                    ->orWhereRaw('LOWER(COALESCE(parameter_utama, "")) LIKE ?', ['%battery%'])
+                    ->orWhereRaw('LOWER(COALESCE(nama_parameter, "")) LIKE ?', ['%humidity%'])
+                    ->orWhereRaw('LOWER(COALESCE(parameter_utama, "")) LIKE ?', ['%humidity%'])
+                    ->orWhereRaw('LOWER(COALESCE(nama_parameter, "")) LIKE ?', ['%temperature%'])
+                    ->orWhereRaw('LOWER(COALESCE(parameter_utama, "")) LIKE ?', ['%temperature%'])
+                    ->update(['parameter_group_id' => $loggerGroupId]);
+            }
+
+            if ($anginGroupId) {
+                DB::table('parameter_sensor')
+                    ->whereRaw('LOWER(COALESCE(nama_parameter, "")) LIKE ?', ['%angin%'])
+                    ->orWhereRaw('LOWER(COALESCE(parameter_utama, "")) LIKE ?', ['%angin%'])
+                    ->orWhereRaw('LOWER(COALESCE(nama_parameter, "")) LIKE ?', ['%wind%'])
+                    ->orWhereRaw('LOWER(COALESCE(parameter_utama, "")) LIKE ?', ['%wind%'])
+                    ->update(['parameter_group_id' => $anginGroupId]);
+            }
+        }
 
         DB::table('t_informasi')->insert([
             [

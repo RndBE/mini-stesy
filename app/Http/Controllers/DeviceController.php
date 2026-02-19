@@ -10,6 +10,7 @@ use App\Models\Instansi;
 use App\Models\t_Lokasi;
 use App\Models\Jiat_data;
 use App\Models\Parameter;
+use App\Models\ParameterGroup;
 use App\Models\List_das;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -43,6 +44,7 @@ class DeviceController extends Controller
                             'nama_parameter' => $p->nama_parameter,
                             'kolom_sensor' => $p->kolom_sensor,
                             'satuan' => $p->satuan,
+                            'parameter_group_id' => $p->parameter_group_id,
                         ];
                     })->values(),
                     'sensor_count' => $d->sensor_count ?? (str_contains($d->tabel_main, '19') ? 19 : 16),
@@ -101,6 +103,7 @@ class DeviceController extends Controller
             'params.*.nama_parameter' => 'required|string|max:255',
             'params.*.kolom_sensor'   => 'required|string|max:50',
             'params.*.satuan'         => 'required|string|max:50',
+            'params.*.parameter_group_id' => 'nullable|integer|exists:parameter_groups,id',
         ]);
 
         // dd($validated);
@@ -151,11 +154,15 @@ class DeviceController extends Controller
 
                 // 4. Create parameters
                 foreach ($validated['params'] as $param) {
+                    $parameterGroupId = $param['parameter_group_id']
+                        ?? $this->inferParameterGroupId($param['nama_parameter'] ?? null, null);
+
                     Parameter::create([
                         'logger_id'       => $logger->id_logger,
                         'nama_parameter'  => $param['nama_parameter'],
                         'kolom_sensor'    => $param['kolom_sensor'],
                         'satuan'          => $param['satuan'],
+                        'parameter_group_id' => $parameterGroupId,
                     ]);
                 }
             });
@@ -184,6 +191,7 @@ class DeviceController extends Controller
             'params.*.nama_parameter'   => 'required_with:params|string|max:255',
             'params.*.kolom_sensor'     => 'required_with:params|string|max:50',
             'params.*.satuan'           => 'required_with:params|string|max:50',
+            'params.*.parameter_group_id'  => 'nullable|integer|exists:parameter_groups,id',
         ]);
 
         // dd($request->all());
@@ -226,6 +234,8 @@ class DeviceController extends Controller
                     'nama_parameter' => $data['nama_parameter'] ?? '',
                     'satuan'         => $data['satuan'] ?? '',
                     'kolom_sensor'   => $data['kolom_sensor'] ?? '',
+                    'parameter_group_id' => $data['parameter_group_id']
+                        ?? $this->inferParameterGroupId($data['nama_parameter'] ?? null, null),
                 ];
 
                 if ($paramId) {
@@ -404,5 +414,43 @@ class DeviceController extends Controller
         $informasi->save();
 
         return back()->with('success', 'Data perangkat berhasil diperbarui.');
+    }
+
+    private function inferParameterGroupId(?string $namaParameter, ?string $parameterUtama): ?int
+    {
+        $groups = $this->parameterGroupMap();
+        $nama = strtolower(trim((string) $namaParameter));
+        $utama = strtolower(trim((string) $parameterUtama));
+
+        if (
+            str_contains($nama, 'angin') || str_contains($utama, 'angin')
+            || str_contains($nama, 'wind') || str_contains($utama, 'wind')
+        ) {
+            return $groups['ANGIN'] ?? null;
+        }
+
+        if (
+            str_contains($nama, 'battery') || str_contains($utama, 'battery')
+            || str_contains($nama, 'humidity') || str_contains($utama, 'humidity')
+            || str_contains($nama, 'temperature') || str_contains($utama, 'temperature')
+        ) {
+            return $groups['LOGGER'] ?? null;
+        }
+
+        return $groups['SUMUR'] ?? null;
+    }
+
+    private function parameterGroupMap(): array
+    {
+        static $cache = null;
+
+        if ($cache === null) {
+            $cache = ParameterGroup::query()
+                ->pluck('id', 'kode_group')
+                ->map(fn($id) => (int) $id)
+                ->all();
+        }
+
+        return $cache;
     }
 }

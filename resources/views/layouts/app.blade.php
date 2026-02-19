@@ -15,6 +15,7 @@
             </main> --}}
             @php
                 $contentPaddingClass = request()->routeIs('peta.*') ? '' : 'p-4';
+                $showFooter = !request()->routeIs('peta.lokasi');
             @endphp
             <main class="flex-1 min-h-[calc(100vh-5rem)] min-w-0">
                 <div class=" bg-white min-h-[calc(100vh-5rem)] min-w-0 overflow-x-hidden">
@@ -24,7 +25,9 @@
                 </div>
             </main>
 
-            @include('partials.footer')
+            @if ($showFooter)
+                @include('partials.footer')
+            @endif
         </div>
     </div>
     @include('partials.script')

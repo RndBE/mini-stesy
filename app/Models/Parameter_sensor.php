@@ -17,6 +17,7 @@ class Parameter_sensor extends Model
         'nama_parameter',
         'kolom_sensor',
         'satuan',
+        'parameter_group_id',
         'tipe_graf',
         'icon_app',
         'debit_awlr',
@@ -26,5 +27,10 @@ class Parameter_sensor extends Model
     public function logger()
     {
         return $this->belongsTo(t_Logger::class);
+    }
+
+    public function parameterGroup()
+    {
+        return $this->belongsTo(ParameterGroup::class, 'parameter_group_id', 'id');
     }
 }
