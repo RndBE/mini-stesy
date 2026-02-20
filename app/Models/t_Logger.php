@@ -32,11 +32,22 @@ class t_Logger extends Model
             return $query->whereRaw('1 = 0');
         }
 
-        if ($user->level_user === 'superadmin') {
+        if (method_exists($user, 'isSuperAdmin') ? $user->isSuperAdmin() : ($user->level_user === 'superadmin')) {
             return $query;
         }
 
-        return $query->where('instansi_id', $user->instansi_id);
+        $query->where('instansi_id', $user->instansi_id);
+
+        if (method_exists($user, 'isInstansiAdmin') && $user->isInstansiAdmin()) {
+            return $query;
+        }
+
+        return $query->whereExists(function ($sub) use ($user) {
+            $sub->selectRaw('1')
+                ->from('user_logger_access as ula')
+                ->whereColumn('ula.logger_id', 't_logger.id_logger')
+                ->where('ula.user_id', $user->id_user);
+        });
     }
 
     public function lokasi()
@@ -47,6 +58,18 @@ class t_Logger extends Model
     public function kategori()
     {
         return $this->belongsTo(Kategori_logger::class, 'id_katlogger', 'id_katlogger');
+    }
+
+    public function allowedUsers()
+    {
+        return $this->belongsToMany(
+            t_User::class,
+            'user_logger_access',
+            'logger_id',
+            'user_id',
+            'id_logger',
+            'id_user'
+        );
     }
 
     public function params()

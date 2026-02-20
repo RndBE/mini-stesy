@@ -20,5 +20,19 @@ class ParameterGroup extends Model
     {
         return $this->hasMany(Parameter::class, 'parameter_group_id', 'id');
     }
-}
 
+    public function listParameters()
+    {
+        return $this->hasMany(ListParameter::class, 'default_parameter_group_id', 'id');
+    }
+
+    public function templateParameters()
+    {
+        return $this->hasMany(TemplateKategoriParameter::class, 'parameter_group_id', 'id');
+    }
+
+    public function sensorParameters()
+    {
+        return $this->hasMany(Parameter_sensor::class, 'parameter_group_id', 'id');
+    }
+}

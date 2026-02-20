@@ -41,6 +41,9 @@ class MiniStesySeeder extends Seeder
         DB::table('jiat_data')->truncate();
         DB::table('t_informasi')->truncate();
         DB::table('parameter_sensor')->truncate();
+        if (Schema::hasTable('user_logger_access')) DB::table('user_logger_access')->truncate();
+        if (Schema::hasTable('template_kategori_parameter')) DB::table('template_kategori_parameter')->truncate();
+        if (Schema::hasTable('list_parameter')) DB::table('list_parameter')->truncate();
         if (Schema::hasTable('parameter_groups')) DB::table('parameter_groups')->truncate();
         DB::table('t_logger')->truncate();
 
@@ -58,8 +61,8 @@ class MiniStesySeeder extends Seeder
 
         DB::table('roles')->insert([
             ['id' => 1, 'role_name' => 'superadmin'],
-            ['id' => 2, 'role_name' => 'admin'],
-            ['id' => 3, 'role_name' => 'user'],
+            ['id' => 2, 'role_name' => 'instansi_admin'],
+            ['id' => 3, 'role_name' => 'pegawai'],
         ]);
 
         $permissions = [
@@ -84,7 +87,7 @@ class MiniStesySeeder extends Seeder
         $rp = [];
         $allPermissionIds = collect($permissions)->pluck('id')->all();
         foreach ($allPermissionIds as $pid) $rp[] = ['role_id' => 1, 'permission_id' => $pid];
-        foreach ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15] as $pid) $rp[] = ['role_id' => 2, 'permission_id' => $pid];
+        foreach ([1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 14] as $pid) $rp[] = ['role_id' => 2, 'permission_id' => $pid];
         foreach ([1, 2, 3, 4, 5, 7, 10, 11, 12] as $pid) $rp[] = ['role_id' => 3, 'permission_id' => $pid];
         DB::table('role_permissions')->insert($rp);
 
@@ -95,6 +98,11 @@ class MiniStesySeeder extends Seeder
                 'nama' => 'Beacon Engineering',
                 'alamat' => 'Kantor Pusat',
                 'telp' => '081234567890',
+                'latitude' => '-7.797068',
+                'longitude' => '110.370529',
+                'zoom' => 11,
+                'logo' => 'logo_instansi/logo.png',
+                'logo_mobile' => 'logo_instansi/logo_mobile.png',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -102,6 +110,11 @@ class MiniStesySeeder extends Seeder
                 'nama' => 'Instansi Contoh',
                 'alamat' => 'Kantor Cabang',
                 'telp' => '081200000000',
+                'latitude' => '-7.780000',
+                'longitude' => '110.360000',
+                'zoom' => 11,
+                'logo' => 'logo_instansi/logo.png',
+                'logo_mobile' => 'logo_instansi/logo_mobile.png',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -114,37 +127,30 @@ class MiniStesySeeder extends Seeder
                 'username' => 'superadmin',
                 'password' => Hash::make('password'),
                 'level_user' => 'superadmin',
-                'alamat' => 'Kantor Pusat',
-                'telp' => '081234567890',
-                'instansi' => 'Beacon Engineering',
                 'instansi_id' => $instansiBeaconId,
-                'latitude' => '-7.797068',
-                'longitude' => '110.370529',
-                'zoom' => 11,
-                'logo' => 'logo.png',
-                'logo_mobile' => 'logo_mobile.png',
             ],
             [
                 'id_user' => 2,
-                'nama' => 'Admin',
-                'username' => 'admin',
+                'nama' => 'Instansi Admin',
+                'username' => 'instansi_admin',
                 'password' => Hash::make('password'),
-                'level_user' => 'admin',
-                'alamat' => 'Kantor Cabang',
-                'telp' => '081200000000',
-                'instansi' => 'Instansi Contoh',
+                'level_user' => 'instansi_admin',
                 'instansi_id' => $instansiContohId,
-                'latitude' => '-7.780000',
-                'longitude' => '110.360000',
-                'zoom' => 11,
-                'logo' => 'logo.png',
-                'logo_mobile' => 'logo_mobile.png',
+            ],
+            [
+                'id_user' => 3,
+                'nama' => 'Pegawai Contoh',
+                'username' => 'pegawai',
+                'password' => Hash::make('password'),
+                'level_user' => 'pegawai',
+                'instansi_id' => $instansiContohId,
             ],
         ]);
 
         DB::table('sub_user')->insert([
             ['id' => 1, 'id_user' => 1, 'nama' => 'Operator 1', 'level' => 'operator', 'no' => '081111111111', 'status' => 1],
             ['id' => 2, 'id_user' => 2, 'nama' => 'Operator 2', 'level' => 'operator', 'no' => '082222222222', 'status' => 1],
+            ['id' => 3, 'id_user' => 3, 'nama' => 'Operator 3', 'level' => 'operator', 'no' => '083333333333', 'status' => 1],
         ]);
 
         DB::table('list_das')->insert([
@@ -161,8 +167,8 @@ class MiniStesySeeder extends Seeder
         ]);
 
         DB::table('kategori_logger')->insert([
-            ['id_katlogger' => 1, 'nama_kategori' => 'AWLR', 'controller' => 'awlr', 'tabel' => 't_awlr', 'kepanjangan' => 'Automatic Water Level Recorder', 'temp_data' => 'temp_s16_latest', 'icon_app' => 'awlr.png', 'view' => 1],
-            ['id_katlogger' => 2, 'nama_kategori' => 'ARR', 'controller' => 'arr', 'tabel' => 't_arr', 'kepanjangan' => 'Automatic Rain Recorder', 'temp_data' => 'temp_s16_latest', 'icon_app' => 'arr.png', 'view' => 1],
+            ['id_katlogger' => 1, 'nama_kategori' => 'AWLR', 'kepanjangan' => 'Automatic Water Level Recorder', 'icon_app' => 'awlr.png', 'view' => 1],
+            ['id_katlogger' => 2, 'nama_kategori' => 'ARR', 'kepanjangan' => 'Automatic Rain Recorder', 'icon_app' => 'arr.png', 'view' => 1],
         ]);
 
         if (Schema::hasTable('parameter_groups')) {
@@ -170,6 +176,66 @@ class MiniStesySeeder extends Seeder
                 ['id' => 1, 'kode_group' => 'LOGGER', 'nama_group' => 'Kesehatan Logger', 'deskripsi' => 'Parameter kesehatan/performa logger seperti baterai, suhu, dan kelembaban.', 'sort_order' => 1],
                 ['id' => 2, 'kode_group' => 'ANGIN', 'nama_group' => 'Parameter Angin', 'deskripsi' => 'Parameter terkait angin seperti arah dan kecepatan.', 'sort_order' => 2],
                 ['id' => 3, 'kode_group' => 'SUMUR', 'nama_group' => 'Parameter Sumur', 'deskripsi' => 'Parameter pengukuran utama sumur/air tanah.', 'sort_order' => 3],
+            ]);
+        }
+
+        if (Schema::hasTable('list_parameter')) {
+            DB::table('list_parameter')->insert([
+                [
+                    'id' => 1,
+                    'nama_parameter' => 'muka_air_tanah',
+                    'parameter_utama' => 'muka_air_tanah',
+                    'default_satuan' => 'm',
+                    'default_kolom_sensor' => 'sensor14',
+                    'default_parameter_group_id' => 3,
+                    'is_active' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 2,
+                    'nama_parameter' => 'Curah Hujan',
+                    'parameter_utama' => 'hujan',
+                    'default_satuan' => 'mm',
+                    'default_kolom_sensor' => 'sensor8',
+                    'default_parameter_group_id' => 3,
+                    'is_active' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 3,
+                    'nama_parameter' => 'battery_logger',
+                    'parameter_utama' => 'battery_logger',
+                    'default_satuan' => 'Volt',
+                    'default_kolom_sensor' => 'sensor6',
+                    'default_parameter_group_id' => 1,
+                    'is_active' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 4,
+                    'nama_parameter' => 'humidity_logger',
+                    'parameter_utama' => 'humidity_logger',
+                    'default_satuan' => '%',
+                    'default_kolom_sensor' => 'sensor4',
+                    'default_parameter_group_id' => 1,
+                    'is_active' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 5,
+                    'nama_parameter' => 'temperature_logger',
+                    'parameter_utama' => 'temperature_logger',
+                    'default_satuan' => 'C',
+                    'default_kolom_sensor' => 'sensor5',
+                    'default_parameter_group_id' => 1,
+                    'is_active' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
             ]);
         }
 
@@ -189,6 +255,99 @@ class MiniStesySeeder extends Seeder
             ['id' => 7, 'id_kategori' => 2, 'nama_filter' => 'Perbaikan', 'icon' => 'arr_perbaikan'],
             ['id' => 8, 'id_kategori' => 2, 'nama_filter' => 'Koneksi Terputus', 'icon' => 'arr_of'],
         ]);
+
+        if (Schema::hasTable('template_kategori_parameter')) {
+            DB::table('template_kategori_parameter')->insert([
+                [
+                    'id' => 1,
+                    'id_katlogger' => 1,
+                    'list_parameter_id' => 1,
+                    'urutan' => 1,
+                    'kolom_sensor_default' => 'sensor14',
+                    'satuan_override' => 'm',
+                    'parameter_group_id' => 3,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 2,
+                    'id_katlogger' => 1,
+                    'list_parameter_id' => 3,
+                    'urutan' => 2,
+                    'kolom_sensor_default' => 'sensor6',
+                    'satuan_override' => 'Volt',
+                    'parameter_group_id' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 3,
+                    'id_katlogger' => 1,
+                    'list_parameter_id' => 4,
+                    'urutan' => 3,
+                    'kolom_sensor_default' => 'sensor4',
+                    'satuan_override' => '%',
+                    'parameter_group_id' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 4,
+                    'id_katlogger' => 1,
+                    'list_parameter_id' => 5,
+                    'urutan' => 4,
+                    'kolom_sensor_default' => 'sensor5',
+                    'satuan_override' => 'C',
+                    'parameter_group_id' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 5,
+                    'id_katlogger' => 2,
+                    'list_parameter_id' => 2,
+                    'urutan' => 1,
+                    'kolom_sensor_default' => 'sensor8',
+                    'satuan_override' => 'mm',
+                    'parameter_group_id' => 3,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 6,
+                    'id_katlogger' => 2,
+                    'list_parameter_id' => 3,
+                    'urutan' => 2,
+                    'kolom_sensor_default' => 'sensor6',
+                    'satuan_override' => 'Volt',
+                    'parameter_group_id' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 7,
+                    'id_katlogger' => 2,
+                    'list_parameter_id' => 4,
+                    'urutan' => 3,
+                    'kolom_sensor_default' => 'sensor4',
+                    'satuan_override' => '%',
+                    'parameter_group_id' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'id' => 8,
+                    'id_katlogger' => 2,
+                    'list_parameter_id' => 5,
+                    'urutan' => 4,
+                    'kolom_sensor_default' => 'sensor5',
+                    'satuan_override' => 'C',
+                    'parameter_group_id' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+            ]);
+        }
 
         // Dynamic rain classification thresholds for ARR kategori
         $arrKategoriId = DB::table('kategori_logger')->where('nama_kategori', 'ARR')->value('id_katlogger');
@@ -274,6 +433,12 @@ class MiniStesySeeder extends Seeder
             ['id' => 3, 'id_logger' => '10003', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'AWLR Sinduadi', 'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 3, 'id_katlogger' => 1, 'sensor_count' => 16],
             ['id' => 4, 'id_logger' => '10004', 'instansi_id' => $instansiContohId, 'nama_logger' => 'ARR Bantar', 'tabel_main' => 't_s19_01', 'jeda_notif' => 1, 'idlokasi' => 4, 'id_katlogger' => 2, 'sensor_count' => 19],
         ]);
+
+        if (Schema::hasTable('user_logger_access')) {
+            DB::table('user_logger_access')->insert([
+                ['user_id' => 3, 'logger_id' => '10004', 'created_at' => now(), 'updated_at' => now()],
+            ]);
+        }
 
         DB::table('klasifikasi_hujan')->insert([
             ['id_klasifikasi' => 1,'logger_id'=> '10002', 'waktu' => 'perjam', 'debit_air' => 0, 'intensitas' => 'Tidak Hujan'],

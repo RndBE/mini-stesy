@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -13,21 +12,13 @@ class t_User extends Authenticatable
     protected $table = 't_user';
     protected $primaryKey = 'id_user';
     public $timestamps = false;
+
     protected $fillable = [
         'nama',
         'username',
         'password',
         'level_user',
-        'alamat',
-        'telp',
-        'instansi',
         'instansi_id',
-        'latitude',
-        'longitude',
-        'longtitude',
-        'zoom',
-        'logo',
-        'logo_mobile'
     ];
 
     protected $hidden = [
@@ -37,7 +28,6 @@ class t_User extends Authenticatable
 
     public function getAuthPassword()
     {
-        // return parent::getAuthPassword();
         return $this->password;
     }
 
@@ -49,6 +39,18 @@ class t_User extends Authenticatable
     public function logger()
     {
         return $this->hasMany(t_Logger::class, 'instansi_id', 'instansi_id');
+    }
+
+    public function accessibleLoggers()
+    {
+        return $this->belongsToMany(
+            t_Logger::class,
+            'user_logger_access',
+            'user_id',
+            'logger_id',
+            'id_user',
+            'id_logger'
+        );
     }
 
     public function instansi()
@@ -63,7 +65,7 @@ class t_User extends Authenticatable
 
     public function hasPermission(string $permission): bool
     {
-        if ($this->level_user === 'superadmin') {
+        if ($this->isSuperAdmin()) {
             return true;
         }
 
@@ -71,5 +73,20 @@ class t_User extends Authenticatable
 
         return $this->role
             && $this->role->permissions->contains('permission_name', $permission);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return strtolower((string) $this->level_user) === 'superadmin';
+    }
+
+    public function isInstansiAdmin(): bool
+    {
+        return in_array(strtolower((string) $this->level_user), ['instansi_admin', 'admin'], true);
+    }
+
+    public function isPegawai(): bool
+    {
+        return in_array(strtolower((string) $this->level_user), ['pegawai', 'user'], true);
     }
 }

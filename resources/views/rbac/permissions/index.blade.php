@@ -1,16 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-    <div x-data="permissionData()" class="space-y-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-900">Permission</h1>
-                <p class="text-sm text-slate-500">Kelola daftar permission.</p>
-            </div>
+    <div x-data="permissionData()" class="space-y-3">
+        <div class="flex items-center justify-between mt-2">
 
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between ">
                 @if (session('success'))
-                    <div class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-semibold shadow-sm ring-1 ring-emerald-200">
+                    <div
+                        class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-semibold shadow-sm ring-1 ring-emerald-200">
                         {{ session('success') }}
                     </div>
                 @else
@@ -21,8 +18,10 @@
                     <div class="relative w-full sm:w-64">
                         <input type="text" x-model="searchQuery" placeholder="Cari permission..."
                             class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                        <svg class="absolute right-3 top-2.5 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        <svg class="absolute right-3 top-2.5 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
                     <button @click="openCreateModal()"
@@ -33,7 +32,7 @@
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+        <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
                     <thead class="bg-neutral-200 text-xs font-semibold uppercase text-neutral-950">
@@ -48,20 +47,25 @@
                         <template x-for="(permission, index) in filteredPermissions()" :key="permission.id">
                             <tr class="hover:bg-slate-50">
                                 <td class="whitespace-nowrap px-6 py-4 font-medium text-slate-900" x-text="index + 1"></td>
-                                <td class="whitespace-nowrap px-6 py-4 font-semibold text-slate-900" x-text="permission.permission_name"></td>
+                                <td class="whitespace-nowrap px-6 py-4 font-semibold text-slate-900"
+                                    x-text="permission.permission_name"></td>
                                 <td class="whitespace-nowrap px-6 py-4" x-text="permission.roles_count"></td>
                                 <td class="whitespace-nowrap px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
                                         <button @click="openEditModal(permission.id)"
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 text-slate-950 hover:bg-slate-200 transition-colors" title="Edit">
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 text-slate-950 hover:bg-slate-200 transition-colors"
+                                            title="Edit">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
                                         <button @click="deletePermission(permission.id, permission.permission_name)"
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-slate-950 hover:bg-red-200 transition-colors" title="Hapus">
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-slate-950 hover:bg-red-200 transition-colors"
+                                            title="Hapus">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
                                         </button>
                                     </div>
@@ -84,16 +88,17 @@
         <div x-show="showCreateModal" x-cloak class="fixed inset-0 z-50" role="dialog" aria-modal="true"
             @keydown.escape.window="closeCreateModal()">
 
-            <div x-show="showCreateModal" x-transition:enter="ease-in-out duration-300"
-                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
+            <div x-show="showCreateModal" x-transition:enter="ease-in-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="ease-in-out duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                 class="fixed inset-0 bg-gray-500/75" @click="closeCreateModal()"></div>
 
             <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeCreateModal()">
                 <div x-show="showCreateModal" x-transition:enter="ease-in-out duration-300"
-                    x-transition:enter-start="opacity-0 scale-95 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                    x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="ease-in-out duration-200"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden my-8" @click.stop>
 
@@ -115,11 +120,12 @@
                             </div>
 
                             <div>
-                                <label for="create_permission_name" class="block text-sm font-semibold text-slate-900 mb-2">
+                                <label for="create_permission_name"
+                                    class="block text-sm font-semibold text-slate-900 mb-2">
                                     Nama Permission <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" id="create_permission_name" x-model="createForm.permission_name" required
-                                    placeholder="Masukkan Nama Permission"
+                                <input type="text" id="create_permission_name" x-model="createForm.permission_name"
+                                    required placeholder="Masukkan Nama Permission"
                                     class="w-full h-14 rounded-xl border border-slate-200 px-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                             </div>
                         </div>
@@ -148,13 +154,15 @@
             <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                 x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 bg-gray-500/75" @click="closeDeleteModal()"></div>
+                x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500/75" @click="closeDeleteModal()">
+            </div>
 
             <div class="fixed inset-0 flex items-center justify-center p-4" @click="closeDeleteModal()">
                 <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
-                    x-transition:enter-start="opacity-0 scale-95 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                    x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="ease-in-out duration-200"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden" @click.stop>
 
@@ -202,13 +210,14 @@
             <div x-show="showEditModal" x-transition:enter="ease-in-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                 x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 bg-gray-500/75" @click="closeEditModal()"></div>
+                x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500/75" @click="closeEditModal()"></div>
 
             <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeEditModal()">
                 <div x-show="showEditModal" x-transition:enter="ease-in-out duration-300"
-                    x-transition:enter-start="opacity-0 scale-95 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                    x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="ease-in-out duration-200"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden my-8" @click.stop>
 
@@ -239,8 +248,8 @@
                                 <label for="edit_permission_name" class="block text-sm font-semibold text-slate-900 mb-2">
                                     Nama Permission <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" id="edit_permission_name" x-model="editForm.permission_name" required
-                                    placeholder="Masukkan Nama Permission"
+                                <input type="text" id="edit_permission_name" x-model="editForm.permission_name"
+                                    required placeholder="Masukkan Nama Permission"
                                     class="w-full h-14 rounded-xl border border-slate-200 px-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                             </div>
                         </div>
@@ -295,7 +304,8 @@
 
                     const query = this.searchQuery.toLowerCase();
                     return this.allPermissions.filter(permission => {
-                        return permission.permission_name && permission.permission_name.toLowerCase().includes(query);
+                        return permission.permission_name && permission.permission_name.toLowerCase().includes(
+                            query);
                     });
                 },
 
@@ -430,13 +440,19 @@
                 },
 
                 async deletePermission(permissionId, permissionName) {
-                    this.deleteData = { id: permissionId, name: permissionName };
+                    this.deleteData = {
+                        id: permissionId,
+                        name: permissionName
+                    };
                     this.showDeleteModal = true;
                 },
 
                 closeDeleteModal() {
                     this.showDeleteModal = false;
-                    this.deleteData = { id: null, name: '' };
+                    this.deleteData = {
+                        id: null,
+                        name: ''
+                    };
                 },
 
                 async confirmDelete() {

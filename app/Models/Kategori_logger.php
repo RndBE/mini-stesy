@@ -14,10 +14,7 @@ class Kategori_logger extends Model
 
     protected $fillable = [
         'nama_kategori',
-        'controller',
-        'tabel',
         'kepanjangan',
-        'temp_data',
         'icon_app',
         'view'
     ];

@@ -1,13 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="space-y-6" x-data="dataPerangkat">
+    <div class="space-y-3" x-data="dataPerangkat">
 
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-900">Data Perangkat</h1>
-                <p class="text-sm text-slate-500">Kelola data perangkat logger yang terpasang</p>
-            </div>
+        <div class="flex items-center justify-between mt-2">
             <div class="flex flex-col sm:flex-row items-center gap-3">
                 @if (session('success'))
                     <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
@@ -34,7 +30,7 @@
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+        <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
                     <thead class="bg-neutral-200 text-xs font-bold text-neutral-950 uppercase">
@@ -90,11 +86,9 @@
             </template>
 
             <div class="border-t border-slate-200 bg-white px-4 py-3 sm:px-6">
-                {{-- Pagination --}}
+
             </div>
         </div>
-
-        <!-- Detail Modal -->
         <div x-show="showDetailModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto"
             aria-labelledby="detail-modal-title" role="dialog" aria-modal="true">
             <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
@@ -133,7 +127,7 @@
                     </div>
 
                     <div class="space-y-4 px-4 py-5 sm:px-6">
-                        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                        <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                             <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                 <img src="{{ asset('icons/identitas_icon.svg') }}" class="h-5 w-5">
                                 <p class="text-base font-bold text-slate-900">Identitas Perangkat</p>
@@ -156,7 +150,7 @@
                             </div>
                         </div>
 
-                        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                        <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                             <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                 <img src="{{ asset('icons/gear_icon.svg') }}" class="h-5 w-5">
                                 <p class="text-base font-bold text-slate-900">Informasi Operasional</p>
@@ -184,7 +178,7 @@
                             </div>
                         </div>
 
-                        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                        <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                             <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                 <img src="{{ asset('icons/penjaga_icon.svg') }}" class="h-5 w-5">
                                 <p class="text-base font-bold text-slate-900">Penjaga</p>
@@ -206,7 +200,7 @@
             </div>
         </div>
 
-        <!-- Create Modal -->
+
         <div x-show="showCreateModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto"
             aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
@@ -226,7 +220,7 @@
                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                     class="relative inline-block overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle">
 
-                    <!-- Header -->
+
                     <div class="flex items-center justify-between border-b px-6 py-4">
                         <h3 class="text-lg font-bold text-gray-900" id="modal-title">Tambah Data Perangkat</h3>
                         <button @click="closeCreateModal()" class="text-gray-400 hover:text-gray-500">
@@ -241,7 +235,7 @@
                         @csrf
                         <div class="px-6 py-4 space-y-6 max-h-[70vh] overflow-y-auto">
 
-                            <!-- Identitas Perangkat -->
+
                             <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-4 ">Identitas Perangkat</h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -314,7 +308,7 @@
                                 </div>
                             </div>
 
-                            <!-- Informasi Operasional -->
+
                             <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-4">Informasi Operasional</h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -390,7 +384,7 @@
             </div>
         </div>
 
-        <!-- Edit Modal -->
+
         <div x-show="showEditModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto"
             aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
@@ -410,7 +404,7 @@
                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                     class="relative inline-block overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle">
 
-                    <!-- Header -->
+
                     <div class="flex items-center justify-between border-b px-6 py-4">
                         <h3 class="text-lg font-bold text-gray-900" id="modal-title">Edit Data Perangkat</h3>
                         <button @click="closeEditModal()" class="text-gray-400 hover:text-gray-500">
@@ -426,7 +420,7 @@
                         @method('PUT')
                         <div class="px-6 py-4 space-y-6 max-h-[70vh] overflow-y-auto">
 
-                            <!-- Identitas Perangkat -->
+
                             <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-4 ">Identitas Perangkat</h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -500,7 +494,7 @@
                                 </div>
                             </div>
 
-                            <!-- Informasi Operasional -->
+
                             <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-4">Informasi Operasional</h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">

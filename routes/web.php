@@ -15,6 +15,9 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DataMasukController;
 use App\Http\Controllers\TingkatSiagaAwlrController;
 use App\Http\Controllers\KategoriLoggerController;
+use App\Http\Controllers\ListParameterController;
+use App\Http\Controllers\ParameterGroupController;
+use App\Http\Controllers\TemplateKategoriParameterController;
 use Illuminate\Support\Facades\Http;
 
 // Route::get('/', function () {
@@ -67,8 +70,15 @@ Route::middleware(['auth', 'permission:view_realtime'])->group(function () {
     Route::put('/tingkat-siaga-awlr/{idLogger}', [TingkatSiagaAwlrController::class, 'update'])->name('tingkat-siaga-awlr.update');
 });
 
-Route::middleware(['auth', 'permission:manage_instansi'])->resource('instansi', InstansiController::class)->except(['show']);
-Route::middleware(['auth', 'permission:manage_instansi'])->resource('kategori', KategoriLoggerController::class)->except(['show', 'create', 'edit']);
+Route::middleware(['auth'])->resource('instansi', InstansiController::class)->except(['show']);
+Route::middleware(['auth', 'permission:manage_instansi'])
+    ->resource('kategori-logger', KategoriLoggerController::class)
+    ->parameters(['kategori-logger' => 'kategori'])
+    ->names('kategori')
+    ->except(['show', 'create', 'edit']);
+Route::middleware(['auth', 'permission:manage_instansi'])->resource('list-parameter', ListParameterController::class)->except(['show', 'create', 'edit']);
+Route::middleware(['auth', 'permission:manage_instansi'])->resource('parameter-group', ParameterGroupController::class)->except(['show', 'create', 'edit']);
+Route::middleware(['auth', 'permission:manage_instansi'])->resource('template-kategori-parameter', TemplateKategoriParameterController::class)->except(['show', 'create', 'edit']);
 
 Route::middleware(['auth', 'permission:manage_rbac'])->group(function () {
     Route::resource('roles', RoleController::class)->except(['create', 'edit']);

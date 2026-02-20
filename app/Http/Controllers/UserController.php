@@ -5,96 +5,125 @@ namespace App\Http\Controllers;
 use App\Models\t_User;
 use App\Models\Role;
 use App\Models\Instansi;
+use App\Models\t_Logger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $query = t_User::query()->with('instansi')->orderBy('nama');
         $currentUser = auth()->user();
-        if ($currentUser && $currentUser->level_user !== 'superadmin') {
+
+        $query = t_User::query()
+            ->with(['instansi', 'accessibleLoggers'])
+            ->orderBy('nama');
+
+        if ($currentUser && !$currentUser->isSuperAdmin()) {
             $query->where('instansi_id', $currentUser->instansi_id);
         }
+
+        if ($currentUser && $currentUser->isInstansiAdmin()) {
+            $query->whereIn('level_user', ['pegawai', 'user']);
+        }
+
         $users = $query->get();
 
-        $roles = Role::query()->orderBy('role_name')->get();
-        $instansi = Instansi::query()->orderBy('nama')->get();
+        $roles = Role::query()
+            ->orderBy('role_name')
+            ->get()
+            ->filter(fn($role) => $this->canAssignRole($currentUser, (string) $role->role_name))
+            ->values();
+
+        $instansiQuery = Instansi::query()->orderBy('nama');
+        if ($currentUser && !$currentUser->isSuperAdmin()) {
+            $instansiQuery->where('id', $currentUser->instansi_id);
+        }
+        $instansi = $instansiQuery->get();
+
+        $loggerOptions = t_Logger::query()
+            ->forUser($currentUser)
+            ->orderBy('nama_logger')
+            ->get(['id_logger', 'nama_logger', 'instansi_id'])
+            ->map(function ($logger) {
+                return [
+                    'id_logger' => (string) $logger->id_logger,
+                    'nama_logger' => (string) $logger->nama_logger,
+                    'instansi_id' => $logger->instansi_id !== null ? (int) $logger->instansi_id : null,
+                ];
+            })
+            ->values();
 
         return view('users.index', [
             'title' => 'User',
             'users' => $users,
             'roles' => $roles,
             'instansi' => $instansi,
+            'loggerOptions' => $loggerOptions,
+            'currentUser' => $currentUser,
         ]);
     }
 
     public function create()
     {
-        $roles = Role::query()->orderBy('role_name')->get();
-        $instansi = Instansi::query()->orderBy('nama')->get();
-
-        return view('users.create', [
-            'title' => 'Tambah User',
-            'roles' => $roles,
-            'instansi' => $instansi,
-            'currentUser' => auth()->user(),
-        ]);
+        return redirect()->route('users.index');
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $currentUser = auth()->user();
+        if (!$currentUser || (!$currentUser->isSuperAdmin() && !$currentUser->isInstansiAdmin())) {
+            abort(403);
+        }
+
+        $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:100',
             'username' => 'required|string|max:30|unique:t_user,username',
             'password' => 'required|string|min:6',
-            'level_user' => 'required|string|exists:roles,role_name',
+            'level_user' => 'required|string|max:50',
             'instansi_id' => 'nullable|integer|exists:instansi,id',
-            'alamat' => 'required|string',
-            'telp' => 'required|string|max:25',
-            'latitude' => 'required|string|max:50',
-            'longitude' => 'required|string|max:50',
-            'zoom' => 'required|integer',
-            'logo' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'logo_mobile' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'logger_access' => 'nullable|array',
+            'logger_access.*' => ['string', 'max:15', Rule::exists('t_logger', 'id_logger')],
         ]);
 
-        $currentUser = auth()->user();
-        if ($currentUser && $currentUser->level_user !== 'superadmin') {
-            if ($validated['level_user'] === 'superadmin') {
-                abort(403);
-            }
+        $validated = $validator->validate();
+
+        $targetRole = $this->normalizeRoleName((string) $validated['level_user']);
+        if (!Role::query()->where('role_name', $targetRole)->exists()) {
+            throw ValidationException::withMessages([
+                'level_user' => 'Role tidak valid.',
+            ]);
+        }
+        if (!$this->canAssignRole($currentUser, $targetRole)) {
+            abort(403);
+        }
+
+        $validated['level_user'] = $targetRole;
+
+        if ($currentUser->isInstansiAdmin()) {
             $validated['instansi_id'] = $currentUser->instansi_id;
         }
 
-        $instansiName = null;
-        if (!empty($validated['instansi_id'])) {
-            $instansi = Instansi::find($validated['instansi_id']);
-            $instansiName = $instansi?->nama;
+        if ($validated['level_user'] !== 'superadmin' && empty($validated['instansi_id'])) {
+            throw ValidationException::withMessages([
+                'instansi_id' => 'Instansi wajib dipilih.',
+            ]);
         }
 
-        $logoPath = $request->file('logo')->store('logos', 'public');
-        $logoMobilePath = $request->file('logo_mobile')->store('logos', 'public');
-
-        t_User::create([
+        $user = t_User::create([
             'nama' => $validated['nama'],
             'username' => $validated['username'],
             'password' => Hash::make($validated['password']),
             'level_user' => $validated['level_user'],
-            'alamat' => $validated['alamat'],
-            'telp' => $validated['telp'],
-            'instansi' => $instansiName,
             'instansi_id' => $validated['instansi_id'] ?? null,
-            'latitude' => $validated['latitude'],
-            'longitude' => $validated['longitude'],
-            'zoom' => $validated['zoom'],
-            'logo' => $logoPath,
-            'logo_mobile' => $logoMobilePath,
         ]);
 
-        // Return JSON for AJAX
+        $loggerIds = $request->input('logger_access', []);
+        $this->syncLoggerAccessForUser($user, $loggerIds, $currentUser);
+
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -108,90 +137,82 @@ class UserController extends Controller
 
     public function edit(t_User $user)
     {
-        // Redirect to index for modal-based editing
         return redirect()->route('users.index');
     }
 
     public function show(t_User $user)
     {
         $currentUser = auth()->user();
-        if ($currentUser && $currentUser->level_user !== 'superadmin' && $user->instansi_id !== $currentUser->instansi_id) {
+        if (!$this->canManageUser($currentUser, $user)) {
             abort(403);
         }
 
+        $user->loadMissing('accessibleLoggers:id_logger');
+
         return response()->json([
             'user' => $user,
+            'logger_access_ids' => $user->accessibleLoggers
+                ->pluck('id_logger')
+                ->map(fn($id) => (string) $id)
+                ->values(),
         ]);
     }
 
     public function update(Request $request, t_User $user)
     {
         $currentUser = auth()->user();
-        if ($currentUser && $currentUser->level_user !== 'superadmin' && $user->instansi_id !== $currentUser->instansi_id) {
+        if (!$this->canManageUser($currentUser, $user)) {
             abort(403);
         }
-        $validated = $request->validate([
+
+        $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:100',
             'username' => 'required|string|max:30|unique:t_user,username,' . $user->id_user . ',id_user',
             'password' => 'nullable|string|min:6',
-            'level_user' => 'required|string|exists:roles,role_name',
+            'level_user' => 'required|string|max:50',
             'instansi_id' => 'nullable|integer|exists:instansi,id',
-            'alamat' => 'required|string',
-            'telp' => 'required|string|max:25',
-            'latitude' => 'required|string|max:50',
-            'longitude' => 'required|string|max:50',
-            'zoom' => 'required|integer',
-            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'logo_mobile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'logger_access' => 'nullable|array',
+            'logger_access.*' => ['string', 'max:15', Rule::exists('t_logger', 'id_logger')],
         ]);
 
-        if ($currentUser && $currentUser->level_user !== 'superadmin') {
-            if ($validated['level_user'] === 'superadmin') {
-                abort(403);
-            }
+        $validated = $validator->validate();
+
+        $targetRole = $this->normalizeRoleName((string) $validated['level_user']);
+        if (!Role::query()->where('role_name', $targetRole)->exists()) {
+            throw ValidationException::withMessages([
+                'level_user' => 'Role tidak valid.',
+            ]);
+        }
+        if (!$this->canAssignRole($currentUser, $targetRole)) {
+            abort(403);
+        }
+
+        if ($currentUser->isInstansiAdmin()) {
             $validated['instansi_id'] = $currentUser->instansi_id;
         }
 
-        $instansiName = null;
-        if (!empty($validated['instansi_id'])) {
-            $instansi = Instansi::find($validated['instansi_id']);
-            $instansiName = $instansi?->nama;
+        if ($targetRole !== 'superadmin' && empty($validated['instansi_id'])) {
+            throw ValidationException::withMessages([
+                'instansi_id' => 'Instansi wajib dipilih.',
+            ]);
         }
 
         $payload = [
             'nama' => $validated['nama'],
             'username' => $validated['username'],
-            'level_user' => $validated['level_user'],
-            'alamat' => $validated['alamat'],
-            'telp' => $validated['telp'],
-            'instansi' => $instansiName,
+            'level_user' => $targetRole,
             'instansi_id' => $validated['instansi_id'] ?? null,
-            'latitude' => $validated['latitude'],
-            'longitude' => $validated['longitude'],
-            'zoom' => $validated['zoom'],
         ];
 
         if (!empty($validated['password'])) {
             $payload['password'] = Hash::make($validated['password']);
         }
 
-        if ($request->hasFile('logo')) {
-            if ($user->logo) {
-                Storage::disk('public')->delete($user->logo);
-            }
-            $payload['logo'] = $request->file('logo')->store('logos', 'public');
-        }
-
-        if ($request->hasFile('logo_mobile')) {
-            if ($user->logo_mobile) {
-                Storage::disk('public')->delete($user->logo_mobile);
-            }
-            $payload['logo_mobile'] = $request->file('logo_mobile')->store('logos', 'public');
-        }
-
         $user->update($payload);
 
-        // Return JSON for AJAX
+        $loggerIds = $request->input('logger_access', []);
+        $this->syncLoggerAccessForUser($user, $loggerIds, $currentUser);
+
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -206,12 +227,19 @@ class UserController extends Controller
     public function destroy(t_User $user)
     {
         $currentUser = auth()->user();
-        if ($currentUser && $currentUser->level_user !== 'superadmin' && $user->instansi_id !== $currentUser->instansi_id) {
+        if (!$this->canManageUser($currentUser, $user)) {
             abort(403);
         }
+
+        if ($currentUser && $currentUser->id_user === $user->id_user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun yang sedang login tidak bisa dihapus.',
+            ], 422);
+        }
+
         $user->delete();
 
-        // Return JSON for AJAX
         if (request()->wantsJson() || request()->ajax()) {
             return response()->json([
                 'success' => true,
@@ -221,5 +249,105 @@ class UserController extends Controller
 
         return redirect()->route('users.index')
             ->with('success', 'User berhasil dihapus.');
+    }
+
+    private function canManageUser(?t_User $actor, t_User $target): bool
+    {
+        if (!$actor) {
+            return false;
+        }
+
+        if ($actor->isSuperAdmin()) {
+            return true;
+        }
+
+        if (!$actor->isInstansiAdmin()) {
+            return false;
+        }
+
+        if ((int) $target->instansi_id !== (int) $actor->instansi_id) {
+            return false;
+        }
+
+        // Instansi admin hanya boleh kelola akun pegawai di instansinya.
+        return $target->isPegawai();
+    }
+
+    private function canAssignRole(?t_User $actor, string $roleName): bool
+    {
+        if (!$actor) {
+            return false;
+        }
+
+        $normalized = strtolower(trim($roleName));
+
+        if ($actor->isSuperAdmin()) {
+            return true;
+        }
+
+        if ($actor->isInstansiAdmin()) {
+            return in_array($normalized, ['pegawai', 'user'], true);
+        }
+
+        return false;
+    }
+
+    private function normalizeRoleName(string $roleName): string
+    {
+        $normalized = strtolower(trim($roleName));
+
+        if ($normalized === 'admin') {
+            return Role::query()->where('role_name', 'instansi_admin')->exists()
+                ? 'instansi_admin'
+                : 'admin';
+        }
+
+        if ($normalized === 'user') {
+            return Role::query()->where('role_name', 'pegawai')->exists()
+                ? 'pegawai'
+                : 'user';
+        }
+
+        return $roleName;
+    }
+
+    /**
+     * @param array<int, string>|null $loggerIds
+     */
+    private function syncLoggerAccessForUser(t_User $user, ?array $loggerIds, t_User $actor): void
+    {
+        if (!$user->isPegawai()) {
+            $user->accessibleLoggers()->sync([]);
+            return;
+        }
+
+        $loggerIds = collect($loggerIds ?? [])
+            ->filter(fn($id) => is_string($id) || is_numeric($id))
+            ->map(fn($id) => trim((string) $id))
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($loggerIds->isEmpty()) {
+            throw ValidationException::withMessages([
+                'logger_access' => 'Minimal pilih 1 logger untuk akun pegawai.',
+            ]);
+        }
+
+        $allowedLoggers = t_Logger::query()
+            ->forUser($actor)
+            ->where('instansi_id', $user->instansi_id)
+            ->whereIn('id_logger', $loggerIds)
+            ->pluck('id_logger')
+            ->map(fn($id) => (string) $id)
+            ->values();
+
+        if ($allowedLoggers->count() !== $loggerIds->count()) {
+            throw ValidationException::withMessages([
+                'logger_access' => 'Ada logger yang tidak valid atau di luar instansi user.',
+            ]);
+        }
+
+        $user->accessibleLoggers()->sync($allowedLoggers->all());
     }
 }

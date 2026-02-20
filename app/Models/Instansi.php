@@ -12,6 +12,11 @@ class Instansi extends Model
         'nama',
         'alamat',
         'telp',
+        'latitude',
+        'longitude',
+        'zoom',
+        'logo',
+        'logo_mobile',
     ];
 
     public function users()

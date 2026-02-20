@@ -233,34 +233,36 @@
                                 </div>
                             </div>
 
-                            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                                <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
-                                    <img src="{{ asset('icons/sub_kategori_icon.svg') }}" class="h-5 w-5">
-                                    <p class="text-sm font-bold text-slate-900">Sub Kategori</p>
+                            <template x-if="isAwlrKategori(detailData.id_katlogger)">
+                                <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                                    <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
+                                        <img src="{{ asset('icons/sub_kategori_icon.svg') }}" class="h-5 w-5">
+                                        <p class="text-sm font-bold text-slate-900">Sub Kategori</p>
+                                    </div>
+                                    <div class="grid grid-cols-1 gap-4 px-4 py-3 text-sm sm:grid-cols-4">
+                                        <div>
+                                            <p class="text-xs uppercase text-slate-400">Sub Kategori</p>
+                                            <p class="mt-1 font-semibold text-slate-900"
+                                                x-text="detailData.sub_kategori || '-'"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs uppercase text-slate-400">Kedalaman Sumur</p>
+                                            <p class="mt-1 font-semibold text-slate-900"
+                                                x-text="detailData.kedalaman_sumur || '-'"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs uppercase text-slate-400">Kedalaman Sensor</p>
+                                            <p class="mt-1 font-semibold text-slate-900"
+                                                x-text="detailData.kedalaman_sensor || '-'"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs uppercase text-slate-400">Kedalaman Pompa</p>
+                                            <p class="mt-1 font-semibold text-slate-900"
+                                                x-text="detailData.kedalaman_pompa || '-'"></p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="grid grid-cols-1 gap-4 px-4 py-3 text-sm sm:grid-cols-4">
-                                    <div>
-                                        <p class="text-xs uppercase text-slate-400">Sub Kategori</p>
-                                        <p class="mt-1 font-semibold text-slate-900"
-                                            x-text="detailData.sub_kategori || '-'"></p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs uppercase text-slate-400">Kedalaman Sumur</p>
-                                        <p class="mt-1 font-semibold text-slate-900"
-                                            x-text="detailData.kedalaman_sumur || '-'"></p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs uppercase text-slate-400">Kedalaman Sensor</p>
-                                        <p class="mt-1 font-semibold text-slate-900"
-                                            x-text="detailData.kedalaman_sensor || '-'"></p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs uppercase text-slate-400">Kedalaman Pompa</p>
-                                        <p class="mt-1 font-semibold text-slate-900"
-                                            x-text="detailData.kedalaman_pompa || '-'"></p>
-                                    </div>
-                                </div>
-                            </div>
+                            </template>
                         </div>
 
                         <div>
@@ -387,96 +389,95 @@
                                     koordinat secara manual.</p>
                             </div>
 
-                            <!-- Sub Kategori -->
-                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                <h4 class="text-sm font-semibold text-gray-900 mb-3">Sub Kategori</h4>
-                                <div class="flex gap-6">
-                                    <label class="inline-flex items-center">
-                                        <input type="radio" name="sub_kategori" value="jiat"
-                                            x-model="addData.subKategori"
-                                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                        <span class="ml-2 text-sm">JIAT</span>
-                                    </label>
-                                    <label class="inline-flex items-center">
-                                        <input type="radio" name="sub_kategori" value="non_jiat"
-                                            x-model="addData.subKategori"
-                                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                        <span class="ml-2 text-sm">Non JIAT</span>
-                                    </label>
+                            <template x-if="isAddAwlr()">
+                                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                    <h4 class="text-sm font-semibold text-gray-900 mb-3">Sub Kategori</h4>
+                                    <div class="flex gap-6">
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" name="sub_kategori" value="jiat"
+                                                x-model="addData.subKategori"
+                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                            <span class="ml-2 text-sm">JIAT</span>
+                                        </label>
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" name="sub_kategori" value="non_jiat"
+                                                x-model="addData.subKategori"
+                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                            <span class="ml-2 text-sm">Non JIAT</span>
+                                        </label>
+                                    </div>
+
+                                    <template x-if="addData.subKategori === 'jiat'">
+                                        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
+                                                    Sumur</label>
+                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                    <input type="number" step="0.01" name="kedalaman_sumur"
+                                                        x-model="addData.kedalaman_sumur"
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                        placeholder="100">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
+                                                    Sensor</label>
+                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                    <input type="number" step="0.01" name="kedalaman_sensor"
+                                                        x-model="addData.kedalaman_sensor"
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                        placeholder="55">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
+                                                    Pompa</label>
+                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                    <input type="number" step="0.01" name="kedalaman_pompa"
+                                                        x-model="addData.kedalaman_pompa"
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                        placeholder="60">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <template x-if="addData.subKategori === 'non_jiat'">
+                                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700 mb-2">Jarak Sensor
+                                                    dengan Air</label>
+                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                    <input type="number" step="0.01" name="kedalaman_sensor"
+                                                        x-model="addData.kedalaman_sensor"
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                        placeholder="100">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700 mb-2">Ketinggian
+                                                    Sensor</label>
+                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                    <input type="number" step="0.01" name="kedalaman_pompa"
+                                                        x-model="addData.kedalaman_pompa"
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                        placeholder="60">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
-
-                                <!-- JIAT Fields -->
-                                <template x-if="addData.subKategori === 'jiat'">
-                                    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
-                                                Sumur</label>
-                                            <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
-                                                <input type="number" step="0.01" name="kedalaman_sumur"
-                                                    x-model="addData.kedalaman_sumur"
-                                                    class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
-                                                    placeholder="100">
-                                                <span
-                                                    class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
-                                                Sensor</label>
-                                            <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
-                                                <input type="number" step="0.01" name="kedalaman_sensor"
-                                                    x-model="addData.kedalaman_sensor"
-                                                    class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
-                                                    placeholder="55">
-                                                <span
-                                                    class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
-                                                Pompa</label>
-                                            <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
-                                                <input type="number" step="0.01" name="kedalaman_pompa"
-                                                    x-model="addData.kedalaman_pompa"
-                                                    class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
-                                                    placeholder="60">
-                                                <span
-                                                    class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </template>
-
-                                <!-- Non JIAT Fields -->
-                                <template x-if="addData.subKategori === 'non_jiat'">
-                                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-700 mb-2">Jarak Sensor dengan
-                                                Air</label>
-                                            <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
-                                                <input type="number" step="0.01" name="kedalaman_sensor"
-                                                    x-model="addData.kedalaman_sensor"
-                                                    class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
-                                                    placeholder="100">
-                                                <span
-                                                    class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-700 mb-2">Ketinggian
-                                                Sensor</label>
-                                            <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
-                                                <input type="number" step="0.01" name="kedalaman_pompa"
-                                                    x-model="addData.kedalaman_pompa"
-                                                    class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
-                                                    placeholder="60">
-                                                <span
-                                                    class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
+                            </template>
 
                             <!-- Nama Logger -->
                             <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
@@ -496,8 +497,13 @@
 
                             <!-- Daftar Parameter -->
                             <div class="rounded-xl border border-gray-300">
-                                <div class="border-b border-gray-300 px-4 py-3">
+                                <div class="border-b border-gray-300 px-4 py-3 flex items-center justify-between gap-3">
                                     <h4 class="text-sm font-semibold text-gray-900">Daftar Parameter</h4>
+                                    <button type="button" @click="applyTemplateToAdd()"
+                                        :disabled="!canApplyTemplateAdd()"
+                                        class="inline-flex items-center rounded-md border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50">
+                                        Template Kategori (Opsional)
+                                    </button>
                                 </div>
                                 <div class="px-4 py-3">
                                     <div
@@ -511,9 +517,26 @@
                                     <div class="space-y-2">
                                         <template x-for="(param, index) in addData.params" :key="index">
                                             <div class="grid grid-cols-[1.6fr_1fr_0.9fr_52px] gap-3 items-start">
-                                                <input :name="'params[' + index + '][nama_parameter]'"
-                                                    x-model="param.nama_parameter" type="text" required
-                                                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                                <input type="hidden" :name="'params[' + index + '][parameter_group_id]'"
+                                                    x-model="param.parameter_group_id">
+
+                                                <div class="space-y-1">
+                                                    <select x-model="param.list_parameter_id"
+                                                        @change="applyListParameterToParamRow(param, addSensorOptions)"
+                                                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 focus:border-indigo-500 focus:ring-indigo-500">
+                                                        <option value="">Isi dari List Parameter (opsional)</option>
+                                                        <template x-for="lp in listParameterOptions"
+                                                            :key="'add-list-' + lp.id">
+                                                            <option :value="String(lp.id)"
+                                                                x-text="lp.parameter_utama ? `${lp.nama_parameter} (${lp.parameter_utama})` : lp.nama_parameter">
+                                                            </option>
+                                                        </template>
+                                                    </select>
+
+                                                    <input :name="'params[' + index + '][nama_parameter]'"
+                                                        x-model="param.nama_parameter" type="text" required
+                                                        class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                                </div>
 
                                                 <select :name="'params[' + index + '][kolom_sensor]'"
                                                     x-model="param.kolom_sensor" required
@@ -620,86 +643,90 @@
                                 </div>
                             </div>
 
-                            <div>
-                                <h4 class="text-sm font-semibold text-gray-900 mb-2">Sub Kategori</h4>
-                                <div class="flex items-center gap-8">
-                                    <label class="inline-flex items-center gap-2 text-sm text-gray-800">
-                                        <input type="radio" value="jiat" x-model="editData.subKategori"
-                                            class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
-                                        JIAT
-                                    </label>
-                                    <label class="inline-flex items-center gap-2 text-sm text-gray-800">
-                                        <input type="radio" value="non_jiat" x-model="editData.subKategori"
-                                            class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
-                                        Non JIAT
-                                    </label>
-                                </div>
-                            </div>
+                            <template x-if="isEditAwlr()">
+                                <div class="space-y-4">
+                                    <div>
+                                        <h4 class="text-sm font-semibold text-gray-900 mb-2">Sub Kategori</h4>
+                                        <div class="flex items-center gap-8">
+                                            <label class="inline-flex items-center gap-2 text-sm text-gray-800">
+                                                <input type="radio" name="sub_kategori" value="jiat"
+                                                    x-model="editData.subKategori"
+                                                    class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
+                                                JIAT
+                                            </label>
+                                            <label class="inline-flex items-center gap-2 text-sm text-gray-800">
+                                                <input type="radio" name="sub_kategori" value="non_jiat"
+                                                    x-model="editData.subKategori"
+                                                    class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
+                                                Non JIAT
+                                            </label>
+                                        </div>
+                                    </div>
 
-                            <!-- JIAT Fields -->
-                            <template x-if="editData.subKategori === 'jiat'">
-                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                                    <div>
-                                        <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
-                                            Sumur</label>
-                                        <div class="flex rounded-xl border border-gray-300 overflow-hidden">
-                                            <input type="number" step="0.01" name="kedalaman_sumur"
-                                                x-model="editData.kedalaman_sumur"
-                                                class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
-                                            <span
-                                                class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                    <template x-if="editData.subKategori === 'jiat'">
+                                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                                            <div>
+                                                <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
+                                                    Sumur</label>
+                                                <div class="flex rounded-xl border border-gray-300 overflow-hidden">
+                                                    <input type="number" step="0.01" name="kedalaman_sumur"
+                                                        x-model="editData.kedalaman_sumur"
+                                                        class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
+                                                    Sensor</label>
+                                                <div class="flex rounded-xl border border-gray-300 overflow-hidden">
+                                                    <input type="number" step="0.01" name="kedalaman_sensor"
+                                                        x-model="editData.kedalaman_sensor"
+                                                        class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
+                                                    Pompa</label>
+                                                <div class="flex rounded-xl border border-gray-300 overflow-hidden">
+                                                    <input type="number" step="0.01" name="kedalaman_pompa"
+                                                        x-model="editData.kedalaman_pompa"
+                                                        class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
-                                            Sensor</label>
-                                        <div class="flex rounded-xl border border-gray-300 overflow-hidden">
-                                            <input type="number" step="0.01" name="kedalaman_sensor"
-                                                x-model="editData.kedalaman_sensor"
-                                                class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
-                                            <span
-                                                class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
-                                            Pompa</label>
-                                        <div class="flex rounded-xl border border-gray-300 overflow-hidden">
-                                            <input type="number" step="0.01" name="kedalaman_pompa"
-                                                x-model="editData.kedalaman_pompa"
-                                                class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
-                                            <span
-                                                class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
+                                    </template>
 
-                            <!-- Non JIAT Fields -->
-                            <template x-if="editData.subKategori === 'non_jiat'">
-                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                    <div>
-                                        <label class="block text-sm font-semibold text-gray-900 mb-2">Jarak Sensor dengan
-                                            Air</label>
-                                        <div class="flex rounded-xl border border-gray-300 overflow-hidden">
-                                            <input type="number" step="0.01" name="kedalaman_sensor"
-                                                x-model="editData.kedalaman_sensor"
-                                                class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
-                                            <span
-                                                class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                    <template x-if="editData.subKategori === 'non_jiat'">
+                                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                            <div>
+                                                <label class="block text-sm font-semibold text-gray-900 mb-2">Jarak Sensor
+                                                    dengan Air</label>
+                                                <div class="flex rounded-xl border border-gray-300 overflow-hidden">
+                                                    <input type="number" step="0.01" name="kedalaman_sensor"
+                                                        x-model="editData.kedalaman_sensor"
+                                                        class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-semibold text-gray-900 mb-2">Ketinggian
+                                                    Sensor</label>
+                                                <div class="flex rounded-xl border border-gray-300 overflow-hidden">
+                                                    <input type="number" step="0.01" name="kedalaman_pompa"
+                                                        x-model="editData.kedalaman_pompa"
+                                                        class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold text-gray-900 mb-2">Ketinggian
-                                            Sensor</label>
-                                        <div class="flex rounded-xl border border-gray-300 overflow-hidden">
-                                            <input type="number" step="0.01" name="kedalaman_pompa"
-                                                x-model="editData.kedalaman_pompa"
-                                                class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
-                                            <span
-                                                class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
-                                        </div>
-                                    </div>
+                                    </template>
                                 </div>
                             </template>
 
@@ -724,8 +751,13 @@
                             </div>
 
                             <div class="rounded-xl border border-gray-300">
-                                <div class="border-b border-gray-300 px-4 py-3">
+                                <div class="border-b border-gray-300 px-4 py-3 flex items-center justify-between gap-3">
                                     <h4 class="text-xl font-semibold text-gray-900">Daftar Parameter</h4>
+                                    <button type="button" @click="applyTemplateToEdit()"
+                                        :disabled="!canApplyTemplateEdit()"
+                                        class="inline-flex items-center rounded-md border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50">
+                                        Template Kategori (Opsional)
+                                    </button>
                                 </div>
                                 <div class="px-4 py-3">
                                     <div
@@ -742,9 +774,26 @@
                                             <div class="grid grid-cols-[1.6fr_1fr_0.9fr_52px] gap-3 items-start">
                                                 <input type="hidden" :name="'params[' + index + '][id_param]'"
                                                     x-model="param.id_param">
-                                                <input :name="'params[' + index + '][nama_parameter]'"
-                                                    x-model="param.nama_parameter"
-                                                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                                <input type="hidden" :name="'params[' + index + '][parameter_group_id]'"
+                                                    x-model="param.parameter_group_id">
+
+                                                <div class="space-y-1">
+                                                    <select x-model="param.list_parameter_id"
+                                                        @change="applyListParameterToParamRow(param, editSensorOptions)"
+                                                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 focus:border-indigo-500 focus:ring-indigo-500">
+                                                        <option value="">Isi dari List Parameter (opsional)</option>
+                                                        <template x-for="lp in listParameterOptions"
+                                                            :key="'edit-list-' + lp.id">
+                                                            <option :value="String(lp.id)"
+                                                                x-text="lp.parameter_utama ? `${lp.nama_parameter} (${lp.parameter_utama})` : lp.nama_parameter">
+                                                            </option>
+                                                        </template>
+                                                    </select>
+
+                                                    <input :name="'params[' + index + '][nama_parameter]'"
+                                                        x-model="param.nama_parameter"
+                                                        class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                                </div>
 
                                                 <select :name="'params[' + index + '][kolom_sensor]'"
                                                     x-model="param.kolom_sensor"
@@ -814,10 +863,14 @@
                 addSensorOptions: [],
                 instansis: [],
                 loggers: [],
+                templateMap: @json($templateMap ?? []),
+                listParameterOptions: @json($listParameters ?? []),
+                awlrCategoryIds: @json($awlrCategoryIds ?? []),
                 addDeviceMap: null,
                 addDeviceMarker: null,
                 detailData: {
                     id_logger: '',
+                    id_katlogger: '',
                     nama_lokasi: '',
                     nama_logger: '',
                     alamat: '',
@@ -832,6 +885,7 @@
                 editData: {
                     updateUrl: '',
                     id_logger: '',
+                    id_katlogger: '',
                     nama_lokasi: '',
                     nama_logger: '',
                     subKategori: 'jiat',
@@ -846,12 +900,18 @@
                     latitude: '',
                     longitude: '',
                     subKategori: '',
+                    kedalaman_sumur: '',
+                    kedalaman_sensor: '',
+                    kedalaman_pompa: '',
                     selectedLogger: null,
+                    id_katlogger: '',
                     sensorCount: 16,
                     params: [{
+                        list_parameter_id: '',
                         nama_parameter: '',
                         kolom_sensor: '',
-                        satuan: ''
+                        satuan: '',
+                        parameter_group_id: ''
                     }]
                 },
                 formdata: {
@@ -932,12 +992,18 @@
                         latitude: '',
                         longitude: '',
                         subKategori: '',
+                        kedalaman_sumur: '',
+                        kedalaman_sensor: '',
+                        kedalaman_pompa: '',
                         selectedLogger: null,
+                        id_katlogger: '',
                         sensorCount: 16,
                         params: [{
+                            list_parameter_id: '',
                             nama_parameter: '',
                             kolom_sensor: '',
-                            satuan: ''
+                            satuan: '',
+                            parameter_group_id: ''
                         }]
                     }
 
@@ -1023,6 +1089,7 @@
 
                     if (logger) {
                         this.addData.selectedLogger = logger
+                        this.addData.id_katlogger = logger.id_katlogger || ''
                         this.addData.sensorCount = logger.sensor_count || 16
 
                         // Update sensor options based on sensor count
@@ -1034,14 +1101,48 @@
                         this.addData.params.forEach(param => {
                             param.kolom_sensor = ''
                         })
+
+                        if (this.isAwlrKategori(this.addData.id_katlogger)) {
+                            if (this.addData.subKategori !== 'jiat' && this.addData.subKategori !==
+                                'non_jiat') {
+                                this.addData.subKategori = 'non_jiat'
+                            }
+                        } else {
+                            this.addData.subKategori = ''
+                            this.addData.kedalaman_sumur = ''
+                            this.addData.kedalaman_sensor = ''
+                            this.addData.kedalaman_pompa = ''
+                        }
+                    } else {
+                        this.addData.subKategori = ''
+                        this.addData.kedalaman_sumur = ''
+                        this.addData.kedalaman_sensor = ''
+                        this.addData.kedalaman_pompa = ''
+                        this.addData.id_katlogger = ''
                     }
+                },
+
+                isAwlrKategori(kategoriId) {
+                    const parsedId = Number(kategoriId)
+                    if (Number.isNaN(parsedId) || !parsedId) return false
+                    return (this.awlrCategoryIds || []).map(id => Number(id)).includes(parsedId)
+                },
+
+                isAddAwlr() {
+                    return this.isAwlrKategori(this.addData.id_katlogger)
+                },
+
+                isEditAwlr() {
+                    return this.isAwlrKategori(this.editData.id_katlogger)
                 },
 
                 addParameter() {
                     this.addData.params.push({
+                        list_parameter_id: '',
                         nama_parameter: '',
                         kolom_sensor: '',
-                        satuan: ''
+                        satuan: '',
+                        parameter_group_id: ''
                     })
                 },
 
@@ -1054,9 +1155,11 @@
                 addEditParameter() {
                     this.editData.params.push({
                         id_param: '',
+                        list_parameter_id: '',
                         nama_parameter: '',
                         kolom_sensor: '',
-                        satuan: ''
+                        satuan: '',
+                        parameter_group_id: ''
                     })
                 },
 
@@ -1074,6 +1177,7 @@
 
                     this.detailData = {
                         id_logger: device?.id_logger ?? '-',
+                        id_katlogger: device?.id_katlogger ?? '',
                         nama_lokasi: device?.nama_lokasi ?? '-',
                         nama_logger: device?.nama_logger ?? '-',
                         alamat: device?.alamat ?? '-',
@@ -1111,6 +1215,7 @@
                     Object.assign(this.editData, {
                         updateUrl: `/pengaturan-device/${device.id_logger}`,
                         id_logger: device.id_logger,
+                        id_katlogger: device.id_katlogger ?? '',
                         nama_lokasi: device.lokasi?.nama_lokasi ?? '',
                         nama_logger: device.nama_logger ?? '',
                         subKategori: (device.jiat?.kedalaman_sumur ?? '') === '' ? 'non_jiat' :
@@ -1156,9 +1261,11 @@
                     this.$nextTick(() => {
                         this.editData.params = (device.params ?? []).map(p => ({
                             id_param: p.id_param,
+                            list_parameter_id: '',
                             nama_parameter: p.nama_parameter ?? '',
                             kolom_sensor: p.kolom_sensor ?? '',
-                            satuan: p.satuan ?? ''
+                            satuan: p.satuan ?? '',
+                            parameter_group_id: p.parameter_group_id ?? ''
                         }))
 
                         if (!this.editData.params.length) {
@@ -1170,6 +1277,95 @@
 
                 closeModal() {
                     this.isOpen = false
+                },
+
+                canApplyTemplateAdd() {
+                    return !!this.addData.id_katlogger && this.templateRowsByKategori(this.addData.id_katlogger)
+                        .length > 0
+                },
+
+                canApplyTemplateEdit() {
+                    return !!this.editData.id_katlogger && this.templateRowsByKategori(this.editData.id_katlogger)
+                        .length > 0
+                },
+
+                templateRowsByKategori(kategoriId) {
+                    if (!kategoriId) return []
+                    return this.templateMap[String(kategoriId)] || []
+                },
+
+                normalizeSensorOption(sensor, options) {
+                    const value = String(sensor || '').trim()
+                    if (!value) return ''
+                    return options.includes(value) ? value : ''
+                },
+
+                applyListParameterToParamRow(param, sensorOptions = []) {
+                    if (!param) return
+
+                    const selectedId = String(param.list_parameter_id || '').trim()
+                    if (!selectedId) return
+
+                    const selected = (this.listParameterOptions || []).find((item) => String(item.id) ===
+                        selectedId)
+                    if (!selected) return
+
+                    param.nama_parameter = selected.nama_parameter || param.nama_parameter || ''
+
+                    if (selected.default_satuan) {
+                        param.satuan = selected.default_satuan
+                    }
+
+                    const sensor = this.normalizeSensorOption(selected.default_kolom_sensor, sensorOptions)
+                    if (sensor) {
+                        param.kolom_sensor = sensor
+                    }
+
+                    param.parameter_group_id = selected.default_parameter_group_id || ''
+                },
+
+                applyTemplateToAdd() {
+                    const templateRows = this.templateRowsByKategori(this.addData.id_katlogger)
+                    if (!templateRows.length) return
+
+                    const mapped = templateRows.map((row) => ({
+                        list_parameter_id: row.list_parameter_id ? String(row.list_parameter_id) : '',
+                        nama_parameter: row.nama_parameter || '',
+                        kolom_sensor: this.normalizeSensorOption(row.kolom_sensor_default, this.addSensorOptions),
+                        satuan: row.satuan || '',
+                        parameter_group_id: row.parameter_group_id || '',
+                    }))
+
+                    this.addData.params = mapped.length ? mapped : [{
+                        list_parameter_id: '',
+                        nama_parameter: '',
+                        kolom_sensor: '',
+                        satuan: '',
+                        parameter_group_id: ''
+                    }]
+                },
+
+                applyTemplateToEdit() {
+                    const templateRows = this.templateRowsByKategori(this.editData.id_katlogger)
+                    if (!templateRows.length) return
+
+                    const mapped = templateRows.map((row) => ({
+                        id_param: '',
+                        list_parameter_id: row.list_parameter_id ? String(row.list_parameter_id) : '',
+                        nama_parameter: row.nama_parameter || '',
+                        kolom_sensor: this.normalizeSensorOption(row.kolom_sensor_default, this.editSensorOptions),
+                        satuan: row.satuan || '',
+                        parameter_group_id: row.parameter_group_id || '',
+                    }))
+
+                    this.editData.params = mapped.length ? mapped : [{
+                        id_param: '',
+                        list_parameter_id: '',
+                        nama_parameter: '',
+                        kolom_sensor: '',
+                        satuan: '',
+                        parameter_group_id: ''
+                    }]
                 }
             }))
         })

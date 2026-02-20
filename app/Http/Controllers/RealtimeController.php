@@ -58,11 +58,10 @@ class RealtimeController extends Controller
     public function getData($id)
     {
         $user = auth()->user();
-        $deviceQuery = DB::table('t_logger')->where('id_logger', $id);
-        if ($user && $user->level_user !== 'superadmin') {
-            $deviceQuery->where('instansi_id', $user->instansi_id);
-        }
-        $device = $deviceQuery->first();
+        $device = t_Logger::query()
+            ->forUser($user)
+            ->where('id_logger', $id)
+            ->first();
 
         if (!$device) {
             return response()->json(['success' => false, 'message' => 'Device not found'], 404);

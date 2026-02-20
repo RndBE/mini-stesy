@@ -14,7 +14,11 @@ class DataMasukController extends Controller
 {
     public function index()
     {
-        $loggers = t_Logger::all();
+        $loggers = t_Logger::query()
+            ->forUser(auth()->user())
+            ->orderBy('nama_logger')
+            ->get();
+
         return view('data-masuk.index', ['title' => 'Data Masuk'], compact('loggers'));
     }
 
@@ -49,10 +53,20 @@ class DataMasukController extends Controller
                 $tanggalAkhir = $tanggalParsed->copy()->endOfDay();
             }
 
-            $parameters = Parameter_sensor::where('logger_id', $logger_id)->get();
-
             $sensorCount = null;
-            $loggerRow = t_Logger::where('id_logger', $logger_id)->first();
+            $loggerRow = t_Logger::query()
+                ->forUser(auth()->user())
+                ->where('id_logger', $logger_id)
+                ->first();
+
+            if (!$loggerRow) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Logger tidak ditemukan atau tidak memiliki akses.'
+                ], 404);
+            }
+
+            $parameters = Parameter_sensor::where('logger_id', $logger_id)->get();
             if ($loggerRow && isset($loggerRow->jumlah_sensor) && is_numeric($loggerRow->jumlah_sensor)) {
                 $sensorCount = (int) $loggerRow->jumlah_sensor;
             }

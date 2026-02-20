@@ -15,6 +15,7 @@ class AnalisaController extends Controller
     public function index($id_logger)
     {
         $logger = t_Logger::query()
+            ->forUser(auth()->user())
             ->with(['lokasi', 'params', 'jiat', 'informasi'])
             ->where('id_logger', $id_logger)
             ->firstOrFail();
@@ -99,7 +100,7 @@ class AnalisaController extends Controller
             $file = fopen('php://output', 'w');
 
             // Metadata Headers
-            $loggerName = DB::table('t_logger')->where('id_logger', $id_logger)->value('nama_logger') ?? $id_logger;
+            $loggerName = $result['logger_name'] ?? $id_logger;
             $paramName = $request->input('parameter', 'Parameter');
             $date = $request->input('date', '');
             $range = $request->input('range', 'day');
@@ -154,8 +155,8 @@ class AnalisaController extends Controller
      */
     private function processData($id_logger, $request)
     {
-        // 1. Fetch Logger (Query Builder)
-        $logger = DB::table('t_logger')->where('id_logger', $id_logger)->first();
+        // 1. Fetch Logger with access guard
+        $logger = $this->findAccessibleLogger($id_logger);
 
         if (!$logger) {
             return ['error' => 'Logger not found'];
@@ -402,6 +403,7 @@ class AnalisaController extends Controller
         $numericValues = collect($values)->filter();
 
         return [
+            'logger_name' => $logger->nama_logger ?? $id_logger,
             'labels'     => $labels,
             'chartData'  => $values,
             'minData'    => $minValues,
@@ -415,7 +417,10 @@ class AnalisaController extends Controller
 
     public function dataMasuk($id_logger)
     {
-        $logger = \App\Models\t_Logger::where('id_logger', $id_logger)->firstOrFail();
+        $logger = $this->findAccessibleLogger($id_logger);
+        if (!$logger) {
+            abort(404);
+        }
 
         $today = now();
         $start = $today->copy()->subDays(29)->startOfDay();
@@ -447,7 +452,10 @@ class AnalisaController extends Controller
     public function getDataMasuk($id)
     {
         // $logger = t_Logger::findOrFail($id);
-        $logger = t_Logger::where('id_logger', $id)->firstOrFail();
+        $logger = $this->findAccessibleLogger($id);
+        if (!$logger) {
+            abort(404);
+        }
 
         // Determine which relation to use based on table name or sensor count
         $query = null;
@@ -564,5 +572,13 @@ class AnalisaController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    private function findAccessibleLogger(string $idLogger): ?t_Logger
+    {
+        return t_Logger::query()
+            ->forUser(auth()->user())
+            ->where('id_logger', $idLogger)
+            ->first();
     }
 }

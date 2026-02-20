@@ -30,30 +30,6 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700">Controller</label>
-                        <input type="text" name="controller" value="{{ old('controller', $kategori->controller) }}"
-                            class="mt-1 w-full rounded-md border-slate-300 p-2 text-sm shadow-sm" required>
-                        @error('controller')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700">Tabel</label>
-                        <input type="text" name="tabel" value="{{ old('tabel', $kategori->tabel) }}"
-                            class="mt-1 w-full rounded-md border-slate-300 p-2 text-sm shadow-sm" required>
-                        @error('tabel')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700">Temp Data</label>
-                        <input type="text" name="temp_data" value="{{ old('temp_data', $kategori->temp_data) }}"
-                            class="mt-1 w-full rounded-md border-slate-300 p-2 text-sm shadow-sm" required>
-                        @error('temp_data')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
                         <label class="block text-sm font-medium text-slate-700">Icon App</label>
                         <input type="text" name="icon_app" value="{{ old('icon_app', $kategori->icon_app) }}"
                             class="mt-1 w-full rounded-md border-slate-300 p-2 text-sm shadow-sm" required>

@@ -11,9 +11,12 @@ use App\Models\t_Lokasi;
 use App\Models\Jiat_data;
 use App\Models\Parameter;
 use App\Models\ParameterGroup;
+use App\Models\ListParameter;
+use App\Models\TemplateKategoriParameter;
 use App\Models\List_das;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DeviceController extends Controller
 {
@@ -32,6 +35,7 @@ class DeviceController extends Controller
                 return [
                     'id_logger' => $d->id_logger,
                     'nama_logger' => $d->nama_logger,
+                    'id_katlogger' => $d->id_katlogger,
                     'alamat' => $d->lokasi->alamat ?? '-',
                     'nama_lokasi' => $d->lokasi->nama_lokasi ?? '-',
                     'tabel_main' => $d->tabel_main,
@@ -51,9 +55,52 @@ class DeviceController extends Controller
                 ];
             });
 
+        $templateMap = [];
+        if (Schema::hasTable('template_kategori_parameter') && Schema::hasTable('list_parameter')) {
+            $templateMap = TemplateKategoriParameter::query()
+                ->with(['listParameter', 'parameterGroup'])
+                ->orderBy('id_katlogger')
+                ->orderBy('urutan')
+                ->get()
+                ->groupBy('id_katlogger')
+                ->map(function ($rows) {
+                    return $rows->map(function ($row) {
+                        $list = $row->listParameter;
+                        return [
+                            'list_parameter_id' => $row->list_parameter_id,
+                            'nama_parameter' => $list?->nama_parameter,
+                            'kolom_sensor_default' => $row->kolom_sensor_default ?: ($list?->default_kolom_sensor ?? null),
+                            'satuan' => $row->satuan_override ?: ($list?->default_satuan ?? null),
+                            'parameter_group_id' => $row->parameter_group_id ?: ($list?->default_parameter_group_id ?? null),
+                            'urutan' => $row->urutan,
+                        ];
+                    })->values();
+                })
+                ->toArray();
+        }
+
+        $listParameters = [];
+        if (Schema::hasTable('list_parameter')) {
+            $listParameters = ListParameter::query()
+                ->where('is_active', true)
+                ->orderBy('nama_parameter')
+                ->get([
+                    'id',
+                    'nama_parameter',
+                    'parameter_utama',
+                    'default_satuan',
+                    'default_kolom_sensor',
+                    'default_parameter_group_id',
+                ])
+                ->toArray();
+        }
+
         return view('device.index', [
             'title' => 'Pengaturan Device',
             'devices' => $devices,
+            'templateMap' => $templateMap,
+            'listParameters' => $listParameters,
+            'awlrCategoryIds' => $this->awlrCategoryIds(),
         ]);
     }
 
@@ -66,13 +113,14 @@ class DeviceController extends Controller
 
         $loggers = t_Logger::query()
             ->forUser(auth()->user())
-            ->select('id_logger', 'nama_logger', 'sensor_count', 'tabel_main')
+            ->select('id_logger', 'nama_logger', 'id_katlogger', 'sensor_count', 'tabel_main')
             ->orderBy('nama_logger')
             ->get()
             ->map(function ($logger) {
                 return [
                     'id_logger' => $logger->id_logger,
                     'nama_logger' => $logger->nama_logger,
+                    'id_katlogger' => $logger->id_katlogger,
                     'sensor_count' => $logger->sensor_count ?? (str_contains($logger->tabel_main, '19') ? 19 : 16),
                 ];
             });
@@ -94,7 +142,7 @@ class DeviceController extends Controller
             // 'pilih_instansi'    => 'required|exists:instansi,id',
             'latitude'          => 'required|numeric',
             'longitude'         => 'required|numeric',
-            'sub_kategori'      => 'required|in:jiat,non_jiat',
+            'sub_kategori'      => 'nullable|in:jiat,non_jiat',
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
             'kedalaman_pompa'   => 'nullable|numeric',
@@ -135,22 +183,25 @@ class DeviceController extends Controller
                 $logger->idlokasi = $lokasi->idlokasi;
                 $logger->save();
 
-                // 3. Create/update JIAT data with non-null numeric values
-                $kedalamanSumur = $validated['sub_kategori'] === 'jiat'
-                    ? (float) ($validated['kedalaman_sumur'] ?? 0)
-                    : 0;
+                // 3. JIAT data hanya dipakai untuk kategori AWLR
+                if ($this->isAwlrCategoryId($logger->id_katlogger)) {
+                    $subKategori = $validated['sub_kategori'] ?? 'non_jiat';
+                    $kedalamanSumur = $subKategori === 'jiat'
+                        ? (float) ($validated['kedalaman_sumur'] ?? 0)
+                        : 0.0;
 
-                $kedalamanSensor = (float) ($validated['kedalaman_sensor'] ?? 0);
-                $kedalamanPompa = (float) ($validated['kedalaman_pompa'] ?? 0);
+                    $kedalamanSensor = (float) ($validated['kedalaman_sensor'] ?? 0);
+                    $kedalamanPompa = (float) ($validated['kedalaman_pompa'] ?? 0);
 
-                Jiat_data::updateOrCreate(
-                    ['id_logger' => $logger->id_logger],
-                    [
-                        'kedalaman_sumur'  => $kedalamanSumur,
-                        'kedalaman_sensor' => $kedalamanSensor,
-                        'kedalaman_pompa'  => $kedalamanPompa,
-                    ]
-                );
+                    Jiat_data::updateOrCreate(
+                        ['id_logger' => $logger->id_logger],
+                        [
+                            'kedalaman_sumur'  => $kedalamanSumur,
+                            'kedalaman_sensor' => $kedalamanSensor,
+                            'kedalaman_pompa'  => $kedalamanPompa,
+                        ]
+                    );
+                }
 
                 // 4. Create parameters
                 foreach ($validated['params'] as $param) {
@@ -183,6 +234,7 @@ class DeviceController extends Controller
             'nama_lokasi'       => 'required|string|max:255',
             'latitude'          => 'nullable|numeric',
             'longitude'         => 'nullable|numeric',
+            'sub_kategori'      => 'nullable|in:jiat,non_jiat',
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
             'kedalaman_pompa'   => 'nullable|numeric',
@@ -211,18 +263,22 @@ class DeviceController extends Controller
             ]);
         }
 
-        if ($logger->jiat) {
-            $logger->jiat->update([
-                'kedalaman_sumur'  => $request->kedalaman_sumur,
-                'kedalaman_sensor' => $request->kedalaman_sensor,
-                'kedalaman_pompa'  => $request->kedalaman_pompa,
-            ]);
-        } else {
-            $logger->jiat()->create([
-                'kedalaman_sumur'  => $request->kedalaman_sumur,
-                'kedalaman_sensor' => $request->kedalaman_sensor,
-                'kedalaman_pompa'  => $request->kedalaman_pompa,
-            ]);
+        if ($this->isAwlrCategoryId($logger->id_katlogger)) {
+            $subKategori = $request->input('sub_kategori', 'non_jiat');
+            $kedalamanSumur = $subKategori === 'jiat'
+                ? (float) ($request->kedalaman_sumur ?? 0)
+                : 0.0;
+            $kedalamanSensor = (float) ($request->kedalaman_sensor ?? 0);
+            $kedalamanPompa = (float) ($request->kedalaman_pompa ?? 0);
+
+            Jiat_data::updateOrCreate(
+                ['id_logger' => $logger->id_logger],
+                [
+                    'kedalaman_sumur'  => $kedalamanSumur,
+                    'kedalaman_sensor' => $kedalamanSensor,
+                    'kedalaman_pompa'  => $kedalamanPompa,
+                ]
+            );
         }
 
         if ($request->has('params') && is_array($request->params)) {
@@ -448,6 +504,31 @@ class DeviceController extends Controller
             $cache = ParameterGroup::query()
                 ->pluck('id', 'kode_group')
                 ->map(fn($id) => (int) $id)
+                ->all();
+        }
+
+        return $cache;
+    }
+
+    private function isAwlrCategoryId($idKatlogger): bool
+    {
+        if ($idKatlogger === null || $idKatlogger === '') {
+            return false;
+        }
+
+        return in_array((int) $idKatlogger, $this->awlrCategoryIds(), true);
+    }
+
+    private function awlrCategoryIds(): array
+    {
+        static $cache = null;
+
+        if ($cache === null) {
+            $cache = Kategori_Logger::query()
+                ->whereRaw('UPPER(nama_kategori) = ?', ['AWLR'])
+                ->pluck('id_katlogger')
+                ->map(fn($id) => (int) $id)
+                ->values()
                 ->all();
         }
 

@@ -77,7 +77,7 @@
                         (auth()->user()->hasPermission('manage_instansi') ||
                             auth()->user()->hasPermission('manage_rbac') ||
                             auth()->user()->hasPermission('manage_user')))
-                    <div x-data="{ open: {{ request()->routeIs('instansi.*') || request()->routeIs('kategori.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('users.*') ? 'true' : 'false' }} }" class="rounded-xl border border-slate-200 bg-slate-50/60">
+                    <div x-data="{ open: {{ request()->routeIs('instansi.*') || request()->routeIs('kategori.*') || request()->routeIs('list-parameter.*') || request()->routeIs('parameter-group.*') || request()->routeIs('template-kategori-parameter.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') || request()->routeIs('users.*') ? 'true' : 'false' }} }" class="rounded-xl border border-slate-200 bg-slate-50/60">
                         <button type="button"
                             @click="
                                 const sidebar = document.getElementById('mainSidebar');
@@ -97,7 +97,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 4v16M15 4v16M4 9h16M4 15h16" />
                                 </svg>
-                                <span class="sidebar-text truncate">Master</span>
+                                <span class="sidebar-text truncate">Master Data</span>
                             </span>
                             <svg class="sidebar-parent-chevron h-4 w-4 text-slate-500 transition-transform"
                                 :class="open ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none"
@@ -106,15 +106,26 @@
                             </svg>
                         </button>
 
-                        <div x-show="open" x-collapse x-cloak class="space-y-1 px-2 pb-2">
-                            @permission('manage_instansi')
+                        <div x-show="open" x-collapse x-cloak class="space-y-2 px-2 pb-2 pt-2">
+                            @if (auth()->check() && (auth()->user()->hasPermission('manage_instansi') || auth()->user()->isInstansiAdmin()))
                                 <a href="{{ route('instansi.index') }}"
                                     class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('instansi.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     <span class="sidebar-text truncate">Instansi</span>
                                 </a>
+                            @endif
+
+                            @permission('manage_instansi')
                                 <a href="{{ route('kategori.index') }}"
                                     class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('kategori.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     <span class="sidebar-text truncate">Kategori Logger</span>
+                                </a>
+                                <a href="{{ route('list-parameter.index') }}"
+                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('list-parameter.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    <span class="sidebar-text truncate">List Parameter</span>
+                                </a>
+                                <a href="{{ route('template-kategori-parameter.index') }}"
+                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('template-kategori-parameter.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    <span class="sidebar-text truncate">Template Parameter</span>
                                 </a>
                             @endpermission
 

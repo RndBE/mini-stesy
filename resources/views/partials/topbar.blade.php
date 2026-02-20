@@ -13,17 +13,22 @@
         @php
             $currentUser = auth()->user();
             $namaUser = $currentUser?->nama ?? ($currentUser?->username ?? 'User');
-            $namaInstansi = $currentUser?->instansi?->nama ?? ($currentUser?->instansi ?? '-');
+            $instansi = $currentUser?->instansi;
+            $namaInstansi = $instansi?->nama ?? '-';
             $avatarUrl = asset('images/logo-avatar.png');
 
-            if (!empty($currentUser?->logo)) {
-                $logoValue = ltrim((string) $currentUser->logo, '/');
+            $logoValue = $instansi?->logo;
+            if (!empty($logoValue)) {
+                $logoValue = ltrim((string) $logoValue, '/');
 
                 if (filter_var($logoValue, FILTER_VALIDATE_URL)) {
                     $avatarUrl = $logoValue;
                 } else {
-                    $logoFile = basename($logoValue);
-                    $candidates = ['logo_instansi/' . $logoFile, $logoValue, 'storage/' . $logoValue];
+                    $candidates = [
+                        'storage/' . $logoValue,
+                        $logoValue,
+                        'logo_instansi/' . basename($logoValue),
+                    ];
 
                     foreach ($candidates as $path) {
                         if (file_exists(public_path($path))) {
