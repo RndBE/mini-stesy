@@ -32,15 +32,30 @@ class KategoriLoggerController extends Controller
         $validated = $request->validate([
             'nama_kategori' => 'required|string|max:191|unique:kategori_logger,nama_kategori',
             'kepanjangan' => 'required|string',
-            'icon_app' => 'required|string|max:25',
+            'icon_app_file' => 'required|image|mimes:png,jpg,jpeg,webp,svg|max:2048',
             'view' => 'required|integer|min:0',
         ]);
 
         $validated['nama_kategori'] = strtoupper(trim((string) $validated['nama_kategori']));
         $validated['kepanjangan'] = trim((string) $validated['kepanjangan']);
-        $validated['icon_app'] = trim((string) $validated['icon_app']);
+        $validated['icon_app'] = '';
+        unset($validated['icon_app_file']);
 
-        Kategori_logger::create($validated);
+        $kategori = Kategori_logger::create($validated);
+
+        if ($request->hasFile('icon_app_file')) {
+            $file = $request->file('icon_app_file');
+            $ext = strtolower((string) $file->getClientOriginalExtension());
+            $filename = 'k' . $kategori->id_katlogger . '_' . time() . '.' . $ext;
+            $targetDir = public_path('kategori');
+
+            if (!is_dir($targetDir)) {
+                mkdir($targetDir, 0755, true);
+            }
+
+            $file->move($targetDir, $filename);
+            $kategori->update(['icon_app' => $filename]);
+        }
 
         return redirect()->route('kategori.index')
             ->with('success', 'Kategori logger berhasil ditambahkan.');

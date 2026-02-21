@@ -359,7 +359,7 @@
                     let csvContent = '\uFEFF'; // BOM for UTF-8
 
                     // Add header
-                    csvContent += ['No', 'Waktu', ...this.columns].join(',') + '\n';
+                    csvContent += ['No', 'tanggal', 'Waktu', ...this.columns].join(',') + '\n';
 
                     // Add data
                     this.tableData.forEach((row, idx) => {

@@ -22,10 +22,12 @@
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <button @click="openCreateModal()"
-                        class="inline-flex items-center gap-2 rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 whitespace-nowrap">
-                        + Tambah Data
-                    </button>
+                    @permission('manage_data_perangkat')
+                        <button @click="openCreateModal()"
+                            class="inline-flex items-center gap-2 rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 whitespace-nowrap">
+                            + Tambah Data
+                        </button>
+                    @endpermission
                 </div>
             </div>
         </div>
