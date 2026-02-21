@@ -177,7 +177,6 @@
         @endif
 
         @if ($isManageAllInstansi)
-            {{-- Create Modal --}}
             <div x-cloak x-show="showCreateModal" class="fixed inset-0 z-50" aria-labelledby="modal-title"
                 role="dialog" aria-modal="true" @keydown.escape.window="closeCreateModal()">
 
@@ -320,7 +319,7 @@
         @endif
 
 
-        {{-- Delete Confirmation Modal --}}
+
         @if ($isManageAllInstansi)
             <div x-cloak x-show="showDeleteModal" class="fixed inset-0 z-50" role="dialog" aria-modal="true"
                 @keydown.escape.window="closeDeleteModal()">
@@ -379,7 +378,7 @@
             </div>
         @endif
 
-        {{-- Edit Modal --}}
+
         <div x-cloak x-show="showEditModal" class="fixed inset-0 z-50" aria-labelledby="modal-title" role="dialog"
             aria-modal="true" @keydown.escape.window="closeEditModal()">
 

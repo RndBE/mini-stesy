@@ -5,7 +5,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3 mt-2">
 
             <button type="button" @click="openCreateModal()"
-                class="inline-flex items-center rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                class="inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
                 + Tambah Kategori
             </button>
         </div>
@@ -54,8 +54,8 @@
                                         <img src="{{ asset('kategori/' . ltrim((string) $kategori->icon_app, '/')) }}"
                                             alt="{{ $kategori->nama_kategori }}"
                                             onerror="this.onerror=null;this.src='{{ asset('images/mini_stesy.png') }}';"
-                                            class="h-8 w-8 rounded-md border border-slate-200 object-contain bg-white">
-                                        <span class="text-xs text-slate-500">{{ $kategori->icon_app }}</span>
+                                            class="h-30 w-30 rounded-md  object-contain bg-white">
+
                                     </div>
                                 </td>
                                 <td class="px-4 py-3">{{ $kategori->view }}</td>
@@ -88,7 +88,7 @@
             @keydown.escape.window="closeCreateModal()">
             <div class="fixed inset-0 bg-black/50" @click="closeCreateModal()"></div>
             <div class="fixed inset-0 flex items-center justify-center p-4">
-                <div class="w-full max-w-3xl rounded-xl bg-white shadow-xl" @click.stop>
+                <div class="w-full max-w-3xl rounded-lg bg-white shadow-xl" @click.stop>
                     <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
                         <h3 class="text-lg font-bold text-slate-900">Tambah Kategori</h3>
                         <button type="button" @click="closeCreateModal()"
@@ -136,7 +136,8 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700">Preview Icon</label>
-                            <div class="mt-1 flex h-16 w-16 items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
+                            <div
+                                class="mt-1 flex h-16 w-16 items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
                                 <img :src="iconPreviewUrl(createData.icon_app)" alt="Preview Icon"
                                     onerror="this.onerror=null;this.src='{{ asset('images/mini_stesy.png') }}';"
                                     class="h-12 w-12 object-contain">
@@ -172,13 +173,14 @@
             @keydown.escape.window="closeEditModal()">
             <div class="fixed inset-0 bg-black/50" @click="closeEditModal()"></div>
             <div class="fixed inset-0 flex items-center justify-center p-4">
-                <div class="w-full max-w-3xl rounded-xl bg-white shadow-xl" @click.stop>
-                    <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                <div class="w-full max-w-3xl rounded-lg bg-white shadow-xl" @click.stop>
+                    <div class="flex items-center justify-between border-b border-slate-200 px-6 py-2">
                         <h3 class="text-lg font-bold text-slate-900">Edit Kategori</h3>
                         <button type="button" @click="closeEditModal()"
                             class="rounded-md p-1 text-slate-500 hover:bg-slate-100">X</button>
                     </div>
-                    <form method="POST" :action="updateAction()" enctype="multipart/form-data" class="space-y-5 p-6">
+                    <form method="POST" :action="updateAction()" enctype="multipart/form-data"
+                        class="space-y-3 px-6 pt-1 pb-4">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="form_mode" value="edit">
@@ -221,13 +223,14 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700">Preview Icon</label>
-                            <div class="mt-1 flex h-16 w-16 items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
+                            <div
+                                class="mt-1 flex h-16 w-16 items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
                                 <img :src="editIconPreviewUrl()" alt="Preview Icon"
                                     onerror="this.onerror=null;this.src='{{ asset('images/mini_stesy.png') }}';"
                                     class="h-12 w-12 object-contain">
                             </div>
                         </div>
-                        <div>
+                        <div class="pb-3">
                             <label class="block text-sm font-medium text-slate-700">View</label>
                             <input type="number" min="0" step="1" name="view" x-model="editData.view"
                                 class="mt-1 w-full rounded-md border-slate-300 p-2 text-sm shadow-sm" required>
@@ -237,7 +240,7 @@
                                 @enderror
                             @endif
                         </div>
-                        <div class="flex items-center justify-end gap-3">
+                        <div class="flex items-center justify-end gap-3 m">
                             <button type="button" @click="closeEditModal()"
                                 class="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
                                 Batal
@@ -256,7 +259,7 @@
             @keydown.escape.window="closeDeleteModal()">
             <div class="fixed inset-0 bg-black/50" @click="closeDeleteModal()"></div>
             <div class="fixed inset-0 flex items-center justify-center p-4">
-                <div class="w-full max-w-md rounded-xl bg-white shadow-xl" @click.stop>
+                <div class="w-full max-w-md rounded-lg bg-white shadow-xl" @click.stop>
                     <div class="border-b border-slate-200 px-6 py-4">
                         <h3 class="text-lg font-bold text-slate-900">Hapus Kategori</h3>
                     </div>

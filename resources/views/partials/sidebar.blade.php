@@ -320,11 +320,14 @@
 
         if (isMobile) {
             mainContent.style.marginLeft = '0';
+            mainContent.style.width = '100%';
             syncSidebarBackdrop();
             return;
         }
 
-        mainContent.style.marginLeft = sidebar.classList.contains('collapsed') ? '5rem' : '16rem';
+        const sidebarWidth = sidebar.classList.contains('collapsed') ? '5rem' : '16rem';
+        mainContent.style.marginLeft = sidebarWidth;
+        mainContent.style.width = `calc(100% - ${sidebarWidth})`;
         syncSidebarBackdrop();
     }
 

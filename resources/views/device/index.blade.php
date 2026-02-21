@@ -27,10 +27,10 @@
         }
     </style>
 
-    <div x-data="deviceEditor()" x-cloak class="mt-6 space-y-6">
+    <div x-data="deviceEditor()" x-cloak class="mt-2 space-y-3">
 
         <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-slate-900">Pengaturan Device</h1>
+
 
             <div class="flex items-center gap-3">
                 @if (session('success'))
@@ -55,7 +55,7 @@
         </div>
 
 
-        <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+        <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
                     <thead class="bg-neutral-200 text-xs font-semibold uppercase text-neutral-950">
@@ -145,14 +145,14 @@
         </div>
 
         {{-- DETAIL DEVICE MODAL --}}
-        <div x-show="showDetailModal" class="fixed inset-0 z-50 overflow-y-auto"
-            aria-labelledby="detail-modal-title" role="dialog" aria-modal="true" style="display: none;">
+        <div x-show="showDetailModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="detail-modal-title"
+            role="dialog" aria-modal="true" style="display: none;">
             <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
                 <div x-show="showDetailModal" x-transition:enter="ease-out duration-300"
                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                     x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0"
-                    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeDetailModal()">
+                    x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                    @click="closeDetailModal()">
                 </div>
 
                 <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
@@ -163,7 +163,7 @@
                     x-transition:leave="ease-in duration-200"
                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative inline-block w-full max-w-6xl transform overflow-hidden rounded-xl bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
+                    class="relative inline-block w-full max-w-6xl transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
 
                     <div class="flex items-start justify-between border-b border-slate-200 px-6 py-4">
                         <div class="flex items-start gap-3">
@@ -185,7 +185,7 @@
 
                     <div class="grid grid-cols-1 gap-4 px-4 py-4 lg:grid-cols-2">
                         <div class="space-y-4">
-                            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                            <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                                 <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                     <img src="{{ asset('icons/identitas_icon.svg') }}" class="h-5 w-5">
                                     <p class="text-sm font-bold text-slate-900">Identitas Device</p>
@@ -209,7 +209,7 @@
                                 </div>
                             </div>
 
-                            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                            <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                                 <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                     <img src="{{ asset('icons/lokasi_icon.svg') }}" class="h-5 w-5">
                                     <p class="text-sm font-bold text-slate-900">Lokasi Pos</p>
@@ -234,7 +234,7 @@
                             </div>
 
                             <template x-if="isAwlrKategori(detailData.id_katlogger)">
-                                <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                                <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                                     <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                         <img src="{{ asset('icons/sub_kategori_icon.svg') }}" class="h-5 w-5">
                                         <p class="text-sm font-bold text-slate-900">Sub Kategori</p>
@@ -266,7 +266,7 @@
                         </div>
 
                         <div>
-                            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                            <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                                 <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                     <img src="{{ asset('icons/param_icon.svg') }}" class="h-5 w-5">
                                     <p class="text-sm font-bold text-slate-900">Detail Parameter</p>
@@ -321,7 +321,7 @@
 
                 <!-- Modal Panel -->
                 <div x-show="isAddOpen" x-transition
-                    class="relative inline-block w-full max-w-5xl transform overflow-hidden rounded-xl bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
+                    class="relative inline-block w-full max-w-5xl transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
 
                     <!-- HEADER -->
                     <div class="flex items-center justify-between border-b px-6 py-4">
@@ -412,7 +412,8 @@
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
                                                     Sumur</label>
-                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                <div
+                                                    class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
                                                     <input type="number" step="0.01" name="kedalaman_sumur"
                                                         x-model="addData.kedalaman_sumur"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
@@ -424,7 +425,8 @@
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
                                                     Sensor</label>
-                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                <div
+                                                    class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
                                                     <input type="number" step="0.01" name="kedalaman_sensor"
                                                         x-model="addData.kedalaman_sensor"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
@@ -436,7 +438,8 @@
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
                                                     Pompa</label>
-                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                <div
+                                                    class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
                                                     <input type="number" step="0.01" name="kedalaman_pompa"
                                                         x-model="addData.kedalaman_pompa"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
@@ -453,7 +456,8 @@
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700 mb-2">Jarak Sensor
                                                     dengan Air</label>
-                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                <div
+                                                    class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
                                                     <input type="number" step="0.01" name="kedalaman_sensor"
                                                         x-model="addData.kedalaman_sensor"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
@@ -465,7 +469,8 @@
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700 mb-2">Ketinggian
                                                     Sensor</label>
-                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                <div
+                                                    class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
                                                     <input type="number" step="0.01" name="kedalaman_pompa"
                                                         x-model="addData.kedalaman_pompa"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
@@ -496,7 +501,7 @@
                             </div>
 
                             <!-- Daftar Parameter -->
-                            <div class="rounded-xl border border-gray-300">
+                            <div class="rounded-lg border border-gray-300">
                                 <div class="border-b border-gray-300 px-4 py-3 flex items-center justify-between gap-3">
                                     <h4 class="text-sm font-semibold text-gray-900">Daftar Parameter</h4>
                                     <button type="button" @click="applyTemplateToAdd()"
@@ -553,7 +558,7 @@
 
                                                 <button type="button" @click="removeParameter(index)"
                                                     :disabled="addData.params.length === 1"
-                                                    class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    class="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                                                     title="Hapus parameter">
                                                     <svg class="h-5 w-5" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -592,16 +597,15 @@
         </div>
 
         {{-- EDIT MODAL --}}
-        <div x-show="isOpen" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title"
-            role="dialog" aria-modal="true" style="display: none;">
+        <div x-show="isOpen" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+            aria-modal="true" style="display: none;">
 
             <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
 
                 <!-- Overlay -->
-                <div x-show="isOpen" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                    x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0"
+                <div x-show="isOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                     class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModal()"></div>
 
                 <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
@@ -613,7 +617,7 @@
                     x-transition:leave="ease-in duration-200"
                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative inline-block w-full max-w-6xl transform overflow-hidden rounded-xl bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
+                    class="relative inline-block w-full max-w-6xl transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
 
                     <!-- HEADER -->
                     <div class="flex items-center justify-between border-b px-6 py-4">
@@ -638,7 +642,7 @@
                                 <label class="block text-sm font-semibold text-gray-900 mb-2">Nama Pos</label>
                                 <input type="hidden" name="nama_lokasi" :value="editData.nama_lokasi">
                                 <div
-                                    class="w-full rounded-xl border border-gray-300 bg-gray-100 px-4 py-3 text-sm text-gray-800">
+                                    class="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-3 text-sm text-gray-800">
                                     <span x-text="editData.nama_lokasi || '-'"></span>
                                 </div>
                             </div>
@@ -668,7 +672,7 @@
                                             <div>
                                                 <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
                                                     Sumur</label>
-                                                <div class="flex rounded-xl border border-gray-300 overflow-hidden">
+                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden">
                                                     <input type="number" step="0.01" name="kedalaman_sumur"
                                                         x-model="editData.kedalaman_sumur"
                                                         class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
@@ -679,7 +683,7 @@
                                             <div>
                                                 <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
                                                     Sensor</label>
-                                                <div class="flex rounded-xl border border-gray-300 overflow-hidden">
+                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden">
                                                     <input type="number" step="0.01" name="kedalaman_sensor"
                                                         x-model="editData.kedalaman_sensor"
                                                         class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
@@ -690,7 +694,7 @@
                                             <div>
                                                 <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
                                                     Pompa</label>
-                                                <div class="flex rounded-xl border border-gray-300 overflow-hidden">
+                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden">
                                                     <input type="number" step="0.01" name="kedalaman_pompa"
                                                         x-model="editData.kedalaman_pompa"
                                                         class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
@@ -706,7 +710,7 @@
                                             <div>
                                                 <label class="block text-sm font-semibold text-gray-900 mb-2">Jarak Sensor
                                                     dengan Air</label>
-                                                <div class="flex rounded-xl border border-gray-300 overflow-hidden">
+                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden">
                                                     <input type="number" step="0.01" name="kedalaman_sensor"
                                                         x-model="editData.kedalaman_sensor"
                                                         class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
@@ -717,7 +721,7 @@
                                             <div>
                                                 <label class="block text-sm font-semibold text-gray-900 mb-2">Ketinggian
                                                     Sensor</label>
-                                                <div class="flex rounded-xl border border-gray-300 overflow-hidden">
+                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden">
                                                     <input type="number" step="0.01" name="kedalaman_pompa"
                                                         x-model="editData.kedalaman_pompa"
                                                         class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
@@ -734,7 +738,7 @@
                                 <label class="block text-sm font-semibold text-gray-900 mb-2">Nama Logger</label>
                                 <div class="relative">
                                     <select x-model="editData.id_logger"
-                                        class="w-full appearance-none rounded-xl border border-gray-300 px-4 py-3 pr-10 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                        class="w-full appearance-none rounded-lg border border-gray-300 px-4 py-3 pr-10 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
                                         <option value="" disabled>Pilih nama logger</option>
                                         <option :value="editData.id_logger" x-text="editData.nama_logger"
                                             x-show="editData.nama_logger"></option>
@@ -750,7 +754,7 @@
                                 </div>
                             </div>
 
-                            <div class="rounded-xl border border-gray-300">
+                            <div class="rounded-lg border border-gray-300">
                                 <div class="border-b border-gray-300 px-4 py-3 flex items-center justify-between gap-3">
                                     <h4 class="text-xl font-semibold text-gray-900">Daftar Parameter</h4>
                                     <button type="button" @click="applyTemplateToEdit()"
@@ -810,7 +814,7 @@
 
                                                 <button type="button" @click="removeEditParameter(index)"
                                                     :disabled="editData.params.length === 1"
-                                                    class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    class="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                                                     title="Hapus parameter">
                                                     <svg class="h-5 w-5" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -834,11 +838,11 @@
                         <!-- FOOTER -->
                         <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3">
                             <button type="button" @click="closeModal()"
-                                class="rounded-xl border border-indigo-300 bg-white px-6 py-2.5 text-sm font-semibold text-indigo-900 hover:bg-indigo-50">
+                                class="rounded-lg border border-indigo-300 bg-white px-6 py-2.5 text-sm font-semibold text-indigo-900 hover:bg-indigo-50">
                                 Batal
                             </button>
                             <button type="submit"
-                                class="rounded-xl bg-indigo-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-indigo-900">
+                                class="rounded-lg bg-indigo-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-indigo-900">
                                 Simpan
                             </button>
                         </div>
@@ -1280,12 +1284,14 @@
                 },
 
                 canApplyTemplateAdd() {
-                    return !!this.addData.id_katlogger && this.templateRowsByKategori(this.addData.id_katlogger)
+                    return !!this.addData.id_katlogger && this.templateRowsByKategori(this.addData
+                            .id_katlogger)
                         .length > 0
                 },
 
                 canApplyTemplateEdit() {
-                    return !!this.editData.id_katlogger && this.templateRowsByKategori(this.editData.id_katlogger)
+                    return !!this.editData.id_katlogger && this.templateRowsByKategori(this.editData
+                            .id_katlogger)
                         .length > 0
                 },
 
@@ -1306,7 +1312,8 @@
                     const selectedId = String(param.list_parameter_id || '').trim()
                     if (!selectedId) return
 
-                    const selected = (this.listParameterOptions || []).find((item) => String(item.id) ===
+                    const selected = (this.listParameterOptions || []).find((item) => String(item
+                            .id) ===
                         selectedId)
                     if (!selected) return
 
@@ -1316,7 +1323,8 @@
                         param.satuan = selected.default_satuan
                     }
 
-                    const sensor = this.normalizeSensorOption(selected.default_kolom_sensor, sensorOptions)
+                    const sensor = this.normalizeSensorOption(selected.default_kolom_sensor,
+                        sensorOptions)
                     if (sensor) {
                         param.kolom_sensor = sensor
                     }
@@ -1329,9 +1337,11 @@
                     if (!templateRows.length) return
 
                     const mapped = templateRows.map((row) => ({
-                        list_parameter_id: row.list_parameter_id ? String(row.list_parameter_id) : '',
+                        list_parameter_id: row.list_parameter_id ? String(row
+                            .list_parameter_id) : '',
                         nama_parameter: row.nama_parameter || '',
-                        kolom_sensor: this.normalizeSensorOption(row.kolom_sensor_default, this.addSensorOptions),
+                        kolom_sensor: this.normalizeSensorOption(row.kolom_sensor_default,
+                            this.addSensorOptions),
                         satuan: row.satuan || '',
                         parameter_group_id: row.parameter_group_id || '',
                     }))
@@ -1351,9 +1361,11 @@
 
                     const mapped = templateRows.map((row) => ({
                         id_param: '',
-                        list_parameter_id: row.list_parameter_id ? String(row.list_parameter_id) : '',
+                        list_parameter_id: row.list_parameter_id ? String(row
+                            .list_parameter_id) : '',
                         nama_parameter: row.nama_parameter || '',
-                        kolom_sensor: this.normalizeSensorOption(row.kolom_sensor_default, this.editSensorOptions),
+                        kolom_sensor: this.normalizeSensorOption(row.kolom_sensor_default,
+                            this.editSensorOptions),
                         satuan: row.satuan || '',
                         parameter_group_id: row.parameter_group_id || '',
                     }))

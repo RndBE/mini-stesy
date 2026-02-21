@@ -1,9 +1,7 @@
 @extends('layouts.app')
-
 @section('content')
     <div x-data="permissionData()" class="space-y-3">
-        <div class="flex items-center justify-between mt-2">
-
+        <div class="flex items-center justify-between mt-3">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between ">
                 @if (session('success'))
                     <div
@@ -13,7 +11,6 @@
                 @else
                     <div></div>
                 @endif
-
                 <div class="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <div class="relative w-full sm:w-64">
                         <input type="text" x-model="searchQuery" placeholder="Cari permission..."
@@ -31,7 +28,6 @@
                 </div>
             </div>
         </div>
-
         <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
@@ -83,16 +79,12 @@
                 </table>
             </div>
         </div>
-
-        {{-- Create Modal --}}
         <div x-show="showCreateModal" x-cloak class="fixed inset-0 z-50" role="dialog" aria-modal="true"
             @keydown.escape.window="closeCreateModal()">
-
             <div x-show="showCreateModal" x-transition:enter="ease-in-out duration-300" x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100" x-transition:leave="ease-in-out duration-200"
                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                 class="fixed inset-0 bg-gray-500/75" @click="closeCreateModal()"></div>
-
             <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeCreateModal()">
                 <div x-show="showCreateModal" x-transition:enter="ease-in-out duration-300"
                     x-transition:enter-start="opacity-0 scale-95 translate-y-4"
@@ -100,10 +92,9 @@
                     x-transition:leave="ease-in-out duration-200"
                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-                    class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden my-8" @click.stop>
-
-                    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-200">
-                        <h3 class="text-xl font-bold text-slate-900">Tambah Permission</h3>
+                    class="w-full max-w-4xl bg-white rounded-lg shadow-xl overflow-hidden my-8" @click.stop>
+                    <div class="flex items-center justify-between px-8 py-2 border-b border-slate-200">
+                        <h3 class="text-xl font-bold text-gray-900">Tambah Permission</h3>
                         <button type="button" @click="closeCreateModal()" class="p-2 rounded-lg hover:bg-slate-100">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -111,14 +102,11 @@
                             </svg>
                         </button>
                     </div>
-
                     <form @submit.prevent="submitCreate()" id="createPermissionForm">
-                        <div class="px-8 py-6 space-y-6">
-
-                            <div x-show="createError" x-cloak class="p-4 bg-red-50 border border-red-200 rounded-xl">
+                        <div class="px-8 pt-0 pb-3 space-y-3">
+                            <div x-show="createError" x-cloak class="p-4 bg-red-50 border border-red-200 rounded-lg">
                                 <p class="text-sm font-semibold text-red-800" x-text="createError"></p>
                             </div>
-
                             <div>
                                 <label for="create_permission_name"
                                     class="block text-sm font-semibold text-slate-900 mb-2">
@@ -126,37 +114,31 @@
                                 </label>
                                 <input type="text" id="create_permission_name" x-model="createForm.permission_name"
                                     required placeholder="Masukkan Nama Permission"
-                                    class="w-full h-14 rounded-xl border border-slate-200 px-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                             </div>
                         </div>
-
-                        <div class="flex items-center justify-end gap-3 px-8 py-6 border-t border-slate-200 bg-white">
+                        <div class="flex items-center justify-end gap-3 px-8 py-3 border-t border-gray-100 bg-white">
                             <button type="button" @click="closeCreateModal()"
-                                class="h-12 px-6 rounded-xl border border-indigo-500 text-indigo-600 font-semibold hover:bg-indigo-50">
+                                class="h-10 px-6 rounded-lg border border-indigo-500 text-indigo-600 font-semibold hover:bg-indigo-50">
                                 Batal
                             </button>
                             <button type="submit" :disabled="createSubmitting"
-                                class="h-12 px-6 rounded-xl bg-indigo-700 text-white font-semibold hover:bg-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                                class="h-10 px-6 rounded-lg bg-indigo-700 text-white font-semibold hover:bg-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <span x-show="!createSubmitting">Simpan</span>
                                 <span x-show="createSubmitting" x-cloak>Menyimpan...</span>
                             </button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
-
-        {{-- Delete Confirmation Modal --}}
         <div x-cloak x-show="showDeleteModal" class="fixed inset-0 z-50" role="dialog" aria-modal="true"
             @keydown.escape.window="closeDeleteModal()">
-
             <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                 x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500/75" @click="closeDeleteModal()">
             </div>
-
             <div class="fixed inset-0 flex items-center justify-center p-4" @click="closeDeleteModal()">
                 <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
                     x-transition:enter-start="opacity-0 scale-95 translate-y-4"
@@ -164,8 +146,7 @@
                     x-transition:leave="ease-in-out duration-200"
                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-                    class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden" @click.stop>
-
+                    class="w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden" @click.stop>
                     <div class="px-6 py-5">
                         <div class="flex flex-col items-center gap-2">
                             <div class="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center">
@@ -178,7 +159,6 @@
                             <h3 class="text-xl text-center font-bold text-blue-900">Hapus RBAC Permission</h3>
                         </div>
                     </div>
-
                     <div class="px-6 py-3">
                         <p class="text-sm text-center text-slate-600">
                             Apakah Anda yakin ingin menghapus permission
@@ -188,7 +168,6 @@
                             Tindakan ini tidak dapat dibatalkan.
                         </p>
                     </div>
-
                     <div class="flex items-center justify-center gap-3 px-6 py-4">
                         <button type="button" @click="closeDeleteModal()"
                             class="px-12 py-2 rounded-lg border border-blue-300 text-blue-700 font-semibold hover:bg-blue-100 transition-colors">
@@ -202,16 +181,12 @@
                 </div>
             </div>
         </div>
-
-        {{-- Edit Modal --}}
         <div x-show="showEditModal" x-cloak class="fixed inset-0 z-50" role="dialog" aria-modal="true"
             @keydown.escape.window="closeEditModal()">
-
             <div x-show="showEditModal" x-transition:enter="ease-in-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                 x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500/75" @click="closeEditModal()"></div>
-
             <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeEditModal()">
                 <div x-show="showEditModal" x-transition:enter="ease-in-out duration-300"
                     x-transition:enter-start="opacity-0 scale-95 translate-y-4"
@@ -219,10 +194,9 @@
                     x-transition:leave="ease-in-out duration-200"
                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-                    class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden my-8" @click.stop>
-
-                    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-200">
-                        <h3 class="text-xl font-bold text-slate-900">Edit Permission</h3>
+                    class="w-full max-w-4xl bg-white rounded-lg shadow-xl overflow-hidden my-8" @click.stop>
+                    <div class="flex items-center justify-between px-8 py-3 border-b border-slate-200">
+                        <h3 class="text-xl font-bold text-gray-900">Edit Permission</h3>
                         <button type="button" @click="closeEditModal()" class="p-2 rounded-lg hover:bg-slate-100">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -230,48 +204,41 @@
                             </svg>
                         </button>
                     </div>
-
                     <form @submit.prevent="submitEdit()" id="editPermissionForm">
-                        <div class="px-8 py-6 space-y-6">
-
-                            <div x-show="editError" x-cloak class="p-4 bg-red-50 border border-red-200 rounded-xl">
+                        <div class="px-8 pt-1 pb-3 space-y-3">
+                            <div x-show="editError" x-cloak class="p-4 bg-red-50 border border-red-200 rounded-lg">
                                 <p class="text-sm font-semibold text-red-800" x-text="editError"></p>
                             </div>
-
                             <div x-show="editLoading" x-cloak class="text-center py-8">
                                 <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600">
                                 </div>
                                 <p class="mt-2 text-sm text-slate-500">Memuat data...</p>
                             </div>
-
                             <div x-show="!editLoading" x-cloak>
                                 <label for="edit_permission_name" class="block text-sm font-semibold text-slate-900 mb-2">
                                     Nama Permission <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" id="edit_permission_name" x-model="editForm.permission_name"
                                     required placeholder="Masukkan Nama Permission"
-                                    class="w-full h-14 rounded-xl border border-slate-200 px-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                             </div>
                         </div>
-
-                        <div class="flex items-center justify-end gap-3 px-8 py-6 border-t border-slate-200 bg-white">
+                        <div class="flex items-center justify-end gap-3 px-8 py-3 border-t border-gray-100 bg-white">
                             <button type="button" @click="closeEditModal()"
-                                class="h-12 px-6 rounded-xl border border-indigo-500 text-indigo-600 font-semibold hover:bg-indigo-50">
+                                class="h-10 px-6 rounded-lg border border-indigo-500 text-indigo-600 font-semibold hover:bg-indigo-50">
                                 Batal
                             </button>
                             <button type="submit" :disabled="editSubmitting || editLoading"
-                                class="h-12 px-6 rounded-xl bg-indigo-700 text-white font-semibold hover:bg-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                                class="h-10 px-6 rounded-lg bg-indigo-700 text-white font-semibold hover:bg-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <span x-show="!editSubmitting">Update</span>
                                 <span x-show="editSubmitting" x-cloak>Menyimpan...</span>
                             </button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
     </div>
-
     <script>
         function permissionData() {
             return {
@@ -296,19 +263,16 @@
                     id: null,
                     name: ''
                 },
-
                 filteredPermissions() {
                     if (!this.searchQuery.trim()) {
                         return this.allPermissions;
                     }
-
                     const query = this.searchQuery.toLowerCase();
                     return this.allPermissions.filter(permission => {
                         return permission.permission_name && permission.permission_name.toLowerCase().includes(
                             query);
                     });
                 },
-
                 openCreateModal() {
                     this.createForm = {
                         permission_name: '',
@@ -316,7 +280,6 @@
                     this.createError = '';
                     this.showCreateModal = true;
                 },
-
                 closeCreateModal() {
                     this.showCreateModal = false;
                     this.createForm = {
@@ -324,11 +287,9 @@
                     };
                     this.createError = '';
                 },
-
                 async submitCreate() {
                     this.createSubmitting = true;
                     this.createError = '';
-
                     try {
                         const response = await fetch('{{ route('permissions.store') }}', {
                             method: 'POST',
@@ -341,9 +302,7 @@
                                 permission_name: this.createForm.permission_name,
                             })
                         });
-
                         const data = await response.json();
-
                         if (response.ok && data.success) {
                             window.location.reload();
                         } else {
@@ -361,7 +320,6 @@
                         this.createSubmitting = false;
                     }
                 },
-
                 async openEditModal(permissionId) {
                     this.showEditModal = true;
                     this.editLoading = true;
@@ -370,16 +328,13 @@
                         id: permissionId,
                         permission_name: '',
                     };
-
                     try {
                         const response = await fetch(`/permissions/${permissionId}`, {
                             headers: {
                                 'Accept': 'application/json',
                             }
                         });
-
                         const data = await response.json();
-
                         if (response.ok) {
                             this.editForm.permission_name = data.permission.permission_name;
                         } else {
@@ -392,7 +347,6 @@
                         this.editLoading = false;
                     }
                 },
-
                 closeEditModal() {
                     this.showEditModal = false;
                     this.editForm = {
@@ -401,11 +355,9 @@
                     };
                     this.editError = '';
                 },
-
                 async submitEdit() {
                     this.editSubmitting = true;
                     this.editError = '';
-
                     try {
                         const response = await fetch(`/permissions/${this.editForm.id}`, {
                             method: 'PUT',
@@ -418,9 +370,7 @@
                                 permission_name: this.editForm.permission_name,
                             })
                         });
-
                         const data = await response.json();
-
                         if (response.ok && data.success) {
                             window.location.reload();
                         } else {
@@ -438,7 +388,6 @@
                         this.editSubmitting = false;
                     }
                 },
-
                 async deletePermission(permissionId, permissionName) {
                     this.deleteData = {
                         id: permissionId,
@@ -446,7 +395,6 @@
                     };
                     this.showDeleteModal = true;
                 },
-
                 closeDeleteModal() {
                     this.showDeleteModal = false;
                     this.deleteData = {
@@ -454,7 +402,6 @@
                         name: ''
                     };
                 },
-
                 async confirmDelete() {
                     try {
                         const response = await fetch(`/permissions/${this.deleteData.id}`, {
@@ -465,9 +412,7 @@
                                 'Accept': 'application/json',
                             }
                         });
-
                         const data = await response.json();
-
                         if (response.ok && data.success) {
                             window.location.reload();
                         } else {
@@ -483,7 +428,6 @@
             };
         }
     </script>
-
     <style>
         [x-cloak] {
             display: none !important;
