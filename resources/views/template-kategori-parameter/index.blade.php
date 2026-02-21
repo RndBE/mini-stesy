@@ -63,18 +63,22 @@
                                 <td class="px-4 py-3">
                                     <div class="flex items-center justify-center gap-2">
                                         <button type="button" @click='openEditModal(@json($editPayload))'
-                                            class="inline-flex items-center rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100">
-                                            Edit
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 text-slate-950 hover:bg-slate-200 transition-colors"
+                                            title="Edit">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
                                         </button>
-                                        <form action="{{ route('template-kategori-parameter.destroy', $item) }}"
-                                            method="POST" onsubmit="return confirm('Hapus template parameter ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="inline-flex items-center rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100">
-                                                Hapus
-                                            </button>
-                                        </form>
+                                        <button type="button"
+                                            @click="openDeleteModal({{ $item->id }}, '{{ addslashes(($item->kategori?->nama_kategori ?? '') . ' - ' . ($item->listParameter?->nama_parameter ?? '')) }}')"
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-slate-950 hover:bg-red-200 transition-colors"
+                                            title="Hapus">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -364,6 +368,60 @@
                 </div>
             </div>
         </div>
+
+        <div x-cloak x-show="showDeleteModal" class="fixed inset-0 z-50" role="dialog" aria-modal="true"
+            @keydown.escape.window="closeDeleteModal()">
+
+            <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in-out duration-200" x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500/75" @click="closeDeleteModal()">
+            </div>
+
+            <div class="fixed inset-0 flex items-center justify-center p-4" @click="closeDeleteModal()">
+                <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="ease-in-out duration-200"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                    class="w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden" @click.stop>
+
+                    <div class="px-6 py-5">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center">
+                                <svg class="w-14 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl text-center font-bold text-blue-900">Hapus Template Parameter</h3>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-3">
+                        <p class="text-sm text-center text-slate-600">
+                            Anda yakin ingin menghapus template
+                            <span class="font-semibold text-slate-900" x-text="deleteData.name"></span>?
+                        </p>
+                        <p class="mt-1 text-sm text-center text-red-600 font-medium">
+                            Tindakan ini tidak dapat dibatalkan.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-center gap-3 px-6 py-3">
+                        <button type="button" @click="closeDeleteModal()"
+                            class="px-12 py-2 rounded-lg border border-blue-300 text-blue-700 font-semibold hover:bg-blue-100 transition-colors">
+                            Batal
+                        </button>
+                        <button type="button" @click="confirmDelete()"
+                            class="px-12 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors">
+                            Hapus
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -377,6 +435,7 @@
                 baseUrl: @json(url('template-kategori-parameter')),
                 showCreateModal: hasErrors && oldFormMode === 'create',
                 showEditModal: hasErrors && oldFormMode === 'edit',
+                showDeleteModal: false,
                 editData: {
                     id: @json(old('item_id')),
                     id_katlogger: @json(old('form_mode') === 'edit' ? (string) old('id_katlogger', '') : ''),
@@ -385,6 +444,10 @@
                     kolom_sensor_default: @json(old('form_mode') === 'edit' ? old('kolom_sensor_default') : ''),
                     satuan_override: @json(old('form_mode') === 'edit' ? old('satuan_override') : ''),
                     parameter_group_id: @json(old('form_mode') === 'edit' ? (string) old('parameter_group_id', '') : ''),
+                },
+                deleteData: {
+                    id: null,
+                    name: '',
                 },
                 openCreateModal() {
                     this.showCreateModal = true;
@@ -409,6 +472,34 @@
                 },
                 updateAction() {
                     return `${this.baseUrl}/${this.editData.id}`;
+                },
+                openDeleteModal(id, name) {
+                    this.deleteData = { id, name };
+                    this.showDeleteModal = true;
+                },
+                closeDeleteModal() {
+                    this.showDeleteModal = false;
+                    this.deleteData = { id: null, name: '' };
+                },
+                confirmDelete() {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `${this.baseUrl}/${this.deleteData.id}`;
+
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
+                    form.appendChild(csrfToken);
+
+                    const methodField = document.createElement('input');
+                    methodField.type = 'hidden';
+                    methodField.name = '_method';
+                    methodField.value = 'DELETE';
+                    form.appendChild(methodField);
+
+                    document.body.appendChild(form);
+                    form.submit();
                 },
             };
         }
