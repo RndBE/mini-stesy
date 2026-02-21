@@ -699,8 +699,7 @@
                 <div class="grid grid-cols-1 gap-3">
                     <div class="">
                         <div class="text-md font-semibold mb-2 ">Pilih Logger</div>
-                        <select id="loggerSelect"
-                            class="calendar-input text-sm py-2 border border-slate-300 rounded-lg mb-3">
+                        <select id="loggerSelect" class="calendar-input text-sm py-2 border border-slate-300 rounded-lg">
                             @foreach ($allLoggers as $l)
                                 <option value="{{ $l->id_logger }}"
                                     {{ $logger->id_logger == $l->id_logger ? 'selected' : '' }}>
@@ -708,7 +707,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <div class="text-md font-semibold mb-2 ">Parameter</div>
+                        <div class="text-md font-semibold mb-2 mt-3">Parameter</div>
                         <select id="parameterSelect"
                             class="calendar-input text-sm py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700">
                             <option value="">Pilih Parameter</option>
@@ -729,7 +728,7 @@
 
                             <div class="relative w-full" id="dpWrap">
                                 <input type="text" id="dateInput"
-                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-blue-950 shadow-lg shadow-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
+                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
                                     value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" autocomplete="off" />
 
                                 <button type="button" id="dpBtn"
@@ -819,7 +818,7 @@
 
                             <div class="relative w-full" id="mpWrap">
                                 <input type="text" id="monthInputText"
-                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-blue-950 shadow-lg shadow-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
+                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
                                     value="" placeholder="Bulan Tahun" autocomplete="off" readonly />
                                 <button type="button" id="mpBtn"
                                     class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
@@ -862,7 +861,7 @@
 
                             <div class="relative w-full" id="ypWrap">
                                 <input type="text" id="yearInputText"
-                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-blue-950 shadow-lg shadow-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
+                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
                                     value="" placeholder="Tahun" autocomplete="off" readonly />
                                 <button type="button" id="ypBtn"
                                     class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
@@ -901,7 +900,7 @@
 
                             <div class="relative w-full" id="rpWrap">
                                 <input type="text" id="rangeText"
-                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-blue-950 shadow-lg shadow-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
+                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
                                     value="" placeholder="YYYY/MM/DD - YYYY/MM/DD" autocomplete="off" readonly />
                                 <button type="button" id="rpBtn"
                                     class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
@@ -1171,6 +1170,20 @@
                         window.location.href = '{{ url('/analisa') }}/' + selectedId;
                     }
                 });
+
+                $('#parameterSelect').select2({
+                    width: '100%',
+                    placeholder: 'Cari parameter...',
+                    allowClear: false,
+                    language: {
+                        searching: function() {
+                            return 'Mencari...';
+                        },
+                        noResults: function() {
+                            return 'Parameter tidak ditemukan';
+                        },
+                    }
+                });
             }
 
             initChart();
@@ -1182,7 +1195,12 @@
                 const paramSelect = document.getElementById('parameterSelect');
                 if (paramSelect) {
                     paramSelect.value = paramFromUrl;
-                    loadData();
+                    if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined' && $('#parameterSelect')
+                        .data('select2')) {
+                        $('#parameterSelect').trigger('change');
+                    } else {
+                        paramSelect.dispatchEvent(new Event('change'));
+                    }
                 }
             }
             document.getElementById('dateInput').addEventListener('change', () => {
@@ -1497,7 +1515,8 @@
         }
 
         function hasAnyDataPayload(data) {
-            return hasAnyRealValue(data && data.chartData) || hasAnyRealValue(data && data.minData) || hasAnyRealValue(data && data.maxData);
+            return hasAnyRealValue(data && data.chartData) || hasAnyRealValue(data && data.minData) || hasAnyRealValue(
+                data && data.maxData);
         }
 
         function getSelectedUnit() {
@@ -2623,9 +2642,9 @@
 
                 document.addEventListener('click', (e) => {
                     const path = typeof e.composedPath === 'function' ? e.composedPath() : []
-                    const isInside = path.length
-                        ? (path.includes(wrap) || path.includes(panel))
-                        : (wrap.contains(e.target) || panel.contains(e.target))
+                    const isInside = path.length ?
+                        (path.includes(wrap) || path.includes(panel)) :
+                        (wrap.contains(e.target) || panel.contains(e.target))
                     if (!isInside) {
                         closePanel()
                     }
