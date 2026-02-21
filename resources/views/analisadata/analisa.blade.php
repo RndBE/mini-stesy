@@ -1,11 +1,73 @@
 @extends('layouts.app')
 @section('title', $title)
 @push('head')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        /* ── Select2 Tailwind-style override ── */
+        .select2-container--default .select2-selection--single {
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            height: 36px;
+            padding: 0 8px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            transition: border-color .15s, box-shadow .15s;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px;
+            top: 0;
+            right: 6px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 36px;
+            padding: 0 4px;
+            color: #374151;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: #1d4ed8;
+            box-shadow: 0 0 0 4px rgba(147, 197, 253, .4);
+            outline: none;
+        }
+
+        .select2-dropdown {
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .10);
+            font-size: 0.875rem;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid #cbd5e1;
+            border-radius: 0.375rem;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(147, 197, 253, .4);
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #303481;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: #e9eafb;
+            color: #303481;
+            font-weight: 600;
+        }
+    </style>
     <style>
         .analysis-container {
             width: 100%;
             background: white;
-            overflow: hidden;
         }
 
         .section-label {
@@ -578,8 +640,7 @@
     <div class="flex items-center justify-between mb-2">
         <div class="flex items-center mb-3">
 
-            <button type="button"
-                onclick="window.history.length > 1 ? window.history.back() : window.location.href='{{ route('peta.lokasi') }}'"
+            <button type="button" onclick="window.location.href='{{ route('peta.lokasi') }}'"
                 class="inline-flex items-center justify-center" aria-label="Kembali">
                 <svg width="8" height="20" viewBox="0 0 10 20" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
@@ -637,9 +698,19 @@
             <div class="border rounded-lg px-4 py-3">
                 <div class="grid grid-cols-1 gap-3">
                     <div class="">
+                        <div class="text-md font-semibold mb-2 ">Pilih Logger</div>
+                        <select id="loggerSelect"
+                            class="calendar-input text-sm py-2 border border-slate-300 rounded-lg mb-3">
+                            @foreach ($allLoggers as $l)
+                                <option value="{{ $l->id_logger }}"
+                                    {{ $logger->id_logger == $l->id_logger ? 'selected' : '' }}>
+                                    {{ $l->id_logger }} - {{ $l->nama_logger ?? 'Logger' }}
+                                </option>
+                            @endforeach
+                        </select>
                         <div class="text-md font-semibold mb-2 ">Parameter</div>
                         <select id="parameterSelect"
-                            class="calendar-input text-sm py-2  border border-slate-300 rounded-lg">
+                            class="calendar-input text-sm py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700">
                             <option value="">Pilih Parameter</option>
                             @foreach ($parameters as $param)
                                 <option value="{{ $param['nama_parameter'] }}" data-unit="{{ $param['satuan'] ?? '' }}">
@@ -653,33 +724,332 @@
                             <label><input type="radio" name="range" value="year"> Tahun</label>
                             <label><input type="radio" name="range" value="custom"> Rentang</label>
                         </div>
-                        <div id="rangeDay" class="range-input-group rounded-lg" style="display: block;">
+                        <div id="rangeDay" class="range-input-group rounded-lg" style="display:block;">
                             <div class="text-md font-semibold mb-2">Tanggal</div>
-                            <input type="date" id="dateInput"
-                                class="calendar-input text-sm py-2 rounded-lg border border-slate-300"
-                                value="{{ date('Y-m-d') }}">
+
+                            <div class="relative w-full" id="dpWrap">
+                                <input type="text" id="dateInput"
+                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-blue-950 shadow-lg shadow-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
+                                    value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" autocomplete="off" />
+
+                                <button type="button" id="dpBtn"
+                                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+
+                                <div id="dpPanel"
+                                    class="fixed w-[320px] rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-[9999] hidden">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <button type="button" id="dpPrev"
+                                            class="h-8 w-8 rounded-lg border border-slate-50 hover:bg-slate-50 flex items-center justify-center">
+                                            <span class="text-slate-600">‹</span>
+                                        </button>
+
+                                        <div class="flex items-center gap-2">
+                                            <div
+                                                class="h-8 rounded-full border border-slate-200 bg-slate-100 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 inline-flex items-center gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                            <div class="relative">
+                                                <button type="button" id="dpMonthBtn"
+                                                    class="h-8 rounded-full border border-slate-200 bg-slate-100 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 inline-flex items-center gap-2">
+                                                    <span id="dpMonthLabel"></span>
+                                                    <svg width="12" height="12" viewBox="0 0 20 20"
+                                                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M5 7.5L10 12.5L15 7.5" stroke="#64748B" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round" />
+                                                    </svg>
+                                                </button>
+
+                                                <div id="dpMonthMenu"
+                                                    class="absolute left-0 mt-2 w-44 rounded-xl border border-slate-200 bg-white shadow-lg p-1 hidden z-50 max-h-64 overflow-auto">
+                                                    <div id="dpMonthItems" class="text-sm"></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="relative">
+                                                <button type="button" id="dpYearBtn"
+                                                    class="h-8 rounded-full border border-slate-200 bg-slate-100 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 inline-flex items-center gap-2">
+                                                    <span id="dpYearLabel"></span>
+                                                    <svg width="12" height="12" viewBox="0 0 20 20"
+                                                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M5 7.5L10 12.5L15 7.5" stroke="#64748B" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round" />
+                                                    </svg>
+                                                </button>
+
+                                                <div id="dpYearMenu"
+                                                    class="absolute right-0 mt-2 w-28 rounded-xl border border-slate-200 bg-white shadow-lg p-1 hidden z-50 max-h-64 overflow-auto">
+                                                    <div id="dpYearItems" class="text-sm"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button type="button" id="dpNext"
+                                            class="h-8 w-8 rounded-lg border border-slate-50 hover:bg-slate-50 flex items-center justify-center">
+                                            <span class="text-slate-600">›</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="mt-3 grid grid-cols-7 text-center text-xs font-semibold text-slate-500">
+                                        <div>Min</div>
+                                        <div>Sen</div>
+                                        <div>Sel</div>
+                                        <div>Rab</div>
+                                        <div>Kam</div>
+                                        <div>Jum</div>
+                                        <div>Sab</div>
+                                    </div>
+
+                                    <div id="dpGrid" class="mt-2 grid grid-cols-7 gap-1"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div id="rangeMonth" class="range-input-group" style="display: none;">
-                            <div class="text-md font-semibold mb-2">Bulan-Tahun</div>
-                            <input type="month" id="monthInput"
-                                class="calendar-input text-sm py-2 rounded-lg border border-slate-300"
-                                value="{{ date('Y-m') }}">
+                        <div id="rangeMonth" class="range-input-group" style="display:none;">
+                            <div class="text-md font-semibold mb-2">Bulan</div>
+
+                            <div class="relative w-full" id="mpWrap">
+                                <input type="text" id="monthInputText"
+                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-blue-950 shadow-lg shadow-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
+                                    value="" placeholder="Bulan Tahun" autocomplete="off" readonly />
+                                <button type="button" id="mpBtn"
+                                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+
+                                <input type="hidden" id="monthInput" value="{{ date('Y-m') }}" />
+
+                                <div id="mpPanel"
+                                    class="fixed w-[320px] rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-[9999] hidden">
+                                    <div class="flex items-center justify-center">
+                                        <div class="relative">
+                                            <button type="button" id="mpYearBtn"
+                                                class="h-7 rounded-full bg-slate-100 px-4 text-xs font-semibold text-slate-700 inline-flex items-center gap-2 hover:bg-slate-200">
+                                                <span id="mpYearLabel"></span>
+                                                <svg width="12" height="12" viewBox="0 0 20 20" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M5 7.5L10 12.5L15 7.5" stroke="#64748B" stroke-width="2"
+                                                        stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            </button>
+
+                                            <div id="mpYearMenu"
+                                                class="absolute left-1/2 -translate-x-1/2 mt-2 w-28 rounded-xl border border-slate-200 bg-white shadow-lg p-1 hidden z-50 max-h-64 overflow-auto">
+                                                <div id="mpYearItems" class="text-sm"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="mpGrid" class="mt-4 grid grid-cols-3 gap-2"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div id="rangeYear" class="range-input-group" style="display: none;">
+                        <div id="rangeYear" class="range-input-group" style="display:none;">
                             <div class="text-md font-semibold mb-2">Tahun</div>
-                            <input type="number" id="yearInput"
-                                class="calendar-input text-sm py-2 rounded-lg border border-slate-300" min="2000"
-                                max="2100" value="{{ date('Y') }}">
+
+                            <div class="relative w-full" id="ypWrap">
+                                <input type="text" id="yearInputText"
+                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-blue-950 shadow-lg shadow-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
+                                    value="" placeholder="Tahun" autocomplete="off" readonly />
+                                <button type="button" id="ypBtn"
+                                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+
+                                <input type="hidden" id="yearInput" value="{{ date('Y') }}" />
+
+                                <div id="ypPanel"
+                                    class="fixed w-[320px] rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-[9999] hidden">
+                                    <div class="flex items-center justify-between">
+                                        <button type="button" id="ypPrev"
+                                            class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">
+                                            <span class="text-slate-600">‹</span>
+                                        </button>
+
+                                        <div class="text-xs font-semibold text-slate-700 bg-slate-100 rounded-full px-4 py-1"
+                                            id="ypRangeLabel"></div>
+
+                                        <button type="button" id="ypNext"
+                                            class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">
+                                            <span class="text-slate-600">›</span>
+                                        </button>
+                                    </div>
+
+                                    <div id="ypGrid" class="mt-4 grid grid-cols-3 gap-2"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div id="rangeCustom" class="range-input-group" style="display: none;">
-                            <div class="text-md font-semibold mb-2">Tanggal Mulai</div>
-                            <input type="datetime-local" id="startDateTime"
-                                class="calendar-input text-sm py-2 rounded-lg border border-slate-300"
-                                value="{{ date('Y-m-d\TH:i') }}">
-                            <div class="text-md font-semibold mb-2" style="margin-top: 12px;">Tanggal Akhir</div>
-                            <input type="datetime-local" id="endDateTime"
-                                class="calendar-input text-sm py-2 rounded-lg border border-slate-300"
-                                value="{{ date('Y-m-d\TH:i') }}">
+                        <div id="rangeCustom" class="range-input-group" style="display:none;">
+                            <div class="text-md font-semibold mb-2">Rentang</div>
+
+                            <div class="relative w-full" id="rpWrap">
+                                <input type="text" id="rangeText"
+                                    class="calendar-input text-sm py-2 rounded-lg pr-10 border border-blue-950 shadow-lg shadow-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
+                                    value="" placeholder="YYYY/MM/DD - YYYY/MM/DD" autocomplete="off" readonly />
+                                <button type="button" id="rpBtn"
+                                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+
+                                <input type="hidden" id="startDateTime" value="{{ date('Y-m-d\T00:00') }}">
+                                <input type="hidden" id="endDateTime" value="{{ date('Y-m-d\T23:59') }}">
+
+                                <div id="rpPanel"
+                                    class="fixed w-[640px] rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-[9999] hidden">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex-1">
+                                            <div id="rpStartBox"
+                                                class="h-9 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-sm text-slate-700">
+                                            </div>
+                                        </div>
+                                        <div class="w-8 flex items-center justify-center text-slate-700">→</div>
+                                        <div class="flex-1">
+                                            <div id="rpEndBox"
+                                                class="h-9 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-sm text-slate-700">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-2 text-center text-xs text-slate-600">
+                                        <span id="rpDays">0 hari</span>
+                                    </div>
+
+                                    <div class="mt-3 grid grid-cols-2 gap-4">
+                                        <div class="rounded-xl border border-slate-200 p-3">
+                                            <div class="flex items-center justify-between">
+                                                <button type="button" id="rpPrev"
+                                                    class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">‹</button>
+
+                                                <div class="flex items-center gap-2">
+                                                    <div class="relative">
+                                                        <button type="button" id="rpMonthBtnL"
+                                                            class="h-7 rounded-full bg-slate-100 px-3 text-xs font-semibold text-slate-700 inline-flex items-center gap-2 hover:bg-slate-200">
+                                                            <span id="rpMonthLabelL"></span>
+                                                            <svg width="12" height="12" viewBox="0 0 20 20"
+                                                                fill="none">
+                                                                <path d="M5 7.5L10 12.5L15 7.5" stroke="#64748B"
+                                                                    stroke-width="2" stroke-linecap="round"
+                                                                    stroke-linejoin="round" />
+                                                            </svg>
+                                                        </button>
+                                                        <div id="rpMonthMenuL"
+                                                            class="absolute left-1/2 -translate-x-1/2 mt-2 w-44 rounded-xl border border-slate-200 bg-white shadow-lg p-1 hidden z-50 max-h-64 overflow-auto">
+                                                            <div id="rpMonthItemsL" class="text-sm"></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="relative">
+                                                        <button type="button" id="rpYearBtnL"
+                                                            class="h-7 rounded-full bg-slate-100 px-3 text-xs font-semibold text-slate-700 inline-flex items-center gap-2 hover:bg-slate-200">
+                                                            <span id="rpYearLabelL"></span>
+                                                            <svg width="12" height="12" viewBox="0 0 20 20"
+                                                                fill="none">
+                                                                <path d="M5 7.5L10 12.5L15 7.5" stroke="#64748B"
+                                                                    stroke-width="2" stroke-linecap="round"
+                                                                    stroke-linejoin="round" />
+                                                            </svg>
+                                                        </button>
+                                                        <div id="rpYearMenuL"
+                                                            class="absolute left-1/2 -translate-x-1/2 mt-2 w-28 rounded-xl border border-slate-200 bg-white shadow-lg p-1 hidden z-50 max-h-64 overflow-auto">
+                                                            <div id="rpYearItemsL" class="text-sm"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <button type="button" id="rpNext"
+                                                    class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">›</button>
+                                            </div>
+
+                                            <div class="mt-3 grid grid-cols-7 gap-1 text-xs text-slate-500">
+                                                <div class="text-center">Sen</div>
+                                                <div class="text-center">Sel</div>
+                                                <div class="text-center">Rab</div>
+                                                <div class="text-center">Kam</div>
+                                                <div class="text-center">Jum</div>
+                                                <div class="text-center">Sab</div>
+                                                <div class="text-center">Min</div>
+                                            </div>
+                                            <div id="rpGridL" class="mt-2 grid grid-cols-7 gap-1"></div>
+                                        </div>
+
+                                        <div class="rounded-xl border border-slate-200 p-3">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <div class="relative">
+                                                    <button type="button" id="rpMonthBtnR"
+                                                        class="h-7 rounded-full bg-slate-100 px-3 text-xs font-semibold text-slate-700 inline-flex items-center gap-2 hover:bg-slate-200">
+                                                        <span id="rpMonthLabelR"></span>
+                                                        <svg width="12" height="12" viewBox="0 0 20 20"
+                                                            fill="none">
+                                                            <path d="M5 7.5L10 12.5L15 7.5" stroke="#64748B"
+                                                                stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round" />
+                                                        </svg>
+                                                    </button>
+                                                    <div id="rpMonthMenuR"
+                                                        class="absolute left-1/2 -translate-x-1/2 mt-2 w-44 rounded-xl border border-slate-200 bg-white shadow-lg p-1 hidden z-50 max-h-64 overflow-auto">
+                                                        <div id="rpMonthItemsR" class="text-sm"></div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="relative">
+                                                    <button type="button" id="rpYearBtnR"
+                                                        class="h-7 rounded-full bg-slate-100 px-3 text-xs font-semibold text-slate-700 inline-flex items-center gap-2 hover:bg-slate-200">
+                                                        <span id="rpYearLabelR"></span>
+                                                        <svg width="12" height="12" viewBox="0 0 20 20"
+                                                            fill="none">
+                                                            <path d="M5 7.5L10 12.5L15 7.5" stroke="#64748B"
+                                                                stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round" />
+                                                        </svg>
+                                                    </button>
+                                                    <div id="rpYearMenuR"
+                                                        class="absolute left-1/2 -translate-x-1/2 mt-2 w-28 rounded-xl border border-slate-200 bg-white shadow-lg p-1 hidden z-50 max-h-64 overflow-auto">
+                                                        <div id="rpYearItemsR" class="text-sm"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-3 grid grid-cols-7 gap-1 text-xs text-slate-500">
+                                                <div class="text-center">Sen</div>
+                                                <div class="text-center">Sel</div>
+                                                <div class="text-center">Rab</div>
+                                                <div class="text-center">Kam</div>
+                                                <div class="text-center">Jum</div>
+                                                <div class="text-center">Sab</div>
+                                                <div class="text-center">Min</div>
+                                            </div>
+                                            <div id="rpGridR" class="mt-2 grid grid-cols-7 gap-1"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4 flex items-center justify-end gap-3 border-t border-slate-200 pt-3">
+                                        <button type="button" id="rpCancel"
+                                            class="h-9 px-5 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50">Batal</button>
+                                        <button type="button" id="rpApply"
+                                            class="h-9 px-5 rounded-lg bg-[#303481] text-white text-sm font-semibold hover:bg-[#10134B]">Terapkan</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-3">
@@ -772,12 +1142,36 @@
     </div>
 @endsection
 @push('scripts')
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script>
         let chart = null;
         const loggerId = '{{ $logger->id_logger }}';
         document.addEventListener('DOMContentLoaded', function() {
+            // Init Select2 untuk dropdown logger
+            if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
+                $('#loggerSelect').select2({
+                    width: '100%',
+                    placeholder: 'Cari ID/Nama logger...',
+                    allowClear: false,
+                    language: {
+                        searching: function() {
+                            return 'Mencari...';
+                        },
+                        noResults: function() {
+                            return 'Logger tidak ditemukan';
+                        },
+                    }
+                }).on('change', function() {
+                    const selectedId = $(this).val();
+                    if (selectedId) {
+                        window.location.href = '{{ url('/analisa') }}/' + selectedId;
+                    }
+                });
+            }
+
             initChart();
             updateChartTitle();
             setupRangeInputs();
@@ -1393,5 +1787,846 @@
                 }
             });
         }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Helper: posisikan panel fixed di bawah trigger wrap
+            function positionPanel(anchorWrap, panel) {
+                const rect = anchorWrap.getBoundingClientRect();
+                // Ukur dimensi panel: sementara buat invisible untuk bisa mengukur
+                const wasHidden = panel.classList.contains('hidden');
+                if (wasHidden) {
+                    panel.style.visibility = 'hidden';
+                    panel.classList.remove('hidden');
+                }
+                const panelWidth = panel.offsetWidth || 320;
+                const panelH = panel.offsetHeight || 400;
+                if (wasHidden) {
+                    panel.classList.add('hidden');
+                    panel.style.visibility = '';
+                }
+                const winW = window.innerWidth;
+                const winH = window.innerHeight;
+                let top = rect.bottom + 8;
+                let left = rect.left;
+                // Jangan sampai keluar batas kanan layar
+                if (left + panelWidth > winW - 8) {
+                    left = winW - panelWidth - 8;
+                }
+                if (left < 8) left = 8;
+                // Jika tidak muat di bawah, tampilkan di atas
+                if (top + panelH > winH - 8) {
+                    top = rect.top - panelH - 8;
+                    if (top < 8) top = 8;
+                }
+                panel.style.top = top + 'px';
+                panel.style.left = left + 'px';
+            }
+
+            // =========================
+            // 1) DATE PICKER (HARI) - KODE KAMU (dpWrap)
+            // =========================
+            const wrap = document.getElementById('dpWrap')
+            const input = document.getElementById('dateInput')
+            const btn = document.getElementById('dpBtn')
+            const panel = document.getElementById('dpPanel')
+            const grid = document.getElementById('dpGrid')
+
+            const prevBtn = document.getElementById('dpPrev')
+            const nextBtn = document.getElementById('dpNext')
+
+            const monthBtn = document.getElementById('dpMonthBtn')
+            const yearBtn = document.getElementById('dpYearBtn')
+            const monthLabel = document.getElementById('dpMonthLabel')
+            const yearLabel = document.getElementById('dpYearLabel')
+            const monthMenu = document.getElementById('dpMonthMenu')
+            const yearMenu = document.getElementById('dpYearMenu')
+            const monthItems = document.getElementById('dpMonthItems')
+            const yearItems = document.getElementById('dpYearItems')
+
+            if (wrap && input && panel && grid) {
+                const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
+                    'September', 'Oktober', 'November', 'Desember'
+                ]
+
+                function pad(n) {
+                    return String(n).padStart(2, '0')
+                }
+
+                function fmt(y, m, d) {
+                    return `${y}-${pad(m+1)}-${pad(d)}`
+                }
+
+                function parseInputToDate(v) {
+                    const s = String(v || '').trim()
+                    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+                    if (!m) return null
+                    const y = Number(m[1]),
+                        mo = Number(m[2]) - 1,
+                        d = Number(m[3])
+                    const dt = new Date(y, mo, d)
+                    if (dt.getFullYear() !== y || dt.getMonth() !== mo || dt.getDate() !== d) return null
+                    return dt
+                }
+
+                function closeMenus() {
+                    monthMenu?.classList.add('hidden')
+                    yearMenu?.classList.add('hidden')
+                }
+
+                function openPanel() {
+                    panel.classList.remove('hidden')
+                    positionPanel(wrap, panel)
+                    closeMenus()
+                    render()
+                }
+
+                function closePanel() {
+                    panel.classList.add('hidden')
+                    closeMenus()
+                }
+
+                function togglePanel() {
+                    panel.classList.toggle('hidden')
+                    if (!panel.classList.contains('hidden')) {
+                        positionPanel(wrap, panel)
+                        closeMenus()
+                        render()
+                    }
+                }
+
+                let viewDate = parseInputToDate(input.value) || new Date()
+                let selectedDate = parseInputToDate(input.value)
+
+                function buildMonthItems() {
+                    if (!monthItems) return
+                    monthItems.innerHTML = ''
+                    monthNames.forEach((name, idx) => {
+                        const b = document.createElement('button')
+                        b.type = 'button'
+                        b.className =
+                            'w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 text-slate-700'
+                        b.textContent = name
+                        b.addEventListener('click', () => {
+                            viewDate = new Date(viewDate.getFullYear(), idx, 1)
+                            closeMenus()
+                            render()
+                        })
+                        monthItems.appendChild(b)
+                    })
+                }
+
+                function buildYearItems() {
+                    if (!yearItems) return
+                    const yNow = new Date().getFullYear()
+                    const yStart = yNow - 10
+                    const yEnd = yNow + 10
+                    yearItems.innerHTML = ''
+                    for (let y = yStart; y <= yEnd; y++) {
+                        const b = document.createElement('button')
+                        b.type = 'button'
+                        b.className = 'w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 text-slate-700'
+                        b.textContent = String(y)
+                        b.addEventListener('click', () => {
+                            viewDate = new Date(y, viewDate.getMonth(), 1)
+                            closeMenus()
+                            render()
+                        })
+                        yearItems.appendChild(b)
+                    }
+                }
+
+                function renderHeader() {
+                    const y = viewDate.getFullYear()
+                    const m = viewDate.getMonth()
+                    if (monthLabel) monthLabel.textContent = monthNames[m]
+                    if (yearLabel) yearLabel.textContent = String(y)
+                }
+
+                function renderGrid() {
+                    const y = viewDate.getFullYear()
+                    const m = viewDate.getMonth()
+                    const first = new Date(y, m, 1)
+                    const last = new Date(y, m + 1, 0)
+                    const daysInMonth = last.getDate()
+                    const dowMon0 = (first.getDay() + 6) % 7
+
+                    grid.innerHTML = ''
+
+                    for (let i = 0; i < dowMon0; i++) {
+                        const empty = document.createElement('div')
+                        empty.className = 'h-9'
+                        grid.appendChild(empty)
+                    }
+
+                    const today = new Date()
+                    const todayKey = fmt(today.getFullYear(), today.getMonth(), today.getDate())
+                    const selectedKey = selectedDate ? fmt(selectedDate.getFullYear(), selectedDate.getMonth(),
+                        selectedDate.getDate()) : null
+
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const key = fmt(y, m, d)
+                        const isSelected = selectedKey === key
+                        const isToday = todayKey === key
+
+                        const b = document.createElement('button')
+                        b.type = 'button'
+                        b.textContent = String(d)
+
+                        let cls = 'h-9 rounded-lg text-sm flex items-center justify-center hover:bg-slate-100'
+                        if (isToday) cls += ' ring-1 ring-blue-400'
+                        if (isSelected) cls += ' bg-[#303481] text-white hover:bg-[#10134B]'
+                        else cls += ' text-slate-700'
+                        b.className = cls
+
+                        b.addEventListener('click', () => {
+                            selectedDate = new Date(y, m, d)
+                            input.value = key
+                            input.dispatchEvent(new Event('change', {
+                                bubbles: true
+                            }))
+                            closePanel()
+                        })
+
+                        grid.appendChild(b)
+                    }
+                }
+
+                function render() {
+                    renderHeader()
+                    renderGrid()
+                }
+
+                buildMonthItems()
+                buildYearItems()
+                renderHeader()
+
+                btn?.addEventListener('click', togglePanel)
+                input.addEventListener('focus', openPanel)
+
+                monthBtn?.addEventListener('click', () => {
+                    if (panel.classList.contains('hidden')) openPanel()
+                    monthMenu.classList.toggle('hidden')
+                    yearMenu.classList.add('hidden')
+                })
+
+                yearBtn?.addEventListener('click', () => {
+                    if (panel.classList.contains('hidden')) openPanel()
+                    yearMenu.classList.toggle('hidden')
+                    monthMenu.classList.add('hidden')
+                })
+
+                prevBtn?.addEventListener('click', () => {
+                    viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1)
+                    render()
+                })
+
+                nextBtn?.addEventListener('click', () => {
+                    viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1)
+                    render()
+                })
+
+                document.addEventListener('click', (e) => {
+                    if (!wrap.contains(e.target)) closePanel()
+                })
+
+                input.addEventListener('change', () => {
+                    const dt = parseInputToDate(input.value)
+                    if (dt) {
+                        selectedDate = dt
+                        viewDate = new Date(dt.getFullYear(), dt.getMonth(), 1)
+                        render()
+                    }
+                })
+
+                monthMenu?.addEventListener('click', (e) => e.stopPropagation())
+                yearMenu?.addEventListener('click', (e) => e.stopPropagation())
+            }
+
+            // =========================
+            // 2) MONTH PICKER (BULAN) - mpWrap
+            // =========================
+            ;
+            (function initMonthPicker() {
+                const wrap = document.getElementById('mpWrap')
+                const btn = document.getElementById('mpBtn')
+                const panel = document.getElementById('mpPanel')
+                const grid = document.getElementById('mpGrid')
+                const yearBtn = document.getElementById('mpYearBtn')
+                const yearLabel = document.getElementById('mpYearLabel')
+                const yearMenu = document.getElementById('mpYearMenu')
+                const yearItems = document.getElementById('mpYearItems')
+                const inputHidden = document.getElementById('monthInput')
+                const inputText = document.getElementById('monthInputText')
+
+                if (!wrap || !btn || !panel || !grid || !yearBtn || !yearLabel || !yearMenu || !yearItems || !
+                    inputHidden || !inputText) return
+
+                const monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov',
+                    'Des'
+                ]
+                const monthLong = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
+                    'September', 'Oktober', 'November', 'Desember'
+                ]
+
+                const now = new Date()
+                const init = String(inputHidden.value || '').match(/^(\d{4})-(\d{2})$/)
+                let viewYear = init ? Number(init[1]) : now.getFullYear()
+                let selMonth = init ? Number(init[2]) - 1 : now.getMonth()
+
+                function pad(n) {
+                    return String(n).padStart(2, '0')
+                }
+
+                function setText() {
+                    inputText.value = `${monthLong[selMonth]} ${viewYear}`
+                }
+
+                function buildYearMenu() {
+                    const yNow = new Date().getFullYear()
+                    const yStart = yNow - 10
+                    const yEnd = yNow + 10
+                    yearItems.innerHTML = ''
+                    for (let y = yStart; y <= yEnd; y++) {
+                        const b = document.createElement('button')
+                        b.type = 'button'
+                        b.className = 'w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 text-slate-700'
+                        b.textContent = String(y)
+                        b.addEventListener('click', () => {
+                            viewYear = y
+                            yearLabel.textContent = String(viewYear)
+                            yearMenu.classList.add('hidden')
+                            renderGrid()
+                        })
+                        yearItems.appendChild(b)
+                    }
+                }
+
+                function renderGrid() {
+                    yearLabel.textContent = String(viewYear)
+                    grid.innerHTML = ''
+                    for (let m = 0; m < 12; m++) {
+                        const b = document.createElement('button')
+                        b.type = 'button'
+                        b.textContent = monthShort[m]
+                        b.className = [
+                            'h-9 rounded-lg text-sm font-medium flex items-center justify-center',
+                            m === selMonth ? 'bg-[#303481] text-white' : 'text-slate-700 hover:bg-slate-100'
+                        ].join(' ')
+                        b.addEventListener('click', () => {
+                            selMonth = m
+                            inputHidden.value = `${viewYear}-${pad(selMonth+1)}`
+                            setText()
+                            inputHidden.dispatchEvent(new Event('change', {
+                                bubbles: true
+                            }))
+                            panel.classList.add('hidden')
+                        })
+                        grid.appendChild(b)
+                    }
+                }
+
+                function openPanel() {
+                    panel.classList.remove('hidden')
+                    positionPanel(wrap, panel)
+                    yearMenu.classList.add('hidden')
+                    renderGrid()
+                }
+
+                btn.addEventListener('click', () => {
+                    panel.classList.toggle('hidden')
+                    if (!panel.classList.contains('hidden')) {
+                        positionPanel(wrap, panel)
+                        yearMenu.classList.add('hidden')
+                        renderGrid()
+                    }
+                })
+
+                inputText.addEventListener('focus', openPanel)
+
+                yearBtn.addEventListener('click', (e) => {
+                    e.stopPropagation()
+                    yearMenu.classList.toggle('hidden')
+                })
+
+                document.addEventListener('click', (e) => {
+                    if (!wrap.contains(e.target)) {
+                        panel.classList.add('hidden')
+                        yearMenu.classList.add('hidden')
+                    }
+                })
+
+                yearMenu.addEventListener('click', (e) => e.stopPropagation())
+
+                buildYearMenu()
+                setText()
+            })()
+
+            // =========================
+            // 3) YEAR PICKER (TAHUN) - ypWrap
+            // =========================
+            ;
+            (function initYearPicker() {
+                const wrap = document.getElementById('ypWrap')
+                const btn = document.getElementById('ypBtn')
+                const panel = document.getElementById('ypPanel')
+                const grid = document.getElementById('ypGrid')
+                const rangeLabel = document.getElementById('ypRangeLabel')
+                const prev = document.getElementById('ypPrev')
+                const next = document.getElementById('ypNext')
+                const inputHidden = document.getElementById('yearInput')
+                const inputText = document.getElementById('yearInputText')
+
+                if (!wrap || !btn || !panel || !grid || !rangeLabel || !prev || !next || !inputHidden || !
+                    inputText) return
+
+                const now = new Date()
+                let selectedYear = Number(inputHidden.value || now.getFullYear())
+                inputHidden.value = String(selectedYear)
+                inputText.value = String(selectedYear)
+
+                let endYear = selectedYear
+                let startYear = endYear - 11
+
+                function render() {
+                    rangeLabel.textContent = `${startYear} - ${endYear}`
+                    grid.innerHTML = ''
+                    for (let y = startYear; y <= endYear; y++) {
+                        const b = document.createElement('button')
+                        b.type = 'button'
+                        b.textContent = String(y)
+                        b.className = [
+                            'h-9 rounded-lg text-sm font-medium flex items-center justify-center',
+                            y === selectedYear ? 'bg-[#303481] text-white' :
+                            'text-slate-700 hover:bg-slate-100'
+                        ].join(' ')
+                        b.addEventListener('click', () => {
+                            selectedYear = y
+                            inputHidden.value = String(selectedYear)
+                            inputText.value = String(selectedYear)
+                            inputHidden.dispatchEvent(new Event('change', {
+                                bubbles: true
+                            }))
+                            panel.classList.add('hidden')
+                            render()
+                        })
+                        grid.appendChild(b)
+                    }
+                }
+
+                function openPanel() {
+                    panel.classList.remove('hidden')
+                    positionPanel(wrap, panel)
+                    render()
+                }
+
+                btn.addEventListener('click', () => {
+                    panel.classList.toggle('hidden')
+                    if (!panel.classList.contains('hidden')) {
+                        positionPanel(wrap, panel)
+                        render()
+                    }
+                })
+
+                inputText.addEventListener('focus', openPanel)
+
+                prev.addEventListener('click', () => {
+                    startYear -= 12
+                    endYear -= 12
+                    render()
+                })
+
+                next.addEventListener('click', () => {
+                    startYear += 12
+                    endYear += 12
+                    render()
+                })
+
+                document.addEventListener('click', (e) => {
+                    if (!wrap.contains(e.target)) panel.classList.add('hidden')
+                })
+
+                render()
+            })();
+            (function initRangePicker() {
+                const wrap = document.getElementById('rpWrap')
+                const btn = document.getElementById('rpBtn')
+                const panel = document.getElementById('rpPanel')
+                const rangeText = document.getElementById('rangeText')
+
+                const startHidden = document.getElementById('startDateTime')
+                const endHidden = document.getElementById('endDateTime')
+
+                const startBox = document.getElementById('rpStartBox')
+                const endBox = document.getElementById('rpEndBox')
+                const daysEl = document.getElementById('rpDays')
+
+                const prev = document.getElementById('rpPrev')
+                const next = document.getElementById('rpNext')
+                const cancel = document.getElementById('rpCancel')
+                const apply = document.getElementById('rpApply')
+
+                const gridL = document.getElementById('rpGridL')
+                const gridR = document.getElementById('rpGridR')
+
+                const monthLabelL = document.getElementById('rpMonthLabelL')
+                const yearLabelL = document.getElementById('rpYearLabelL')
+                const monthLabelR = document.getElementById('rpMonthLabelR')
+                const yearLabelR = document.getElementById('rpYearLabelR')
+
+                const monthBtnL = document.getElementById('rpMonthBtnL')
+                const yearBtnL = document.getElementById('rpYearBtnL')
+                const monthBtnR = document.getElementById('rpMonthBtnR')
+                const yearBtnR = document.getElementById('rpYearBtnR')
+
+                const monthMenuL = document.getElementById('rpMonthMenuL')
+                const yearMenuL = document.getElementById('rpYearMenuL')
+                const monthMenuR = document.getElementById('rpMonthMenuR')
+                const yearMenuR = document.getElementById('rpYearMenuR')
+
+                const monthItemsL = document.getElementById('rpMonthItemsL')
+                const yearItemsL = document.getElementById('rpYearItemsL')
+                const monthItemsR = document.getElementById('rpMonthItemsR')
+                const yearItemsR = document.getElementById('rpYearItemsR')
+
+                if (!wrap || !btn || !panel || !rangeText || !startHidden || !endHidden || !gridL || !gridR)
+                    return
+
+                const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
+                    'September', 'Oktober', 'November', 'Desember'
+                ]
+                const monthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt',
+                    'Nov', 'Des'
+                ]
+
+                function pad(n) {
+                    return String(n).padStart(2, '0')
+                }
+
+                function key(d) {
+                    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
+                }
+
+                function fmtSlash(d) {
+                    return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`
+                }
+
+                function parseDT(v) {
+                    const s = String(v || '').trim()
+                    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})T/)
+                    if (!m) return null
+                    const y = Number(m[1]),
+                        mo = Number(m[2]) - 1,
+                        da = Number(m[3])
+                    const dt = new Date(y, mo, da)
+                    if (dt.getFullYear() !== y || dt.getMonth() !== mo || dt.getDate() !== da) return null
+                    return dt
+                }
+
+                function daysDiff(a, b) {
+                    const ms = 24 * 60 * 60 * 1000
+                    const aa = new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime()
+                    const bb = new Date(b.getFullYear(), b.getMonth(), b.getDate()).getTime()
+                    return Math.round((bb - aa) / ms) + 1
+                }
+
+                function closeMenus() {
+                    monthMenuL.classList.add('hidden')
+                    yearMenuL.classList.add('hidden')
+                    monthMenuR.classList.add('hidden')
+                    yearMenuR.classList.add('hidden')
+                }
+
+                let appliedStart = parseDT(startHidden.value) || new Date()
+                let appliedEnd = parseDT(endHidden.value) || new Date()
+
+                let tempStart = new Date(appliedStart.getFullYear(), appliedStart.getMonth(), appliedStart
+                    .getDate())
+                let tempEnd = new Date(appliedEnd.getFullYear(), appliedEnd.getMonth(), appliedEnd.getDate())
+
+                let viewLeft = new Date(tempStart.getFullYear(), tempStart.getMonth(), 1)
+
+                // picking=false: klik berikutnya menjadi START (termasuk klik ketiga/reset)
+                // picking=true: klik berikutnya menjadi END
+                let picking = false
+                let hoverDate = null
+
+                function syncRightFromLeft() {
+                    return new Date(viewLeft.getFullYear(), viewLeft.getMonth() + 1, 1)
+                }
+
+                function setHeaderLabels() {
+                    const lY = viewLeft.getFullYear()
+                    const lM = viewLeft.getMonth()
+                    const r = syncRightFromLeft()
+                    const rY = r.getFullYear()
+                    const rM = r.getMonth()
+                    monthLabelL.textContent = monthNames[lM]
+                    yearLabelL.textContent = String(lY)
+                    monthLabelR.textContent = monthNames[rM]
+                    yearLabelR.textContent = String(rY)
+                }
+
+                function updateTopInfo() {
+                    const liveEnd = tempEnd
+                    startBox.textContent =
+                        `${tempStart.getDate()} ${monthNamesShort[tempStart.getMonth()]} ${tempStart.getFullYear()}`
+                    endBox.textContent =
+                        `${liveEnd.getDate()} ${monthNamesShort[liveEnd.getMonth()]} ${liveEnd.getFullYear()}`
+                    const d = daysDiff(tempStart, liveEnd)
+                    daysEl.textContent = `${d} hari`
+                    rangeText.value = `${fmtSlash(tempStart)} - ${fmtSlash(liveEnd)}`
+                }
+
+                function isBetween(d, a, b) {
+                    const t = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+                    const ta = new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime()
+                    const tb = new Date(b.getFullYear(), b.getMonth(), b.getDate()).getTime()
+                    return t >= ta && t <= tb
+                }
+
+                function renderMonthGrid(targetGrid, viewMonth, side) {
+                    const y = viewMonth.getFullYear()
+                    const m = viewMonth.getMonth()
+                    const first = new Date(y, m, 1)
+                    const last = new Date(y, m + 1, 0)
+                    const daysInMonth = last.getDate()
+                    const dowMon0 = (first.getDay() + 6) % 7
+
+                    targetGrid.innerHTML = ''
+
+                    for (let i = 0; i < dowMon0; i++) {
+                        const e = document.createElement('div')
+                        e.className = 'h-9'
+                        targetGrid.appendChild(e)
+                    }
+
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const cur = new Date(y, m, d)
+                        const liveEnd = tempEnd
+                        const isS = key(cur) === key(tempStart)
+                        const isE = key(cur) === key(liveEnd)
+                        const inRange = isBetween(cur, tempStart, liveEnd)
+
+                        const b = document.createElement('button')
+                        b.type = 'button'
+                        b.textContent = String(d)
+
+                        let cls = 'h-9 rounded-lg text-sm flex items-center justify-center'
+                        if (inRange) cls += ' bg-[#E9EAFB] text-slate-700'
+                        else cls += ' hover:bg-slate-100 text-slate-700'
+
+                        if (isS || isE) cls =
+                            'h-9 rounded-lg text-sm flex items-center justify-center bg-[#303481] text-white'
+
+                        b.className = cls
+
+                        b.addEventListener('click', (e) => {
+                            e.stopPropagation()
+                            const clicked = new Date(y, m, d)
+
+                            if (!picking) {
+                                // ── Klik Pertama (Start) ──
+                                // Selalu reset rentang dan jadikan tanggal yang diklik sebagai start baru
+                                tempStart = clicked
+                                tempEnd = clicked
+                                picking = true
+                            } else {
+                                // ── Klik Kedua (End) ──
+                                // Beri kebebasan apakah klik sebelum atau sesudah start (auto-swap)
+                                tempEnd = clicked
+                                if (tempEnd.getTime() < tempStart.getTime()) {
+                                    const t = tempStart
+                                    tempStart = tempEnd
+                                    tempEnd = t
+                                }
+                                picking = false
+                            }
+
+                            hoverDate = null
+                            updateTopInfo()
+                            render()
+                        })
+
+                        targetGrid.appendChild(b)
+                    }
+                }
+
+                function buildMonthMenu(itemsEl, onPick) {
+                    itemsEl.innerHTML = ''
+                    monthNames.forEach((nm, idx) => {
+                        const b = document.createElement('button')
+                        b.type = 'button'
+                        b.className =
+                            'w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 text-slate-700'
+                        b.textContent = nm
+                        b.addEventListener('click', () => {
+                            onPick(idx)
+                            closeMenus()
+                            render()
+                        })
+                        itemsEl.appendChild(b)
+                    })
+                }
+
+                function buildYearMenu(itemsEl, onPick) {
+                    const yNow = new Date().getFullYear()
+                    const yStart = yNow - 10
+                    const yEnd = yNow + 10
+                    itemsEl.innerHTML = ''
+                    for (let y = yStart; y <= yEnd; y++) {
+                        const b = document.createElement('button')
+                        b.type = 'button'
+                        b.className = 'w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 text-slate-700'
+                        b.textContent = String(y)
+                        b.addEventListener('click', () => {
+                            onPick(y)
+                            closeMenus()
+                            render()
+                        })
+                        itemsEl.appendChild(b)
+                    }
+                }
+
+                function render() {
+                    setHeaderLabels()
+                    updateTopInfo()
+                    renderMonthGrid(gridL, viewLeft, 'L')
+                    renderMonthGrid(gridR, syncRightFromLeft(), 'R')
+                }
+
+                function openPanel() {
+                    panel.classList.remove('hidden')
+                    positionPanel(wrap, panel)
+                    closeMenus()
+                    render()
+                }
+
+                function closePanel() {
+                    panel.classList.add('hidden')
+                    picking = false
+                    hoverDate = null
+                    closeMenus()
+                }
+
+                btn.addEventListener('click', () => {
+                    if (panel.classList.contains('hidden')) {
+                        openPanel()
+                    } else {
+                        closePanel()
+                    }
+                })
+
+                rangeText.addEventListener('focus', openPanel)
+
+                prev.addEventListener('click', () => {
+                    viewLeft = new Date(viewLeft.getFullYear(), viewLeft.getMonth() - 1, 1)
+                    render()
+                })
+
+                next.addEventListener('click', () => {
+                    viewLeft = new Date(viewLeft.getFullYear(), viewLeft.getMonth() + 1, 1)
+                    render()
+                })
+
+                cancel.addEventListener('click', () => {
+                    tempStart = new Date(appliedStart.getFullYear(), appliedStart.getMonth(),
+                        appliedStart.getDate())
+                    tempEnd = new Date(appliedEnd.getFullYear(), appliedEnd.getMonth(), appliedEnd
+                        .getDate())
+                    picking = false
+                    hoverDate = null
+                    viewLeft = new Date(tempStart.getFullYear(), tempStart.getMonth(), 1)
+                    closePanel()
+                })
+
+                apply.addEventListener('click', () => {
+                    appliedStart = new Date(tempStart.getFullYear(), tempStart.getMonth(), tempStart
+                        .getDate())
+                    appliedEnd = new Date(tempEnd.getFullYear(), tempEnd.getMonth(), tempEnd.getDate())
+
+                    startHidden.value = `${key(appliedStart)}T00:00`
+                    endHidden.value = `${key(appliedEnd)}T23:59`
+
+                    startHidden.dispatchEvent(new Event('change', {
+                        bubbles: true
+                    }))
+                    endHidden.dispatchEvent(new Event('change', {
+                        bubbles: true
+                    }))
+
+                    picking = false
+                    hoverDate = null
+                    closePanel()
+                })
+
+                monthBtnL.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    monthMenuL.classList.toggle('hidden');
+                    yearMenuL.classList.add('hidden');
+                    monthMenuR.classList.add('hidden');
+                    yearMenuR.classList.add('hidden')
+                })
+                yearBtnL.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    yearMenuL.classList.toggle('hidden');
+                    monthMenuL.classList.add('hidden');
+                    monthMenuR.classList.add('hidden');
+                    yearMenuR.classList.add('hidden')
+                })
+                monthBtnR.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    monthMenuR.classList.toggle('hidden');
+                    yearMenuR.classList.add('hidden');
+                    monthMenuL.classList.add('hidden');
+                    yearMenuL.classList.add('hidden')
+                })
+                yearBtnR.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    yearMenuR.classList.toggle('hidden');
+                    monthMenuR.classList.add('hidden');
+                    monthMenuL.classList.add('hidden');
+                    yearMenuL.classList.add('hidden')
+                })
+
+                buildMonthMenu(monthItemsL, (m) => {
+                    viewLeft = new Date(viewLeft.getFullYear(), m, 1)
+                })
+                buildYearMenu(yearItemsL, (y) => {
+                    viewLeft = new Date(y, viewLeft.getMonth(), 1)
+                })
+
+                buildMonthMenu(monthItemsR, (m) => {
+                    const left = new Date(viewLeft.getFullYear(), viewLeft.getMonth(), 1)
+                    const right = new Date(left.getFullYear(), left.getMonth() + 1, 1)
+                    const newRight = new Date(right.getFullYear(), m, 1)
+                    viewLeft = new Date(newRight.getFullYear(), newRight.getMonth() - 1, 1)
+                })
+                buildYearMenu(yearItemsR, (y) => {
+                    const left = new Date(viewLeft.getFullYear(), viewLeft.getMonth(), 1)
+                    const right = new Date(left.getFullYear(), left.getMonth() + 1, 1)
+                    const newRight = new Date(y, right.getMonth(), 1)
+                    viewLeft = new Date(newRight.getFullYear(), newRight.getMonth() - 1, 1)
+                })
+
+                document.addEventListener('click', (e) => {
+                    const path = typeof e.composedPath === 'function' ? e.composedPath() : []
+                    const isInside = path.length
+                        ? (path.includes(wrap) || path.includes(panel))
+                        : (wrap.contains(e.target) || panel.contains(e.target))
+                    if (!isInside) {
+                        closePanel()
+                    }
+                })
+
+                monthMenuL.addEventListener('click', (e) => e.stopPropagation())
+                yearMenuL.addEventListener('click', (e) => e.stopPropagation())
+                monthMenuR.addEventListener('click', (e) => e.stopPropagation())
+                yearMenuR.addEventListener('click', (e) => e.stopPropagation())
+
+                render()
+                closePanel()
+            })()
+        })
     </script>
 @endpush

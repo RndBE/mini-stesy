@@ -386,31 +386,36 @@ class DeviceController extends Controller
         ]);
 
         $sensorCount = (int) ($validated['jumlah_sensor'] ?? 16);
-        $tabelMain = $sensorCount === 19 ? 't_s19_01' : 't_s16_01';
 
-        $logger = new t_Logger();
-        $logger->id_logger = $validated['id_logger'];
-        $logger->nama_logger = $validated['nama_logger'];
-        $logger->id_katlogger = $validated['id_katlogger'] ?? null;
-        $logger->instansi_id = $validated['instansi_id'];
-        $logger->sensor_count = $sensorCount;
-        $logger->tabel_main = $tabelMain;
-        $logger->jeda_notif = 0;
-        $logger->save();
+        // Important: allocate/create shard table outside transaction.
+        // MySQL DDL (CREATE TABLE) can trigger implicit commit inside transaction.
+        $tabelMain = $this->allocateMainTableForSensorCount($sensorCount);
 
-        $logger->informasi()->create([
-            'logger_id' => $logger->id_logger,
-            'seri_logger' => $request->seri,
-            'serial_number' => $request->serial_number,
-            'sensor' => $request->sensor_type,
-            'no_pic' => $request->no_hp,
-            'nama_pic' => $request->nama_penjaga,
-            'tanggal_pemasangan' => $request->tanggal_pemasangan,
-            'garansi' => $request->masa_garansi,
-            'elevasi' => $request->elevasi ?? '-',
-            'imei'    => $request->imei ?? '-',
-            'awal_kontrak'  => $request->awal_kontrak ?? '',
-        ]);
+        DB::transaction(function () use ($validated, $sensorCount, $request, $tabelMain) {
+            $logger = new t_Logger();
+            $logger->id_logger = $validated['id_logger'];
+            $logger->nama_logger = $validated['nama_logger'];
+            $logger->id_katlogger = $validated['id_katlogger'] ?? null;
+            $logger->instansi_id = $validated['instansi_id'];
+            $logger->sensor_count = $sensorCount;
+            $logger->tabel_main = $tabelMain;
+            $logger->jeda_notif = 0;
+            $logger->save();
+
+            $logger->informasi()->create([
+                'logger_id' => $logger->id_logger,
+                'seri_logger' => $request->seri,
+                'serial_number' => $request->serial_number,
+                'sensor' => $request->sensor_type,
+                'no_pic' => $request->no_hp,
+                'nama_pic' => $request->nama_penjaga,
+                'tanggal_pemasangan' => $request->tanggal_pemasangan,
+                'garansi' => $request->masa_garansi,
+                'elevasi' => $request->elevasi ?? '-',
+                'imei'    => $request->imei ?? '-',
+                'awal_kontrak'  => $request->awal_kontrak ?? '',
+            ]);
+        });
 
 
         return back()->with('success', 'Data perangkat berhasil ditambahkan.');
@@ -441,7 +446,11 @@ class DeviceController extends Controller
             ->firstOrFail();
 
         $sensorCount = (int) ($validated['jumlah_sensor'] ?? $logger->sensor_count ?? 16);
-        $tabelMain = $sensorCount === 19 ? 't_s19_01' : 't_s16_01';
+        $currentTable = (string) ($logger->tabel_main ?? '');
+        $sameFamily = ($sensorCount >= 19 && str_starts_with($currentTable, 't_s19_'))
+            || ($sensorCount < 19 && str_starts_with($currentTable, 't_s16_'));
+        $preferredTable = $sameFamily ? $currentTable : null;
+        $tabelMain = $this->allocateMainTableForSensorCount($sensorCount, $logger->id_logger, $preferredTable);
 
         $logger->nama_logger  = $validated['nama_logger'];
         $logger->id_katlogger = $validated['id_katlogger'] ?? null;
@@ -470,6 +479,121 @@ class DeviceController extends Controller
         $informasi->save();
 
         return back()->with('success', 'Data perangkat berhasil diperbarui.');
+    }
+
+    private function allocateMainTableForSensorCount(int $sensorCount, ?string $ignoreLoggerId = null, ?string $preferredTable = null): string
+    {
+        $normalizedSensorCount = $sensorCount >= 19 ? 19 : 16;
+        $prefix = $normalizedSensorCount === 19 ? 't_s19_' : 't_s16_';
+        $maxLoggerPerTable = max((int) env('MAX_LOGGER_PER_TABLE', 5), 1);
+
+        $query = DB::table('t_logger')
+            ->select('tabel_main', DB::raw('COUNT(*) as total'))
+            ->whereNotNull('tabel_main')
+            ->where('tabel_main', 'like', $prefix . '%')
+            ->where('sensor_count', $normalizedSensorCount)
+            ->groupBy('tabel_main');
+
+        if (DB::transactionLevel() > 0) {
+            $query->lockForUpdate();
+        }
+
+        if ($ignoreLoggerId) {
+            $query->where('id_logger', '!=', $ignoreLoggerId);
+        }
+
+        $countsByTable = $query
+            ->get()
+            ->mapWithKeys(function ($row) {
+                return [(string) $row->tabel_main => (int) $row->total];
+            })
+            ->all();
+
+        $candidateTables = array_keys($countsByTable);
+
+        if ($preferredTable && str_starts_with($preferredTable, $prefix)) {
+            $candidateTables[] = $preferredTable;
+        }
+
+        $defaultTable = $prefix . '01';
+        $candidateTables[] = $defaultTable;
+
+        $candidateTables = array_values(array_unique($candidateTables));
+        usort($candidateTables, function ($a, $b) use ($prefix) {
+            return $this->extractShardSuffix($a, $prefix) <=> $this->extractShardSuffix($b, $prefix);
+        });
+
+        foreach ($candidateTables as $tableName) {
+            if (!str_starts_with($tableName, $prefix)) {
+                continue;
+            }
+
+            $currentCount = (int) ($countsByTable[$tableName] ?? 0);
+            if ($currentCount >= $maxLoggerPerTable) {
+                continue;
+            }
+
+            $this->ensureTimeseriesTableExists($tableName, $normalizedSensorCount, $maxLoggerPerTable);
+            return $tableName;
+        }
+
+        $maxSuffix = 1;
+        foreach ($candidateTables as $tableName) {
+            $suffix = $this->extractShardSuffix($tableName, $prefix);
+            if ($suffix > $maxSuffix) {
+                $maxSuffix = $suffix;
+            }
+        }
+
+        $newTable = $prefix . sprintf('%02d', $maxSuffix + 1);
+        $this->ensureTimeseriesTableExists($newTable, $normalizedSensorCount, $maxLoggerPerTable);
+
+        return $newTable;
+    }
+
+    private function extractShardSuffix(string $tableName, string $prefix): int
+    {
+        if (!str_starts_with($tableName, $prefix)) {
+            return 0;
+        }
+
+        $suffix = substr($tableName, strlen($prefix));
+        return ctype_digit($suffix) ? (int) $suffix : 0;
+    }
+
+    private function ensureTimeseriesTableExists(string $tableName, int $sensorCount, int $maxLoggerPerTable): void
+    {
+        if (!Schema::hasTable($tableName)) {
+            Schema::create($tableName, function (Blueprint $table) use ($sensorCount) {
+                $table->charset = 'utf8';
+                $table->collation = 'utf8_general_ci';
+
+                $table->bigIncrements('id');
+                $table->string('id_logger', 15);
+                $table->dateTime('waktu');
+
+                $maxSensor = $sensorCount >= 19 ? 19 : 16;
+                for ($i = 1; $i <= $maxSensor; $i++) {
+                    $table->float('sensor' . $i)->nullable();
+                }
+
+                $table->index(['id_logger', 'waktu']);
+                $table->index('waktu');
+                $table->foreign('id_logger')->references('id_logger')->on('t_logger')->cascadeOnUpdate()->restrictOnDelete();
+            });
+        }
+
+        if (Schema::hasTable('ts_table_pool')) {
+            DB::table('ts_table_pool')->updateOrInsert(
+                ['table_name' => $tableName],
+                [
+                    'sensor_count' => $sensorCount,
+                    'max_logger' => $maxLoggerPerTable,
+                    'is_active' => 1,
+                    'created_at' => now(),
+                ]
+            );
+        }
     }
 
     private function inferParameterGroupId(?string $namaParameter, ?string $parameterUtama): ?int

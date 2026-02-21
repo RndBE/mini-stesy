@@ -20,6 +20,12 @@ class AnalisaController extends Controller
             ->where('id_logger', $id_logger)
             ->firstOrFail();
 
+        $allLoggers = t_Logger::query()
+            ->forUser(auth()->user())
+            ->select('id_logger', 'nama_logger')
+            ->orderBy('nama_logger')
+            ->get();
+
         // Get all parameters for this logger
         $parameters = $logger->params->map(function ($param) {
             return [
@@ -54,6 +60,7 @@ class AnalisaController extends Controller
         return view('analisadata.analisa', [
             'title' => 'Analisa Data',
             'logger' => $logger,
+            'allLoggers' => $allLoggers,
             'parameters' => $parameters,
             'photos' => $photos,
             'status' => $status,

@@ -48,10 +48,20 @@ class RealtimeController extends Controller
                 return $lg;
             });
 
+        $firstDevice = $devices->firstWhere('status_logger', 'online') ?: $devices->first();
+
         return view('realtime.index', [
             'title'   => 'Realtime Monitoring',
             'devices' => $devices,
-            'firstDevice' => $devices->first(),
+            'firstDevice' => $firstDevice,
+            'mqttConfig' => [
+                'broker' => env('MQTT_WS_HOST', '72.60.78.159'),
+                'port' => (int) env('MQTT_WS_PORT', 8383),
+                'path' => env('MQTT_WS_PATH', '/mqtt'),
+                'user' => env('MQTT_WS_USER', env('MQTT_USER', 'beacon')),
+                'pass' => env('MQTT_WS_PASS', env('MQTT_PASS', 'be_jogja')),
+                'useSSL' => filter_var(env('MQTT_WS_SSL', false), FILTER_VALIDATE_BOOLEAN),
+            ],
         ]);
     }
 
@@ -85,11 +95,15 @@ class RealtimeController extends Controller
         }
 
         $primaryTable = $tableMain;
-        $fallbackTable = $primaryTable === 't_s19_01' ? 't_s16_01' : 't_s19_01';
+        $fallbackTable = $this->buildFallbackTableName($primaryTable);
 
-        // Get data from last 60 minutes
-        $start = now()->subMinutes(60);
-        $end = now();
+        // Query window for reload:
+        // - history keeps recent data
+        // - future grace allows logger timestamps slightly ahead of server clock
+        $historyMinutes = max((int) env('REALTIME_HISTORY_MINUTES', 60), 1);
+        $futureGraceMinutes = max((int) env('REALTIME_FUTURE_GRACE_MINUTES', 15), 0);
+        $start = now()->subMinutes($historyMinutes);
+        $end = now()->addMinutes($futureGraceMinutes);
 
         try {
             $data = $this->getRealtimeRows($primaryTable, $id, $start, $end);
@@ -140,10 +154,20 @@ class RealtimeController extends Controller
 
     private function isSupportedTable(string $tableName): bool
     {
-        if (!in_array($tableName, ['t_s16_01', 't_s19_01'], true)) {
+        if (!preg_match('/^t_s(16|19)_\d{2,}$/', $tableName)) {
             return false;
         }
 
         return Schema::hasTable($tableName);
+    }
+
+    private function buildFallbackTableName(string $tableMain): string
+    {
+        if (preg_match('/^t_s(16|19)_(\d{2,})$/', $tableMain, $m)) {
+            $otherFamily = ((int) $m[1] === 19) ? 16 : 19;
+            return 't_s' . $otherFamily . '_' . $m[2];
+        }
+
+        return 't_s16_01';
     }
 }

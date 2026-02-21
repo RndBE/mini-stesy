@@ -90,7 +90,7 @@ class DataMasukController extends Controller
             $sensorCount = $useS19 ? 19 : 16;
 
             if ($query->count() === 0) {
-                $fallbackTable = $tableMain === 't_s19_01' ? 't_s16_01' : 't_s19_01';
+                $fallbackTable = $this->buildFallbackTableName($tableMain, $sensorCount);
                 if ($this->isSupportedTable($fallbackTable)) {
                     $fallbackQuery = DB::table($fallbackTable)
                         ->where('id_logger', $logger_id)
@@ -176,7 +176,10 @@ class DataMasukController extends Controller
         }
 
         try {
-            $waktuParsed = \Carbon\Carbon::parse($waktu, config('app.timezone'))->toDateTimeString();
+            $appTimezone = config('app.timezone', 'Asia/Jakarta');
+            $waktuParsed = \Carbon\Carbon::parse($waktu, $appTimezone)
+                ->setTimezone($appTimezone)
+                ->toDateTimeString();
         } catch (\Throwable $e) {
             return response()->json(['success' => false, 'message' => 'Format waktu tidak valid'], 400);
         }
@@ -225,10 +228,10 @@ class DataMasukController extends Controller
             }
         }
 
-        $mqttHost = env('MQTT_HOST', 'mqtt.beacontelemetry.com');
-        $mqttPort = (int) env('MQTT_PORT', 8883);
-        $mqttUser = env('MQTT_USER', 'userlog');
-        $mqttPass = env('MQTT_PASS', 'b34c0n');
+        $mqttHost = env('MQTT_HOST', '72.60.78.159');
+        $mqttPort = (int) env('MQTT_PORT', 1883);
+        $mqttUser = env('MQTT_USER', 'beacon');
+        $mqttPass = env('MQTT_PASS', 'be_jogja');
         // $mqttCa = env('MQTT_CA', '/etc/ssl/certs/ca-bundle.crt');
 
         $mqttOk = null;
@@ -261,7 +264,7 @@ class DataMasukController extends Controller
                 'enabled' => (bool) $forwardUrl,
                 'ok' => $forwardOk,
                 'error' => $forwardErr,
-            ],  
+            ],
             'mqtt' => [
                 'ok' => $mqttOk,
                 'error' => $mqttErr,
@@ -282,10 +285,20 @@ class DataMasukController extends Controller
 
     private function isSupportedTable(string $tableName): bool
     {
-        if (!in_array($tableName, ['t_s16_01', 't_s19_01'], true)) {
+        if (!preg_match('/^t_s(16|19)_\d{2,}$/', $tableName)) {
             return false;
         }
 
         return Schema::hasTable($tableName);
+    }
+
+    private function buildFallbackTableName(string $tableMain, int $sensorCount): string
+    {
+        if (preg_match('/^t_s(16|19)_(\d{2,})$/', $tableMain, $m)) {
+            $otherFamily = ((int) $m[1] === 19) ? 16 : 19;
+            return 't_s' . $otherFamily . '_' . $m[2];
+        }
+
+        return $sensorCount >= 19 ? 't_s16_01' : 't_s19_01';
     }
 }
