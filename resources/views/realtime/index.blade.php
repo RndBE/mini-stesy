@@ -1,9 +1,58 @@
 @extends('layouts.app')
 
 @push('head')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
+    <style>
+        .select2-container--default .select2-selection--single {
+            border: 0;
+            height: auto;
+            min-height: 28px;
+            padding: 0;
+            background: transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #1e293b;
+            font-size: 1.125rem;
+            font-weight: 700;
+            line-height: 1.4;
+            padding-left: 0;
+            padding-right: 1.5rem;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 100%;
+            right: 0;
+        }
+
+        .select2-dropdown {
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            font-size: 0.875rem;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid #cbd5e1;
+            border-radius: 0.375rem;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.4);
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #303481;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -22,11 +71,13 @@
                 <div>
                     {{-- <h1 class="text-xl font-bold text-slate-800" x-text="selectedDeviceName || 'Pilih Pos'"></h1> --}}
                     @if ($devices->isNotEmpty())
-                        <select x-model="selectedDeviceId"
-                            @change="activeTab = null; rawData = []; dataHistory = []; loadDeviceData()"
+                        <select id="loggerSelect" x-model="selectedDeviceId"
+                            @change="switchDevice()"
                             class="appearance-none bg-transparent text-lg font-bold text-slate-800 border-none focus:ring-0 p-0 pr-8 cursor-pointer w-full md:w-auto">
                             @foreach ($devices as $d)
-                                <option value="{{ $d->id_logger }}">{{ $d->nama_logger }}</option>
+                                <option value="{{ $d->id_logger }}">
+                                    {{ $d->id_logger }} - {{ $d->nama_logger ?? 'Logger' }}
+                                </option>
                             @endforeach
                         </select>
                     @else
@@ -106,7 +157,9 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
-                        <template x-for="row in dataHistory" :key="row.waktu">
+                        {{-- <template x-for="row in dataHistory" :key="row.waktu"> --}}
+                        <template x-for="(row, i) in dataHistory" :key="`${row.waktu}-${i}`">
+
                             <tr class="hover:bg-slate-50">
                                 <td class="px-6 py-4 text-center text-slate-900" x-text="row.waktu"></td>
                                 <td class="px-6 py-4 text-center font-medium text-slate-900"
@@ -122,487 +175,16 @@
         </div>
 
     </div>
-
-    {{-- @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-        <script>
-            function realtimeHandler() {
-                return {
-                    selectedDeviceId: @json(optional($firstDevice)->id_logger ?? ''),
-                    selectedDeviceName: '',
-                    lastUpdate: '-',
-                    activeTab: null, // Will be set after loading params
-                    tabs: [],
-                    chartInstance: null,
-                    rawData: [], // Full API response data
-                    dataHistory: [], // Processed for table/chart
-                    isLoadingData: false,
-                    pollIntervalMs: 5000,
-                    pollTimer: null,
-                    reconnectDelayMs: 3000,
-                    reconnectTimer: null,
-                    lastDataAt: null,
-                    dataOnline: false,
-
-                    mqtt: {
-                        broker: 'mqtt.beacontelemetry.com',
-                        port: 8083,
-                        user: 'userlog',
-                        pass: 'b34c0n',
-                        useSSL: false,
-                        client: null,
-                        connected: false,
-                        connecting: false,
-                        currentTopic: null
-                    },
-
-                    // initData() {
-                    //     this.lastUpdate = moment().format('HH:mm:ss');
-                    //     if (this.selectedDeviceId) {
-                    //         this.loadDeviceData();
-                    //     }
-                    // },
-
-                    startClock() {
-                        if (this._clockTimer) clearInterval(this._clockTimer);
-                        this._clockTimer = setInterval(() => {
-                            this.lastUpdate = moment().format('HH:mm:ss');
-                        }, 1000);
-                    },
-
-                    initData() {
-                        this.startClock();
-
-                        this.$nextTick(async () => {
-                            if (!this.selectedDeviceId) {
-                                const firstOption = this.$el.querySelector('select option');
-                                if (firstOption) this.selectedDeviceId = String(firstOption.value);
-                            }
-
-                            if (this.selectedDeviceId) {
-                                await this.loadDeviceData();
-                            }
-
-                            this.startAutoRefresh();
-
-                            setTimeout(() => {
-                                if (window.Paho && window.Paho.MQTT && window.Paho.MQTT.Client) {
-                                    this.connectMqtt();
-                                    this.subscribeMqttTopic(String(this.selectedDeviceId));
-                                } else {
-                                    console.warn('Paho belum siap, MQTT skip dulu');
-                                }
-                            }, 0);
-                        });
-                    },
-
-                    getTabLabel() {
-                        const tab = this.tabs.find(t => t.id === this.activeTab);
-                        return tab ? tab.label : '-';
-                    },
-
-                    getUnit() {
-                        const tab = this.tabs.find(t => t.id === this.activeTab);
-                        return tab ? tab.unit : '';
-                    },
-
-                    refreshDataOnline() {
-                        if (!this.lastDataAt) {
-                            this.dataOnline = false
-                            return
-                        }
-                        const diffMs = Date.now() - this.lastDataAt.getTime()
-                        this.dataOnline = (diffMs / 60000) < 60
-                    },
-
-
-                    normalizeRealtimeRow(row) {
-                        if (!row || !row.waktu) return null;
-                        const ts = moment(row.waktu);
-                        if (!ts.isValid()) return null;
-                        return {
-                            ...row,
-                            waktu: ts.format('YYYY-MM-DD HH:mm:ss')
-                        };
-                    },
-
-                    sortRealtimeRows(rows) {
-                        return [...rows].sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
-                    },
-
-                    getWindowedRows() {
-                        if (!this.rawData.length) return [];
-                        const rows = this.sortRealtimeRows(this.rawData);
-                        const latestTime = moment(rows[0].waktu);
-                        if (!latestTime.isValid()) return rows;
-                        const sixtyMinutesAgo = latestTime.clone().subtract(60, 'minutes');
-                        return rows.filter(d => {
-                            const dataTime = moment(d.waktu);
-                            return dataTime.isValid() && dataTime.isSameOrAfter(sixtyMinutesAgo) && dataTime
-                                .isSameOrBefore(latestTime);
-                        });
-                    },
-
-                    upsertRealtimeRow(row) {
-                        const normalized = this.normalizeRealtimeRow(row);
-                        if (!normalized) return false;
-
-                        const newTs = moment(normalized.waktu).valueOf();
-                        const existingIdx = this.rawData.findIndex(r => moment(r.waktu).valueOf() === newTs);
-
-                        if (existingIdx >= 0) {
-                            this.rawData[existingIdx] = {
-                                ...this.rawData[existingIdx],
-                                ...normalized
-                            };
-                        } else {
-                            this.rawData.push(normalized);
-                        }
-
-                        this.rawData = this.sortRealtimeRows(this.rawData).slice(0, 2000);
-                        return true;
-                    },
-
-                    buildFallbackTabs(sampleRow) {
-                        if (!sampleRow) return [];
-                        const sensorKeys = Object.keys(sampleRow)
-                            .filter(k => /^sensor\d+$/i.test(k))
-                            .sort((a, b) => Number(a.replace(/[^0-9]/g, '')) - Number(b.replace(/[^0-9]/g, '')));
-
-                        return sensorKeys.map(key => ({
-                            id: key,
-                            label: key.replace(/^sensor/i, 'Sensor '),
-                            unit: '',
-                            column: key
-                        }));
-                    },
-
-                    startAutoRefresh() {
-                        if (this.pollTimer) clearInterval(this.pollTimer);
-                        this.pollTimer = setInterval(() => {
-                            this.loadDeviceData({
-                                silent: true,
-                                merge: true
-                            });
-                        }, this.pollIntervalMs);
-                    },
-
-                    async loadDeviceData(options = {}) {
-                        const silent = !!options.silent;
-                        const merge = !!options.merge;
-
-                        if (!this.selectedDeviceId) {
-                            this.rawData = [];
-                            this.dataHistory = [];
-                            this.tabs = [];
-                            this.activeTab = null;
-                            return;
-                        }
-
-                        if (this.isLoadingData) return;
-                        this.isLoadingData = true;
-                        if (!silent) this.lastUpdate = 'Updating...';
-
-                        try {
-                            const response = await fetch(`{{ route('realtime.index') }}/data/${this.selectedDeviceId}`);
-                            const result = await response.json();
-
-                            if (result.success) {
-                                const incomingRows = (result.data || [])
-                                    .map(row => this.normalizeRealtimeRow(row))
-                                    .filter(Boolean);
-
-                                if (merge) {
-                                    incomingRows.forEach(row => this.upsertRealtimeRow(row));
-                                } else {
-                                    this.rawData = this.sortRealtimeRows(incomingRows);
-                                }
-
-                                this.selectedDeviceName = result.device.nama_logger;
-                                this.lastDataAt = this.rawData?.[0]?.waktu ? new Date(this.rawData[0].waktu) : null
-                                this.refreshDataOnline()
-                                this.subscribeMqttTopic(String(this.selectedDeviceId));
-
-                                // Dynamically build tabs from params
-                                if (result.params && result.params.length > 0) {
-                                    this.tabs = result.params
-                                        .filter(p => p && p.kolom_sensor)
-                                        .map(p => ({
-                                            id: p.nama_parameter || p.kolom_sensor,
-                                            label: p.nama_parameter || p.kolom_sensor.replace(/^sensor/i,
-                                                'Sensor '),
-                                            unit: p.satuan || '',
-                                            column: p.kolom_sensor
-                                        }));
-
-                                    if (this.tabs.length === 0) {
-                                        const fallbackTabs = this.buildFallbackTabs(this.rawData[0] || incomingRows[0] ||
-                                            null);
-                                        this.tabs = fallbackTabs;
-                                        this.activeTab = fallbackTabs.length ? fallbackTabs[0].id : null;
-                                    }
-
-                                    // Set active tab if not set or invalid
-                                    if (this.tabs.length > 0 && (!this.activeTab || !this.tabs.find(t => t.id === this
-                                            .activeTab))) {
-                                        this.activeTab = this.tabs[0].id;
-                                    }
-                                } else {
-                                    const fallbackTabs = this.buildFallbackTabs(this.rawData[0] || incomingRows[0] ||
-                                        null);
-                                    this.tabs = fallbackTabs;
-                                    this.activeTab = fallbackTabs.length ? fallbackTabs[0].id : null;
-                                }
-
-                                this.updateChart();
-
-                                this.lastUpdate = moment().format('HH:mm:ss');
-                            } else if (!silent) {
-                                console.warn(result.message);
-                                this.dataHistory = [];
-                                this.rawData = [];
-                                this.tabs = [];
-                                if (this.chartInstance) {
-                                    this.chartInstance.data.labels = [];
-                                    this.chartInstance.data.datasets[0].data = [];
-                                    this.chartInstance.update();
-                                }
-                            }
-
-                        } catch (error) {
-                            console.error('Error fetching data:', error);
-                        } finally {
-                            this.isLoadingData = false;
-                        }
-                    },
-
-                    updateChart() {
-                        this.$nextTick(() => {
-                            const canvas = document.getElementById('realtimeChart');
-                            if (!canvas) return;
-
-                            const ctx = canvas.getContext('2d');
-                            if (!ctx) return;
-
-                            let currentTab = this.tabs.find(t => t.id === this.activeTab);
-                            if (!currentTab && this.tabs.length > 0) {
-                                currentTab = this.tabs[0];
-                                this.activeTab = currentTab.id;
-                            }
-                            if (!currentTab) {
-                                this.dataHistory = [];
-                                if (this.chartInstance) {
-                                    this.chartInstance.destroy();
-                                    this.chartInstance = null;
-                                }
-                                return;
-                            }
-
-                            const dbColumn = currentTab.column;
-                            let chartLabels = [];
-                            let chartData = [];
-
-                            const windowedRows = this.getWindowedRows();
-                            if (windowedRows.length > 0) {
-                                // Sort ascending for chart
-                                const sortedDocs = [...windowedRows].sort((a, b) => new Date(a.waktu) - new Date(b
-                                    .waktu));
-                                chartLabels = sortedDocs.map(d => moment(d.waktu).format('HH:mm'));
-
-                                chartData = sortedDocs.map(d => {
-                                    const v = d[dbColumn];
-                                    return (v !== null && v !== undefined && v !== '' && !isNaN(v)) ?
-                                        parseFloat(v) : null;
-                                });
-                            }
-
-                            if (this.chartInstance) {
-                                this.chartInstance.destroy(); // Always destroy to ensure clean state
-                                this.chartInstance = null;
-                            }
-                            if (!this.chartInstance) {
-                                this.chartInstance = new Chart(ctx, {
-                                    type: 'line',
-                                    data: {
-                                        labels: chartLabels,
-                                        datasets: [{
-                                            label: currentTab.label,
-                                            data: chartData,
-                                            borderColor: '#3b82f6',
-                                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                            borderWidth: 2,
-                                            tension: 0.4,
-                                            cubicInterpolationMode: 'monotone',
-                                            fill: true,
-                                            pointRadius: 2,
-                                            pointHoverRadius: 4
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        animation: false,
-                                        plugins: {
-                                            legend: {
-                                                display: false
-                                            },
-                                            tooltip: {
-                                                mode: 'index',
-                                                intersect: false,
-                                                callbacks: {
-                                                    label: function(context) {
-                                                        let label = context.dataset.label || '';
-                                                        if (label) label += ': ';
-                                                        if (context.parsed.y !== null) {
-                                                            label += context.parsed.y + ' ' + currentTab
-                                                                .unit;
-                                                        }
-                                                        return label;
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        interaction: {
-                                            mode: 'nearest',
-                                            axis: 'x',
-                                            intersect: false
-                                        },
-                                        scales: {
-                                            x: {
-                                                grid: {
-                                                    display: false
-                                                },
-                                                ticks: {
-                                                    maxTicksLimit: 10
-                                                }
-                                            },
-                                            y: {
-                                                beginAtZero: false
-                                            }
-                                        }
-                                    }
-                                });
-                            } else {
-                                this.chartInstance.data.labels = chartLabels;
-                                this.chartInstance.data.datasets[0].data = chartData;
-                                this.chartInstance.data.datasets[0].label = currentTab.label;
-                                this.chartInstance.update('none');
-                            }
-
-                            this.updateTable(dbColumn);
-                        });
-                    },
-
-
-                    updateTable(column) {
-                        const windowedRows = this.getWindowedRows();
-                        if (windowedRows.length > 0) {
-                            const latestFirstRows = [...windowedRows].sort((a, b) => new Date(b.waktu) - new Date(a
-                                .waktu));
-                            this.dataHistory = latestFirstRows.map(row => {
-                                const num = Number(row[column]);
-                                return {
-                                    waktu: moment(row.waktu).format('HH:mm:ss'),
-                                    value: Number.isFinite(num) ? num.toFixed(2) : '-'
-                                };
-                            });
-                        } else {
-                            this.dataHistory = [];
-                        }
-                    },
-                    connectMqtt() {
-                        if (this.mqtt.connected || this.mqtt.connecting) return;
-
-                        const clientID = "web_" + Math.floor(Math.random() * 1000000);
-                        this.mqtt.client = new Paho.MQTT.Client(this.mqtt.broker, Number(this.mqtt.port), clientID);
-                        this.mqtt.connecting = true;
-
-                        this.mqtt.client.onConnectionLost = () => {
-                            this.mqtt.connected = false;
-                            this.mqtt.connecting = false;
-                            this.scheduleMqttReconnect();
-                        };
-
-                        this.mqtt.client.onMessageArrived = (message) => {
-                            this.handleMqttMessage(message);
-                        };
-
-                        this.mqtt.client.connect({
-                            timeout: 3,
-                            useSSL: this.mqtt.useSSL,
-                            userName: this.mqtt.user,
-                            password: this.mqtt.pass,
-                            onSuccess: () => {
-                                this.mqtt.connected = true;
-                                this.mqtt.connecting = false;
-                                this.subscribeMqttTopic(String(this.selectedDeviceId));
-                            },
-                            onFailure: (err) => {
-                                this.mqtt.connected = false;
-                                this.mqtt.connecting = false;
-                                console.log('MQTT connect failed:', err);
-                                this.scheduleMqttReconnect();
-                            }
-                        });
-                    },
-
-                    scheduleMqttReconnect() {
-                        if (this.reconnectTimer) return;
-                        this.reconnectTimer = setTimeout(() => {
-                            this.reconnectTimer = null;
-                            this.connectMqtt();
-                        }, this.reconnectDelayMs);
-                    },
-
-                    subscribeMqttTopic(topic) {
-                        if (!this.mqtt.client || !this.mqtt.connected || !topic) return;
-
-                        const nextTopic = String(topic);
-
-                        if (this.mqtt.currentTopic && this.mqtt.currentTopic !== nextTopic) {
-                            try {
-                                this.mqtt.client.unsubscribe(this.mqtt.currentTopic);
-                            } catch (e) {}
-                        }
-
-                        this.mqtt.currentTopic = nextTopic;
-                        this.mqtt.client.subscribe(this.mqtt.currentTopic, {
-                            qos: 0
-                        });
-                    },
-
-                    handleMqttMessage(message) {
-                        const topic = String(message.destinationName || '');
-                        if (topic !== String(this.selectedDeviceId)) return;
-
-                        let data;
-                        try {
-                            data = JSON.parse(message.payloadString || '{}');
-                        } catch (e) {
-                            return;
-                        }
-
-                        if (!data || !data.waktu) return;
-                        if (!this.upsertRealtimeRow(data)) return;
-
-                        this.lastDataAt = new Date(data.waktu)
-                        this.refreshDataOnline()
-
-                        this.lastUpdate = moment().format('HH:mm:ss');
-                        this.updateChart();
-                    },
-
-                }
-            }
-        </script>
-    @endpush --}}
     @push('scripts')
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
         <script>
             function realtimeHandler() {
+                const mqttCfg = @json($mqttConfig ?? []);
+
                 return {
                     selectedDeviceId: @json(optional($firstDevice)->id_logger ?? ''),
                     selectedDeviceName: '',
@@ -623,15 +205,32 @@
                     _pahoWaitTimer: null,
 
                     mqtt: {
-                        broker: 'mqtt.beacontelemetry.com',
-                        port: 8083,
-                        user: 'userlog',
-                        pass: 'b34c0n',
-                        useSSL: false,
+                        broker: String(mqttCfg.broker || '72.60.78.159'),
+                        port: Number(mqttCfg.port || 8383),
+                        path: String(mqttCfg.path || '/mqtt'),
+                        user: String(mqttCfg.user || 'beacon'),
+                        pass: String(mqttCfg.pass || 'be_jogja'),
+                        useSSL: Boolean(mqttCfg.useSSL || false),
                         client: null,
                         connected: false,
                         connecting: false,
                         currentTopic: null
+                    },
+
+                    switchDevice() {
+                        this.activeTab = null;
+                        this.rawData = [];
+                        this.dataHistory = [];
+                        this.tabs = [];
+                        this.selectedDeviceName = '';
+                        this.lastDataAt = null;
+                        this.dataOnline = false;
+                        if (this.mqtt.connected) {
+                            this.subscribeMqttTopic(String(this.selectedDeviceId));
+                        }
+                        this.loadDeviceData({
+                            force: true
+                        });
                     },
 
                     startClock() {
@@ -645,9 +244,15 @@
                         this.startClock();
 
                         this.$nextTick(async () => {
+                            this.initLoggerSelect2();
+
                             if (!this.selectedDeviceId) {
                                 const firstOption = this.$el.querySelector('select option');
                                 if (firstOption) this.selectedDeviceId = String(firstOption.value);
+                            }
+
+                            if (window.$ && $.fn && $.fn.select2 && this.selectedDeviceId) {
+                                $('#loggerSelect').val(String(this.selectedDeviceId)).trigger('change.select2');
                             }
 
                             if (this.selectedDeviceId) {
@@ -655,6 +260,36 @@
                                 this.startAutoRefresh();
                                 this.waitPahoThenConnect();
                             }
+                        });
+                    },
+
+                    initLoggerSelect2() {
+                        if (!(window.$ && $.fn && $.fn.select2)) return;
+                        const $select = $('#loggerSelect');
+                        if (!$select.length) return;
+                        if ($select.hasClass('select2-hidden-accessible')) {
+                            $select.select2('destroy');
+                        }
+                        $select.select2({
+                            width: '100%',
+                            placeholder: 'Cari ID/Nama logger...',
+                            allowClear: false,
+                            language: {
+                                searching: function() {
+                                    return 'Mencari...';
+                                },
+                                noResults: function() {
+                                    return 'Logger tidak ditemukan';
+                                },
+                            }
+                        });
+
+                        const self = this;
+                        $select.off('change.realtimeLogger').on('change.realtimeLogger', function() {
+                            const next = String($(this).val() || '');
+                            if (!next || next === String(self.selectedDeviceId || '')) return;
+                            self.selectedDeviceId = next;
+                            self.switchDevice();
                         });
                     },
 
@@ -667,31 +302,81 @@
                             });
                         }, this.pollIntervalMs);
                     },
+                    loadScriptOnce(src, key) {
+                        return new Promise((resolve, reject) => {
+                            const attr = 'data-lib-' + key;
+                            const selector = 'script[' + attr + '="1"]';
+                            const existing = document.querySelector(selector);
+
+                            if (existing) {
+                                if (window.Paho && (window.Paho.Client || (window.Paho.MQTT && window.Paho.MQTT.Client))) {
+                                    resolve();
+                                    return;
+                                }
+                                existing.addEventListener('load', () => resolve(), { once: true });
+                                existing.addEventListener('error', () => reject(new Error('script load error')), { once: true });
+                                return;
+                            }
+
+                            const script = document.createElement('script');
+                            script.src = src;
+                            script.async = true;
+                            script.setAttribute(attr, '1');
+                            script.onload = () => resolve();
+                            script.onerror = () => reject(new Error('gagal load ' + src));
+                            document.head.appendChild(script);
+                        });
+                    },
+
+                    async ensurePahoLoaded() {
+                        const ready = () => !!(window.Paho && (window.Paho.Client || (window.Paho.MQTT && window.Paho.MQTT.Client)));
+                        if (ready()) return true;
+
+                        const sources = [
+                            'https://unpkg.com/paho-mqtt@1.1.0/mqttws31.min.js',
+                            'https://cdn.jsdelivr.net/npm/paho-mqtt@1.1.0/mqttws31.min.js'
+                        ];
+
+                        for (const src of sources) {
+                            try {
+                                await this.loadScriptOnce(src, 'paho');
+                                if (ready()) return true;
+                            } catch (e) {}
+                        }
+
+                        return ready();
+                    },
 
                     waitPahoThenConnect() {
                         if (this._pahoWaitTimer) clearInterval(this._pahoWaitTimer);
 
-                        let tries = 0;
-                        this._pahoWaitTimer = setInterval(() => {
-                            tries++;
-
-                            const ok = window.Paho && window.Paho.MQTT && window.Paho.MQTT.Client;
-                            if (ok) {
-                                clearInterval(this._pahoWaitTimer);
-                                this._pahoWaitTimer = null;
-                                this.connectMqtt();
-                                this.subscribeMqttTopic(String(this.selectedDeviceId));
+                        this.ensurePahoLoaded().then((loaded) => {
+                            if (!loaded) {
+                                console.warn('Paho gagal dimuat, MQTT dimatikan untuk halaman ini');
                                 return;
                             }
 
-                            if (tries >= 20) {
-                                clearInterval(this._pahoWaitTimer);
-                                this._pahoWaitTimer = null;
-                                console.warn('Paho belum siap, MQTT dimatikan untuk halaman ini');
-                            }
-                        }, 150);
-                    },
+                            let tries = 0;
+                            this._pahoWaitTimer = setInterval(() => {
+                                tries++;
+                                const ok = !!(window.Paho && (window.Paho.Client || (window.Paho.MQTT && window.Paho.MQTT.Client)));
 
+                                if (ok) {
+                                    clearInterval(this._pahoWaitTimer);
+                                    this._pahoWaitTimer = null;
+                                    this.connectMqtt();
+                                    this.subscribeMqttTopic(String(this.selectedDeviceId));
+                                    return;
+                                }
+
+                                if (tries >= 60) {
+                                    clearInterval(this._pahoWaitTimer);
+                                    this._pahoWaitTimer = null;
+                                    console.warn('Paho belum siap, MQTT dimatikan untuk halaman ini');
+                                }
+                            }, 200);
+                        });
+                    },
                     getTabLabel() {
                         const tab = this.tabs.find(t => t.id === this.activeTab);
                         return tab ? tab.label : '-';
@@ -711,39 +396,65 @@
                         this.dataOnline = (diffMs / 60000) < 60;
                     },
 
+                    parseLoggerMoment(rawWaktu) {
+                        if (!rawWaktu) return null;
+                        const raw = String(rawWaktu).trim();
+                        let ts = moment.parseZone(raw, moment.ISO_8601, true);
+                        if (!ts.isValid()) {
+                            ts = moment.parseZone(raw, 'YYYY-MM-DD HH:mm:ss', true);
+                        }
+                        return ts.isValid() ? ts : null;
+                    },
+
+                    extractLoggerTime(rawWaktu, withSeconds = true) {
+                        const raw = String(rawWaktu || '').trim();
+                        const withSec = raw.match(/(\d{2}:\d{2}:\d{2})/);
+                        if (withSec) return withSeconds ? withSec[1] : withSec[1].slice(0, 5);
+
+                        const noSec = raw.match(/(\d{2}:\d{2})/);
+                        if (noSec) return noSec[1];
+
+                        const parsed = this.parseLoggerMoment(raw);
+                        if (!parsed) return raw;
+                        return withSeconds ? parsed.format('HH:mm:ss') : parsed.format('HH:mm');
+                    },
+
                     normalizeRealtimeRow(row) {
                         if (!row || !row.waktu) return null;
-                        const ts = moment(row.waktu);
-                        if (!ts.isValid()) return null;
+                        const rawWaktu = String(row.waktu).trim();
+                        const ts = this.parseLoggerMoment(rawWaktu);
+                        if (!ts) return null;
                         return {
                             ...row,
-                            waktu: ts.format('YYYY-MM-DD HH:mm:ss')
+                            waktu: rawWaktu,
+                            waktu_ts: ts.valueOf(),
+                            waktu_label: this.extractLoggerTime(rawWaktu, true),
+                            chart_label: this.extractLoggerTime(rawWaktu, false)
                         };
                     },
 
                     sortRealtimeRows(rows) {
-                        return [...rows].sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
+                        return [...rows].sort((a, b) => Number(b.waktu_ts || 0) - Number(a.waktu_ts || 0));
                     },
 
                     getWindowedRows() {
                         if (!this.rawData.length) return [];
                         const rows = this.sortRealtimeRows(this.rawData);
-                        const latestTime = moment(rows[0].waktu);
-                        if (!latestTime.isValid()) return rows;
-                        const sixtyMinutesAgo = latestTime.clone().subtract(60, 'minutes');
+                        const latestTs = Number(rows[0].waktu_ts || 0);
+                        if (!latestTs) return rows;
+                        const sixtyMinutesAgoTs = latestTs - (60 * 60 * 1000);
                         return rows.filter(d => {
-                            const dataTime = moment(d.waktu);
-                            return dataTime.isValid() && dataTime.isSameOrAfter(sixtyMinutesAgo) && dataTime
-                                .isSameOrBefore(latestTime);
+                            const ts = Number(d.waktu_ts || 0);
+                            return ts >= sixtyMinutesAgoTs && ts <= latestTs;
                         });
                     },
 
                     upsertRealtimeRow(row) {
                         const normalized = this.normalizeRealtimeRow(row);
-                        if (!normalized) return false;
+                        if (!normalized) return null;
 
-                        const newTs = moment(normalized.waktu).valueOf();
-                        const existingIdx = this.rawData.findIndex(r => moment(r.waktu).valueOf() === newTs);
+                        const newTs = Number(normalized.waktu_ts || 0);
+                        const existingIdx = this.rawData.findIndex(r => Number(r.waktu_ts || 0) === newTs);
 
                         if (existingIdx >= 0) {
                             this.rawData[existingIdx] = {
@@ -755,17 +466,18 @@
                         }
 
                         this.rawData = this.sortRealtimeRows(this.rawData).slice(0, 2000);
-                        return true;
+                        return normalized;
                     },
 
                     buildFallbackTabs(sampleRow) {
                         if (!sampleRow) return [];
+                        const deviceId = String(this.selectedDeviceId || '');
                         const sensorKeys = Object.keys(sampleRow)
                             .filter(k => /^sensor\d+$/i.test(k))
                             .sort((a, b) => Number(a.replace(/[^0-9]/g, '')) - Number(b.replace(/[^0-9]/g, '')));
 
                         return sensorKeys.map(key => ({
-                            id: key,
+                            id: `${deviceId}:${key}`,
                             label: key.replace(/^sensor/i, 'Sensor '),
                             unit: '',
                             column: key
@@ -775,22 +487,29 @@
                     async loadDeviceData(options = {}) {
                         const silent = !!options.silent;
                         const merge = !!options.merge;
+                        const force = !!options.force;
+                        const requestedDeviceId = String(this.selectedDeviceId || '');
 
-                        if (!this.selectedDeviceId) {
+                        if (!requestedDeviceId) {
                             this.rawData = [];
                             this.dataHistory = [];
                             this.tabs = [];
                             this.activeTab = null;
+                            this.lastDataAt = null;
+                            this.dataOnline = false;
                             return;
                         }
 
-                        if (this.isLoadingData) return;
+                        if (this.isLoadingData && !force) return;
                         this.isLoadingData = true;
                         if (!silent) this.lastUpdate = 'Updating...';
 
                         try {
-                            const response = await fetch(`{{ route('realtime.index') }}/data/${this.selectedDeviceId}`);
+                            const response = await fetch(`{{ route('realtime.index') }}/data/${requestedDeviceId}`);
                             const result = await response.json();
+                            if (requestedDeviceId !== String(this.selectedDeviceId || '')) {
+                                return;
+                            }
 
                             if (result.success) {
                                 const incomingRows = (result.data || [])
@@ -804,14 +523,15 @@
                                 }
 
                                 this.selectedDeviceName = result.device?.nama_logger || '';
-                                this.lastDataAt = this.rawData?.[0]?.waktu ? new Date(this.rawData[0].waktu) : null;
+                                this.subscribeMqttTopic(requestedDeviceId);
+                                this.lastDataAt = this.rawData?.[0]?.waktu_ts ? new Date(this.rawData[0].waktu_ts) : null;
                                 this.refreshDataOnline();
 
                                 if (result.params && result.params.length > 0) {
                                     this.tabs = result.params
                                         .filter(p => p && p.kolom_sensor)
                                         .map(p => ({
-                                            id: p.nama_parameter || p.kolom_sensor,
+                                            id: `${requestedDeviceId}:${p.kolom_sensor}`,
                                             label: p.nama_parameter || p.kolom_sensor.replace(/^sensor/i,
                                                 'Sensor '),
                                             unit: p.satuan || '',
@@ -871,9 +591,9 @@
                             const dbColumn = currentTab.column;
 
                             const windowedRows = this.getWindowedRows();
-                            const sortedDocs = [...windowedRows].sort((a, b) => new Date(a.waktu) - new Date(b.waktu));
+                            const sortedDocs = [...windowedRows].sort((a, b) => Number(a.waktu_ts || 0) - Number(b.waktu_ts || 0));
 
-                            const chartLabels = sortedDocs.map(d => moment(d.waktu).format('HH:mm'));
+                            const chartLabels = sortedDocs.map(d => d.chart_label || this.extractLoggerTime(d.waktu, false));
                             const chartData = sortedDocs.map(d => {
                                 const v = d[dbColumn];
                                 return (v !== null && v !== undefined && v !== '' && !isNaN(v)) ? parseFloat(
@@ -951,12 +671,12 @@
 
                     updateTable(column) {
                         const windowedRows = this.getWindowedRows();
-                        const latestFirstRows = [...windowedRows].sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
+                        const latestFirstRows = [...windowedRows].sort((a, b) => Number(b.waktu_ts || 0) - Number(a.waktu_ts || 0));
 
                         this.dataHistory = latestFirstRows.map(row => {
                             const num = Number(row[column]);
                             return {
-                                waktu: moment(row.waktu).format('HH:mm:ss'),
+                                waktu: row.waktu_label || this.extractLoggerTime(row.waktu, true),
                                 value: Number.isFinite(num) ? num.toFixed(2) : '-'
                             };
                         });
@@ -966,7 +686,18 @@
                         if (this.mqtt.connected || this.mqtt.connecting) return;
 
                         const clientID = "web_" + Math.floor(Math.random() * 1000000);
-                        this.mqtt.client = new Paho.MQTT.Client(this.mqtt.broker, Number(this.mqtt.port), clientID);
+                        const PahoClient = window.Paho?.Client || window.Paho?.MQTT?.Client;
+                        if (!PahoClient) {
+                            console.warn('Paho Client constructor tidak ditemukan');
+                            return;
+                        }
+                        this.mqtt.client = new PahoClient(
+                            this.mqtt.broker,
+                            Number(this.mqtt.port),
+                            String(this.mqtt.path || '/mqtt'),
+                            clientID
+                        );
+
                         this.mqtt.connecting = true;
 
                         this.mqtt.client.onConnectionLost = () => {
@@ -1035,9 +766,10 @@
                         }
 
                         if (!data || !data.waktu) return;
-                        if (!this.upsertRealtimeRow(data)) return;
+                        const normalized = this.upsertRealtimeRow(data);
+                        if (!normalized) return;
 
-                        this.lastDataAt = new Date(data.waktu);
+                        this.lastDataAt = normalized.waktu_ts ? new Date(normalized.waktu_ts) : null;
                         this.refreshDataOnline();
                         this.updateChart();
                     }
