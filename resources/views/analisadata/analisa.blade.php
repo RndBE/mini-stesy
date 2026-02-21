@@ -761,7 +761,8 @@
                                             <div class="relative">
                                                 <button type="button" id="dpMonthBtn"
                                                     class="h-8 rounded-full border border-slate-200 bg-slate-100 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 inline-flex items-center gap-2">
-                                                    <span id="dpMonthLabel"></span>
+                                                    <span
+                                                        id="dpMonthLabel">{{ ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][(int) date('n') - 1] }}</span>
                                                     <svg width="12" height="12" viewBox="0 0 20 20"
                                                         fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M5 7.5L10 12.5L15 7.5" stroke="#64748B" stroke-width="2"
@@ -778,7 +779,7 @@
                                             <div class="relative">
                                                 <button type="button" id="dpYearBtn"
                                                     class="h-8 rounded-full border border-slate-200 bg-slate-100 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 inline-flex items-center gap-2">
-                                                    <span id="dpYearLabel"></span>
+                                                    <span id="dpYearLabel">{{ date('Y') }}</span>
                                                     <svg width="12" height="12" viewBox="0 0 20 20"
                                                         fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M5 7.5L10 12.5L15 7.5" stroke="#64748B" stroke-width="2"
@@ -1251,13 +1252,19 @@
             let titleText = `Rerata ${param} `;
             let tableTitleText = `Tabel Rerata ${param} `;
             if (range === 'day') {
-                const dateInput = document.getElementById('dateInput').value;
-                const date = new Date(dateInput);
-                const day = date.getDate();
-                const month = monthNames[date.getMonth()];
-                const year = date.getFullYear();
-                titleText += `Pada ${day} ${month} ${year}`;
-                tableTitleText += `Pada ${day} ${month} ${year}`;
+                const dateInput = String(document.getElementById('dateInput').value || '').trim();
+                const m = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                if (m) {
+                    const year = Number(m[1]);
+                    const monthIdx = Number(m[2]) - 1;
+                    const day = Number(m[3]);
+                    const month = monthNames[monthIdx] || '-';
+                    titleText += `Pada ${day} ${month} ${year}`;
+                    tableTitleText += `Pada ${day} ${month} ${year}`;
+                } else {
+                    titleText += 'Pada -';
+                    tableTitleText += 'Pada -';
+                }
             } else if (range === 'month') {
                 const monthInput = document.getElementById('monthInput').value;
                 const [year, month] = monthInput.split('-');
@@ -1419,7 +1426,8 @@
             const currentYear = String(now.getFullYear());
             let idx = -1;
             if (range === 'day') {
-                const dateInput = document.getElementById('dateInput')?.value || '';
+                const dateInputEl = document.getElementById('dateInput');
+                const dateInput = dateInputEl ? dateInputEl.value : '';
                 if (!isToday(dateInput)) {
                     return {
                         labels,
@@ -1432,7 +1440,8 @@
                     if (t <= nowMin) idx = i;
                 }
             } else if (range === 'month') {
-                const monthInput = document.getElementById('monthInput')?.value || '';
+                const monthInputEl = document.getElementById('monthInput');
+                const monthInput = monthInputEl ? monthInputEl.value : '';
                 if (!isCurrentMonth(monthInput)) {
                     return {
                         labels,
@@ -1448,7 +1457,8 @@
                     }
                 }
             } else if (range === 'year') {
-                const yearInput = document.getElementById('yearInput')?.value || '';
+                const yearInputEl = document.getElementById('yearInput');
+                const yearInput = yearInputEl ? yearInputEl.value : '';
                 if (!isCurrentYear(yearInput)) {
                     return {
                         labels: [],
@@ -1487,14 +1497,14 @@
         }
 
         function hasAnyDataPayload(data) {
-            return hasAnyRealValue(data?.chartData) || hasAnyRealValue(data?.minData) || hasAnyRealValue(data?.maxData);
+            return hasAnyRealValue(data && data.chartData) || hasAnyRealValue(data && data.minData) || hasAnyRealValue(data && data.maxData);
         }
 
         function getSelectedUnit() {
             const sel = document.getElementById('parameterSelect');
             if (!sel) return '';
             const opt = sel.options[sel.selectedIndex];
-            const u = opt?.dataset?.unit || '';
+            const u = (opt && opt.dataset && opt.dataset.unit) ? opt.dataset.unit : '';
             return u ? ` ${u}` : '';
         }
 
@@ -1509,7 +1519,8 @@
             const avgRaw = data.chartData || [];
             const minRaw = data.minData || [];
             const maxRaw = data.maxData || [];
-            const range = document.querySelector('input[name="range"]:checked')?.value;
+            const rangeNode = document.querySelector('input[name="range"]:checked');
+            const range = rangeNode ? rangeNode.value : 'day';
             if (!hasAnyDataPayload(data)) {
                 chart.data.labels = [];
                 chart.data.datasets[0].data = [];
@@ -1537,7 +1548,8 @@
         function updateTable(data) {
             const tbody = document.getElementById('dataTableBody');
             if (!tbody) return;
-            const range = document.querySelector('input[name="range"]:checked')?.value;
+            const rangeNode = document.querySelector('input[name="range"]:checked');
+            const range = rangeNode ? rangeNode.value : 'day';
             const rows = Array.isArray(data.tableData) ? data.tableData : [];
             const labelsRaw = Array.isArray(data.labels) ? data.labels : [];
             const unit = getSelectedUnit();
@@ -1671,12 +1683,12 @@
         }
 
         function prevDocPhoto(event) {
-            event?.stopPropagation();
+            if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
             updateDocPhoto(docPhotoIndex - 1);
         }
 
         function nextDocPhoto(event) {
-            event?.stopPropagation();
+            if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
             updateDocPhoto(docPhotoIndex + 1);
         }
 
@@ -1870,8 +1882,8 @@
                 }
 
                 function closeMenus() {
-                    monthMenu?.classList.add('hidden')
-                    yearMenu?.classList.add('hidden')
+                    if (monthMenu) monthMenu.classList.add('hidden')
+                    if (yearMenu) yearMenu.classList.add('hidden')
                 }
 
                 function openPanel() {
@@ -2001,27 +2013,27 @@
                 buildYearItems()
                 renderHeader()
 
-                btn?.addEventListener('click', togglePanel)
+                if (btn) btn.addEventListener('click', togglePanel)
                 input.addEventListener('focus', openPanel)
 
-                monthBtn?.addEventListener('click', () => {
+                if (monthBtn) monthBtn.addEventListener('click', () => {
                     if (panel.classList.contains('hidden')) openPanel()
                     monthMenu.classList.toggle('hidden')
                     yearMenu.classList.add('hidden')
                 })
 
-                yearBtn?.addEventListener('click', () => {
+                if (yearBtn) yearBtn.addEventListener('click', () => {
                     if (panel.classList.contains('hidden')) openPanel()
                     yearMenu.classList.toggle('hidden')
                     monthMenu.classList.add('hidden')
                 })
 
-                prevBtn?.addEventListener('click', () => {
+                if (prevBtn) prevBtn.addEventListener('click', () => {
                     viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1)
                     render()
                 })
 
-                nextBtn?.addEventListener('click', () => {
+                if (nextBtn) nextBtn.addEventListener('click', () => {
                     viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1)
                     render()
                 })
@@ -2039,8 +2051,8 @@
                     }
                 })
 
-                monthMenu?.addEventListener('click', (e) => e.stopPropagation())
-                yearMenu?.addEventListener('click', (e) => e.stopPropagation())
+                if (monthMenu) monthMenu.addEventListener('click', (e) => e.stopPropagation())
+                if (yearMenu) yearMenu.addEventListener('click', (e) => e.stopPropagation())
             }
 
             // =========================
