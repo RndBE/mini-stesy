@@ -45,5 +45,3 @@
 
     function onConnectionLost(responseObject) {}
 </script> -->
-
-@stack('scripts')
