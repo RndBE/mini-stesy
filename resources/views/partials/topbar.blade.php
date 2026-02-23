@@ -62,7 +62,8 @@
             <div x-show="open" x-cloak x-transition @click.outside="open = false"
                 class="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
 
-                <a href="#" class="block px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">Lupa Password</a>
+                <a href="{{ route('profile.password') }}"
+                    class="block px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">Ubah Kata Sandi</a>
                 <div class="h-px bg-slate-200"></div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

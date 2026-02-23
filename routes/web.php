@@ -92,6 +92,7 @@ Route::middleware(['auth', 'permission:manage_rbac'])->group(function () {
 Route::middleware(['auth', 'permission:manage_user'])->resource('users', UserController::class)->except(['create', 'edit']);
 
 Route::middleware(['auth', 'permission:view_profile'])->get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+Route::middleware(['auth', 'permission:manage_profile'])->get('/profile/password', [ProfileController::class, 'password'])->name('profile.password');
 Route::middleware(['auth', 'permission:manage_profile'])->patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 Route::middleware(['auth', 'permission:manage_profile'])->delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
