@@ -18,6 +18,7 @@ use App\Http\Controllers\KategoriLoggerController;
 use App\Http\Controllers\ListParameterController;
 use App\Http\Controllers\ParameterGroupController;
 use App\Http\Controllers\TemplateKategoriParameterController;
+use App\Http\Controllers\AuditLogController;
 use Illuminate\Support\Facades\Http;
 
 // Route::get('/', function () {
@@ -52,6 +53,9 @@ Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
     Route::get('/data-masuk', [DataMasukController::class, 'index'])->name('data-masuk.index');
     Route::get('/api/data-masuk', [DataMasukController::class, 'getData'])->name('data-masuk.api');
 });
+
+Route::middleware(['auth'])->get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
+// Route::middleware(['auth'])->post('/audit-log/client-export', [AuditLogController::class, 'clientExport'])->name('audit-log.client-export');
 
 // Device Routes
 Route::middleware(['auth', 'permission:view_device'])->get('/pengaturan-device', [DeviceController::class, 'index'])->name('device.index');
