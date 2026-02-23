@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     @php
         $isManageAllInstansi = $canManageAllInstansi ?? false;
         $ownInstansi = $instansi->first();
@@ -194,7 +195,8 @@
                         x-transition:leave="ease-in-out duration-200"
                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                         x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-                        class="w-full max-w-5xl bg-white rounded-lg shadow-xl overflow-hidden my-8" @click.stop>
+                        class="w-full max-w-5xl bg-white rounded-lg shadow-xl overflow-hidden my-8 max-h-[90vh] flex flex-col"
+                        @click.stop>
                         <div class="flex items-center justify-between px-8 py-2 border-b border-slate-200">
                             <h3 id="modal-title" class="text-xl font-bold text-gray-900">Tambah Instansi</h3>
                             <button type="button" @click="closeCreateModal()" class="p-2 rounded-lg hover:bg-gray-100">
@@ -205,10 +207,11 @@
                             </button>
                         </div>
 
-                        <form action="{{ route('instansi.store') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('instansi.store') }}" method="POST" enctype="multipart/form-data"
+                            class="flex flex-col min-h-0">
                             @csrf
 
-                            <div class="px-8 pt-4 pb-3 space-y-3">
+                            <div class="px-8 pt-4 pb-3 space-y-3 overflow-y-auto flex-1 min-h-0">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label class="block text-sm font-semibold text-gray-900 mb-2">Nama Instansi <span
@@ -245,7 +248,8 @@
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div>
                                         <label class="block text-sm font-semibold text-gray-900 mb-2">Latitude</label>
-                                        <input type="text" name="latitude" value="{{ old('latitude') }}"
+                                        <input type="text" name="latitude" x-model="createData.latitude"
+                                            @input="updateCreateMapFromInputs()"
                                             placeholder="-7.800000"
                                             class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                         @error('latitude')
@@ -254,7 +258,8 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-gray-900 mb-2">Longitude</label>
-                                        <input type="text" name="longitude" value="{{ old('longitude') }}"
+                                        <input type="text" name="longitude" x-model="createData.longitude"
+                                            @input="updateCreateMapFromInputs()"
                                             placeholder="110.360000"
                                             class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                         @error('longitude')
@@ -263,13 +268,21 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-gray-900 mb-2">Zoom</label>
-                                        <input type="number" name="zoom" value="{{ old('zoom', 11) }}"
+                                        <input type="number" name="zoom" x-model="createData.zoom"
+                                            @input="updateCreateMapFromInputs()"
                                             min="1" max="20"
                                             class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                         @error('zoom')
                                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
+                                </div>
+
+                                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                    <h4 class="text-sm font-semibold text-gray-900 mb-3">Pilih Lokasi di Peta</h4>
+                                    <div id="addInstansiMap" class="h-72 rounded-lg border border-gray-300"></div>
+                                    <p class="text-xs text-gray-500 mt-2">Klik peta atau geser marker untuk mengisi
+                                        koordinat secara otomatis.</p>
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -394,7 +407,8 @@
                     x-transition:leave="ease-in-out duration-200"
                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-                    class="w-full max-w-5xl bg-white rounded-lg shadow-xl overflow-hidden my-8" @click.stop>
+                    class="w-full max-w-5xl bg-white rounded-lg shadow-xl overflow-hidden my-8 max-h-[90vh] flex flex-col"
+                    @click.stop>
 
                     <div class="flex items-center justify-between px-8 py-2 border-b border-slate-200">
                         <h3 class="text-xl font-bold text-gray-900">Edit Instansi</h3>
@@ -406,10 +420,11 @@
                         </button>
                     </div>
 
-                    <form :action="`{{ url('instansi') }}/${editData.id}`" method="POST" enctype="multipart/form-data">
+                    <form :action="`{{ url('instansi') }}/${editData.id}`" method="POST" enctype="multipart/form-data"
+                        class="flex flex-col min-h-0">
                         @csrf
                         @method('PUT')
-                        <div class="px-8 pb-3 pt-4 space-y-3">
+                        <div class="px-8 pb-3 pt-4 space-y-3 overflow-y-auto flex-1 min-h-0">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Nama Instansi <span
@@ -446,6 +461,7 @@
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Latitude</label>
                                     <input type="text" name="latitude" x-model="editData.latitude"
+                                        @input="updateEditMapFromInputs()"
                                         placeholder="-7.800000"
                                         class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                     @error('latitude')
@@ -455,6 +471,7 @@
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Longitude</label>
                                     <input type="text" name="longitude" x-model="editData.longitude"
+                                        @input="updateEditMapFromInputs()"
                                         placeholder="110.360000"
                                         class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                     @error('longitude')
@@ -464,12 +481,20 @@
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Zoom</label>
                                     <input type="number" name="zoom" x-model="editData.zoom" min="1"
+                                        @input="updateEditMapFromInputs()"
                                         max="20"
                                         class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                     @error('zoom')
                                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
+                            </div>
+
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <h4 class="text-sm font-semibold text-gray-900 mb-3">Pilih Lokasi di Peta</h4>
+                                <div id="editInstansiMap" class="h-72 rounded-lg border border-gray-300"></div>
+                                <p class="text-xs text-gray-500 mt-2">Klik peta atau geser marker untuk mengisi
+                                    koordinat secara otomatis.</p>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -527,6 +552,7 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         function instansiData() {
             return {
@@ -535,6 +561,15 @@
                 showDeleteModal: false,
                 searchQuery: '',
                 allInstansi: @json($instansi),
+                addInstansiMap: null,
+                addInstansiMarker: null,
+                editInstansiMap: null,
+                editInstansiMarker: null,
+                createData: {
+                    latitude: '{{ old('latitude', '') }}',
+                    longitude: '{{ old('longitude', '') }}',
+                    zoom: '{{ old('zoom', 11) }}',
+                },
                 editData: {
                     id: null,
                     nama: '',
@@ -580,10 +615,93 @@
 
                 openCreateModal() {
                     this.showCreateModal = true;
+                    this.initCreateMap();
                 },
 
                 closeCreateModal() {
                     this.showCreateModal = false;
+                    if (this.addInstansiMap) {
+                        this.addInstansiMap.remove();
+                        this.addInstansiMap = null;
+                        this.addInstansiMarker = null;
+                    }
+                },
+
+                parseCoordinate(value, fallback) {
+                    const parsed = parseFloat(value);
+                    return Number.isFinite(parsed) ? parsed : fallback;
+                },
+
+                parseZoom(value, fallback = 11) {
+                    const parsed = parseInt(value, 10);
+                    return Number.isInteger(parsed) && parsed >= 1 && parsed <= 20 ? parsed : fallback;
+                },
+
+                initCreateMap() {
+                    this.$nextTick(() => {
+                        if (typeof L === 'undefined') return;
+                        const mapElement = document.getElementById('addInstansiMap');
+                        if (!mapElement) return;
+
+                        if (this.addInstansiMap) {
+                            this.addInstansiMap.remove();
+                        }
+
+                        const defaultLat = this.parseCoordinate(this.createData.latitude, -6.200000);
+                        const defaultLng = this.parseCoordinate(this.createData.longitude, 106.816666);
+                        const defaultZoom = this.parseZoom(this.createData.zoom, 11);
+
+                        this.createData.latitude = Number(defaultLat).toFixed(6);
+                        this.createData.longitude = Number(defaultLng).toFixed(6);
+                        this.createData.zoom = defaultZoom;
+
+                        this.addInstansiMap = L.map('addInstansiMap').setView([defaultLat, defaultLng], defaultZoom);
+
+                        L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                            maxZoom: 20,
+                            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+                        }).addTo(this.addInstansiMap);
+
+                        this.addInstansiMarker = L.marker([defaultLat, defaultLng], {
+                            draggable: true
+                        }).addTo(this.addInstansiMap);
+
+                        this.addInstansiMap.on('click', (e) => {
+                            this.createData.latitude = e.latlng.lat.toFixed(6);
+                            this.createData.longitude = e.latlng.lng.toFixed(6);
+                            this.addInstansiMarker.setLatLng(e.latlng);
+                        });
+
+                        this.addInstansiMarker.on('dragend', (e) => {
+                            const position = e.target.getLatLng();
+                            this.createData.latitude = position.lat.toFixed(6);
+                            this.createData.longitude = position.lng.toFixed(6);
+                        });
+
+                        this.addInstansiMap.on('zoomend', () => {
+                            this.createData.zoom = this.addInstansiMap.getZoom();
+                        });
+
+                        setTimeout(() => {
+                            this.addInstansiMap.invalidateSize();
+                        }, 100);
+                    });
+                },
+
+                updateCreateMapFromInputs() {
+                    if (!this.addInstansiMap || !this.addInstansiMarker) return;
+
+                    const lat = parseFloat(this.createData.latitude);
+                    const lng = parseFloat(this.createData.longitude);
+                    const zoom = this.parseZoom(this.createData.zoom, this.addInstansiMap.getZoom());
+
+                    if (Number.isFinite(lat) && Number.isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 &&
+                        lng <= 180) {
+                        this.addInstansiMarker.setLatLng([lat, lng]);
+                        this.addInstansiMap.setView([lat, lng], zoom);
+                    } else if (this.addInstansiMap.getZoom() !== zoom) {
+                        this.addInstansiMap.setZoom(zoom);
+                    }
                 },
 
                 openEditModal(instansi) {
@@ -599,10 +717,16 @@
                         logo_mobile: instansi.logo_mobile || ''
                     };
                     this.showEditModal = true;
+                    this.initEditMap();
                 },
 
                 closeEditModal() {
                     this.showEditModal = false;
+                    if (this.editInstansiMap) {
+                        this.editInstansiMap.remove();
+                        this.editInstansiMap = null;
+                        this.editInstansiMarker = null;
+                    }
                     this.editData = {
                         id: null,
                         nama: '',
@@ -614,6 +738,73 @@
                         logo: '',
                         logo_mobile: ''
                     };
+                },
+
+                initEditMap() {
+                    this.$nextTick(() => {
+                        if (typeof L === 'undefined') return;
+                        const mapElement = document.getElementById('editInstansiMap');
+                        if (!mapElement) return;
+
+                        if (this.editInstansiMap) {
+                            this.editInstansiMap.remove();
+                        }
+
+                        const defaultLat = this.parseCoordinate(this.editData.latitude, -6.200000);
+                        const defaultLng = this.parseCoordinate(this.editData.longitude, 106.816666);
+                        const defaultZoom = this.parseZoom(this.editData.zoom, 11);
+
+                        this.editData.latitude = Number(defaultLat).toFixed(6);
+                        this.editData.longitude = Number(defaultLng).toFixed(6);
+                        this.editData.zoom = defaultZoom;
+
+                        this.editInstansiMap = L.map('editInstansiMap').setView([defaultLat, defaultLng], defaultZoom);
+
+                        L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                            maxZoom: 20,
+                            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+                        }).addTo(this.editInstansiMap);
+
+                        this.editInstansiMarker = L.marker([defaultLat, defaultLng], {
+                            draggable: true
+                        }).addTo(this.editInstansiMap);
+
+                        this.editInstansiMap.on('click', (e) => {
+                            this.editData.latitude = e.latlng.lat.toFixed(6);
+                            this.editData.longitude = e.latlng.lng.toFixed(6);
+                            this.editInstansiMarker.setLatLng(e.latlng);
+                        });
+
+                        this.editInstansiMarker.on('dragend', (e) => {
+                            const position = e.target.getLatLng();
+                            this.editData.latitude = position.lat.toFixed(6);
+                            this.editData.longitude = position.lng.toFixed(6);
+                        });
+
+                        this.editInstansiMap.on('zoomend', () => {
+                            this.editData.zoom = this.editInstansiMap.getZoom();
+                        });
+
+                        setTimeout(() => {
+                            this.editInstansiMap.invalidateSize();
+                        }, 100);
+                    });
+                },
+
+                updateEditMapFromInputs() {
+                    if (!this.editInstansiMap || !this.editInstansiMarker) return;
+
+                    const lat = parseFloat(this.editData.latitude);
+                    const lng = parseFloat(this.editData.longitude);
+                    const zoom = this.parseZoom(this.editData.zoom, this.editInstansiMap.getZoom());
+
+                    if (Number.isFinite(lat) && Number.isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 &&
+                        lng <= 180) {
+                        this.editInstansiMarker.setLatLng([lat, lng]);
+                        this.editInstansiMap.setView([lat, lng], zoom);
+                    } else if (this.editInstansiMap.getZoom() !== zoom) {
+                        this.editInstansiMap.setZoom(zoom);
+                    }
                 },
 
                 openDeleteModal(id, name) {
