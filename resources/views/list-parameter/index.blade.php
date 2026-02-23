@@ -52,8 +52,9 @@
                             @endphp
                             <tr class="hover:bg-slate-50">
                                 <td class="px-4 py-3">{{ $index + 1 }}</td>
-                                <td class="px-4 py-3 font-semibold text-slate-900">{{ $item->nama_parameter }}</td>
-                                <td class="px-4 py-3">{{ $item->parameter_utama ?? '-' }}</td>
+                                <td class="px-4 py-3 font-semibold text-slate-900">
+                                    {{ str_replace('_', ' ', $item->nama_parameter) }}</td>
+                                <td class="px-4 py-3">{{ str_replace('_', ' ', $item->parameter_utama) }}</td>
                                 <td class="px-4 py-3">{{ $item->default_satuan ?? '-' }}</td>
                                 <td class="px-4 py-3">{{ $item->default_kolom_sensor ?? '-' }}</td>
                                 <td class="px-4 py-3">{{ $item->parameterGroup?->nama_group ?? '-' }}</td>
@@ -73,7 +74,8 @@
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
-                                        <button type="button" @click="openDeleteModal({{ $item->id }}, '{{ addslashes($item->nama_parameter) }}')"
+                                        <button type="button"
+                                            @click="openDeleteModal({{ $item->id }}, '{{ addslashes($item->nama_parameter) }}')"
                                             class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-slate-950 hover:bg-red-200 transition-colors"
                                             title="Hapus">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,7 +353,8 @@
                     <div class="px-6 py-5">
                         <div class="flex flex-col items-center gap-2">
                             <div class="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center">
-                                <svg class="w-14 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-14 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
@@ -386,6 +389,10 @@
     </div>
 @endsection
 
+@php
+    $oldNamaParam = old('form_mode') === 'edit' ? str_replace('_', ' ', old('nama_parameter', '')) : '';
+@endphp
+
 @push('scripts')
     <script>
         function listParameterCrud() {
@@ -399,7 +406,8 @@
                 showDeleteModal: false,
                 editData: {
                     id: @json(old('item_id')),
-                    nama_parameter: @json(old('form_mode') === 'edit' ? old('nama_parameter') : ''),
+                    // nama_parameter: @json(old('form_mode') === 'edit' ? old('nama_parameter') : ''),
+                    nama_parameter: @json($oldNamaParam),
                     parameter_utama: @json(old('form_mode') === 'edit' ? old('parameter_utama') : ''),
                     default_satuan: @json(old('form_mode') === 'edit' ? old('default_satuan') : ''),
                     default_kolom_sensor: @json(old('form_mode') === 'edit' ? old('default_kolom_sensor') : ''),
@@ -419,8 +427,8 @@
                 openEditModal(row) {
                     this.editData = {
                         id: row.id,
-                        nama_parameter: row.nama_parameter ?? '',
-                        parameter_utama: row.parameter_utama ?? '',
+                        nama_parameter: (row.nama_parameter ?? '').replaceAll('_', ' '),
+                        parameter_utama: (row.parameter_utama ?? '').replaceAll('_', ' '),
                         default_satuan: row.default_satuan ?? '',
                         default_kolom_sensor: row.default_kolom_sensor ?? '',
                         default_parameter_group_id: row.default_parameter_group_id ? String(row
@@ -436,12 +444,18 @@
                     return `${this.baseUrl}/${this.editData.id}`;
                 },
                 openDeleteModal(id, name) {
-                    this.deleteData = { id, name };
+                    this.deleteData = {
+                        id,
+                        name
+                    };
                     this.showDeleteModal = true;
                 },
                 closeDeleteModal() {
                     this.showDeleteModal = false;
-                    this.deleteData = { id: null, name: '' };
+                    this.deleteData = {
+                        id: null,
+                        name: ''
+                    };
                 },
                 confirmDelete() {
                     const form = document.createElement('form');

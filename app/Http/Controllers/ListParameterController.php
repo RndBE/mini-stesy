@@ -43,9 +43,28 @@ class ListParameterController extends Controller
             'default_parameter_group_id' => 'nullable|integer|exists:parameter_groups,id',
             'is_active' => 'nullable|boolean',
         ]);
+        $nama = trim((string) $validated['nama_parameter']);
+        $nama = preg_replace('/\s+/', ' ', $nama);
 
-        $validated['nama_parameter'] = trim((string) $validated['nama_parameter']);
-        $validated['parameter_utama'] = isset($validated['parameter_utama']) ? trim((string) $validated['parameter_utama']) : null;
+        if (!str_contains($nama, '_')) {
+            $nama = str_replace(' ', '_', $nama);
+        }
+
+        $validated['nama_parameter'] = strtolower($nama);
+
+        $utama = isset($validated['parameter_utama']) ? trim((string) $validated['parameter_utama']) : null;
+        if ($utama !== null && $utama !== '') {
+            $utama = preg_replace('/\s+/', ' ', $utama);
+            if (!str_contains($utama, '_')) {
+                $utama = str_replace(' ', '_', $utama);
+            }
+            $validated['parameter_utama'] = strtolower($utama);
+        } else {
+            $validated['parameter_utama'] = null;
+        }
+
+        // $validated['nama_parameter'] = trim((string) $validated['nama_parameter']);
+        // $validated['parameter_utama'] = isset($validated['parameter_utama']) ? trim((string) $validated['parameter_utama']) : null;
         $validated['default_satuan'] = isset($validated['default_satuan']) ? trim((string) $validated['default_satuan']) : null;
         $validated['default_kolom_sensor'] = isset($validated['default_kolom_sensor']) ? trim((string) $validated['default_kolom_sensor']) : null;
         $validated['is_active'] = (bool) ($validated['is_active'] ?? false);
@@ -76,8 +95,28 @@ class ListParameterController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        $validated['nama_parameter'] = trim((string) $validated['nama_parameter']);
-        $validated['parameter_utama'] = isset($validated['parameter_utama']) ? trim((string) $validated['parameter_utama']) : null;
+        $nama = trim((string) $validated['nama_parameter']);
+        $nama = preg_replace('/\s+/', ' ', $nama);
+
+        if (!str_contains($nama, '_')) {
+            $nama = str_replace(' ', '_', $nama);
+        }
+
+        $validated['nama_parameter'] = strtolower($nama);
+    
+        $utama = isset($validated['parameter_utama']) ? trim((string) $validated['parameter_utama']) : null;
+        if ($utama !== null && $utama !== '') {
+            $utama = preg_replace('/\s+/', ' ', $utama);
+            if (!str_contains($utama, '_')) {
+                $utama = str_replace(' ', '_', $utama);
+            }
+            $validated['parameter_utama'] = strtolower($utama);
+        } else {
+            $validated['parameter_utama'] = null;
+        }
+
+        // $validated['nama_parameter'] = trim((string) $validated['nama_parameter']);
+        // $validated['parameter_utama'] = isset($validated['parameter_utama']) ? trim((string) $validated['parameter_utama']) : null;
         $validated['default_satuan'] = isset($validated['default_satuan']) ? trim((string) $validated['default_satuan']) : null;
         $validated['default_kolom_sensor'] = isset($validated['default_kolom_sensor']) ? trim((string) $validated['default_kolom_sensor']) : null;
         $validated['is_active'] = (bool) ($validated['is_active'] ?? false);

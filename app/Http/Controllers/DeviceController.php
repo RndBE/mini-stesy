@@ -246,9 +246,6 @@ class DeviceController extends Controller
             'params.*.parameter_group_id'  => 'nullable|integer|exists:parameter_groups,id',
         ]);
 
-        // dd($request->all());
-
-        // Ambil logger + semua relasi yg dibutuhkan
         $logger = t_Logger::query()
             ->forUser(auth()->user())
             ->with(['lokasi', 'jiat', 'params'])
@@ -268,6 +265,7 @@ class DeviceController extends Controller
             $kedalamanSumur = $subKategori === 'jiat'
                 ? (float) ($request->kedalaman_sumur ?? 0)
                 : 0.0;
+
             $kedalamanSensor = (float) ($request->kedalaman_sensor ?? 0);
             $kedalamanPompa = (float) ($request->kedalaman_pompa ?? 0);
 
@@ -281,17 +279,32 @@ class DeviceController extends Controller
             );
         }
 
+        $normalize = function ($v) {
+            $v = trim((string) $v);
+            $v = preg_replace('/\s+/', ' ', $v);
+            if ($v === '') return '';
+            if (!str_contains($v, '_')) {
+                $v = str_replace(' ', '_', $v);
+            }
+            return strtolower($v);
+        };
+
         if ($request->has('params') && is_array($request->params)) {
             $keptParamIds = [];
 
             foreach ($request->params as $data) {
                 $paramId = $data['id_param'] ?? null;
+
+                $namaParam = $normalize($data['nama_parameter'] ?? '');
+                $kolomSensor = trim((string) ($data['kolom_sensor'] ?? ''));
+                $satuan = trim((string) ($data['satuan'] ?? ''));
+
                 $payload = [
-                    'nama_parameter' => $data['nama_parameter'] ?? '',
-                    'satuan'         => $data['satuan'] ?? '',
-                    'kolom_sensor'   => $data['kolom_sensor'] ?? '',
+                    'nama_parameter' => $namaParam,
+                    'satuan'         => $satuan,
+                    'kolom_sensor'   => $kolomSensor,
                     'parameter_group_id' => $data['parameter_group_id']
-                        ?? $this->inferParameterGroupId($data['nama_parameter'] ?? null, null),
+                        ?? $this->inferParameterGroupId($namaParam ?: null, null),
                 ];
 
                 if ($paramId) {
@@ -310,7 +323,6 @@ class DeviceController extends Controller
 
             $logger->params()->whereNotIn('id_param', $keptParamIds)->delete();
         }
-
 
         return back()->with('success', 'Data device berhasil diperbarui');
     }

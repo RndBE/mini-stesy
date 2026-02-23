@@ -88,8 +88,8 @@
                                         <template x-for="(param, paramIndex) in (device.params || [])"
                                             :key="param.id_param || paramIndex">
                                             <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium"
-                                                :class="paramColorClass(param.nama_parameter)"
-                                                x-text="param.nama_parameter || '-'"></span>
+                                                :class="paramColorClass(param.nama_parameter)" {{-- x-text="param.nama_parameter || '-'"></span> --}}
+                                                x-text="(param.nama_parameter || '-').replaceAll('_', ' ')"></span>
                                         </template>
                                     </div>
                                 </td>
@@ -291,8 +291,10 @@
                                             <template x-for="(param, index) in (detailData.params || [])"
                                                 :key="param.id_param || index">
                                                 <tr>
+                                                    {{-- <td class="px-4 py-3 font-semibold text-slate-900"
+                                                        x-text="param.nama_parameter || '-'"></td> --}}
                                                     <td class="px-4 py-3 font-semibold text-slate-900"
-                                                        x-text="param.nama_parameter || '-'"></td>
+                                                        x-text="(param.nama_parameter || '-').replaceAll('_', ' ')"></td>
                                                     <td class="px-4 py-3" x-text="param.kolom_sensor || '-'"></td>
                                                     <td class="px-4 py-3" x-text="param.satuan || '-'"></td>
                                                 </tr>
@@ -533,7 +535,8 @@
                                                         <template x-for="lp in listParameterOptions"
                                                             :key="'add-list-' + lp.id">
                                                             <option :value="String(lp.id)"
-                                                                x-text="lp.parameter_utama ? `${lp.nama_parameter} (${lp.parameter_utama})` : lp.nama_parameter">
+                                                                {{-- x-text="lp.parameter_utama ? `${lp.nama_parameter} (${lp.parameter_utama})` : lp.nama_parameter"> --}}
+                                                                x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} (${(lp.parameter_utama || '').replaceAll('_',' ')})`: (lp.nama_parameter || '').replaceAll('_',' ')">
                                                             </option>
                                                         </template>
                                                     </select>
@@ -788,8 +791,8 @@
                                                         <option value="">Isi dari List Parameter (opsional)</option>
                                                         <template x-for="lp in listParameterOptions"
                                                             :key="'edit-list-' + lp.id">
-                                                            <option :value="String(lp.id)"
-                                                                x-text="lp.parameter_utama ? `${lp.nama_parameter} (${lp.parameter_utama})` : lp.nama_parameter">
+                                                            <option :value="String(lp.id)" {{-- x-text="lp.parameter_utama ? `${lp.nama_parameter} (${lp.parameter_utama})` : lp.nama_parameter"> --}}
+                                                                x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} (${(lp.parameter_utama || '').replaceAll('_',' ')})`: (lp.nama_parameter || '').replaceAll('_',' ')">
                                                             </option>
                                                         </template>
                                                     </select>
@@ -1266,7 +1269,8 @@
                         this.editData.params = (device.params ?? []).map(p => ({
                             id_param: p.id_param,
                             list_parameter_id: '',
-                            nama_parameter: p.nama_parameter ?? '',
+                            // nama_parameter: p.nama_parameter ?? '',
+                            nama_parameter: (p.nama_parameter ?? '').toString().replaceAll('_', ' '),
                             kolom_sensor: p.kolom_sensor ?? '',
                             satuan: p.satuan ?? '',
                             parameter_group_id: p.parameter_group_id ?? ''
@@ -1317,7 +1321,12 @@
                         selectedId)
                     if (!selected) return
 
-                    param.nama_parameter = selected.nama_parameter || param.nama_parameter || ''
+                    // param.nama_parameter = selected.nama_parameter || param.nama_parameter || ''
+                    const np = (selected.nama_parameter || '').toString()
+                    param.nama_parameter = np ? np.replaceAll('_', ' ') : (param.nama_parameter || '')
+
+                    const pu = (selected.parameter_utama || '').toString()
+                    if (pu) param.parameter_utama = pu.replaceAll('_', ' ')
 
                     if (selected.default_satuan) {
                         param.satuan = selected.default_satuan

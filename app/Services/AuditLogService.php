@@ -8,6 +8,7 @@ use Throwable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\ViewErrorBag;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuditLogService
@@ -138,6 +139,16 @@ class AuditLogService
         ?t_User $actorBefore,
         ?t_User $actorAfter
     ): string {
+        if ($routeName === 'password.update') {
+            if ($this->hasPasswordUpdateValidationError($request)) {
+                return 'FAILED';
+            }
+
+            if ($this->isPasswordUpdated($request)) {
+                return 'SUCCESS';
+            }
+        }
+
         if ($this->isLoginRequest($request, $routeName)) {
             return $actorAfter ? 'SUCCESS' : 'FAILED';
         }
@@ -146,7 +157,66 @@ class AuditLogService
             return $actorBefore ? 'SUCCESS' : 'FAILED';
         }
 
+        if ($this->isMutatingRequest($request) && $this->hasAnyValidationError($request)) {
+            return 'FAILED';
+        }
+
         return $response->getStatusCode() >= 400 ? 'FAILED' : 'SUCCESS';
+    }
+
+    private function hasPasswordUpdateValidationError(Request $request): bool
+    {
+        if (!$request->hasSession()) {
+            return false;
+        }
+
+        $errors = $request->session()->get('errors');
+        if (!$errors instanceof ViewErrorBag) {
+            return false;
+        }
+
+        $bag = $errors->getBag('updatePassword');
+        if (!$bag || !$bag->any()) {
+            return false;
+        }
+
+        return $bag->has('current_password')
+            || $bag->has('password')
+            || $bag->has('password_confirmation');
+    }
+
+    private function isPasswordUpdated(Request $request): bool
+    {
+        if (!$request->hasSession()) {
+            return false;
+        }
+
+        return $request->session()->get('status') === 'password-updated';
+    }
+
+    private function hasAnyValidationError(Request $request): bool
+    {
+        if (!$request->hasSession()) {
+            return false;
+        }
+
+        $errors = $request->session()->get('errors');
+        if (!$errors instanceof ViewErrorBag) {
+            return false;
+        }
+
+        foreach ($errors->getBags() as $bag) {
+            if ($bag && $bag->any()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isMutatingRequest(Request $request): bool
+    {
+        return in_array(strtoupper($request->method()), ['POST', 'PUT', 'PATCH', 'DELETE'], true);
     }
 
     private function resolveModule(Request $request, string $routeName): string

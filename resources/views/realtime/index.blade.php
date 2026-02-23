@@ -118,7 +118,7 @@
                         :class="activeTab === tab.id ? 'border-indigo-600 text-indigo-600' :
                             'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
                         class="px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap"
-                        x-text="tab.label">
+                        x-text="(tab.label || '').replaceAll('_', ' ')">
                     </button>
                 </template>
             </div>

@@ -49,7 +49,7 @@
                                 <td class="px-4 py-3 font-semibold text-slate-900">
                                     {{ $item->kategori?->nama_kategori ?? '-' }}
                                 </td>
-                                <td class="px-4 py-3">{{ $item->listParameter?->nama_parameter ?? '-' }}</td>
+                                <td class="px-4 py-3">{{ str_replace('_', ' ', $item->listParameter?->nama_parameter) }}</td>
                                 <td class="px-4 py-3">{{ $item->urutan }}</td>
                                 <td class="px-4 py-3">
                                     {{ $item->kolom_sensor_default ?: $item->listParameter?->default_kolom_sensor ?? '-' }}
@@ -147,7 +147,7 @@
                                         <option value="">- Pilih Parameter -</option>
                                         @foreach ($listParameters as $lp)
                                             <option value="{{ $lp->id }}" @selected((string) old('list_parameter_id') === (string) $lp->id)>
-                                                {{ $lp->nama_parameter }}
+                                                {{ str_replace('_', ' ', $lp->nama_parameter) }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -288,7 +288,7 @@
                                         class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                         <option value="">Pilih Parameter</option>
                                         @foreach ($listParameters as $lp)
-                                            <option value="{{ $lp->id }}">{{ $lp->nama_parameter }}</option>
+                                            <option value="{{ $lp->id }}">{{ str_replace('_', ' ', $lp->nama_parameter) }}</option>
                                         @endforeach
                                     </select>
                                     @if (old('form_mode') === 'edit')
