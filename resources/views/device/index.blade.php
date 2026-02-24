@@ -757,6 +757,29 @@
                                 </div>
                             </div>
 
+                            {{-- Peta Lokasi --}}
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <h4 class="text-sm font-semibold text-gray-900 mb-3">Pilih Lokasi di Peta</h4>
+                                <div class="grid grid-cols-2 gap-3 mb-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-600 mb-1">Latitude</label>
+                                        <input type="text" x-model="editData.latitude"
+                                            @input="updateEditMapFromInputs()"
+                                            placeholder="-6.200000"
+                                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-600 mb-1">Longitude</label>
+                                        <input type="text" x-model="editData.longitude"
+                                            @input="updateEditMapFromInputs()"
+                                            placeholder="106.816666"
+                                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                    </div>
+                                </div>
+                                <div id="editDeviceMap" class="h-64 rounded-lg border border-gray-300"></div>
+                                <p class="text-xs text-gray-500 mt-2">Klik peta atau geser marker untuk mengisi koordinat secara otomatis.</p>
+                            </div>
+
                             <div class="rounded-lg border border-gray-300">
                                 <div class="border-b border-gray-300 px-4 py-3 flex items-center justify-between gap-3">
                                     <h4 class="text-xl font-semibold text-gray-900">Daftar Parameter</h4>
@@ -875,6 +898,8 @@
                 awlrCategoryIds: @json($awlrCategoryIds ?? []),
                 addDeviceMap: null,
                 addDeviceMarker: null,
+                editDeviceMap: null,
+                editDeviceMarker: null,
                 detailData: {
                     id_logger: '',
                     id_katlogger: '',
@@ -1045,15 +1070,24 @@
                             subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
                         }).addTo(this.addDeviceMap)
 
+                        const customMarkerIcon = L.icon({
+                            iconUrl: '{{ asset("icons/marker_lokasi.svg") }}',
+                            iconSize:    [34, 56],
+                            iconAnchor:  [17, 56],
+                            popupAnchor: [0, -56]
+                        });
+
                         // Create draggable marker if coordinates exist
                         if (this.addData.latitude && this.addData.longitude) {
                             this.addDeviceMarker = L.marker([defaultLat, defaultLng], {
-                                draggable: true
+                                draggable: true,
+                                icon: customMarkerIcon
                             }).addTo(this.addDeviceMap)
                         } else {
                             // Create marker at default position
                             this.addDeviceMarker = L.marker([defaultLat, defaultLng], {
-                                draggable: true
+                                draggable: true,
+                                icon: customMarkerIcon
                             }).addTo(this.addDeviceMap)
                             // Set initial coordinates
                             this.addData.latitude = defaultLat.toFixed(6)
@@ -1087,6 +1121,67 @@
                         180) {
                         this.addDeviceMarker.setLatLng([lat, lng])
                         this.addDeviceMap.setView([lat, lng], this.addDeviceMap.getZoom())
+                    }
+                },
+
+                initEditDeviceMap() {
+                    if (!document.getElementById('editDeviceMap')) return
+
+                    if (this.editDeviceMap) {
+                        this.editDeviceMap.remove()
+                        this.editDeviceMap = null
+                        this.editDeviceMarker = null
+                    }
+
+                    const defaultLat = parseFloat(this.editData.latitude) || -6.200000
+                    const defaultLng = parseFloat(this.editData.longitude) || 106.816666
+                    const defaultZoom = 13
+
+                    this.editDeviceMap = L.map('editDeviceMap').setView([defaultLat, defaultLng], defaultZoom)
+
+                    L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                        maxZoom: 20,
+                        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+                    }).addTo(this.editDeviceMap)
+
+                    const customMarkerIcon = L.icon({
+                        iconUrl: '{{ asset("icons/marker_lokasi.svg") }}',
+                        iconSize:    [34, 56],
+                        iconAnchor:  [17, 56],
+                        popupAnchor: [0, -56]
+                    })
+
+                    this.editDeviceMarker = L.marker([defaultLat, defaultLng], {
+                        draggable: true,
+                        icon: customMarkerIcon
+                    }).addTo(this.editDeviceMap)
+
+                    this.editDeviceMap.on('click', (e) => {
+                        this.editData.latitude  = e.latlng.lat.toFixed(6)
+                        this.editData.longitude = e.latlng.lng.toFixed(6)
+                        this.editDeviceMarker.setLatLng(e.latlng)
+                    })
+
+                    this.editDeviceMarker.on('dragend', (e) => {
+                        const position = e.target.getLatLng()
+                        this.editData.latitude  = position.lat.toFixed(6)
+                        this.editData.longitude = position.lng.toFixed(6)
+                    })
+
+                    setTimeout(() => {
+                        this.editDeviceMap.invalidateSize()
+                    }, 150)
+                },
+
+                updateEditMapFromInputs() {
+                    if (!this.editDeviceMap || !this.editDeviceMarker) return
+
+                    const lat = parseFloat(this.editData.latitude)
+                    const lng = parseFloat(this.editData.longitude)
+
+                    if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                        this.editDeviceMarker.setLatLng([lat, lng])
+                        this.editDeviceMap.setView([lat, lng], this.editDeviceMap.getZoom())
                     }
                 },
 
@@ -1264,6 +1359,11 @@
                     // Buka modal dulu
                     this.isOpen = true
 
+                    // Init peta setelah modal terbuka
+                    this.$nextTick(() => {
+                        this.initEditDeviceMap()
+                    })
+
                     // Tunggu DOM siap, baru inject params
                     this.$nextTick(() => {
                         this.editData.params = (device.params ?? []).map(p => ({
@@ -1285,6 +1385,11 @@
 
                 closeModal() {
                     this.isOpen = false
+                    if (this.editDeviceMap) {
+                        this.editDeviceMap.remove()
+                        this.editDeviceMap = null
+                        this.editDeviceMarker = null
+                    }
                 },
 
                 canApplyTemplateAdd() {

@@ -662,8 +662,16 @@
                             subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
                         }).addTo(this.addInstansiMap);
 
+                        const customMarkerIcon = L.icon({
+                            iconUrl: '{{ asset("icons/marker_lokasi.svg") }}',
+                            iconSize:    [34, 56],
+                            iconAnchor:  [17, 56],
+                            popupAnchor: [0, -56]
+                        });
+
                         this.addInstansiMarker = L.marker([defaultLat, defaultLng], {
-                            draggable: true
+                            draggable: true,
+                            icon: customMarkerIcon
                         }).addTo(this.addInstansiMap);
 
                         this.addInstansiMap.on('click', (e) => {
@@ -765,8 +773,16 @@
                             subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
                         }).addTo(this.editInstansiMap);
 
+                        const customMarkerIcon = L.icon({
+                            iconUrl: '{{ asset("icons/marker_lokasi.svg") }}',
+                            iconSize:    [34, 56],
+                            iconAnchor:  [17, 56],
+                            popupAnchor: [0, -56]
+                        });
+
                         this.editInstansiMarker = L.marker([defaultLat, defaultLng], {
-                            draggable: true
+                            draggable: true,
+                            icon: customMarkerIcon
                         }).addTo(this.editInstansiMap);
 
                         this.editInstansiMap.on('click', (e) => {
