@@ -14,11 +14,7 @@
                 @permission('view_beranda')
                     <a href="{{ route('beranda') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('beranda') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                        </svg>
+                        <img src="{{ asset('icons/beranda_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('beranda') ? 'brightness-0 invert' : '' }}" alt="Beranda">
                         <span class="sidebar-text truncate">Beranda</span>
                     </a>
                 @endpermission
@@ -26,11 +22,7 @@
                 @permission('view_peta_lokasi')
                     <a href="{{ route('peta.lokasi') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('peta.lokasi') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                        </svg>
+                        <img src="{{ asset('icons/peta_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('peta.lokasi') ? 'brightness-0 invert' : '' }}" alt="Peta Lokasi">
                         <span class="sidebar-text truncate">Peta Lokasi</span>
                     </a>
                 @endpermission
@@ -38,33 +30,21 @@
                 @permission('view_realtime')
                     <a href="{{ route('realtime.index') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('realtime.index') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
-                        </svg>
+                        <img src="{{ asset('icons/realtime_monitoring_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('realtime.index') ? 'brightness-0 invert' : '' }}" alt="Realtime">
                         <span class="sidebar-text truncate">Realtime Monitoring</span>
                     </a>
 
-                    {{-- <a href="{{ route('tingkat-siaga-awlr.index') }}"
+                    <a href="{{ route('tingkat-siaga-awlr.index') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('tingkat-siaga-awlr.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 17v-2m3 2v-4m3 4V7m4 12H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2Z" />
-                        </svg>
+                        <img src="{{ asset('icons/pengaturan_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('tingkat-siaga-awlr.*') ? 'brightness-0 invert' : '' }}" alt="Tingkat Siaga">
                         <span class="sidebar-text truncate">Tingkat Siaga AWLR</span>
-                    </a> --}}
+                    </a>
                 @endpermission
 
                 @permission('view_data_perangkat')
                     <a href="{{ route('device.data') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('device.data') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+                        <img src="{{ asset('icons/data_perangkat_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('device.data') ? 'brightness-0 invert' : '' }}" alt="Data Perangkat">
                         <span class="sidebar-text truncate">Data Perangkat</span>
                     </a>
                 @endpermission
@@ -72,13 +52,7 @@
                 @permission('view_device')
                     <a href="{{ route('device.index') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('device.index') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
+                        <img src="{{ asset('icons/pengaturan_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('device.index') ? 'brightness-0 invert' : '' }}" alt="Pengaturan Device">
                         <span class="sidebar-text truncate">Pengaturan Device</span>
                     </a>
                 @endpermission
@@ -100,13 +74,7 @@
                             "
                             class="sidebar-parent-btn flex w-full items-center justify-between gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
                             <span class="sidebar-parent-label flex items-center gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 4h16v16H4z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 4v16M15 4v16M4 9h16M4 15h16" />
-                                </svg>
+                                <img src="{{ asset('icons/master_line.svg') }}" class="h-5 w-5 flex-shrink-0" alt="Master Data">
                                 <span class="sidebar-text truncate">Master Data</span>
                             </span>
                             <svg class="sidebar-parent-chevron h-4 w-4 text-slate-500 transition-transform"
@@ -120,6 +88,7 @@
                             @if (auth()->check() && (auth()->user()->hasPermission('manage_instansi') || auth()->user()->isInstansiAdmin()))
                                 <a href="{{ route('instansi.index') }}"
                                     class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('instansi.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    <img src="{{ asset('icons/instansi_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('instansi.*') ? 'brightness-0 invert' : '' }}" alt="Instansi">
                                     <span class="sidebar-text truncate">Instansi</span>
                                 </a>
                             @endif
@@ -127,14 +96,17 @@
                             @permission('manage_instansi')
                                 <a href="{{ route('kategori.index') }}"
                                     class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('kategori.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    <img src="{{ asset('icons/kategori_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('kategori.*') ? 'brightness-0 invert' : '' }}" alt="Kategori Logger">
                                     <span class="sidebar-text truncate">Kategori Logger</span>
                                 </a>
                                 <a href="{{ route('list-parameter.index') }}"
                                     class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('list-parameter.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    <img src="{{ asset('icons/list_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('list-parameter.*') ? 'brightness-0 invert' : '' }}" alt="List Parameter">
                                     <span class="sidebar-text truncate">List Parameter</span>
                                 </a>
                                 <a href="{{ route('template-kategori-parameter.index') }}"
                                     class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('template-kategori-parameter.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    <img src="{{ asset('icons/template_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('template-kategori-parameter.*') ? 'brightness-0 invert' : '' }}" alt="Template Parameter">
                                     <span class="sidebar-text truncate">Template Parameter</span>
                                 </a>
                             @endpermission
@@ -142,10 +114,12 @@
                             @permission('manage_rbac')
                                 <a href="{{ route('roles.index') }}"
                                     class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('roles.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    <img src="{{ asset('icons/rbac_role_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('roles.*') ? 'brightness-0 invert' : '' }}" alt="RBAC Role">
                                     <span class="sidebar-text truncate">RBAC Role</span>
                                 </a>
                                 <a href="{{ route('permissions.index') }}"
                                     class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    <img src="{{ asset('icons/rbac_permission_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('permissions.*') ? 'brightness-0 invert' : '' }}" alt="RBAC Permission">
                                     <span class="sidebar-text truncate">RBAC Permission</span>
                                 </a>
                             @endpermission
@@ -153,6 +127,7 @@
                             @permission('manage_user')
                                 <a href="{{ route('users.index') }}"
                                     class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('users.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    <img src="{{ asset('icons/user_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('users.*') ? 'brightness-0 invert' : '' }}" alt="User">
                                     <span class="sidebar-text truncate">User</span>
                                 </a>
                             @endpermission
@@ -162,21 +137,13 @@
 
                 <a href="{{ route('download.index') }}"
                     class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('download.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
+                    <img src="{{ asset('icons/unduh_aplikasi_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('download.*') ? 'brightness-0 invert' : '' }}" alt="Unduh Aplikasi">
                     <span class="sidebar-text truncate">Unduh Aplikasi</span>
                 </a>
 
                 <a href="{{ route('audit-log.index') }}"
                     class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('audit-log.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                    <img src="{{ asset('icons/log_audit_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('audit-log.*') ? 'brightness-0 invert' : '' }}" alt="Log Audit">
                     <span class="sidebar-text truncate">Log Audit</span>
                 </a>
             </div>
@@ -187,11 +154,7 @@
                 @csrf
                 <button type="submit"
                     class="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
+                    <img src="{{ asset('icons/keluar_line.svg') }}" class="h-5 w-5 flex-shrink-0" alt="Logout">
                     <span class="sidebar-text truncate">Logout</span>
                 </button>
             </form>
