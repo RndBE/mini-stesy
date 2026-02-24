@@ -1110,6 +1110,41 @@
         <div class="xl:col-span-9 2xl:col-span-10">
             <div class="border rounded-lg ">
                 <div class="chart-section ps-3 pe-3 pt-3 pb-0 mb-0">
+
+                    {{-- Rainfall Summary + Legend (hanya tampil saat tipe_graf = bar) --}}
+                    <div id="rainfallHeader" class="hidden mb-3">
+                        <div class="flex flex-col md:flex-row gap-3">
+                            {{-- Card Akumulasi --}}
+                            <div
+                                class="relative overflow-hidden flex items-start gap-4 bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-sm min-w-[240px]">
+                                <div class="z-10">
+                                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1"
+                                        id="rainfallCardLabel">AKUMULASI CURAH HUJAN</div>
+                                    <div class="text-xs text-slate-400 mb-1" id="rainfallCardDate">—</div>
+                                    <div class="flex items-baseline gap-1">
+                                        <span class="text-3xl font-bold text-slate-800"
+                                            id="rainfallCardTotal">0.000</span>
+                                        <span class="text-sm font-semibold text-slate-500">mm</span>
+                                    </div>
+                                    <div class="mt-1 text-xs font-medium" id="rainfallCardCategory">—</div>
+                                </div>
+                                <img id="rainfallCardIcon" src="{{ asset('klasifikasi_hujan/tidak_hujan.png') }}"
+                                    onerror="this.onerror=null;this.src='{{ asset('klasifikasi_hujan/tidak_hujan.png') }}';"
+                                    alt="Status Hujan"
+                                    class="pointer-events-none absolute right-[-0.5rem] top-6 h-24 w-24 object-contain opacity-90">
+                            </div>
+
+                            {{-- Legend Intensitas (dirender dinamis dari DB) --}}
+                            <div class="flex-1 bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-sm">
+                                <div class="text-xl font-bold text-slate-700 mb-2">Keterangan Intensitas Hujan Per Jam:
+                                </div>
+                                <div id="rainfallLegendItems" class="flex flex-wrap gap-x-5 gap-y-1">
+                                    {{-- akan diisi JS dari data.klasifikasi --}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="chart-title text-lg font-semibold" id="chartTitle">{{ date('F Y') }}</div>
                     <div class="chart-wrapper mb-3 mt-2">
                         <canvas id="dataChart" height="400"></canvas>
@@ -1117,7 +1152,9 @@
                 </div>
                 <div class="data-table-section ps-3 pe-3">
                     <div class="table-title" id="tableTitle">{{ date('F Y') }}</div>
-                    <div class=" w-full overflow-hidden rounded-lg border  border-slate-300 mb-3">
+
+                    {{-- Tabel Utama (line chart) --}}
+                    <div id="mainTableWrap" class="w-full overflow-hidden rounded-lg border border-slate-300 mb-3">
                         <table class="data-table ">
                             <thead class="bg-neutral-300 text-neutral-950 font-semibold uppercase text-xs">
                                 <tr>
@@ -1136,6 +1173,27 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {{-- Tabel Intensitas Curah Hujan (bar chart) --}}
+                    <div id="rainfallTableWrap"
+                        class="hidden w-full overflow-hidden rounded-lg border border-slate-300 mb-3">
+                        <table class="data-table w-full">
+                            <thead class="bg-neutral-300 text-neutral-950 font-semibold uppercase text-xs">
+                                <tr>
+                                    <th class="py-2 px-4 text-left w-1/2">WAKTU</th>
+                                    <th class="py-2 px-4 text-left w-1/2">CURAH HUJAN</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rainfallTableBody" class="text-sm">
+                                <tr>
+                                    <td colspan="2" class="text-center py-10 text-slate-400">
+                                        Pilih parameter dan klik Tampil Data
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -1150,6 +1208,15 @@
         let chart = null;
         const loggerId = '{{ $logger->id_logger }}';
         document.addEventListener('DOMContentLoaded', function() {
+            const paramSelectEl = document.getElementById('parameterSelect');
+            const refreshCurrentParamData = () => {
+                const param = paramSelectEl ? String(paramSelectEl.value || '').trim() : '';
+                if (!param) return;
+                updateChartTitle();
+                loadData();
+            };
+            let parameterUsesSelect2 = false;
+
             // Init Select2 untuk dropdown logger
             if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
                 $('#loggerSelect').select2({
@@ -1184,25 +1251,12 @@
                         },
                     }
                 });
+                parameterUsesSelect2 = true;
             }
 
             initChart();
             updateChartTitle();
             setupRangeInputs();
-            const urlParams = new URLSearchParams(window.location.search);
-            const paramFromUrl = urlParams.get('parameter');
-            if (paramFromUrl) {
-                const paramSelect = document.getElementById('parameterSelect');
-                if (paramSelect) {
-                    paramSelect.value = paramFromUrl;
-                    if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined' && $('#parameterSelect')
-                        .data('select2')) {
-                        $('#parameterSelect').trigger('change');
-                    } else {
-                        paramSelect.dispatchEvent(new Event('change'));
-                    }
-                }
-            }
             document.getElementById('dateInput').addEventListener('change', () => {
                 updateChartTitle();
                 const param = document.getElementById('parameterSelect').value;
@@ -1236,9 +1290,38 @@
                     if (param) loadData();
                 });
             });
-            document.getElementById('parameterSelect').addEventListener('change', () => {
-                loadData();
-            });
+            if (parameterUsesSelect2 && typeof $ !== 'undefined') {
+                $('#parameterSelect').on('change', refreshCurrentParamData);
+            } else if (paramSelectEl) {
+                paramSelectEl.addEventListener('change', refreshCurrentParamData);
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramFromUrl = String(urlParams.get('parameter') || '').trim();
+            const options = Array.from(paramSelectEl?.options || []);
+
+            const hasParamOption = (value) => options.some((opt) => opt.value === value);
+            const firstValidParam = options.find((opt) => String(opt.value || '').trim() !== '')?.value || '';
+
+            let initialParam = '';
+            if (paramFromUrl && hasParamOption(paramFromUrl)) {
+                initialParam = paramFromUrl;
+            } else if (paramSelectEl && String(paramSelectEl.value || '').trim() !== '') {
+                initialParam = paramSelectEl.value;
+            } else {
+                initialParam = firstValidParam;
+            }
+
+            if (paramSelectEl && initialParam) {
+                paramSelectEl.value = initialParam;
+                if (parameterUsesSelect2 && typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined' && $(
+                        '#parameterSelect').data(
+                        'select2')) {
+                    $('#parameterSelect').val(initialParam).trigger('change');
+                } else {
+                    refreshCurrentParamData();
+                }
+            }
         });
 
         function setupRangeInputs() {
@@ -1303,72 +1386,81 @@
             document.getElementById('tableTitle').textContent = tableTitleText;
         }
 
-        function initChart() {
+        let currentChartType = 'line';
+
+        function buildChart(isBar) {
+            const type = isBar ? 'bar' : 'line';
+            if (chart) {
+                chart.destroy();
+                chart = null;
+            }
             const canvas = document.getElementById('dataChart');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
+
+            const datasets = isBar ? [
+                { label: 'Curah Hujan', data: [], backgroundColor: [], borderColor: [], borderWidth: 0, borderRadius: 2, minBarLength: 3, barPercentage: 0.6, categoryPercentage: 0.7 },
+                { label: '', data: [], hidden: true },
+                { label: '', data: [], hidden: true }
+            ] : [
+                { label: 'Rerata',   data: [], borderColor: '#1e40af', backgroundColor: 'rgba(30,64,175,0.1)',  tension: 0.4, cubicInterpolationMode: 'monotone', fill: true,  borderWidth: 3, pointRadius: 2 },
+                { label: 'Minimum',  data: [], borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.1)', tension: 0.4, cubicInterpolationMode: 'monotone', fill: false, borderWidth: 2, borderDash: [5,5], pointRadius: 0 },
+                { label: 'Maksimum', data: [], borderColor: '#4338ca', backgroundColor: 'rgba(67,56,202,0.1)', tension: 0.4, cubicInterpolationMode: 'monotone', fill: true,  borderWidth: 2, borderDash: [5,5], pointRadius: 0 }
+            ];
+
             chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                            label: 'Rerata',
-                            data: [],
-                            borderColor: '#1e40af',
-                            backgroundColor: 'rgba(30, 64, 175, 0.1)',
-                            tension: 0.4,
-                            cubicInterpolationMode: 'monotone',
-                            fill: true,
-                            borderWidth: 3,
-                            pointRadius: 2
-                        },
-                        {
-                            label: 'Minimum',
-                            data: [],
-                            borderColor: '#60a5fa',
-                            backgroundColor: 'rgba(96,165,250,0.1)',
-                            tension: 0.4,
-                            cubicInterpolationMode: 'monotone',
-                            fill: false,
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            pointRadius: 0
-                        },
-                        {
-                            label: 'Maksimum',
-                            data: [],
-                            borderColor: '#4338ca',
-                            backgroundColor: 'rgba(67,56,202,0.1)',
-                            tension: 0.4,
-                            cubicInterpolationMode: 'monotone',
-                            fill: true,
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            pointRadius: 0
-                        }
-                    ]
-                },
+                type: type,
+                data: { labels: [], datasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             display: true,
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8, padding: 16, font: { size: 12 } }
                         },
                         tooltip: {
                             mode: 'index',
-                            intersect: false
+                            intersect: false,
+                            callbacks: {
+                                label: function(ctx) {
+                                    const v = ctx.parsed.y;
+                                    if (v === null || v === undefined) return null;
+                                    return isBar ? `${ctx.dataset.label}: ${v} mm` : `${ctx.dataset.label}: ${v}`;
+                                }
+                            }
                         }
                     },
-                    interaction: {
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false
+                    interaction: { mode: 'nearest', axis: 'x', intersect: false },
+                    scales: {
+                        x: {
+                            offset: isBar,
+                            grid: { display: false, offset: isBar },
+                            ticks: { font: { size: 11 }, color: '#94a3b8', maxRotation: 0 },
+                            border: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            min: isBar ? 0 : undefined,
+                            grid: { color: 'rgba(148,163,184,0.15)', lineWidth: 1 },
+                            ticks: {
+                                font: { size: 11 },
+                                color: '#94a3b8',
+                                callback: function(value) { return isBar ? value + ' mm' : value; }
+                            },
+                            border: { display: false }
+                        }
                     }
                 }
             });
+            currentChartType = type;
         }
+
+        function initChart() {
+            buildChart(false);
+        }
+
 
         function loadData() {
             const selectedParam = document.getElementById('parameterSelect').value;
@@ -1390,8 +1482,12 @@
             }
             const originalTitle = document.getElementById('chartTitle').textContent;
             document.getElementById('chartTitle').textContent = 'Memuat data...';
-            fetch(`{{ route('analisa.data', ':id') }}`.replace(':id', loggerId) +
-                    `?parameter=${selectedParam}&range=${range}&date=${date}`)
+            const query = new URLSearchParams({
+                parameter: selectedParam,
+                range: range,
+                date: date
+            });
+            fetch(`{{ route('analisa.data', ':id') }}`.replace(':id', loggerId) + `?${query.toString()}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('chartTitle').textContent = originalTitle;
@@ -1532,6 +1628,157 @@
             return `${v}${unit}`;
         }
 
+        // ─── Rainfall helpers ────────────────────────────────────────────────
+        function getRainfallColor(val) {
+            if (val === null || val === undefined) return 'rgba(200,200,200,0.3)';
+            if (val <= 0) return '#84C450'; // Tidak Hujan
+            if (val < 1) return '#70CDDD'; // Sangat Ringan
+            if (val < 5) return '#35549D'; // Ringan
+            if (val < 10) return '#FEF216'; // Sedang
+            if (val < 20) return '#F47E2C'; // Lebat
+            return '#ED1C24'; // Sangat Lebat
+        }
+
+        function getRainfallCategory(total) {
+            if (total <= 0) return {
+                label: 'Tidak Hujan',
+                color: '#4b7c1e'
+            };
+            if (total < 1) return {
+                label: 'Hujan Sangat Ringan',
+                color: '#1a7ab5'
+            };
+            if (total < 5) return {
+                label: 'Hujan Ringan',
+                color: '#1e4db7'
+            };
+            if (total < 10) return {
+                label: 'Hujan Sedang',
+                color: '#b08900'
+            };
+            if (total < 20) return {
+                label: 'Hujan Lebat',
+                color: '#b85d1f'
+            };
+            return {
+                label: 'Hujan Sangat Lebat',
+                color: '#922b21'
+            };
+        }
+
+        function getRainfallIconState(total, klasifikasi) {
+            // Gunakan thresholds dari DB jika tersedia
+            if (Array.isArray(klasifikasi) && klasifikasi.length) {
+                const sorted = [...klasifikasi].sort((a, b) => a.debit_air - b.debit_air);
+                // Mapping intensitas label → icon filename slug
+                const slugMap = {
+                    'tidak hujan': 'tidak_hujan',
+                    'hujan sangat ringan': 'hujan_sangat_ringan',
+                    'hujan ringan': 'hujan_ringan',
+                    'hujan sedang': 'hujan_sedang',
+                    'hujan lebat': 'hujan_lebat',
+                    'hujan sangat lebat': 'hujan_sangat_lebat',
+                };
+                let matched = sorted[0];
+                for (const row of sorted) {
+                    if (total >= row.debit_air) matched = row;
+                }
+                const slug = slugMap[(matched.intensitas ?? '').toLowerCase().trim()];
+                return slug ?? 'tidak_hujan';
+            }
+            // Fallback hardcoded
+            if (total <= 0) return 'tidak_hujan';
+            if (total < 1) return 'hujan_sangat_ringan';
+            if (total < 5) return 'hujan_ringan';
+            if (total < 10) return 'hujan_sedang';
+            if (total < 20) return 'hujan_lebat';
+            return 'hujan_sangat_lebat';
+        }
+
+        function renderRainfallLegend(klasifikasi) {
+            const container = document.getElementById('rainfallLegendItems');
+            if (!container) return;
+            if (!Array.isArray(klasifikasi) || !klasifikasi.length) {
+                container.innerHTML = '<span class="text-sm text-slate-400">Keterangan tidak tersedia</span>';
+                return;
+            }
+            const sorted = [...klasifikasi].sort((a, b) => a.debit_air - b.debit_air);
+            let html = '';
+            for (let i = 0; i < sorted.length; i++) {
+                const row   = sorted[i];
+                const next  = sorted[i + 1];
+                const color = getRainfallColor(row.debit_air <= 0 ? 0 : row.debit_air);
+                let rangeLabel;
+                if (row.debit_air <= 0) {
+                    rangeLabel = '0 mm';
+                } else if (next) {
+                    rangeLabel = `${row.debit_air} \u2013 ${next.debit_air} mm`;
+                } else {
+                    rangeLabel = `\u2265 ${row.debit_air} mm`;
+                }
+                html += `<div class="flex items-center gap-2">
+                    <span class="inline-block w-9 h-9 rounded-sm flex-shrink-0" style="background:${color}"></span>
+                    <div>
+                        <div class="text-sm font-semibold text-slate-700">${row.intensitas}</div>
+                        <div class="text-sm text-slate-400">${rangeLabel}</div>
+                    </div>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function updateRainfallCard(data) {
+            const isBar = (data.tipe_graf === 'bar');
+            const header = document.getElementById('rainfallHeader');
+            if (!header) return;
+            if (!isBar) {
+                header.classList.add('hidden');
+                return;
+            }
+            header.classList.remove('hidden');
+
+            // Render legend dinamis dari data DB
+            renderRainfallLegend(data.klasifikasi ?? []);
+
+            const total = data.akumulasi ?? 0;
+            document.getElementById('rainfallCardTotal').textContent = total.toFixed(3);
+
+            // Update icon image
+            const iconEl = document.getElementById('rainfallCardIcon');
+            const iconState = getRainfallIconState(total, data.klasifikasi ?? []);
+            if (iconEl) {
+                iconEl.src = `{{ asset('klasifikasi_hujan') }}/${iconState}.png`;
+                iconEl.alt = iconState.replace(/_/g, ' ');
+            }
+
+            // Date label
+            const range = document.querySelector('input[name="range"]:checked')?.value ?? 'day';
+            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            let dateLabel = '';
+            if (range === 'day') {
+                const v = document.getElementById('dateInput')?.value ?? '';
+                const m = v.match(/(\d{4})-(\d{2})-(\d{2})/);
+                if (m) dateLabel = `${parseInt(m[3])} ${monthNames[parseInt(m[2])-1]} ${m[1]}`;
+            } else if (range === 'month') {
+                const v = document.getElementById('monthInput')?.value ?? '';
+                const [yr, mo] = v.split('-');
+                dateLabel = `${monthNames[parseInt(mo)-1]} ${yr}`;
+            } else if (range === 'year') {
+                dateLabel = document.getElementById('yearInput')?.value ?? '';
+            } else {
+                dateLabel = 'Rentang Kustom';
+            }
+            document.getElementById('rainfallCardDate').textContent = dateLabel;
+
+            const cat = getRainfallCategory(total);
+            const catEl = document.getElementById('rainfallCardCategory');
+            catEl.textContent = cat.label;
+            catEl.style.color = cat.color;
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
         function updateChart(data) {
             if (!chart) return;
             const labelsRaw = data.labels || [];
@@ -1540,50 +1787,145 @@
             const maxRaw = data.maxData || [];
             const rangeNode = document.querySelector('input[name="range"]:checked');
             const range = rangeNode ? rangeNode.value : 'day';
+            const isBar = (data.tipe_graf === 'bar');
+
+            // ── Rebuild chart if type changed (ensures correct x-axis offset) ──
+            const neededType = isBar ? 'bar' : 'line';
+            if (currentChartType !== neededType) {
+                buildChart(isBar);
+            }
+
             if (!hasAnyDataPayload(data)) {
                 chart.data.labels = [];
                 chart.data.datasets[0].data = [];
                 chart.data.datasets[1].data = [];
                 chart.data.datasets[2].data = [];
                 chart.update();
+                updateRainfallCard(data);
                 return;
             }
+
+            let filteredLabels, filteredAvg, filteredMin, filteredMax;
+
             if (range === 'custom') {
-                chart.data.labels = labelsRaw;
-                chart.data.datasets[0].data = avgRaw;
-                chart.data.datasets[1].data = minRaw;
-                chart.data.datasets[2].data = maxRaw;
-                chart.update();
-                return;
+                filteredLabels = labelsRaw;
+                filteredAvg = avgRaw;
+                filteredMin = minRaw;
+                filteredMax = maxRaw;
+            } else {
+                const f = filterSeriesToNow(labelsRaw, range, avgRaw, minRaw, maxRaw);
+                filteredLabels = f.labels;
+                filteredAvg = f.series[0];
+                filteredMin = f.series[1];
+                filteredMax = f.series[2];
             }
-            const f = filterSeriesToNow(labelsRaw, range, avgRaw, minRaw, maxRaw);
-            chart.data.labels = f.labels;
-            chart.data.datasets[0].data = f.series[0];
-            chart.data.datasets[1].data = f.series[1];
-            chart.data.datasets[2].data = f.series[2];
+
+            chart.data.labels = filteredLabels;
+
+            if (isBar) {
+                // Bar chart: strip null slots so bars align perfectly with labels
+                const barLabels = [];
+                const barValues = [];
+                for (let i = 0; i < (filteredLabels || []).length; i++) {
+                    const v = (filteredAvg || [])[i];
+                    if (v !== null && v !== undefined) {
+                        barLabels.push(filteredLabels[i]);
+                        barValues.push(v);
+                    }
+                }
+                const barColors = barValues.map(v => getRainfallColor(v));
+                chart.data.labels                       = barLabels;
+                chart.data.datasets[0].data             = barValues;
+                chart.data.datasets[0].backgroundColor  = barColors;
+                chart.data.datasets[0].borderColor      = barColors;
+                chart.data.datasets[1].data             = [];
+                chart.data.datasets[2].data             = [];
+            } else {
+                chart.data.labels              = filteredLabels;
+                chart.data.datasets[0].data    = filteredAvg;
+                chart.data.datasets[1].data    = filteredMin;
+                chart.data.datasets[2].data    = filteredMax;
+            }
+
             chart.update();
+            updateRainfallCard(data);
         }
 
         function updateTable(data) {
             const tbody = document.getElementById('dataTableBody');
+            const rbody = document.getElementById('rainfallTableBody');
+            const mainWrap = document.getElementById('mainTableWrap');
+            const rfWrap = document.getElementById('rainfallTableWrap');
             if (!tbody) return;
+
+            const isBar = (data.tipe_graf === 'bar');
             const rangeNode = document.querySelector('input[name="range"]:checked');
             const range = rangeNode ? rangeNode.value : 'day';
             const rows = Array.isArray(data.tableData) ? data.tableData : [];
             const labelsRaw = Array.isArray(data.labels) ? data.labels : [];
             const unit = getSelectedUnit();
             const isAllEmpty = !hasAnyDataPayload(data);
+
+            if (isBar) {
+                // Show rainfall table, hide main table
+                mainWrap?.classList.add('hidden');
+                rfWrap?.classList.remove('hidden');
+
+                if (isAllEmpty || !rbody) {
+                    if (rbody) rbody.innerHTML =
+                        '<tr><td colspan="2" class="text-center py-10 text-slate-400">Tidak ada data</td></tr>';
+                    return;
+                }
+
+                // Filter to visible labels
+                let visibleLabels;
+                if (range === 'custom' || range === 'month') {
+                    visibleLabels = null; // show all non-null
+                } else {
+                    const f = filterSeriesToNow(labelsRaw, range);
+                    visibleLabels = new Set(f.labels || []);
+                }
+
+                const filtered = rows.filter(r => {
+                    if (!r) return false;
+                    if (r.rerata === null && r.minimum === null && r.maksimum === null) return false;
+                    if (visibleLabels && !visibleLabels.has(String(r.waktu))) return false;
+                    return true;
+                });
+
+                if (!filtered.length) {
+                    rbody.innerHTML =
+                        '<tr><td colspan="2" class="text-center py-10 text-slate-400">Tidak ada data</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                for (const r of filtered) {
+                    const val = r.rerata;
+                    html += `<tr>
+                        <td class="px-4 py-2">${r.waktu ?? '-'}</td>
+                        <td class="px-4 py-2">${fmtWithUnit(val, unit)}</td>
+                    </tr>`;
+                }
+                rbody.innerHTML = html;
+                return;
+            }
+
+            // ── Line chart: use main table ──
+            mainWrap?.classList.remove('hidden');
+            rfWrap?.classList.add('hidden');
+
             if (isAllEmpty) {
                 tbody.innerHTML =
-                    '<tr><td colspan="4" style="text-align:center; padding:40px; color:#9ca3af;">Tidak ada data</td></tr>';
+                    '<tr><td colspan="4" style="text-align:center; padding:40px; color:#9ca3af;">Tidak ada data</td></t r>';
                 return;
             }
             if (range === 'custom' || range === 'month') {
                 const filtered = rows.filter(r => {
                     if (!r) return false;
-                    const a = r.rerata;
-                    const b = r.minimum;
-                    const c = r.maksimum;
+                    const a = r.rerata,
+                        b = r.minimum,
+                        c = r.maksimum;
                     return !((a == null || a === '') && (b == null || b === '') && (c == null || c === ''));
                 });
                 if (!filtered.length) {
@@ -1593,8 +1935,7 @@
                 }
                 let html = '';
                 for (const r of filtered) {
-                    html += `
-            <tr>
+                    html += `<tr>
                 <td>${r.waktu ?? '-'}</td>
                 <td>${fmtWithUnit(r.rerata, unit)}</td>
                 <td>${fmtWithUnit(r.minimum, unit)}</td>
@@ -1610,9 +1951,9 @@
             const filtered = rows.filter(r => {
                 if (!r || r.waktu == null) return false;
                 if (!labelSet.has(String(r.waktu))) return false;
-                const a = r.rerata;
-                const b = r.minimum;
-                const c = r.maksimum;
+                const a = r.rerata,
+                    b = r.minimum,
+                    c = r.maksimum;
                 return !((a == null || a === '') && (b == null || b === '') && (c == null || c === ''));
             });
             if (!filtered.length) {
@@ -1622,13 +1963,12 @@
             }
             let html = '';
             for (const r of filtered) {
-                html += `
-            <tr>
-                <td>${r.waktu ?? '-'}</td>
-                <td>${fmtWithUnit(r.rerata, unit)}</td>
-                <td>${fmtWithUnit(r.minimum, unit)}</td>
-                <td>${fmtWithUnit(r.maksimum, unit)}</td>
-            </tr>`;
+                html += `<tr>
+            <td>${r.waktu ?? '-'}</td>
+            <td>${fmtWithUnit(r.rerata, unit)}</td>
+            <td>${fmtWithUnit(r.minimum, unit)}</td>
+            <td>${fmtWithUnit(r.maksimum, unit)}</td>
+        </tr>`;
             }
             tbody.innerHTML = html;
         }
@@ -1652,8 +1992,13 @@
                 const endDateTime = document.getElementById('endDateTime').value;
                 date = `${startDateTime},${endDateTime}`;
             }
+            const query = new URLSearchParams({
+                parameter: selectedParam,
+                range: range,
+                date: date
+            });
             const url = `{{ route('analisa.export', ['id_logger' => 'PLACEHOLDER']) }}`.replace('PLACEHOLDER', loggerId) +
-                `?parameter=${selectedParam}&range=${range}&date=${date}`;
+                `?${query.toString()}`;
             window.location.href = url;
         }
 

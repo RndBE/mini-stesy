@@ -179,16 +179,30 @@ class AnalisaController extends Controller
             ->where('nama_parameter', $parameter)
             ->first();
 
+        // Fetch klasifikasi hujan per jam for this logger
+        $klasifikasiRaw = DB::table('klasifikasi_hujan')
+            ->where('logger_id', $id_logger)
+            ->where('waktu', 'perjam')
+            ->orderBy('debit_air')
+            ->get(['debit_air', 'intensitas']);
+        $klasifikasi = $klasifikasiRaw->map(fn($r) => [
+            'debit_air' => (float) $r->debit_air,
+            'intensitas' => $r->intensitas,
+        ])->values()->toArray();
+
         if (!$param || !$logger->tabel_main) {
             return [
-                'labels' => [],
-                'chartData' => [],
-                'minData' => [],
-                'maxData' => [],
-                'tableData' => [],
-                'rerata' => 0,
-                'minimum' => 0,
-                'maksimum' => 0,
+                'labels'       => [],
+                'chartData'    => [],
+                'minData'      => [],
+                'maxData'      => [],
+                'tableData'    => [],
+                'rerata'       => 0,
+                'minimum'      => 0,
+                'maksimum'     => 0,
+                'tipe_graf'    => $param->tipe_graf ?? 'line',
+                'akumulasi'    => 0,
+                'klasifikasi'  => $klasifikasi,
             ];
         }
 
@@ -408,17 +422,23 @@ class AnalisaController extends Controller
         }
 
         $numericValues = collect($values)->filter();
+        $akumulasi = ($param->tipe_graf ?? 'line') === 'bar'
+            ? round($numericValues->sum(), 2)
+            : 0;
 
         return [
-            'logger_name' => $logger->nama_logger ?? $id_logger,
-            'labels'     => $labels,
-            'chartData'  => $values,
-            'minData'    => $minValues,
-            'maxData'    => $maxValues,
-            'tableData'  => $tableData,
-            'rerata'     => $numericValues->avg() ? round($numericValues->avg(), 2) : 0,
-            'minimum'    => $numericValues->min() ? round($numericValues->min(), 2) : 0,
-            'maksimum'   => $numericValues->max() ? round($numericValues->max(), 2) : 0,
+            'logger_name'  => $logger->nama_logger ?? $id_logger,
+            'labels'       => $labels,
+            'chartData'    => $values,
+            'minData'      => $minValues,
+            'maxData'      => $maxValues,
+            'tableData'    => $tableData,
+            'rerata'       => $numericValues->avg() ? round($numericValues->avg(), 2) : 0,
+            'minimum'      => $numericValues->min() ? round($numericValues->min(), 2) : 0,
+            'maksimum'     => $numericValues->max() ? round($numericValues->max(), 2) : 0,
+            'tipe_graf'    => $param->tipe_graf ?? 'line',
+            'akumulasi'    => $akumulasi,
+            'klasifikasi'  => $klasifikasi,
         ];
     }
 
