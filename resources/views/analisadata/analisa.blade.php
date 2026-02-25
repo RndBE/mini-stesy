@@ -989,7 +989,7 @@
                                                 <div class="text-center">Sab</div>
                                                 <div class="text-center">Min</div>
                                             </div>
-                                            <div id="rpGridL" class="mt-2 grid grid-cols-7 gap-1"></div>
+                                            <div id="rpGridL" class="mt-2 grid grid-cols-7"></div>
                                         </div>
 
                                         <div class="rounded-xl border border-slate-200 p-3">
@@ -1038,7 +1038,7 @@
                                                 <div class="text-center">Sab</div>
                                                 <div class="text-center">Min</div>
                                             </div>
-                                            <div id="rpGridR" class="mt-2 grid grid-cols-7 gap-1"></div>
+                                            <div id="rpGridR" class="mt-2 grid grid-cols-7"></div>
                                         </div>
                                     </div>
 
@@ -2765,8 +2765,7 @@
                     const y = viewMonth.getFullYear()
                     const m = viewMonth.getMonth()
                     const first = new Date(y, m, 1)
-                    const last = new Date(y, m + 1, 0)
-                    const daysInMonth = last.getDate()
+                    const daysInMonth = new Date(y, m + 1, 0).getDate()
                     const dowMon0 = (first.getDay() + 6) % 7
 
                     targetGrid.innerHTML = ''
@@ -2779,37 +2778,48 @@
 
                     for (let d = 1; d <= daysInMonth; d++) {
                         const cur = new Date(y, m, d)
-                        const liveEnd = tempEnd
                         const isS = key(cur) === key(tempStart)
-                        const isE = key(cur) === key(liveEnd)
-                        const inRange = isBetween(cur, tempStart, liveEnd)
+                        const isE = key(cur) === key(tempEnd)
+                        const isSE = isS && isE
+                        const inRange = !isSE && isBetween(cur, tempStart, tempEnd)
 
-                        const b = document.createElement('button')
-                        b.type = 'button'
-                        b.textContent = String(d)
+                        // ── Outer wrapper: full-width grid cell ────────────────
+                        const wrapper = document.createElement('div')
+                        wrapper.className = 'relative h-9 flex items-center justify-center cursor-pointer'
 
-                        let cls = 'h-9 rounded-lg text-sm flex items-center justify-center'
-                        if (inRange) cls += ' bg-[#E9EAFB] text-slate-700'
-                        else cls += ' hover:bg-slate-100 text-slate-700'
+                        // ── Strip background behind the circle ─────────────────
+                        if (!isSE && (inRange || isS || isE)) {
+                            const strip = document.createElement('div')
+                            strip.className = 'absolute inset-y-0 bg-[#E9EAFB] pointer-events-none'
+                            if (isS)      strip.style.cssText = 'left:50%;right:0'
+                            else if (isE) strip.style.cssText = 'left:0;right:50%'
+                            else          strip.style.cssText = 'left:0;right:0'
+                            wrapper.appendChild(strip)
+                        }
 
-                        if (isS || isE) cls =
-                            'h-9 rounded-lg text-sm flex items-center justify-center bg-[#303481] text-white'
+                        // ── Inner circle / day number ──────────────────────────
+                        const circle = document.createElement('div')
+                        circle.textContent = String(d)
+                        if (isS || isE) {
+                            circle.className = 'relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-[#303481] text-white font-semibold'
+                        } else if (inRange) {
+                            circle.className = 'relative z-10 w-8 h-8 flex items-center justify-center text-sm text-slate-700'
+                        } else {
+                            circle.className = 'relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-sm text-slate-700 hover:bg-slate-100'
+                        }
+                        wrapper.appendChild(circle)
 
-                        b.className = cls
-
-                        b.addEventListener('click', (e) => {
+                        wrapper.addEventListener('click', (e) => {
                             e.stopPropagation()
                             const clicked = new Date(y, m, d)
 
                             if (!picking) {
                                 // ── Klik Pertama (Start) ──
-                                // Selalu reset rentang dan jadikan tanggal yang diklik sebagai start baru
                                 tempStart = clicked
                                 tempEnd = clicked
                                 picking = true
                             } else {
                                 // ── Klik Kedua (End) ──
-                                // Beri kebebasan apakah klik sebelum atau sesudah start (auto-swap)
                                 tempEnd = clicked
                                 if (tempEnd.getTime() < tempStart.getTime()) {
                                     const t = tempStart
@@ -2824,7 +2834,7 @@
                             render()
                         })
 
-                        targetGrid.appendChild(b)
+                        targetGrid.appendChild(wrapper)
                     }
                 }
 

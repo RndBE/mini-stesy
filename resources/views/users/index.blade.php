@@ -402,12 +402,26 @@
                     const q = (this.searchQuery || '').toLowerCase().trim();
                     if (!q) return this.users;
 
-                    return this.users.filter((u) =>
-                        (u.nama || '').toLowerCase().includes(q) ||
+                    // Fuzzy search on name/text fields
+                    const fuse = new Fuse(this.users, {
+                        threshold: 0.35,
+                        keys: ['nama', 'instansi']
+                    });
+                    const fuzzyResults = fuse.search(this.searchQuery.trim()).map(r => r.item);
+
+                    // Exact search on code/ID fields
+                    const exactResults = this.users.filter(u =>
                         (u.username || '').toLowerCase().includes(q) ||
-                        (u.level_user || '').toLowerCase().includes(q) ||
-                        (u.instansi || '').toLowerCase().includes(q)
+                        (u.level_user || '').toLowerCase().includes(q)
                     );
+
+                    // Merge & deduplicate
+                    const seen = new Set();
+                    return [...fuzzyResults, ...exactResults].filter(u => {
+                        if (seen.has(u.id)) return false;
+                        seen.add(u.id);
+                        return true;
+                    });
                 },
 
                 normalizeRole(role) {
