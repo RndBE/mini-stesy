@@ -587,19 +587,29 @@
                 },
 
                 filteredInstansi() {
-                    if (!this.searchQuery.trim()) {
-                        return this.allInstansi;
-                    }
+                    const q = (this.searchQuery || '').trim();
+                    if (!q) return this.allInstansi;
 
-                    const query = this.searchQuery.toLowerCase();
-                    return this.allInstansi.filter(item => {
-                        return (
-                            (item.nama && item.nama.toLowerCase().includes(query)) ||
-                            (item.alamat && item.alamat.toLowerCase().includes(query)) ||
-                            (item.telp && item.telp.toLowerCase().includes(query)) ||
-                            (item.latitude && String(item.latitude).toLowerCase().includes(query)) ||
-                            (item.longitude && String(item.longitude).toLowerCase().includes(query))
-                        );
+                    // Fuzzy on text fields
+                    const fuse = new Fuse(this.allInstansi, {
+                        threshold: 0.7,
+                        keys: ['nama', 'alamat']
+                    });
+                    const fuzzyResults = fuse.search(q).map(r => r.item);
+
+                    // Exact on code fields
+                    const ql = q.toLowerCase();
+                    const exactResults = this.allInstansi.filter(item =>
+                        (item.telp && item.telp.toLowerCase().includes(ql)) ||
+                        (item.latitude && String(item.latitude).includes(ql)) ||
+                        (item.longitude && String(item.longitude).includes(ql))
+                    );
+
+                    const seen = new Set();
+                    return [...fuzzyResults, ...exactResults].filter(item => {
+                        if (seen.has(item.id)) return false;
+                        seen.add(item.id);
+                        return true;
                     });
                 },
 

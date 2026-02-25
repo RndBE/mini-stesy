@@ -335,14 +335,14 @@
                 },
 
                 filteredRoles() {
-                    if (!this.searchQuery.trim()) {
-                        return this.allRoles;
-                    }
+                    const q = (this.searchQuery || '').trim();
+                    if (!q) return this.allRoles;
 
-                    const query = this.searchQuery.toLowerCase();
-                    return this.allRoles.filter(role => {
-                        return role.role_name && role.role_name.toLowerCase().includes(query);
-                    });
+                    // role_name is a short code — exact match is more predictable
+                    const ql = q.toLowerCase();
+                    return this.allRoles.filter(role =>
+                        role.role_name && role.role_name.toLowerCase().includes(ql)
+                    );
                 },
 
                 openCreateModal() {

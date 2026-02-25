@@ -264,14 +264,12 @@
                     name: ''
                 },
                 filteredPermissions() {
-                    if (!this.searchQuery.trim()) {
-                        return this.allPermissions;
-                    }
-                    const query = this.searchQuery.toLowerCase();
-                    return this.allPermissions.filter(permission => {
-                        return permission.permission_name && permission.permission_name.toLowerCase().includes(
-                            query);
-                    });
+                    const q = (this.searchQuery || '').trim().toLowerCase();
+                    if (!q) return this.allPermissions;
+                    // permission_name is a technical code — exact match
+                    return this.allPermissions.filter(p =>
+                        p.permission_name && p.permission_name.toLowerCase().includes(q)
+                    );
                 },
                 openCreateModal() {
                     this.createForm = {

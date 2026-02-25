@@ -903,30 +903,46 @@
         const loggerCountEl = document.getElementById('loggerCount');
         const totalLoggers = {{ count($points) }};
         if (searchInput) {
+            // Build searchable data array from sidebar items
+            const buildSearchData = () =>
+                Array.from(document.querySelectorAll('.sidebar-item')).map(item => ({
+                    el: item,
+                    loggerName: item.getAttribute('data-logger-name') || '',
+                    loggerId: item.getAttribute('data-logger-id') || '',
+                }));
+
             searchInput.addEventListener('input', function(e) {
-                const searchText = e.target.value.toLowerCase().trim();
+                const searchText = e.target.value.trim();
                 let visibleCount = 0;
+
                 if (searchText === '') {
-                    // Reset: re-apply category filters to restore proper display
                     applyKategoriFilter();
-                    return; // Exit early, applyKategoriFilter already updates counter
+                    return;
                 }
-                document.querySelectorAll('.sidebar-item').forEach(item => {
-                    const loggerName = item.getAttribute('data-logger-name') || '';
-                    const loggerId = item.getAttribute('data-logger-id') || '';
-                    // Check if search text matches name or ID
-                    const matchesSearch = loggerName.includes(searchText) || loggerId.includes(searchText);
-                    // Check if item is currently visible (not hidden by filters)
-                    const wasVisibleByFilter = item.getAttribute('data-filter-visible') !== 'false';
-                    // Show only if matches search AND was visible by filter
+
+                const items = buildSearchData();
+
+                // Fuzzy on logger name
+                const fuse = new Fuse(items, { threshold: 0.7, keys: ['loggerName'] });
+                const fuzzyMatched = new Set(fuse.search(searchText).map(r => r.item.el));
+
+                // Exact on logger ID
+                const ql = searchText.toLowerCase();
+                const exactMatched = new Set(
+                    items.filter(it => it.loggerId.toLowerCase().includes(ql)).map(it => it.el)
+                );
+
+                items.forEach(({ el }) => {
+                    const matchesSearch = fuzzyMatched.has(el) || exactMatched.has(el);
+                    const wasVisibleByFilter = el.getAttribute('data-filter-visible') !== 'false';
                     if (matchesSearch && wasVisibleByFilter) {
-                        item.style.display = '';
+                        el.style.display = '';
                         visibleCount++;
                     } else {
-                        item.style.display = 'none';
+                        el.style.display = 'none';
                     }
                 });
-                // Update counter
+
                 if (loggerCountEl) {
                     loggerCountEl.textContent = `${visibleCount} dari ${totalLoggers} logger ditemukan`;
                 }

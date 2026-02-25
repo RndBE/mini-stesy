@@ -956,19 +956,27 @@
 
                 filteredDevices() {
                     const devices = Array.isArray(this.allDevices) ? this.allDevices : [];
-                    const normalize = (value) => String(value ?? '').toLowerCase();
-                    const query = normalize(this.searchQuery).trim();
+                    const q = (this.searchQuery || '').trim();
+                    if (!q) return devices;
 
-                    if (!query) {
-                        return devices;
-                    }
+                    // Fuzzy on text/description fields
+                    const fuse = new Fuse(devices, {
+                        threshold: 0.7,
+                        keys: ['nama_lokasi', 'alamat']
+                    });
+                    const fuzzyResults = fuse.search(q).map(r => r.item);
 
-                    return devices.filter(device => {
-                        return (
-                            normalize(device.id_logger).includes(query) ||
-                            normalize(device.nama_lokasi).includes(query) ||
-                            normalize(device.alamat).includes(query)
-                        );
+                    // Exact on ID field
+                    const ql = q.toLowerCase();
+                    const exactResults = devices.filter(d =>
+                        d.id_logger && d.id_logger.toLowerCase().includes(ql)
+                    );
+
+                    const seen = new Set();
+                    return [...fuzzyResults, ...exactResults].filter(d => {
+                        if (seen.has(d.id_logger)) return false;
+                        seen.add(d.id_logger);
+                        return true;
                     });
                 },
 

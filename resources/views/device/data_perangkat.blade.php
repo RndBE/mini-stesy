@@ -611,29 +611,31 @@
                 updateUrl: '',
 
                 filteredDevices() {
-                    if (!this.searchQuery.trim()) {
-                        return this.allDevices;
-                    }
+                    const q = (this.searchQuery || '').trim();
+                    if (!q) return this.allDevices;
 
-                    const query = this.searchQuery.toLowerCase();
-                    return this.allDevices.filter(device => {
-                        return (
-                            (device.id_logger && device.id_logger.toLowerCase().includes(
-                                query)) ||
-                            (device.nama_logger && device.nama_logger.toLowerCase()
-                                .includes(query)) ||
-                            (device.kategori && device.kategori.toLowerCase().includes(
-                                query)) ||
-                            (device.instansi && device.instansi.toLowerCase()
-                                .includes(query)) ||
-                            (device.seri && device.seri.toLowerCase()
-                                .includes(query)) ||
-                            (device.serial_number && device.serial_number.toLowerCase()
-                                .includes(query)) ||
-                            (device.no_hp && device.no_hp.toLowerCase().includes(query)) ||
-                            (device.nama_penjaga && device.nama_penjaga.toLowerCase()
-                                .includes(query))
-                        );
+                    // Fuzzy on name/text fields
+                    const fuse = new Fuse(this.allDevices, {
+                        threshold: 0.7,
+                        keys: ['nama_logger', 'instansi', 'nama_penjaga']
+                    });
+                    const fuzzyResults = fuse.search(q).map(r => r.item);
+
+                    // Exact on code/ID fields
+                    const ql = q.toLowerCase();
+                    const exactResults = this.allDevices.filter(d =>
+                        (d.id_logger && d.id_logger.toLowerCase().includes(ql)) ||
+                        (d.seri && d.seri.toLowerCase().includes(ql)) ||
+                        (d.serial_number && d.serial_number.toLowerCase().includes(ql)) ||
+                        (d.no_hp && d.no_hp.toLowerCase().includes(ql)) ||
+                        (d.kategori && d.kategori.toLowerCase().includes(ql))
+                    );
+
+                    const seen = new Set();
+                    return [...fuzzyResults, ...exactResults].filter(d => {
+                        if (seen.has(d.id)) return false;
+                        seen.add(d.id);
+                        return true;
                     });
                 },
 
