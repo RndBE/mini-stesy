@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DataMasukController;
 use App\Http\Controllers\TingkatSiagaAwlrController;
+use App\Http\Controllers\RekapDataController;
 use App\Http\Controllers\KategoriLoggerController;
 use App\Http\Controllers\ListParameterController;
 use App\Http\Controllers\ParameterGroupController;
@@ -52,6 +53,11 @@ Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
 Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
     Route::get('/data-masuk', [DataMasukController::class, 'index'])->name('data-masuk.index');
     Route::get('/api/data-masuk', [DataMasukController::class, 'getData'])->name('data-masuk.api');
+});
+
+Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
+    Route::get('/rekap-data', [RekapDataController::class, 'index'])->name('rekap-data.index');
+    Route::get('/api/rekap-data', [RekapDataController::class, 'getData'])->name('rekap-data.api');
 });
 
 Route::middleware(['auth'])->get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
