@@ -616,7 +616,7 @@
 
                     // Fuzzy on name/text fields
                     const fuse = new Fuse(this.allDevices, {
-                        threshold: 0.7,
+                        threshold: 0.35,
                         keys: ['nama_logger', 'instansi', 'nama_penjaga']
                     });
                     const fuzzyResults = fuse.search(q).map(r => r.item);

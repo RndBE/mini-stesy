@@ -923,7 +923,7 @@
                 const items = buildSearchData();
 
                 // Fuzzy on logger name
-                const fuse = new Fuse(items, { threshold: 0.7, keys: ['loggerName'] });
+                const fuse = new Fuse(items, { threshold: 0.35, keys: ['loggerName'] });
                 const fuzzyMatched = new Set(fuse.search(searchText).map(r => r.item.el));
 
                 // Exact on logger ID

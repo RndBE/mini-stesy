@@ -294,24 +294,28 @@
                 },
 
                 filteredRows() {
-                    const q = this.searchQuery.trim().toLowerCase()
-                    if (!q) return this.allRows
+                    const q = (this.searchQuery || '').trim();
+                    if (!q) return this.allRows;
 
-                    return this.allRows.filter(row => {
-                        const levelsText = (row.levels || [])
-                            .map(level => `${level.nama || ''} ${level.nilai || ''}`)
-                            .join(' ')
-                            .toLowerCase()
+                    // Fuzzy on name fields
+                    const fuse = new Fuse(this.allRows, {
+                        threshold: 0.35,
+                        keys: ['nama_pos', 'nama_lokasi']
+                    });
+                    const fuzzyResults = fuse.search(q).map(r => r.item);
 
-                        return (
-                            String(row.id_logger || '').toLowerCase().includes(q) ||
-                            String(row.nama_pos || '').toLowerCase().includes(q) ||
-                            String(row.nama_lokasi || '').toLowerCase().includes(q) ||
-                            String(row.status_notifikasi || '').toLowerCase().includes(q) ||
-                            String(row.jeda_notif || '').toLowerCase().includes(q) ||
-                            levelsText.includes(q)
-                        )
-                    })
+                    // Exact on ID field
+                    const ql = q.toLowerCase();
+                    const exactResults = this.allRows.filter(row =>
+                        row.id_logger && String(row.id_logger).toLowerCase().includes(ql)
+                    );
+
+                    const seen = new Set();
+                    return [...fuzzyResults, ...exactResults].filter(row => {
+                        if (seen.has(row.id_logger)) return false;
+                        seen.add(row.id_logger);
+                        return true;
+                    });
                 },
 
                 openEditModal(row) {

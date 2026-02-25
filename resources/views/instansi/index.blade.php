@@ -592,7 +592,7 @@
 
                     // Fuzzy on text fields
                     const fuse = new Fuse(this.allInstansi, {
-                        threshold: 0.7,
+                        threshold: 0.35,
                         keys: ['nama', 'alamat']
                     });
                     const fuzzyResults = fuse.search(q).map(r => r.item);

@@ -961,7 +961,7 @@
 
                     // Fuzzy on text/description fields
                     const fuse = new Fuse(devices, {
-                        threshold: 0.7,
+                        threshold: 0.35,
                         keys: ['nama_lokasi', 'alamat']
                     });
                     const fuzzyResults = fuse.search(q).map(r => r.item);
