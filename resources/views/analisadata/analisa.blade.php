@@ -3,6 +3,7 @@
 @push('head')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
+        [x-cloak] { display: none !important; }
         /* ── Select2 Tailwind-style override ── */
         .select2-container--default .select2-selection--single {
             border: 1px solid #cbd5e1;
@@ -280,8 +281,9 @@
         .info-panel {
             position: fixed;
             top: 0;
-            right: -400px;
-            width: 400px;
+            right: -100vw;
+            width: 100vw;
+            max-width: 400px;
             height: 100vh;
             background: white;
             box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
@@ -637,11 +639,11 @@
             </div>
         </div>
     </div>
-    <div class="flex items-center justify-between mb-2">
-        <div class="flex items-center mb-3">
-
+    <div x-data="{ filterOpen: false }">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
+        <div class="flex items-center gap-3">
             <button type="button" onclick="window.location.href='{{ route('peta.lokasi') }}'"
-                class="inline-flex items-center justify-center" aria-label="Kembali">
+                class="inline-flex items-center justify-center flex-shrink-0" aria-label="Kembali">
                 <svg width="8" height="20" viewBox="0 0 10 20" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <path d="M8.5 18.5L1 9.75L8.5 1" stroke="#303481" stroke-width="2" stroke-linecap="round"
@@ -650,24 +652,31 @@
             </button>
 
             <span
-                class="ms-6 w-3 h-3 rounded-full {{ $status === 'online' ? 'bg-green-500' : 'bg-red-500' }} me-4"></span>
-            <div>
-                <div class="text-lg font-bold mb-0 py-0 my-0">{{ $logger->nama_logger }}</div>
-                <div
-                    class="flex items-center gap-2 text-xs font-semibold {{ $status === 'online' ? 'text-emerald-600' : 'text-rose-600' }}">
-
-                    <small class="text-sm font-medium">
+                class="w-3 h-3 rounded-full flex-shrink-0 {{ $status === 'online' ? 'bg-green-500' : 'bg-red-500' }}"></span>
+            <div class="min-w-0">
+                <div class="text-base sm:text-lg font-bold truncate">{{ $logger->nama_logger }}</div>
+                <div class="flex items-center gap-2 text-xs font-semibold {{ $status === 'online' ? 'text-emerald-600' : 'text-rose-600' }}">
+                    <small class="text-xs sm:text-sm font-medium">
                         {{ $status === 'online' ? 'Koneksi Terhubung' : 'Koneksi Terputus' }}
                     </small>
                 </div>
             </div>
         </div>
 
-        <div class="flex">
+        <div class="flex gap-2 flex-shrink-0">
+            {{-- Tombol Filter: hanya muncul di mobile --}}
+            <button @click="filterOpen = !filterOpen"
+                :class="filterOpen ? 'bg-[#303481] text-white border-[#303481]' : 'bg-slate-100 text-slate-700 border-slate-300'"
+                class="md:hidden border items-center rounded-lg flex px-3 py-2 text-sm transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+                </svg>
+                <span x-text="filterOpen ? 'Filter' : 'Filter'"></span>
+            </button>
             <button
-                class="bg-[#303481] items-center rounded-lg flex px-4 text-white py-3 hover:bg-[#10134B] hover:font-semibold text-sm me-3"
+                class="bg-[#303481] items-center rounded-lg flex px-3 sm:px-4 text-white py-2 sm:py-3 hover:bg-[#10134B] text-sm"
                 onclick="openInfoPanel()">
-                <svg class="me-2" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                <svg class="sm:me-2" width="18" height="18" viewBox="0 0 20 20" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M10 18.3334C14.6024 18.3334 18.3334 14.6025 18.3334 10.0001C18.3334 5.39771 14.6024 1.66675 10 1.66675C5.39765 1.66675 1.66669 5.39771 1.66669 10.0001C1.66669 14.6025 5.39765 18.3334 10 18.3334Z"
@@ -675,12 +684,12 @@
                     <path d="M10 13.3334V10.0001M10 6.66675H10.0083" stroke="white" stroke-width="1.5"
                         stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                Informasi
+                <span class="hidden sm:inline">Informasi</span>
             </button>
             <button
-                class="bg-white border  items-center  border-[#303481] text-[#303481] rounded-lg flex px-4 py-3 hover:bg-[#eaebff] hover:font-semibold text-sm "
+                class="bg-white border items-center border-[#303481] text-[#303481] rounded-lg flex px-3 sm:px-4 py-2 sm:py-3 hover:bg-[#eaebff] text-sm"
                 onclick="openDocModal()">
-                <svg width="20" height="18" viewBox="0 0 20 18" class="me-2" fill="none"
+                <svg width="18" height="16" viewBox="0 0 20 18" class="sm:me-2" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M9.91667 13.5833C11.9417 13.5833 13.5833 11.9417 13.5833 9.91667C13.5833 7.89162 11.9417 6.25 9.91667 6.25C7.89162 6.25 6.25 7.89162 6.25 9.91667C6.25 11.9417 7.89162 13.5833 9.91667 13.5833Z"
@@ -690,12 +699,17 @@
                         stroke="#303481" stroke-width="1.5" />
                     <path d="M16.3333 7.16675H15.4166" stroke="#303481" stroke-width="1.5" stroke-linecap="round" />
                 </svg>
-                Dokumentasi</button>
+                <span class="hidden sm:inline">Dokumentasi</span>
+            </button>
         </div>
     </div>
-    <div class="analysis-container grid grid-cols-12 gap-3">
-        <div class="xl:col-span-3 2xl:col-span-2">
+    <div class="analysis-container grid grid-cols-1 md:grid-cols-12 gap-3">
+
+        {{-- Filter Panel: hidden di mobile hingga diklik, selalu tampil di md+ --}}
+        <div :class="filterOpen ? 'block' : 'hidden md:block'"
+            class="col-span-1 md:col-span-5 xl:col-span-3 2xl:col-span-2">
             <div class="border rounded-lg px-4 py-3">
+
                 <div class="grid grid-cols-1 gap-3">
                     <div class="">
                         <div class="text-md font-semibold mb-2 ">Pilih Logger</div>
@@ -1107,7 +1121,7 @@
                 </div>
             </div>
         </div>
-        <div class="xl:col-span-9 2xl:col-span-10">
+        <div class="col-span-1 md:col-span-7 xl:col-span-9 2xl:col-span-10">
             <div class="border rounded-lg ">
                 <div class="chart-section ps-3 pe-3 pt-3 pb-0 mb-0">
 
@@ -1144,6 +1158,70 @@
                             </div>
                         </div>
                     </div>
+
+                    @php
+                        $loggerKategoriName = strtoupper(
+                            $logger->kategori_logger
+                            ?? $logger->kategori?->nama_kategori
+                            ?? ''
+                        );
+                    @endphp
+                    @if($loggerKategoriName === 'AWQR')
+                    @php
+                        $latestAwgrRow = ($logger->temp19 instanceof \Illuminate\Database\Eloquent\Model)
+                            ? $logger->temp19 : $logger->temp16;
+                        $phParamAwgr = $logger->params->first(fn($p) =>
+                            in_array(strtolower(trim($p->nama_parameter)), ['ph_air','ph air','ph']) ||
+                            in_array(strtolower(trim($p->kolom_sensor ?? '')), ['ph_air','ph'])
+                        );
+                        $phKolomAwgr = $phParamAwgr?->kolom_sensor;
+                        $latestPhAwgr = $latestAwgrRow && $phKolomAwgr ? ($latestAwgrRow->{$phKolomAwgr} ?? null) : null;
+                        $latestPhTimeAwgr = $latestAwgrRow?->waktu ?? null;
+                        $phDisplayAwgr = is_numeric($latestPhAwgr) ? number_format((float)$latestPhAwgr, 2) : '-';
+                        $phTimeDisplayAwgr = $latestPhTimeAwgr ? date('d-m-Y H:i:s', strtotime($latestPhTimeAwgr)) : '-';
+                        $phVal = is_numeric($latestPhAwgr) ? (float)$latestPhAwgr : null;
+                        $phClassLabel = $phVal !== null ? ($phVal >= 6 && $phVal <= 9 ? 'Kelas I – III' : ($phVal >= 5 ? 'Kelas IV' : 'Di Luar Baku Mutu')) : '';
+                        $phClassColor = $phVal !== null ? ($phVal >= 6 && $phVal <= 9 ? '#3b82f6' : ($phVal >= 5 ? '#ef4444' : '#6b7280')) : '#6b7280';
+                    @endphp
+                    {{-- Universal AWQR Parameter Panel — konten diupdate JS sesuai parameter dipilih --}}
+                    <div id="awqrParamHeader" class="hidden mb-3">
+                        <div class="flex flex-col md:flex-row gap-3">
+                            {{-- Card Nilai --}}
+                            <div class="relative overflow-hidden flex-shrink-0 bg-white border border-slate-200 rounded-xl px-5 py-2 shadow-sm" style="min-width:290px">
+                                <div class="z-10 relative">
+                                    <div class="flex items-start justify-between gap-4 mt-2">
+                                        <div>
+                                            <div class="text-xs font-semibold text-slate-700 uppercase tracking-wide" id="awqrParamLabel">NILAI PARAMETER</div>
+                                            <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
+                                                <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 16 16" stroke="currentColor"><rect x="1" y="2" width="14" height="13" rx="2" stroke-width="1.5"/><path d="M1 6h14" stroke-width="1.5"/><path d="M5 1v3M11 1v3" stroke-width="1.5" stroke-linecap="round"/></svg>
+                                                <span id="awqrParamTimeSpan">—</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-right leading-none">
+                                            <span class="text-3xl font-bold text-slate-800" id="awqrParamValue">—</span>
+                                            <span class="text-xs text-slate-400 ml-1" id="awqrParamUnit"></span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 flex items-center gap-1.5" id="awqrParamBadge">
+                                        <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" id="awqrParamClassDot" style="background:#009CD9"></span>
+                                        <span class="text-sm font-semibold" id="awqrParamClass" style="color:#009CD9"></span>
+                                    </div>
+                                </div>
+                                <div class="pointer-events-none absolute inset-x-0 bottom-0 h-12 opacity-60" aria-hidden="true">
+                                    <img src="{{ asset('icons/gelombang.svg') }}" class="w-full h-full object-cover object-center" alt="">
+                                </div>
+                            </div>
+                            {{-- Keterangan (diisi JS) --}}
+                            <div class="flex-1 bg-white border border-slate-200 rounded-xl px-5 py-2 shadow-sm">
+                                <div class="text-base font-bold text-slate-700 mb-2">Keterangan:</div>
+                                <div class="flex flex-wrap gap-x-8 gap-y-3" id="awqrKeteranganItems">
+                                    {{-- Diisi JS --}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @endif
 
                     <div class="chart-title text-lg font-semibold" id="chartTitle">{{ date('F Y') }}</div>
                     <div class="chart-wrapper mb-3 mt-2">
@@ -1303,9 +1381,16 @@
             const hasParamOption = (value) => options.some((opt) => opt.value === value);
             const firstValidParam = options.find((opt) => String(opt.value || '').trim() !== '')?.value || '';
 
+            // Parameter utama dari controller (parameter_utama = 1 di DB)
+            const defaultParam = '{{ $defaultParameter ?? '' }}';
+
             let initialParam = '';
             if (paramFromUrl && hasParamOption(paramFromUrl)) {
+                // Prioritas 1: dari URL ?parameter=
                 initialParam = paramFromUrl;
+            } else if (defaultParam && hasParamOption(defaultParam)) {
+                // Prioritas 2: parameter_utama = 1 dari controller
+                initialParam = defaultParam;
             } else if (paramSelectEl && String(paramSelectEl.value || '').trim() !== '') {
                 initialParam = paramSelectEl.value;
             } else {
@@ -1347,11 +1432,12 @@
         function updateChartTitle() {
             const range = document.querySelector('input[name="range"]:checked').value;
             const param = document.getElementById('parameterSelect').value;
+            const paramLabel = param.replace(/_/g, ' ');
             const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
                 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
             ];
-            let titleText = `Rerata ${param} `;
-            let tableTitleText = `Tabel Rerata ${param} `;
+            let titleText = `Rerata ${paramLabel} `;
+            let tableTitleText = `Tabel Rerata ${paramLabel} `;
             if (range === 'day') {
                 const dateInput = String(document.getElementById('dateInput').value || '').trim();
                 const m = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -1779,6 +1865,205 @@
         }
         // ─────────────────────────────────────────────────────────────────────
 
+        // ─── AWQR Universal Parameter Panel ────────────────────────────────────
+        const _isAwgr = @php
+            echo (strtoupper($logger->kategori_logger ?? $logger->kategori?->nama_kategori ?? '') === 'AWQR') ? 'true' : 'false';
+        @endphp;
+
+        // Definisi keterangan untuk setiap parameter AWQR
+        const _awqrParamDefs = {
+            // Tinggi Muka Air
+            tinggi_muka_air: {
+                aliases: ['tinggi_muka_air','tinggi muka air','water level','tma'],
+                label: 'TINGGI MUKA AIR', unit: 'm',
+                classify: () => null,
+                keterangan: [] // tidak ada klasifikasi baku mutu
+            },
+            // pH Air
+            ph_air: {
+                aliases: ['ph_air','ph air','ph','ph_water'],
+                label: 'NILAI pH AIR', unit: '',
+                classify: v => {
+                    if (v >= 6 && v <= 9) return { label: 'Kelas I \u2013 III', color: '#009CD9' };
+                    if (v >= 5 && v <= 9) return { label: 'Kelas IV', color: '#E62421' };
+                    return { label: 'Di Luar Baku Mutu', color: '#6b7280' };
+                },
+                keterangan: [
+                    { color: '#009CD9', label: 'Kelas I \u2013 III', range: '6 \u2013 9' },
+                    { color: '#E62421', label: 'Kelas IV',        range: '5 \u2013 9' },
+                ]
+            },
+            // Suhu Air
+            suhu_air: {
+                aliases: ['suhu_air','suhu air','suhu','temperature','temp','water_temperature'],
+                label: 'SUHU AIR', unit: '\u00b0C',
+                classify: v => {
+                    if (v >= 25 && v <= 30) return { label: 'Normal', color: '#009CD9' };
+                    return { label: 'Di Luar Rentang', color: '#F97316' };
+                },
+                keterangan: [
+                    { color: '#009CD9', label: 'Normal',          range: '25 \u2013 30 \u00b0C' },
+                    { color: '#F97316', label: 'Di Luar Rentang', range: '< 25 atau > 30 \u00b0C' },
+                ]
+            },
+            // ORP
+            orp: {
+                aliases: ['orp'],
+                label: 'NILAI ORP', unit: 'mV',
+                classify: v => v <= 200
+                    ? { label: 'Aman',    color: '#009CD9' }
+                    : { label: 'Waspada', color: '#F97316' },
+                keterangan: [
+                    { color: '#009CD9', label: 'Aman',    range: '0 mV \u2013 200 mV' },
+                    { color: '#F97316', label: 'Waspada', range: '\u2265 200 mV' },
+                ]
+            },
+            // Conductivity
+            conductivity: {
+                aliases: ['conductivity','konduktivitas','electrical_conductivity','ec'],
+                label: 'NILAI CONDUCTIVITY', unit: '\u03bcS/cm',
+                classify: v => v <= 1000
+                    ? { label: 'Kelas I',         color: '#009CD9' }
+                    : { label: 'Kelas II \u2013 IV', color: '#F97316' },
+                keterangan: [
+                    { color: '#009CD9', label: 'Kelas I',           range: '0 \u03bcS/cm \u2013 1000 \u03bcS/cm' },
+                    { color: '#F97316', label: 'Kelas II \u2013 IV', range: '\u2265 1000 \u03bcS/cm' },
+                ]
+            },
+            // Salinity
+            salinity: {
+                aliases: ['salinity','salinitas'],
+                label: 'NILAI SALINITY', unit: 'PSU',
+                classify: () => ({ label: 'Kelas I \u2013 III', color: '#009CD9' }),
+                keterangan: [
+                    { color: '#009CD9', label: 'Kelas I \u2013 III', range: 'Mendekati Nol' },
+                ]
+            },
+            // Total Dissolved Solids
+            tds: {
+                aliases: ['tds','total_dissolved_solids','dissolved_solids','total dissolved solids'],
+                label: 'TOTAL DISSOLVED SOLIDS', unit: 'mg/L',
+                classify: v => v <= 1000
+                    ? { label: 'Kelas I \u2013 III', color: '#009CD9' }
+                    : { label: 'Kelas IV',         color: '#F97316' },
+                keterangan: [
+                    { color: '#009CD9', label: 'Kelas I \u2013 III', range: '0 \u2013 1000 mg/L' },
+                    { color: '#F97316', label: 'Kelas IV',           range: '\u2265 1000 mg/L' },
+                ]
+            },
+            // Turbidity
+            turbidity: {
+                aliases: ['turbidity','kekeruhan'],
+                label: 'NILAI TURBIDITY', unit: 'NTU',
+                classify: v => v <= 5
+                    ? { label: 'Kelas I',           color: '#009CD9' }
+                    : { label: 'Kelas II \u2013 IV', color: '#F97316' },
+                keterangan: [
+                    { color: '#009CD9', label: 'Kelas I',           range: '0 \u2013 5 NTU' },
+                    { color: '#F97316', label: 'Kelas II \u2013 IV', range: '\u2265 5 NTU' },
+                ]
+            },
+            // Tinggi Sensor
+            tinggi_sensor: {
+                aliases: ['tinggi_sensor','tinggi sensor','sensor height','sensor_height'],
+                label: 'TINGGI SENSOR', unit: 'm',
+                classify: () => null,
+                keterangan: []
+            },
+        };
+
+        function _buildKeteranganHtml(items) {
+            if (!items || !items.length) {
+                return '<span class="text-sm text-slate-400">Tidak ada klasifikasi baku mutu untuk parameter ini.</span>';
+            }
+            return items.map(it => `
+                <div class="flex items-center gap-3">
+                    <span class="inline-block w-8 h-8 rounded-sm flex-shrink-0" style="background:${it.color}"></span>
+                    <div>
+                        <div class="text-sm font-semibold text-slate-700">${it.label}</div>
+                        <div class="text-sm text-slate-400">${it.range}</div>
+                    </div>
+                </div>`).join('');
+        }
+
+        function _getTimeLbl() {
+            const mn = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            const r  = document.querySelector('input[name="range"]:checked')?.value ?? 'day';
+            if (r === 'day') {
+                const v = document.getElementById('dateInput')?.value ?? '';
+                const m = v.match(/(\d{4})-(\d{2})-(\d{2})/);
+                return m ? `Rerata ${parseInt(m[3])} ${mn[parseInt(m[2])-1]} ${m[1]}` : 'Rerata';
+            }
+            if (r === 'month') {
+                const v = document.getElementById('monthInput')?.value ?? '';
+                const [yr, mo] = v.split('-');
+                return (yr && mo) ? `Rerata ${mn[parseInt(mo)-1]} ${yr}` : 'Rerata';
+            }
+            if (r === 'year') return `Rerata Tahun ${document.getElementById('yearInput')?.value ?? ''}`;
+            return 'Rerata Rentang';
+        }
+
+        function updatePhAirPanel(data) {
+            // alias ke fungsi universal agar backward-compatible
+            updateAwqrParamPanel(data);
+        }
+
+        function updateAwqrParamPanel(data) {
+            const panel = document.getElementById('awqrParamHeader');
+            if (!panel) return;
+
+            if (!_isAwgr) { panel.classList.add('hidden'); return; }
+
+            const sel      = document.getElementById('parameterSelect');
+            const paramVal = String(sel ? sel.value : '').toLowerCase().trim();
+            if (!paramVal) { panel.classList.add('hidden'); return; }
+
+            // Temukan definisi parameter
+            let def = null;
+            for (const key of Object.keys(_awqrParamDefs)) {
+                const d = _awqrParamDefs[key];
+                if (d.aliases.some(a => paramVal === a || paramVal.includes(a) || a.includes(paramVal))) {
+                    def = d; break;
+                }
+            }
+            if (!def) { panel.classList.add('hidden'); return; }
+
+            panel.classList.remove('hidden');
+
+            // Hitung rerata
+            const chartArr = Array.isArray(data && data.chartData) ? data.chartData : [];
+            const valid    = chartArr.filter(v => v !== null && v !== undefined && !isNaN(Number(v))).map(Number);
+            const avg      = valid.length > 0 ? valid.reduce((a, b) => a + b, 0) / valid.length : null;
+
+            // Update elemen
+            const lblEl  = document.getElementById('awqrParamLabel');
+            const valEl  = document.getElementById('awqrParamValue');
+            const unitEl = document.getElementById('awqrParamUnit');
+            const timeEl = document.getElementById('awqrParamTimeSpan');
+            const dotEl  = document.getElementById('awqrParamClassDot');
+            const clsEl  = document.getElementById('awqrParamClass');
+            const badgeEl= document.getElementById('awqrParamBadge');
+            const ktEl   = document.getElementById('awqrKeteranganItems');
+
+            if (lblEl)  lblEl.textContent  = def.label;
+            if (unitEl) unitEl.textContent = def.unit;
+            if (timeEl) timeEl.textContent = _getTimeLbl();
+            if (valEl)  valEl.textContent  = avg !== null ? avg.toFixed(2) : '\u2014';
+            if (ktEl)   ktEl.innerHTML     = _buildKeteranganHtml(def.keterangan);
+
+            // Badge klasifikasi
+            const cls = avg !== null ? def.classify(avg) : null;
+            if (badgeEl) badgeEl.style.display = cls ? '' : 'none';
+            if (cls) {
+                if (dotEl) dotEl.style.background = cls.color;
+                if (clsEl) { clsEl.textContent = cls.label; clsEl.style.color = cls.color; }
+            }
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
+
+
+
         function updateChart(data) {
             if (!chart) return;
             const labelsRaw = data.labels || [];
@@ -1802,6 +2087,7 @@
                 chart.data.datasets[2].data = [];
                 chart.update();
                 updateRainfallCard(data);
+                updatePhAirPanel(data);
                 return;
             }
 
@@ -1849,6 +2135,7 @@
 
             chart.update();
             updateRainfallCard(data);
+            updatePhAirPanel(data);
         }
 
         function updateTable(data) {

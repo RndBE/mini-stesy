@@ -32,7 +32,7 @@
             </div>
         </section>
 
-        <section class="flex items-center justify-center bg-slate-50 px-6 py-12 sm:px-12 lg:col-span-4 relative ">
+        <section class="flex flex-col items-center justify-center bg-slate-50 px-6 py-12 sm:px-12 lg:col-span-4">
             <div class="w-full max-w-md">
                 <div class="mb-8">
                     <h1 class="text-3xl font-semibold text-indigo-900">Masuk ke Akun</h1>
@@ -111,11 +111,10 @@
                     </button>
                 </form>
 
-
-            </div>
-            <div class="mt-10 flex w-full justify-center items-center absolute bottom-10">
-                <img src="{{ asset('images/beacon-logo.png') }}" alt="Dashboard illustration" class="h-full me-5" />
-                <img src="{{ asset('images/mini_stesy.png') }}" alt="Dashboard illustration" class="h-full mb-1" />
+                <div class="mt-8 flex w-full justify-center items-center gap-4">
+                    <img src="{{ asset('images/beacon-logo.png') }}" alt="Beacon Logo" class="h-8 object-contain" />
+                    <img src="{{ asset('images/mini_stesy.png') }}" alt="Mini Stesy" class="h-7 object-contain" />
+                </div>
             </div>
         </section>
     </div>
