@@ -13,53 +13,72 @@
                     : '-';
                 $jamRange = now()->format('H:00') . ' - ' . now()->format('H:59');
                 $tanggalHarian = now()->format('d M Y');
+
+                // Tentukan siang/malam berdasarkan waktu terakhir logger kirim data
+                $loggerWaktu   = $lg->latest_waktu ? \Carbon\Carbon::parse($lg->latest_waktu) : now();
+                $loggerHour    = (int) $loggerWaktu->format('H');
+                $isPagi        = ($loggerHour >= 6 && $loggerHour < 18);
+                $waktuSuffix   = $isPagi ? '_pagi' : '_malam';
+
+                // State yang punya varian _pagi / _malam
+                $timeAwareStates = ['tidak_hujan', 'hujan_sangat_ringan', 'hujan_ringan'];
+
                 $iconStatePerJam = preg_match('/^[a-z0-9_]+$/', (string) $stateHujanPerJam)
                     ? $stateHujanPerJam
                     : 'tidak_hujan';
                 $iconStateHarian = preg_match('/^[a-z0-9_]+$/', (string) $stateHujanHarian)
                     ? $stateHujanHarian
                     : 'tidak_hujan';
-                $defaultIcon = asset('klasifikasi_hujan/tidak_hujan.png');
+
+                // Tambahkan suffix _pagi/_malam untuk state yang relevan
+                if (in_array($iconStatePerJam, $timeAwareStates)) {
+                    $iconStatePerJam .= $waktuSuffix;
+                }
+                if (in_array($iconStateHarian, $timeAwareStates)) {
+                    $iconStateHarian .= $waktuSuffix;
+                }
+
+                $defaultIcon = asset('klasifikasi_hujan/tidak_hujan_pagi.png');
             @endphp
 
             <div class="grid grid-cols-2 gap-4 lg:grid-cols-2 relative">
-                <div class="relative overflow-hidden rounded-xl border px-4 py-3 text-center">
-                    <div class="text-xs font-semibold tracking-wide text-slate-700">AKUMULASI
+                <div class="relative overflow-hidden rounded-xl border px-3 py-3 text-center">
+                    <div class="text-[10px] sm:text-xs font-semibold tracking-wide text-slate-700">AKUMULASI
                         HUJAN PER JAM</div>
 
                     <img src="{{ asset('klasifikasi_hujan/' . $iconStatePerJam . '.png') }}"
                         onerror="this.onerror=null;this.src='{{ $defaultIcon }}';"
                         alt="{{ $statusHujanPerJam ?? 'Status Hujan' }}"
-                        class="pointer-events-none absolute right-[-1rem] top-10 2xl:top-7 h-30 w-30 lg:h-32 lg:w-32 2xl:h-36 2xl:w-36 object-contain {{ $muted ? 'opacity-60' : '' }}">
-                    <div class="mt-28 xl:mt-28 2xl:mt-32"></div>
+                        class="pointer-events-none absolute right-[-0.5rem] top-8 h-20 w-20 sm:top-10 sm:h-28 sm:w-28 lg:h-32 lg:w-32 2xl:top-7 2xl:h-36 2xl:w-36 object-contain {{ $muted ? 'opacity-60' : '' }}">
+                    <div class="mt-20 sm:mt-24 xl:mt-28 2xl:mt-32"></div>
 
                     <div
-                        class="text-4xl font-extrabold text-slate-900 whitespace-nowrap pt-2 {{ $muted ? 'opacity-60' : '' }}">
+                        class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 whitespace-nowrap pt-1 {{ $muted ? 'opacity-60' : '' }}">
                         {{ $displayPerJam }}
-                        <span class="text-sm font-semibold ">mm</span>
+                        <span class="text-xs sm:text-sm font-semibold">mm</span>
                     </div>
-                    <div class=" inline-flex  text-xs font-semibold  uppercase {{ $muted ? 'opacity-60' : '' }}">
+                    <div class="inline-flex text-[10px] sm:text-xs font-semibold uppercase {{ $muted ? 'opacity-60' : '' }}">
                         {{ $statusHujanPerJam ?? '-' }}
                     </div>
 
                 </div>
 
-                <div class="relative overflow-hidden rounded-xl border  px-4 py-3 text-center ">
-                    <div class="text-xs font-semibold tracking-wide text-slate-700 ">
+                <div class="relative overflow-hidden rounded-xl border px-3 py-3 text-center">
+                    <div class="text-[10px] sm:text-xs font-semibold tracking-wide text-slate-700">
                         AKUMULASI HUJAN HARIAN</div>
 
                     <img src="{{ asset('klasifikasi_hujan/' . $iconStateHarian . '.png') }}"
                         onerror="this.onerror=null;this.src='{{ $defaultIcon }}';"
                         alt="{{ $statusHujanHarian ?? 'Status Hujan' }}"
-                        class="pointer-events-none absolute right-[-1rem] top-10 2xl:top-7 h-30 w-30 lg:h-32 lg:w-32 2xl:h-36 2xl:w-36 object-contain {{ $muted ? 'opacity-60' : '' }}">
-                    <div class="mt-28 xl:mt-28 2xl:mt-32"></div>
+                        class="pointer-events-none absolute right-[-0.5rem] top-8 h-20 w-20 sm:top-10 sm:h-28 sm:w-28 lg:h-32 lg:w-32 2xl:top-7 2xl:h-36 2xl:w-36 object-contain {{ $muted ? 'opacity-60' : '' }}">
+                    <div class="mt-20 sm:mt-24 xl:mt-28 2xl:mt-32"></div>
 
                     <div
-                        class=" text-4xl font-extrabold text-slate-900 whitespace-nowrap pt-2 {{ $muted ? 'opacity-60' : '' }}">
+                        class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 whitespace-nowrap pt-1 {{ $muted ? 'opacity-60' : '' }}">
                         {{ $displayHarian }}
-                        <span class="text-sm font-semibold ">mm</span>
+                        <span class="text-xs sm:text-sm font-semibold">mm</span>
                     </div>
-                    <div class="inline-flex text-xs font-semibold uppercase {{ $muted ? 'opacity-60' : '' }}">
+                    <div class="inline-flex text-[10px] sm:text-xs font-semibold uppercase {{ $muted ? 'opacity-60' : '' }}">
                         {{ $statusHujanHarian ?? '-' }}
                     </div>
                 </div>

@@ -8,6 +8,12 @@
             z-index: 10;
         }
 
+        /* Gunakan dynamic viewport height agar tidak terpotong address bar mobile */
+        .peta-wrapper {
+            height: calc(100vh - 65px);
+            height: calc(100dvh - 65px); /* modern browsers: dynamic viewport */
+        }
+
         .sidebar-item:hover {
             background-color: #f1f5f9;
             cursor: pointer;
@@ -27,6 +33,100 @@
             border-radius: 20px;
         }
 
+        /* Sidebar collapsible */
+        .sidebar-panel {
+            transition: width 0.3s ease, min-width 0.3s ease;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .sidebar-panel.collapsed {
+            width: 0 !important;
+            min-width: 0 !important;
+        }
+
+        .sidebar-toggle-btn {
+            position: absolute;
+            top: 50%;
+            left: -28px;
+            transform: translateY(-50%);
+            z-index: 500;
+            width: 28px;
+            height: 56px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: -3px 0 8px rgba(0, 0, 0, 0.08);
+            transition: background 0.2s;
+        }
+
+        .sidebar-toggle-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .sidebar-toggle-btn svg {
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-toggle-btn.collapsed svg {
+            transform: rotate(180deg);
+        }
+
+        /* Mobile overlay backdrop for right sidebar */
+        #petaSidebarBackdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 490;
+        }
+        #petaSidebarBackdrop.show {
+            display: block;
+        }
+
+        /* Mobile: sidebar slides in from right over map */
+        @media (max-width: 1023px) {
+            .sidebar-panel {
+                position: fixed !important;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 80vw !important;
+                min-width: 0 !important;
+                max-width: 320px;
+                height: 100% !important;
+                z-index: 500;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                border-left: 1px solid #e2e8f0;
+                box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+                white-space: normal;
+            }
+            .sidebar-panel.mobile-open {
+                transform: translateX(0);
+            }
+            /* Hide width-based collapsed state on mobile */
+            .sidebar-panel.collapsed {
+                width: 80vw !important;
+            }
+            /* Wrapper takes zero width so toggle button floats at map edge */
+            #petaSidebarWrapper {
+                width: 0 !important;
+                flex-shrink: 0;
+            }
+            /* Reposition toggle button on mobile */
+            .sidebar-toggle-btn {
+                left: -36px;
+                width: 36px;
+                height: 48px;
+            }
+        }
+
         .map-settings-btn {
             position: absolute;
             bottom: 12px;
@@ -40,11 +140,28 @@
             font-size: 14px;
             font-weight: 500;
             border: none;
-            transition: all 0.2s;
+            transition: all 0.2s, opacity 0.3s ease;
+            opacity: 1;
         }
 
         .map-settings-btn:hover {
             background: #10134B;
+        }
+
+        @media (max-width: 1023px) {
+            .map-settings-btn {
+                bottom: auto;
+                top: 12px;
+                right: 12px;
+                padding: 8px;
+                z-index: 100;
+            }
+            .map-settings-btn .btn-label {
+                display: none;
+            }
+            .map-settings-btn svg {
+                margin-right: 0;
+            }
         }
 
         .settings-modal-overlay {
@@ -351,8 +468,18 @@
     </style>
 @endpush
 @section('content')
-    <div class="h-[calc(100vh-65px)] w-full">
-        <div class="flex h-full w-full overflow-hidden bg-white shadow-sm ring-1 ring-slate-200">
+    <div class="peta-wrapper w-full">
+        {{-- Overlay backdrop for mobile right sidebar (outside flex to avoid layout issues) --}}
+        <div id="petaSidebarBackdrop" onclick="closePetaSidebar()"></div>
+
+        <div class="flex h-full w-full overflow-hidden bg-white shadow-sm ring-1 ring-slate-200"
+            x-data="{
+                sidebarOpen: window.innerWidth >= 1024,
+                init() {
+                    if (window.innerWidth < 1024) this.sidebarOpen = false;
+                }
+            }"
+            @close-peta-sidebar.window="sidebarOpen = false; togglePetaSidebar(false)">
             <div class="relative flex-1">
                 <div id="map" class="h-full w-full"></div>
                 <button class="map-settings-btn rounded-xl" id="mapSettingsBtn">
@@ -361,90 +488,115 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                     </svg>
-                    Pengaturan Peta
+                    <span class="btn-label">Pengaturan Peta</span>
                 </button>
             </div>
-            <div class="flex w-1/5   flex-col border-l border-slate-200 bg-white">
-                <div class=" px-3 py-2">
-                    <span class="text-lg font-semibold text-slate-900">Daftar Logger</span>
-                    {{-- <p class="text-xs text-slate-500" id="loggerCount">{{ count($points) }} logger terdeteksi</p> --}}
-                </div>
-                <div class="px-3 mb-2 pb-3 border-slate-200">
-                    <div class="relative">
-                        <input type="text" id="searchLogger" placeholder="Cari logger..."
-                            class="w-full px-4 py-2 pl-10 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <svg class="absolute left-3 top-2.5 h-5 w-5 text-slate-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+            {{-- Sidebar collapsible --}}
+            <div class="relative flex-shrink-0" id="petaSidebarWrapper">
+                {{-- Tombol toggle --}}
+                <button
+                    @click="
+                        sidebarOpen = !sidebarOpen;
+                        togglePetaSidebar(sidebarOpen);
+                        const dur = 320, step = 16;
+                        let t = 0;
+                        const iv = setInterval(() => {
+                            if(typeof map !== 'undefined') map.invalidateSize({animate: false});
+                            t += step;
+                            if(t >= dur) clearInterval(iv);
+                        }, step);"
+                    :class="!sidebarOpen ? 'collapsed' : ''" class="sidebar-toggle-btn"
+                    :title="sidebarOpen ? 'Tutup sidebar' : 'Buka sidebar'">
+                    {{-- Chevron kiri saat terbuka, kanan saat tertutup --}}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+                {{-- Panel sidebar --}}
+                <div :class="sidebarOpen ? 'w-96' : 'w-0'"
+                    class="sidebar-panel flex flex-col border-l border-slate-200 bg-white h-full">
+                    <div class=" px-3 py-2">
+                        <span class="text-lg font-semibold text-slate-900">Daftar Logger</span>
+                        {{-- <p class="text-xs text-slate-500" id="loggerCount">{{ count($points) }} logger terdeteksi</p> --}}
                     </div>
-                </div>
-                <div class="flex-1 overflow-y-auto sidebar-scroll px-3 pt-1" id="loggerList">
-                    @forelse ($points as $point)
-                        <div class="sidebar-item mb-4 rounded-lg bg-white pt-3 pb-2 px-3 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md"
-                            data-kategori="{{ $point['kategori'] }}" data-status="{{ $point['status'] }}"
-                            data-arr-state="{{ $point['arr_state'] ?? '' }}"
-                            data-logger-name="{{ strtolower($point['nama_logger']) }}"
-                            data-logger-id="{{ strtolower($point['id_logger']) }}"
-                            onclick="focusLogger({{ $point['lat'] }}, {{ $point['lng'] }}, '{{ $point['id_logger'] }}')">
-
-                            <div class="flex items-center justify-between">
-                                <div
-                                    class="flex items-center gap-2 text-xs font-semibold {{ $point['status'] === 'online' ? 'text-emerald-600' : 'text-rose-600' }}">
-                                    <span
-                                        class="h-2 w-2 rounded-full {{ $point['status'] === 'online' ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
-                                    {{ $point['status'] === 'online' ? 'Koneksi Terhubung' : 'Koneksi Terputus' }}
-                                </div>
-                                <div class="text-[10px] text-slate-500">
-                                    {{ $point['last_time'] ? \Carbon\Carbon::parse($point['last_time'])->format('d M Y H:i') : '-' }}
-                                </div>
-                            </div>
-
-
-
-                            <div class="flex justify-between items-center mt-1 border-b border-slate-200 pb-2">
-                                <div class="font-semibold leading-tight">
-                                    {{ $point['nama_logger'] }}
-                                </div>
-
-                                <div class="text-xs border border-slate-300 bg-slate-100 px-2  rounded-lg">
-                                    ID : {{ substr($point['id_logger'], -5) }}
-                                </div>
-                            </div>
-                            <div class="text-center my-2">
-                                <div class="text-xl font-bold text-slate-900">{{ $point['kedalaman_sumur'] }} m</div>
-                                <div class="text-xs text-slate-500">Kedalaman Air Sumur</div>
-                            </div>
-                            <div class="grid grid-cols-3 text-xs  text-slate-600 border-t">
-                                <div class="flex flex-col items-center  py-3 ">
-                                    <span class="text-blue-500 font-semibold">
-                                        {{ $point['humidity'] ?? '—' }}%
-                                    </span>
-                                    <span>humidity</span>
-                                </div>
-                                <div class="flex flex-col items-center border-l py-3 border-r">
-                                    <span class="text-amber-500 font-semibold">
-                                        {{ $point['battery'] ?? '-' }} V
-                                    </span>
-                                    <span>battery</span>
-                                </div>
-                                <div class="flex flex-col items-center  py-3 ">
-                                    <span class="text-rose-500 font-semibold">
-                                        {{ $point['temp'] ?? '-' }} °C
-                                    </span>
-                                    <span>temp</span>
-                                </div>
-                            </div>
+                    <div class="px-3 mb-2 pb-3 border-slate-200">
+                        <div class="relative">
+                            <input type="text" id="searchLogger" placeholder="Cari logger..."
+                                class="w-full px-4 py-2 pl-10 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <svg class="absolute left-3 top-2.5 h-5 w-5 text-slate-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
                         </div>
-                    @empty
-                        <div class="p-4 text-center text-sm text-slate-500">
-                            Tidak ada data logger.
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto sidebar-scroll px-3 pt-1" id="loggerList">
+                        @forelse ($points as $point)
+                            <div class="sidebar-item mb-4 rounded-lg bg-white pt-3 pb-2 px-3 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md"
+                                data-kategori="{{ $point['kategori'] }}" data-status="{{ $point['status'] }}"
+                                data-arr-state="{{ $point['arr_state'] ?? '' }}"
+                                data-logger-name="{{ strtolower($point['nama_logger']) }}"
+                                data-logger-id="{{ strtolower($point['id_logger']) }}"
+                                onclick="focusLogger({{ $point['lat'] }}, {{ $point['lng'] }}, '{{ $point['id_logger'] }}')">
+
+                                <div class="flex items-center justify-between">
+                                    <div
+                                        class="flex items-center gap-2 text-xs font-semibold {{ $point['status'] === 'online' ? 'text-emerald-600' : 'text-rose-600' }}">
+                                        <span
+                                            class="h-2 w-2 rounded-full {{ $point['status'] === 'online' ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
+                                        {{ $point['status'] === 'online' ? 'Koneksi Terhubung' : 'Koneksi Terputus' }}
+                                    </div>
+                                    <div class="text-[10px] text-slate-500">
+                                        {{ $point['last_time'] ? \Carbon\Carbon::parse($point['last_time'])->format('d M Y H:i') : '-' }}
+                                    </div>
+                                </div>
+
+
+
+                                <div class="flex justify-between items-center mt-1 border-b border-slate-200 pb-2">
+                                    <div class="font-semibold leading-tight">
+                                        {{ $point['nama_logger'] }}
+                                    </div>
+
+                                    <div class="text-xs border border-slate-300 bg-slate-100 px-2  rounded-lg">
+                                        ID : {{ substr($point['id_logger'], -5) }}
+                                    </div>
+                                </div>
+                                <div class="text-center my-2">
+                                    <div class="text-xl font-bold text-slate-900">{{ $point['kedalaman_sumur'] }} m</div>
+                                    <div class="text-xs text-slate-500">Kedalaman Air Sumur</div>
+                                </div>
+                                <div class="grid grid-cols-3 text-xs  text-slate-600 border-t">
+                                    <div class="flex flex-col items-center  py-3 ">
+                                        <span class="text-blue-500 font-semibold">
+                                            {{ $point['humidity'] ?? '—' }}%
+                                        </span>
+                                        <span>humidity</span>
+                                    </div>
+                                    <div class="flex flex-col items-center border-l py-3 border-r">
+                                        <span class="text-amber-500 font-semibold">
+                                            {{ $point['battery'] ?? '-' }} V
+                                        </span>
+                                        <span>battery</span>
+                                    </div>
+                                    <div class="flex flex-col items-center  py-3 ">
+                                        <span class="text-rose-500 font-semibold">
+                                            {{ $point['temp'] ?? '-' }} °C
+                                        </span>
+                                        <span>temp</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="p-4 text-center text-sm text-slate-500">
+                                Tidak ada data logger.
+                            </div>
+                        @endforelse
+                    </div>{{-- akhir #loggerList --}}
+                </div>{{-- akhir sidebar-panel --}}
+            </div>{{-- akhir relative flex-shrink-0 --}}
+        </div>{{-- akhir flex h-full --}}
     </div>
     <div class="settings-modal-overlay" id="settingsModal">
         <div class="settings-modal">
@@ -466,10 +618,11 @@
                     @if ($arrThresholds->isNotEmpty())
                         <div class="border rounded-xl p-4 mb-4">
                             <label class="flex items-center gap-2 font-semibold mb-3">
-                                <input type="checkbox" id="filterARR" checked class="accent-indigo-600"> ARR (Automatic Rain
-                                Recorder)
+                                <input type="checkbox" id="filterARR" checked class="accent-indigo-600">
+                                <img src="{{ asset('icons/arr/ikon_arr.svg') }}" class="h-5 w-5 mr-2 inline-block">
+                                ARR (Automatic Rain Recorder)
                             </label>
-                            <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                                 @foreach ($arrThresholds->sortBy('sort_order') as $threshold)
                                     @php
                                         $count = collect($points)
@@ -479,8 +632,8 @@
                                     @endphp
                                     <label class="flex items-center gap-2">
                                         <input type="checkbox" id="filterARR_{{ $threshold->state_key }}" checked>
-                                        <span class="h-3 w-3 rounded-full"
-                                            style="background-color: {{ $threshold->color_hex }}"></span>
+                                        <img src="{{ asset('icons/arr/' . $threshold->state_key . '.svg') }}"
+                                            class="h-7 w-7 inline-block" alt="{{ $threshold->state_label }}">
                                         {{ $threshold->state_label }} ({{ $count }})
                                     </label>
                                 @endforeach
@@ -488,48 +641,132 @@
                         </div>
                     @endif
                     @php
-                        $awlrOnline = collect($points)->where('kategori', 'AWLR')->where('status', 'online')->count();
-                        $awlrOffline = collect($points)->where('kategori', 'AWLR')->where('status', 'offline')->count();
+                        $awlrOnline    = collect($points)->where('kategori', 'AWLR')->where('status', 'online')->count();
+                        $awlrOffline   = collect($points)->where('kategori', 'AWLR')->where('status', 'offline')->count();
+                        $awlrPerbaikan = collect($points)->where('kategori', 'AWLR')->where('status', 'perbaikan')->count();
                     @endphp
                     <div class="border rounded-xl p-4 mb-4">
                         <label class="flex items-center gap-2 font-semibold mb-3">
-                            <input type="checkbox" id="filterAWLR" checked class="accent-indigo-600"> AWLR (Automatic
-                            Water
-                            Level Recorder)
+                            <input type="checkbox" id="filterAWLR" checked class="accent-indigo-600">
+                            <img src="{{ asset('icons/awlr/ikon_awlr.svg') }}" class="h-5 w-5 mr-2 inline-block">
+                            AWLR (Automatic Water Level Recorder)
                         </label>
-                        <div class="flex gap-6 text-sm">
+                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm">
                             <label class="flex items-center gap-2">
-                                <input type="checkbox" id="filterAWLR_online" checked> <span
-                                    class="h-3 w-3 rounded-full bg-green-500"></span> Koneksi Terhubung
-                                ({{ $awlrOnline }})</label>
+                                <input type="checkbox" id="filterAWLR_online" checked>
+                                <img src="{{ asset('icons/awlr/online.svg') }}" class="h-7 w-7 inline-block">
+                                Koneksi Terhubung ({{ $awlrOnline }})
+                            </label>
                             <label class="flex items-center gap-2">
-                                <input type="checkbox" id="filterAWLR_offline" checked> <span
-                                    class="h-3 w-3 rounded-full bg-black"></span> Koneksi Terputus
-                                ({{ $awlrOffline }})</label>
+                                <input type="checkbox" id="filterAWLR_offline" checked>
+                                <img src="{{ asset('icons/awlr/offline.svg') }}" class="h-7 w-7 inline-block">
+                                Koneksi Terputus ({{ $awlrOffline }})
+                            </label>
+                            @if($awlrPerbaikan > 0)
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWLR_perbaikan" checked>
+                                <img src="{{ asset('icons/awlr/perbaikan.svg') }}" class="h-7 w-7 inline-block">
+                                Perbaikan ({{ $awlrPerbaikan }})
+                            </label>
+                            @endif
                         </div>
                     </div>
+                    @php
+                        $awqrOnline    = collect($points)->where('kategori', 'AWQR')->where('status', 'online')->count();
+                        $awqrOffline   = collect($points)->where('kategori', 'AWQR')->where('status', 'offline')->count();
+                        $awqrPerbaikan = collect($points)->where('kategori', 'AWQR')->where('status', 'perbaikan')->count();
+                    @endphp
+                    @if($awqrOnline + $awqrOffline + $awqrPerbaikan > 0)
+                    <div class="border rounded-xl p-4 mb-4">
+                        <label class="flex items-center gap-2 font-semibold mb-3">
+                            <input type="checkbox" id="filterAWQR" checked class="accent-indigo-600">
+                            <img src="{{ asset('icons/awgr/ph_air.svg') }}" class="h-5 w-5 mr-2 inline-block">
+                            AWQR (Automatic Water Quality Recorder)
+                        </label>
+                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWQR_online" checked>
+                                <img src="{{ asset('icons/awgr/awlr_map_pins_on.svg') }}" class="h-7 w-7 inline-block">
+                                Koneksi Terhubung ({{ $awqrOnline }})
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWQR_offline" checked>
+                                <img src="{{ asset('icons/awgr/awlr_map_pins_off.svg') }}" class="h-7 w-7 inline-block">
+                                Koneksi Terputus ({{ $awqrOffline }})
+                            </label>
+                            @if($awqrPerbaikan > 0)
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWQR_perbaikan" checked>
+                                <img src="{{ asset('icons/awgr/perbaikan_awqr.svg') }}" class="h-7 w-7 inline-block">
+                                Perbaikan ({{ $awqrPerbaikan }})
+                            </label>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                    @php
+                        $awrOnline        = collect($points)->where('kategori', 'AWR')->where('status', 'online')->count();
+                        $awrOffline       = collect($points)->where('kategori', 'AWR')->where('status', 'offline')->count();
+                        $awrSangatRingan  = collect($points)->where('kategori', 'AWR')->where('arr_state', 'awr_sangat_ringan')->count();
+                        $awrRingan        = collect($points)->where('kategori', 'AWR')->where('arr_state', 'awr_ringan')->count();
+                        $awrSedang        = collect($points)->where('kategori', 'AWR')->where('arr_state', 'awr_sedang')->count();
+                        $awrLebat         = collect($points)->where('kategori', 'AWR')->where('arr_state', 'awr_lebat')->count();
+                        $awrSangatLebat   = collect($points)->where('kategori', 'AWR')->where('arr_state', 'awr_sangat_lebat')->count();
+                        $awrPerbaikan     = collect($points)->where('kategori', 'AWR')->where('arr_state', 'perbaikan')->count();
+                        // {{-- Koneksi terputus: arr_state='koneksi_terputus' ATAU (offline & arr_state null/kosong) --}}
+                        $awrKoneksiPutus  = collect($points)->where('kategori', 'AWR')->filter(function($p) {
+                            return $p['arr_state'] === 'koneksi_terputus'
+                                || ($p['status'] === 'offline' && empty($p['arr_state']));
+                        })->count();
+
+                    @endphp
                     <div class="border rounded-xl p-4">
                         <label class="flex items-center gap-2 font-semibold mb-3">
-                            <input type="checkbox" id="filterAWR" class="accent-indigo-600"> AWR (Automatic Weather
-                            Recorder)
+                            <input type="checkbox" id="filterAWR" checked class="accent-indigo-600">
+                            <img src="{{ asset('icons/awr/ikon_awr.svg') }}" class="h-5 w-5 mr-2 inline-block">
+                            AWR (Automatic Weather Recorder)
                         </label>
-                        <div class="grid grid-cols-2 gap-2 text-sm">
-                            <label class="flex items-center gap-2"><input type="checkbox"> <span
-                                    class="h-3 w-3 rounded-full bg-green-500"></span> Tidak Hujan (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox"> <span
-                                    class="h-3 w-3 rounded-full bg-sky-300"></span> Hujan Sangat Ringan (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox"> <span
-                                    class="h-3 w-3 rounded-full bg-blue-500"></span> Hujan Ringan (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox"> <span
-                                    class="h-3 w-3 rounded-full bg-yellow-400"></span> Hujan Sedang (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox"> <span
-                                    class="h-3 w-3 rounded-full bg-orange-500"></span> Hujan Lebat (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox"> <span
-                                    class="h-3 w-3 rounded-full bg-red-500"></span> Hujan Sangat Lebat (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox"> <span
-                                    class="h-3 w-3 rounded-full bg-amber-700"></span> Perbaikan (0)</label>
-                            <label class="flex items-center gap-2"><input type="checkbox"> <span
-                                    class="h-3 w-3 rounded-full bg-black"></span> Koneksi Terputus (0)</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWR_online" checked>
+                                <img src="{{ asset('icons/awr/online.svg') }}" class="h-7 w-7 inline-block">
+                                Terhubung ({{ $awrOnline }})
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWR_awr_sangat_ringan" checked>
+                                <img src="{{ asset('icons/awr/sangat_ringan.svg') }}" class="h-7 w-7 inline-block">
+                                Sangat Ringan ({{ $awrSangatRingan }})
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWR_awr_ringan" checked>
+                                <img src="{{ asset('icons/awr/ringan.svg') }}" class="h-7 w-7 inline-block">
+                                Ringan ({{ $awrRingan }})
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWR_awr_sedang" checked>
+                                <img src="{{ asset('icons/awr/sedang.svg') }}" class="h-7 w-7 inline-block">
+                                Sedang ({{ $awrSedang }})
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWR_awr_lebat" checked>
+                                <img src="{{ asset('icons/awr/lebat.svg') }}" class="h-7 w-7 inline-block">
+                                Lebat ({{ $awrLebat }})
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWR_awr_sangat_lebat" checked>
+                                <img src="{{ asset('icons/awr/sangat_lebat.svg') }}" class="h-7 w-7 inline-block">
+                                Sangat Lebat ({{ $awrSangatLebat }})
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWR_perbaikan" checked>
+                                <img src="{{ asset('icons/awr/perbaikan.svg') }}" class="h-7 w-7 inline-block">
+                                Perbaikan ({{ $awrPerbaikan }})
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAWR_koneksi_terputus" checked>
+                                <img src="{{ asset('icons/awr/offline.svg') }}" class="h-7 w-7 inline-block">
+                                Koneksi Terputus ({{ $awrKoneksiPutus }})
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -538,22 +775,26 @@
                     <div class="radio-group">
                         <label class="radio-item">
                             <input type="radio" name="mapType" value="hybrid" checked>
-                            <img src="{{ asset('icons/peta_hybrid.svg') }}" class="h-5 w-5 mr-2 inline-block" alt="Hybrid">
+                            <img src="{{ asset('icons/peta_hybrid.svg') }}" class="h-5 w-5 mr-2 inline-block"
+                                alt="Hybrid">
                             Hybrid
                         </label>
                         <label class="radio-item">
                             <input type="radio" name="mapType" value="normal">
-                            <img src="{{ asset('icons/peta_normal.svg') }}" class="h-5 w-5 mr-2 inline-block" alt="Normal">
+                            <img src="{{ asset('icons/peta_normal.svg') }}" class="h-5 w-5 mr-2 inline-block"
+                                alt="Normal">
                             Normal
                         </label>
                         <label class="radio-item">
                             <input type="radio" name="mapType" value="satelit">
-                            <img src="{{ asset('icons/peta_satellite.svg') }}" class="h-5 w-5 mr-2 inline-block" alt="Satellite">
+                            <img src="{{ asset('icons/peta_satellite.svg') }}" class="h-5 w-5 mr-2 inline-block"
+                                alt="Satellite">
                             Satellite
                         </label>
                         <label class="radio-item">
                             <input type="radio" name="mapType" value="terrain">
-                            <img src="{{ asset('icons/peta_terrain.svg') }}" class="h-5 w-5 mr-2 inline-block" alt="Terrain">
+                            <img src="{{ asset('icons/peta_terrain.svg') }}" class="h-5 w-5 mr-2 inline-block"
+                                alt="Terrain">
                             Terrain
                         </label>
                     </div>
@@ -611,6 +852,47 @@
         window.closeSettingsModal = function() {
             settingsModal?.classList.remove('show');
         };
+
+        /* ── Right sidebar mobile overlay ── */
+        function isMobilePeta() { return window.innerWidth < 1024; }
+
+        window.togglePetaSidebar = function(isOpen) {
+            if (!isMobilePeta()) return;
+            const panel = document.querySelector('.sidebar-panel');
+            const backdrop = document.getElementById('petaSidebarBackdrop');
+            if (!panel || !backdrop) return;
+            if (isOpen) {
+                panel.classList.add('mobile-open');
+                backdrop.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            } else {
+                panel.classList.remove('mobile-open');
+                backdrop.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        };
+
+        window.closePetaSidebar = function() {
+            /* Dispatch event so Alpine handles its own state correctly */
+            window.dispatchEvent(new Event('close-peta-sidebar'));
+        };
+
+        /* On mobile, start with sidebar closed */
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isMobilePeta()) {
+                const panel = document.querySelector('.sidebar-panel');
+                if (panel) panel.classList.remove('mobile-open');
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (!isMobilePeta()) {
+                /* Restore normal when back to desktop */
+                const backdrop = document.getElementById('petaSidebarBackdrop');
+                if (backdrop) backdrop.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        });
         window.applySettings = function() {
             const selectedLayer = document.querySelector('input[name="mapType"]:checked')?.value || 'hybrid';
             if (layers[currentLayer]) map.removeLayer(layers[currentLayer]);
@@ -623,20 +905,23 @@
         const groupARR = L.layerGroup().addTo(map);
         const groupAWLR = L.layerGroup().addTo(map);
         const groupAWR = L.layerGroup().addTo(map);
+        const groupAWQR = L.layerGroup().addTo(map);
 
         function getGroupByKategori(kat) {
             const k = String(kat || '').toUpperCase();
             if (k === 'ARR') return groupARR;
             if (k === 'AWLR') return groupAWLR;
             if (k === 'AWR') return groupAWR;
+            if (k === 'AWQR') return groupAWQR;
             return null;
         }
 
         function awlrIcon(status) {
             const base = '/icons/awlr/';
             const map = {
-                'online': 'online.svg',
-                'offline': 'offline.svg'
+                'online'    : 'online.svg',
+                'offline'   : 'offline.svg',
+                'perbaikan' : 'perbaikan.svg'
             };
             const file = map[String(status).toLowerCase()] || map['offline'];
             return L.icon({
@@ -683,6 +968,46 @@
             };
             return map[k] || 'Tidak Hujan';
         }
+
+        function awqrIcon(status) {
+            const base = '/icons/awgr/';
+            const map = {
+                'online'    : 'awlr_map_pins_on.svg',
+                'offline'   : 'awlr_map_pins_off.svg',
+                'perbaikan' : 'perbaikan_awqr.svg'
+            };
+            const file = map[String(status).toLowerCase()] || map['offline'];
+            return L.icon({
+                iconUrl: base + file,
+                iconSize: [32, 40],
+                iconAnchor: [16, 40],
+                popupAnchor: [0, -36]
+            });
+        }
+
+        function awrIcon(awrState) {
+            const k = String(awrState || '').toLowerCase();
+            const base = '/icons/awr/';
+            const fileMap = {
+                'awr_sangat_ringan' : 'awr_sangat_ringan.svg',
+                'awr_ringan'        : 'awr_ringan.svg',
+                'awr_sedang'        : 'awr_sedang.svg',
+                'awr_lebat'         : 'awr_lebat.svg',
+                'awr_sangat_lebat'  : 'awr_sangat_lebat.svg',
+                'perbaikan'         : 'perbaikan.svg',
+                'koneksi_terputus'  : 'offline.svg',
+                'offline'           : 'offline.svg',
+                'online'            : 'online.svg',
+            };
+            const file = fileMap[k] || 'online.svg';
+            return L.icon({
+                iconUrl: base + file,
+                iconSize: [36, 44],
+                iconAnchor: [18, 44],
+                popupAnchor: [0, -40]
+            });
+        }
+
         points.forEach(p => {
             if (!p.lat || !p.lng) return;
             const marker = L.marker([p.lat, p.lng]);
@@ -775,14 +1100,25 @@
             if (kategori === 'ARR') {
                 marker.setIcon(arrIcon(p.arr_state));
             }
+            if (kategori === 'AWQR') {
+                marker.setIcon(awqrIcon(status));
+            }
+            if (kategori === 'AWR') {
+                marker.setIcon(awrIcon(p.arr_state || status));
+            }
         });
 
         function applyKategoriFilter() {
-            const showARR = document.getElementById('filterARR')?.checked ?? true;
+            const showARR  = document.getElementById('filterARR')?.checked ?? true;
             const showAWLR = document.getElementById('filterAWLR')?.checked ?? true;
-            const showAWR = document.getElementById('filterAWR')?.checked ?? true;
-            const showAWLRonline = document.getElementById('filterAWLR_online')?.checked ?? true;
-            const showAWLRoffline = document.getElementById('filterAWLR_offline')?.checked ?? true;
+            const showAWR  = document.getElementById('filterAWR')?.checked ?? true;
+            const showAWQR = document.getElementById('filterAWQR')?.checked ?? true;
+            const showAWLRonline    = document.getElementById('filterAWLR_online')?.checked ?? true;
+            const showAWLRoffline   = document.getElementById('filterAWLR_offline')?.checked ?? true;
+            const showAWLRperbaikan = document.getElementById('filterAWLR_perbaikan')?.checked ?? true;
+            const showAWQRonline    = document.getElementById('filterAWQR_online')?.checked ?? true;
+            const showAWQRoffline   = document.getElementById('filterAWQR_offline')?.checked ?? true;
+            const showAWQRperbaikan = document.getElementById('filterAWQR_perbaikan')?.checked ?? true;
             const arrStates = [
                 'tidak_hujan',
                 'hujan_sangat_ringan',
@@ -798,6 +1134,13 @@
                 const cb = document.getElementById(`filterARR_${st}`);
                 showArrStates[st] = cb ? cb.checked : true;
             });
+            // AWR states (static)
+            const awrStates = ['online','awr_sangat_ringan','awr_ringan','awr_sedang','awr_lebat','awr_sangat_lebat','perbaikan','koneksi_terputus'];
+            const showAwrStates = {};
+            awrStates.forEach(st => {
+                const cb = document.getElementById(`filterAWR_${st}`);
+                showAwrStates[st] = cb ? cb.checked : true;
+            });
             Object.values(markerStore).forEach(o => {
                 if (!o?.marker) return;
                 let visible = true;
@@ -808,11 +1151,24 @@
                         visible = showArrStates[st] ?? true;
                     }
                 } else if (o.kategori === 'AWR') {
-                    visible = showAWR;
+                    if (!showAWR) visible = false;
+                    else {
+                        let awrSt = String(o.arr_state || '').toLowerCase();
+                        // Normalise: arr_state kosong + offline → koneksi_terputus
+                        if (!awrSt || awrSt === 'offline') awrSt = (o.status === 'offline') ? 'koneksi_terputus' : 'online';
+                        visible = showAwrStates[awrSt] ?? true;
+                    }
                 } else if (o.kategori === 'AWLR') {
                     if (!showAWLR) visible = false;
-                    else if (String(o.status || '').toLowerCase() === 'online') visible = showAWLRonline;
-                    else if (String(o.status || '').toLowerCase() === 'offline') visible = showAWLRoffline;
+                    else if (String(o.status || '').toLowerCase() === 'online')     visible = showAWLRonline;
+                    else if (String(o.status || '').toLowerCase() === 'offline')    visible = showAWLRoffline;
+                    else if (String(o.status || '').toLowerCase() === 'perbaikan')  visible = showAWLRperbaikan;
+                    else visible = true;
+                } else if (o.kategori === 'AWQR') {
+                    if (!showAWQR) visible = false;
+                    else if (String(o.status || '').toLowerCase() === 'online')     visible = showAWQRonline;
+                    else if (String(o.status || '').toLowerCase() === 'offline')    visible = showAWQRoffline;
+                    else if (String(o.status || '').toLowerCase() === 'perbaikan')  visible = showAWQRperbaikan;
                     else visible = true;
                 }
                 if (visible) {
@@ -830,11 +1186,24 @@
                     if (!showARR) visible = false;
                     else visible = showArrStates[st || 'tidak_hujan'] ?? true;
                 } else if (k === 'AWR') {
-                    visible = showAWR;
+                    if (!showAWR) visible = false;
+                    else {
+                        let awrSt = String(st || '').toLowerCase();
+                        // Normalise: arr_state kosong + offline → koneksi_terputus
+                        if (!awrSt || awrSt === 'offline') awrSt = (s === 'offline') ? 'koneksi_terputus' : 'online';
+                        visible = showAwrStates[awrSt] ?? true;
+                    }
                 } else if (k === 'AWLR') {
                     if (!showAWLR) visible = false;
-                    else if (s === 'online') visible = showAWLRonline;
-                    else if (s === 'offline') visible = showAWLRoffline;
+                    else if (s === 'online')     visible = showAWLRonline;
+                    else if (s === 'offline')    visible = showAWLRoffline;
+                    else if (s === 'perbaikan')  visible = showAWLRperbaikan;
+                    else visible = true;
+                } else if (k === 'AWQR') {
+                    if (!showAWQR) visible = false;
+                    else if (s === 'online')     visible = showAWQRonline;
+                    else if (s === 'offline')    visible = showAWQRoffline;
+                    else if (s === 'perbaikan')  visible = showAWQRperbaikan;
                     else visible = true;
                 }
                 // Mark visibility state for search integration
@@ -855,8 +1224,21 @@
             'filterARR',
             'filterAWLR',
             'filterAWR',
+            'filterAWR_online',
+            'filterAWR_awr_sangat_ringan',
+            'filterAWR_awr_ringan',
+            'filterAWR_awr_sedang',
+            'filterAWR_awr_lebat',
+            'filterAWR_awr_sangat_lebat',
+            'filterAWR_perbaikan',
+            'filterAWR_koneksi_terputus',
+            'filterAWQR',
             'filterAWLR_online',
             'filterAWLR_offline',
+            'filterAWLR_perbaikan',
+            'filterAWQR_online',
+            'filterAWQR_offline',
+            'filterAWQR_perbaikan',
             'filterARR_tidak_hujan',
             'filterARR_hujan_sangat_ringan',
             'filterARR_hujan_ringan',
@@ -871,15 +1253,40 @@
         });
         applyKategoriFilter();
         applyKategoriFilter();
-        setTimeout(() => map.invalidateSize(), 500);
-        window.addEventListener('resize', () => map.invalidateSize());
-        // Listen for sidebar toggle transition to update map size faster
+        // ── invalidateSize: multi-call on load for mobile reflow ─────────────
+        function safeInvalidate() {
+            if (typeof map !== 'undefined') map.invalidateSize({ animate: false });
+        }
+        // Fire at 200ms, 500ms, 1000ms, 2000ms to catch slow mobile reflow
+        [200, 500, 1000, 2000].forEach(ms => setTimeout(safeInvalidate, ms));
+
+        // ── window.resize (desktop & Android Chrome) ──────────────────────────
+        window.addEventListener('resize', safeInvalidate);
+
+        // ── visualViewport: iOS Safari address-bar hide/show ─────────────────
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', safeInvalidate);
+            window.visualViewport.addEventListener('scroll', safeInvalidate);
+        }
+
+        // ── ResizeObserver: container size change (sidebar, orientation) ──────
+        if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(safeInvalidate).observe(document.getElementById('map'));
+        }
+
+        // ── transitionend: sidebar toggle (desktop = margin-left, mobile = transform) ──
         const mainContent = document.getElementById('mainContent');
         if (mainContent) {
             mainContent.addEventListener('transitionend', function(e) {
-                // Only trigger on margin-left transitions (sidebar toggle)
-                if (e.propertyName === 'margin-left') {
-                    map.invalidateSize();
+                if (e.propertyName === 'margin-left') safeInvalidate();
+            });
+        }
+        // Mobile sidebar pakai transform, listen di sidebar-panel
+        const sidebarPanel = document.querySelector('.sidebar-panel');
+        if (sidebarPanel) {
+            sidebarPanel.addEventListener('transitionend', function(e) {
+                if (e.propertyName === 'transform' || e.propertyName === 'width') {
+                    safeInvalidate();
                 }
             });
         }
@@ -923,7 +1330,10 @@
                 const items = buildSearchData();
 
                 // Fuzzy on logger name
-                const fuse = new Fuse(items, { threshold: 0.35, keys: ['loggerName'] });
+                const fuse = new Fuse(items, {
+                    threshold: 0.35,
+                    keys: ['loggerName']
+                });
                 const fuzzyMatched = new Set(fuse.search(searchText).map(r => r.item.el));
 
                 // Exact on logger ID
@@ -932,7 +1342,9 @@
                     items.filter(it => it.loggerId.toLowerCase().includes(ql)).map(it => it.el)
                 );
 
-                items.forEach(({ el }) => {
+                items.forEach(({
+                    el
+                }) => {
                     const matchesSearch = fuzzyMatched.has(el) || exactMatched.has(el);
                     const wasVisibleByFilter = el.getAttribute('data-filter-visible') !== 'false';
                     if (matchesSearch && wasVisibleByFilter) {

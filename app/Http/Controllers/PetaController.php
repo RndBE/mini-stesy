@@ -255,50 +255,56 @@ class PetaController extends Controller
      */
     private function getStateFromThreshold($logger, string $status, $latest, $thresholdCollection): string
     {
-        // If offline, return koneksi_terputus state
+        // Jika offline → selalu koneksi_terputus
         if ($status === 'offline') {
             return $thresholdCollection->firstWhere('state_key', 'koneksi_terputus')
                 ?->state_key ?? 'koneksi_terputus';
         }
 
-        // Find rain parameter dynamically
+        // Cari parameter curah hujan
         $pRain = $logger->params->first(function ($p) {
             $n = strtolower(trim((string) $p->nama_parameter));
             $u = strtolower(trim((string) $p->parameter_utama));
             return $n === 'curah hujan' || $u === 'hujan';
         });
 
-        $col = $pRain?->kolom_sensor;
+        $col   = $pRain?->kolom_sensor;
         $value = null;
 
         if ($latest && $col && isset($latest->{$col})) {
             $value = is_numeric($latest->{$col}) ? (float) $latest->{$col} : null;
         }
 
-        // If no value, default to first threshold (usually tidak_hujan)
-        if ($value === null) {
-            return $thresholdCollection->sortBy('sort_order')->first()?->state_key ?? 'tidak_hujan';
+        // Jika tidak ada parameter hujan (misal logger AWR) → gunakan state online default
+        if (!$pRain) {
+            // Cari state 'online' jika ada, atau gunakan state pertama yang bukan koneksi_terputus
+            $onlineState = $thresholdCollection->firstWhere('state_key', 'online')
+                ?? $thresholdCollection->filter(fn($t) => $t->state_key !== 'koneksi_terputus' && $t->state_key !== 'perbaikan')
+                    ->sortBy('sort_order')->first();
+            return $onlineState?->state_key ?? $thresholdCollection->sortBy('sort_order')->first()?->state_key ?? 'online';
         }
 
-        // Find matching threshold based on value
+        // Jika tidak ada nilai hujan → state pertama (biasanya tidak_hujan / awr_sangat_ringan)
+        if ($value === null) {
+            return $thresholdCollection->filter(fn($t) => $t->min_value !== null || $t->max_value !== null)
+                ->sortBy('sort_order')->first()?->state_key
+                ?? $thresholdCollection->sortBy('sort_order')->first()?->state_key
+                ?? 'tidak_hujan';
+        }
+
+        // Cocokkan nilai ke threshold
         foreach ($thresholdCollection->sortBy('sort_order') as $threshold) {
-            // Skip special states like koneksi_terputus
             if ($threshold->min_value === null && $threshold->max_value === null) {
                 continue;
             }
-
-            $min = $threshold->min_value;
-            $max = $threshold->max_value;
-
-            $matchesMin = $min === null || $value >= $min;
-            $matchesMax = $max === null || $value < $max;
-
+            $matchesMin = $threshold->min_value === null || $value >= $threshold->min_value;
+            $matchesMax = $threshold->max_value === null || $value < $threshold->max_value;
             if ($matchesMin && $matchesMax) {
                 return $threshold->state_key;
             }
         }
 
-        // Fallback to first threshold
         return $thresholdCollection->sortBy('sort_order')->first()?->state_key ?? 'tidak_hujan';
     }
+
 }
