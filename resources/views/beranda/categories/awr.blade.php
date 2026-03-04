@@ -179,13 +179,13 @@
         };
     @endphp
 
-    <div class="p-4 space-y-4">
+    <div class="px-4 py-3 space-y-3">
 
         {{-- ── ROW 1: Angin (kiri) | Hujan + Cahaya stacked (kanan) ─── --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             {{-- ANGIN --}}
-            <div class="rounded-xl border border-slate-200 p-4 bg-white">
+            <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
                 <div class="text-sm font-semibold text-slate-700 mb-3">Angin</div>
                 <div class="flex flex-col items-center gap-4">
                     {{-- Wind Compass: tengah, max-width adaptif --}}
@@ -232,7 +232,7 @@
             <div class="flex flex-col gap-4">
 
                 {{-- HUJAN --}}
-                <div class="rounded-xl border border-slate-200 p-4 bg-white flex-1">
+                <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white flex-1">
                     <div class="text-sm font-semibold text-slate-700 mb-3">Hujan</div>
                     <div class="grid grid-cols-2 gap-3">
                         {{-- Akumulasi Harian --}}
@@ -271,7 +271,7 @@
                 </div>
 
                 {{-- CAHAYA --}}
-                <div class="rounded-xl border border-slate-200 p-4 bg-white">
+                <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
                     <div class="text-sm font-semibold text-slate-700 mb-3">Cahaya</div>
                     <div class="grid grid-cols-2 gap-3">
                         <a href="{{ $awrRoute('kecerahan') }}"
@@ -306,7 +306,7 @@
         </div>
 
         {{-- ── ROW 2: Udara — full width ──────────────────────────────── --}}
-        <div class="rounded-xl border border-slate-200 p-4 bg-white">
+        <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
             <div class="text-sm font-semibold text-slate-700 mb-3">Udara</div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <a href="{{ $awrRoute('temperatur') }}"
@@ -350,8 +350,8 @@
             </div>
         </div>
 
-        <div class="rounded-xl border border-slate-200 p-4 bg-white">
-            <div class="text-md font-semibold text-slate-700 mb-3">Logger</div>
+        <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
+            <div class="text-sm font-semibold text-slate-700 mb-3">Logger</div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {{-- HUMIDITY --}}
                 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
