@@ -2,37 +2,35 @@
 
 @section('content')
     <div x-data="roleData()" class="space-y-3">
-        <div class="flex items-center justify-between mt-3">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between ">
-                @if (session('success'))
-                    <div
-                        class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-semibold shadow-sm ring-1 ring-emerald-200">
-                        {{ session('success') }}
-                    </div>
-                @else
-                    <div></div>
-                @endif
-
-                <div class="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                    <div class="relative w-full sm:w-64">
-                        <input type="text" x-model="searchQuery" placeholder="Cari role..."
-                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                        <svg class="absolute right-3 top-2.5 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                    <button @click="openCreateModal()"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 whitespace-nowrap">
-                        + Tambah Role
-                    </button>
+        <div class="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            @if (session('success'))
+                <div
+                    class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-semibold shadow-sm ring-1 ring-emerald-200">
+                    {{ session('success') }}
                 </div>
+            @else
+                <div></div>
+            @endif
+
+            <div class="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div class="relative w-full sm:w-64">
+                    <input type="text" x-model="searchQuery" placeholder="Cari role..."
+                        class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <svg class="absolute right-3 top-2.5 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <button @click="openCreateModal()"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 whitespace-nowrap">
+                    + Tambah Role
+                </button>
             </div>
         </div>
 
         <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
                 <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
                     <thead class="bg-neutral-200 text-xs font-semibold uppercase text-neutral-950">
                         <tr>
@@ -101,7 +99,7 @@
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="w-full max-w-4xl bg-white rounded-lg shadow-xl overflow-hidden my-8" @click.stop>
 
-                    <div class="flex items-center justify-between px-8 py-3 border-b border-slate-200">
+                    <div class="flex items-center justify-between px-4 sm:px-8 py-3 border-b border-slate-200">
                         <h3 class="text-xl font-bold text-gray-900">Tambah Role</h3>
                         <button type="button" @click="closeCreateModal()" class="p-2 rounded-lg hover:bg-slate-100">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,7 +110,7 @@
                     </div>
 
                     <form @submit.prevent="submitCreate()" id="createRoleForm">
-                        <div class="px-8 pt-4 pb-3 space-y-3">
+                        <div class="px-4 sm:px-8 pt-4 pb-3 space-y-3 max-h-[70vh] overflow-y-auto">
 
                             <div x-show="createError" x-cloak class="p-4 bg-red-50 border border-red-200 rounded-lg">
                                 <p class="text-sm font-semibold text-red-800" x-text="createError"></p>
@@ -144,7 +142,7 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-end gap-3 px-8 py-3 border-t border-gray-100 bg-white">
+                        <div class="flex items-center justify-end gap-3 px-4 sm:px-8 py-3 border-t border-gray-100 bg-white">
                             <button type="button" @click="closeCreateModal()"
                                 class="h-10 px-6 rounded-lg border border-indigo-500 text-indigo-600 font-semibold hover:bg-indigo-50">
                                 Batal
@@ -236,7 +234,7 @@
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="w-full max-w-4xl bg-white rounded-lg shadow-xl overflow-hidden my-8" @click.stop>
 
-                    <div class="flex items-center justify-between px-8 py-2 border-b border-slate-200">
+                    <div class="flex items-center justify-between px-4 sm:px-8 py-3 border-b border-slate-200">
                         <h3 class="text-xl font-bold text-gray-900">Edit Role</h3>
                         <button type="button" @click="closeEditModal()" class="p-2 rounded-lg hover:bg-slate-100">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,7 +245,7 @@
                     </div>
 
                     <form @submit.prevent="submitEdit()" id="editRoleForm">
-                        <div class="px-8 pt-2 pb-3 space-y-3">
+                        <div class="px-4 sm:px-8 pt-2 pb-3 space-y-3 max-h-[70vh] overflow-y-auto">
 
                             <div x-show="editError" x-cloak class="p-4 bg-red-50 border border-red-200 rounded-lg">
                                 <p class="text-sm font-semibold text-red-800" x-text="editError"></p>
@@ -288,7 +286,7 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-end gap-3 px-8 py-3 border-t border-gray-100 bg-white">
+                        <div class="flex items-center justify-end gap-3 px-4 sm:px-8 py-3 border-t border-gray-100 bg-white">
                             <button type="button" @click="closeEditModal()"
                                 class="h-10 px-6 rounded-lg border border-indigo-500 text-indigo-600 font-semibold hover:bg-indigo-50">
                                 Batal

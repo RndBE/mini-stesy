@@ -51,7 +51,7 @@
 
         @if ($isManageAllInstansi)
             <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
                     <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
                         <thead class="bg-neutral-200 text-xs font-semibold uppercase text-neutral-950">
                             <tr>

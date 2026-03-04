@@ -1,9 +1,9 @@
 <div class="flex items-center justify-between bg-neutral-100 px-5 py-3">
-    <div class="flex items-center gap-2">
+    <div class="relative sm:static flex items-center gap-2">
         <div class="text-md font-semibold text-slate-900">
             {{ $lg->nama_logger }}
         </div>
-        <div x-data="{ open: false }" class="relative">
+        <div x-data="{ open: false }" class="sm:relative">
             <button type="button" @click="open = !open" @keydown.escape.window="open = false"
                 class="inline-flex h-8 w-8 items-center justify-center" aria-label="Info Logger">
                 <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -13,8 +13,8 @@
                 </svg>
             </button>
             <div x-show="open" x-transition.origin.top.left @click.outside="open = false"
-                class="absolute left-0 z-30 mt-2 w-[360px] max-w-[90vw]" style="display: none;">
-                <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+                class="absolute left-0 z-[9999] mt-2 w-[320px] max-w-[calc(100vw-2.5rem)] sm:max-w-xs md:max-w-sm lg:max-w-[320px]" style="display: none;">
+                <div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl">
                     <div class="grid grid-cols-3 gap-0 border-b border-slate-200 bg-white text-xs font-semibold text-slate-700">
                         <div class="px-3 py-2">ID Logger</div>
                         <div class="col-span-2 px-3 py-2 text-right text-slate-900">{{ $lg->id_logger }}</div>

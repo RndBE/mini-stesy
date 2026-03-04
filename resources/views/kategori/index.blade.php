@@ -17,7 +17,7 @@
         @endif
 
         <div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
                 <table class="min-w-full text-left text-sm text-slate-700">
                     <thead class="bg-neutral-200 text-xs font-semibold uppercase text-neutral-900">
                         <tr>

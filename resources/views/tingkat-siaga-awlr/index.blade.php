@@ -89,26 +89,25 @@
             </template>
         </div>
 
-        <div x-show="showEditModal" x-cloak style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" role="dialog"
+        <div x-show="showEditModal" x-cloak style="display: none;" class="fixed inset-0 z-50" role="dialog"
             aria-modal="true">
-            <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-                <div x-show="showEditModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-                    class="fixed inset-0 bg-slate-900/40 transition-opacity" @click="closeEditModal()"></div>
+            <div x-show="showEditModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-slate-900/40 transition-opacity" @click="closeEditModal()"></div>
 
-                <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
-
+            <div class="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto"
+                @click="closeEditModal()">
                 <div x-show="showEditModal" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative inline-block w-full max-w-3xl transform overflow-hidden rounded-2xl bg-slate-100 text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
-                    <div class="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-5">
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0" x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                    class="relative w-full h-[100dvh] max-h-[100dvh] rounded-none sm:h-auto sm:max-h-[92vh] sm:max-w-3xl sm:rounded-2xl overflow-hidden bg-slate-100 text-left shadow-xl flex flex-col"
+                    @click.stop>
+                    <div class="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5">
                         <div>
-                            <h3 class="text-xl font-bold text-slate-900">Edit Pos</h3>
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-900">Edit Pos</h3>
                             <p class="text-sm text-slate-500" x-text="`${editForm.nama_pos} - ${editForm.id_logger}`"></p>
                         </div>
                         <button type="button" @click="closeEditModal()"
@@ -120,136 +119,206 @@
                             </svg>
                         </button>
                     </div>
-
-                    <div class="space-y-4 px-6 py-5">
-                        <div class="flex items-center gap-4">
-                            <span class="text-sm font-medium text-slate-700">Status Notifikasi</span>
-                            <button type="button" @click="toggleStatus()"
-                                class="inline-flex h-7 w-14 items-center rounded-full border transition"
-                                :class="editForm.status_notifikasi ? 'border-emerald-300 bg-emerald-500' :
-                                    'border-slate-300 bg-slate-300'">
-                                <span class="h-6 w-6 rounded-full bg-white transition-transform"
-                                    :class="editForm.status_notifikasi ? 'translate-x-7' : 'translate-x-0'"></span>
-                            </button>
-                            <span class="text-sm font-semibold"
-                                :class="editForm.status_notifikasi ? 'text-emerald-600' : 'text-slate-500'"
-                                x-text="editForm.status_notifikasi ? 'ON' : 'OFF'"></span>
-                        </div>
-                        <template x-if="editForm.status_notifikasi">
-                            <div class="space-y-4">
-                                <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden">
-                                    <div
-                                        class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900">
-                                        Level Alert
-                                    </div>
-
-                                    <div class="p-4">
-                                        <div class="grid grid-cols-12 gap-4 pb-3 text-sm font-bold text-slate-900">
-                                            <div class="col-span-4">Nama Alert</div>
-                                            <div class="col-span-4">Nilai</div>
-                                            <div class="col-span-3">Warna</div>
-                                            <div class="col-span-1 text-center">Aksi</div>
+                    <div class="flex-1 overflow-y-auto">
+                        <div class="space-y-4 px-4 py-4 sm:px-6 sm:py-5">
+                            <div class="flex items-center gap-4">
+                                <span class="text-sm font-medium text-slate-700">Status Notifikasi</span>
+                                <button type="button" @click="toggleStatus()"
+                                    class="inline-flex h-7 w-14 items-center rounded-full border transition"
+                                    :class="editForm.status_notifikasi ? 'border-emerald-300 bg-emerald-500' :
+                                        'border-slate-300 bg-slate-300'">
+                                    <span class="h-6 w-6 rounded-full bg-white transition-transform"
+                                        :class="editForm.status_notifikasi ? 'translate-x-7' : 'translate-x-0'"></span>
+                                </button>
+                                <span class="text-sm font-semibold"
+                                    :class="editForm.status_notifikasi ? 'text-emerald-600' : 'text-slate-500'"
+                                    x-text="editForm.status_notifikasi ? 'ON' : 'OFF'"></span>
+                            </div>
+                            <template x-if="editForm.status_notifikasi">
+                                <div class="space-y-4">
+                                    <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+                                        <div
+                                            class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900">
+                                            Level Alert
                                         </div>
 
-                                        <div class="space-y-3">
-                                            <template x-for="(level, index) in editForm.levels" :key="`level-${index}`">
-                                                <div class="grid grid-cols-12 gap-4 items-center">
-                                                    <div class="col-span-4">
-                                                        <input type="text" x-model="level.nama"
-                                                            class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                                            placeholder="Nama alert">
-                                                    </div>
+                                        <div class="p-3 sm:p-4">
+                                            <div class="hidden sm:grid grid-cols-12 gap-4 pb-3 text-sm font-bold text-slate-900">
+                                                <div class="col-span-4">Nama Alert</div>
+                                                <div class="col-span-4">Nilai</div>
+                                                <div class="col-span-3">Warna</div>
+                                                <div class="col-span-1 text-center">Aksi</div>
+                                            </div>
 
-                                                    <div class="col-span-4">
-                                                        <div
-                                                            class="flex h-12 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
-                                                            <input type="number" step="0.01" x-model="level.nilai"
-                                                                class="h-full w-full border-0 px-4 text-sm text-slate-900 focus:outline-none"
-                                                                placeholder="0.00">
-                                                            <div
-                                                                class="flex h-full w-16 items-center justify-center border-l border-slate-200 text-sm text-slate-700">
-                                                                m
+                                            <div class="space-y-3">
+                                                <template x-for="(level, index) in editForm.levels" :key="`level-${index}`">
+                                                    <div>
+                                                        <div class="sm:hidden rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-3">
+                                                            <div class="flex items-center justify-between">
+                                                                <span class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                                                    x-text="`Level ${index + 1}`"></span>
+                                                                <button type="button" x-show="index === 0" @click="addLevel()"
+                                                                    class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-900 text-white shadow-sm hover:bg-indigo-800"
+                                                                    title="Tambah level">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                            stroke-width="2" d="M12 4v16m8-8H4" />
+                                                                    </svg>
+                                                                </button>
+                                                                <button type="button" x-show="index !== 0"
+                                                                    @click="removeLevel(index)"
+                                                                    class="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-600 text-white shadow-sm hover:bg-rose-700"
+                                                                    title="Hapus level">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                            stroke-width="2"
+                                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0l1-2h6l1 2" />
+                                                                    </svg>
+                                                                </button>
                                                             </div>
-                                                        </div>
-                                                    </div>
 
-                                                    <div class="col-span-3">
-                                                        <div class="flex items-center gap-3">
-                                                            <div class="relative">
+                                                            <div>
+                                                                <label class="mb-1 block text-xs font-semibold text-slate-600">Nama Alert</label>
+                                                                <input type="text" x-model="level.nama"
+                                                                    class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                                    placeholder="Nama alert">
+                                                            </div>
+
+                                                            <div>
+                                                                <label class="mb-1 block text-xs font-semibold text-slate-600">Nilai</label>
                                                                 <div
-                                                                    class="flex h-12 w-14 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm">
-                                                                    <div class="h-7 w-7 rounded-full"
-                                                                        :style="`background-color:${toHexColor(level.warna)}`">
+                                                                    class="flex h-11 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
+                                                                    <input type="number" step="0.01" x-model="level.nilai"
+                                                                        class="h-full w-full border-0 px-3 text-sm text-slate-900 focus:outline-none"
+                                                                        placeholder="0.00">
+                                                                    <div
+                                                                        class="flex h-full w-14 items-center justify-center border-l border-slate-200 text-sm text-slate-700">
+                                                                        m
                                                                     </div>
                                                                 </div>
-                                                                <input type="color" x-model="level.warna"
-                                                                    class="absolute inset-0 h-12 w-14 cursor-pointer opacity-0">
                                                             </div>
 
-                                                            <input type="text" x-model="level.warna"
-                                                                class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm uppercase text-slate-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                                                placeholder="#HEX">
+                                                            <div>
+                                                                <label class="mb-1 block text-xs font-semibold text-slate-600">Warna</label>
+                                                                <div class="flex items-center gap-2">
+                                                                    <div class="relative shrink-0">
+                                                                        <div
+                                                                            class="flex h-11 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm">
+                                                                            <div class="h-6 w-6 rounded-full"
+                                                                                :style="`background-color:${toHexColor(level.warna)}`">
+                                                                            </div>
+                                                                        </div>
+                                                                        <input type="color" x-model="level.warna"
+                                                                            class="absolute inset-0 h-11 w-12 cursor-pointer opacity-0">
+                                                                    </div>
+                                                                    <input type="text" x-model="level.warna"
+                                                                        class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm uppercase text-slate-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                                        placeholder="#HEX">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="hidden sm:grid grid-cols-12 gap-4 items-center">
+                                                            <div class="col-span-4">
+                                                                <input type="text" x-model="level.nama"
+                                                                    class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                                    placeholder="Nama alert">
+                                                            </div>
+
+                                                            <div class="col-span-4">
+                                                                <div
+                                                                    class="flex h-12 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
+                                                                    <input type="number" step="0.01" x-model="level.nilai"
+                                                                        class="h-full w-full border-0 px-4 text-sm text-slate-900 focus:outline-none"
+                                                                        placeholder="0.00">
+                                                                    <div
+                                                                        class="flex h-full w-16 items-center justify-center border-l border-slate-200 text-sm text-slate-700">
+                                                                        m
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-span-3">
+                                                                <div class="flex items-center gap-3">
+                                                                    <div class="relative">
+                                                                        <div
+                                                                            class="flex h-12 w-14 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm">
+                                                                            <div class="h-7 w-7 rounded-full"
+                                                                                :style="`background-color:${toHexColor(level.warna)}`">
+                                                                            </div>
+                                                                        </div>
+                                                                        <input type="color" x-model="level.warna"
+                                                                            class="absolute inset-0 h-12 w-14 cursor-pointer opacity-0">
+                                                                    </div>
+
+                                                                    <input type="text" x-model="level.warna"
+                                                                        class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm uppercase text-slate-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                                        placeholder="#HEX">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-span-1 flex justify-center">
+                                                                <button type="button" x-show="index === 0" @click="addLevel()"
+                                                                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-900 text-white shadow-sm hover:bg-indigo-800"
+                                                                    title="Tambah level">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+                                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                            stroke-width="2" d="M12 4v16m8-8H4" />
+                                                                    </svg>
+                                                                </button>
+
+                                                                <button type="button" x-show="index !== 0"
+                                                                    @click="removeLevel(index)"
+                                                                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-600 text-white shadow-sm hover:bg-rose-700"
+                                                                    title="Hapus level">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+                                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                            stroke-width="2"
+                                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0l1-2h6l1 2" />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
-
-                                                    <div class="col-span-1 flex justify-center">
-                                                        <button type="button" x-show="index === 0" @click="addLevel()"
-                                                            class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-900 text-white shadow-sm hover:bg-indigo-800"
-                                                            title="Tambah level">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
-                                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2" d="M12 4v16m8-8H4" />
-                                                            </svg>
-                                                        </button>
-
-                                                        <button type="button" x-show="index !== 0"
-                                                            @click="removeLevel(index)"
-                                                            class="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-600 text-white shadow-sm hover:bg-rose-700"
-                                                            title="Hapus level">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
-                                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0l1-2h6l1 2" />
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </template>
+                                                </template>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div>
-                                    <label class="mb-2 block text-sm font-semibold text-slate-900">Jeda Notifikasi</label>
-                                    <div class="flex w-full overflow-hidden rounded-xl border border-slate-50 bg-white">
-                                        <input type="number" min="1" max="1440"
-                                            x-model.number="editForm.jeda_notif"
-                                            class="h-11 w-full flex-1 bg-white px-4 text-sm text-slate-900 outline-none focus:ring-0"
-                                            placeholder="1" />
-                                        <div
-                                            class="flex items-center gap-2 border-l border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-700">
-                                            Menit
+                                    <div>
+                                        <label class="mb-2 block text-sm font-semibold text-slate-900">Jeda Notifikasi</label>
+                                        <div class="flex w-full overflow-hidden rounded-xl border border-slate-50 bg-white">
+                                            <input type="number" min="1" max="1440"
+                                                x-model.number="editForm.jeda_notif"
+                                                class="h-11 w-full flex-1 bg-white px-4 text-sm text-slate-900 outline-none focus:ring-0"
+                                                placeholder="1" />
+                                            <div
+                                                class="flex items-center gap-2 border-l border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-700">
+                                                Menit
+                                            </div>
                                         </div>
                                     </div>
+
                                 </div>
+                            </template>
 
-                            </div>
-                        </template>
-
-                        <template x-if="editError">
-                            <div class="rounded border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
-                                x-text="editError"></div>
-                        </template>
+                            <template x-if="editError">
+                                <div class="rounded border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+                                    x-text="editError"></div>
+                            </template>
+                        </div>
                     </div>
 
-                    <div class="flex items-center justify-end gap-2 border-t border-slate-200 bg-white px-6 py-4">
+                    <div class="flex items-center justify-end gap-2 border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
                         <button type="button" @click="closeEditModal()"
-                            class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                            class="h-11 sm:h-auto flex-1 sm:flex-none rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
                             Batal
                         </button>
                         <button type="button" @click="submitEdit()" :disabled="savingEdit"
-                            class="rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">
+                            class="h-11 sm:h-auto flex-1 sm:flex-none rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">
                             <span x-show="!savingEdit">Simpan</span>
                             <span x-show="savingEdit" x-cloak>Menyimpan...</span>
                         </button>

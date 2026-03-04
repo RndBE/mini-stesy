@@ -5,7 +5,7 @@
 
         {{-- Filter Bar --}}
         <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 px-6 py-4">
-            <div class="flex flex-col sm:flex-row items-end gap-4">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
                 <div class="flex-1 min-w-0">
                     <label class="block text-sm font-semibold text-slate-900 mb-2">Rentang Tanggal</label>
                     <div class="relative w-full" id="rkpWrap">
@@ -23,7 +23,7 @@
 
                         {{-- Floating Panel --}}
                         <div id="rkpPanel"
-                            class="fixed w-[640px] rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-[9999] hidden">
+                            class="fixed w-[calc(100vw-32px)] max-w-[640px] rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-[9999] hidden">
 
                             {{-- Start / End boxes --}}
                             <div class="flex items-center gap-3">
@@ -45,7 +45,7 @@
                             </div>
 
                             {{-- Dual calendar grid --}}
-                            <div class="mt-3 grid grid-cols-2 gap-4">
+                            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {{-- Left calendar --}}
                                 <div class="rounded-xl border border-slate-200 p-3">
                                     <div class="flex items-center justify-between">
@@ -148,9 +148,9 @@
                     </div>
                 </div>
 
-                <div class="flex items-end gap-3 flex-shrink-0">
+                <div class="flex items-center gap-3 flex-shrink-0 sm:flex-shrink w-full sm:w-auto">
                     <button @click="fetchData()"
-                        class="h-11 px-6 rounded-lg bg-gradient-to-r from-blue-900 to-blue-800 text-white font-semibold hover:shadow-lg hover:shadow-blue-900/30 transition-all duration-200 active:scale-95 flex items-center gap-2">
+                        class="flex-1 sm:flex-none h-11 px-6 rounded-lg bg-gradient-to-r from-blue-900 to-blue-800 text-white font-semibold hover:shadow-lg hover:shadow-blue-900/30 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2">
                         <svg x-show="!loading" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -163,7 +163,7 @@
                         <span x-show="loading" x-cloak>Memuat...</span>
                     </button>
                     <button @click="resetFilter()"
-                        class="h-11 px-4 rounded-lg border-2 border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 active:scale-95">
+                        class="flex-1 sm:flex-none h-11 px-4 rounded-lg border-2 border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 active:scale-95">
                         Reset
                     </button>
                 </div>
@@ -218,14 +218,17 @@
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
                 <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap border-separate border-spacing-0">
                     <thead class="text-xs font-bold text-neutral-950 uppercase">
                         {{-- Row 1: Month groups (sticky label columns span both rows) --}}
                         <tr class="bg-neutral-300">
-                            <th class="sticky left-0 z-30 bg-neutral-300 px-3 py-2 min-w-[2.5rem] text-center" rowspan="2">No</th>
-                            <th class="sticky left-[2.5rem] z-30 bg-neutral-300 px-4 py-2 min-w-[7rem]" rowspan="2">ID Logger</th>
-                            <th class="sticky left-[9.5rem] z-30 bg-neutral-300 px-4 py-2 min-w-[11rem]" rowspan="2"
+                            {{-- NO: disembunyikan di mobile --}}
+                            <th class="hidden sm:table-cell sticky left-0 z-30 bg-neutral-300 px-3 py-2 min-w-[2.5rem] text-center" rowspan="2">No</th>
+                            {{-- ID Logger: disembunyikan di mobile --}}
+                            <th class="hidden sm:table-cell sticky sm:left-[2.5rem] z-30 bg-neutral-300 px-4 py-2 min-w-[7rem]" rowspan="2">ID Logger</th>
+                            {{-- Nama Logger: sticky left-0 di mobile, left-[9.5rem] di sm+ --}}
+                            <th class="sticky left-0 sm:left-[9.5rem] z-30 bg-neutral-300 px-4 py-2 min-w-[8rem] sm:min-w-[11rem]" rowspan="2"
                                 style="box-shadow: 4px 0 6px rgba(0,0,0,0.12)">Nama Logger</th>
                             <template x-for="group in monthGroups" :key="group.label">
                                 <th class="px-4 py-2 text-center border-l-2 border-neutral-400"
@@ -245,12 +248,12 @@
                     <tbody class="divide-y divide-slate-200 bg-white">
                         <template x-for="(logger, idx) in loggers" :key="logger.id">
                             <tr class="hover:bg-slate-50 transition-colors">
-                                {{-- No --}}
-                                <td class="sticky left-0 z-10 bg-white px-3 py-3 text-center font-medium text-slate-500 min-w-[2.5rem] border-r border-slate-100" x-text="idx + 1"></td>
-                                {{-- ID Logger --}}
-                                <td class="sticky left-[2.5rem] z-10 bg-white px-4 py-3 font-mono text-xs text-slate-800 min-w-[7rem] border-r border-slate-100" x-text="logger.id"></td>
-                                {{-- Nama Logger --}}
-                                <td class="sticky left-[9.5rem] z-10 bg-white px-4 py-3 font-semibold text-slate-900 min-w-[11rem]"
+                                {{-- No: hidden di mobile --}}
+                                <td class="hidden sm:table-cell sticky left-0 z-10 bg-white px-3 py-3 text-center font-medium text-slate-500 min-w-[2.5rem] border-r border-slate-100" x-text="idx + 1"></td>
+                                {{-- ID Logger: hidden di mobile --}}
+                                <td class="hidden sm:table-cell sticky sm:left-[2.5rem] z-10 bg-white px-4 py-3 font-mono text-xs text-slate-800 min-w-[7rem] border-r border-slate-100" x-text="logger.id"></td>
+                                {{-- Nama Logger: left-0 di mobile, left-[9.5rem] di sm+ --}}
+                                <td class="sticky left-0 sm:left-[9.5rem] z-10 bg-white px-3 sm:px-4 py-3 font-semibold text-slate-900 min-w-[8rem] sm:min-w-[11rem] text-sm"
                                     style="box-shadow: 4px 0 6px rgba(0,0,0,0.09)" x-text="logger.name"></td>
                                 {{-- Per-day cells --}}
                                 <template x-for="day in logger.days" :key="day.date">

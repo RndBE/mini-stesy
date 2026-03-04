@@ -24,35 +24,35 @@
             ->values();
     @endphp
     <div x-data="userData()" class="space-y-3">
-        <div class="flex items-center justify-between mt-3">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                @if (session('success'))
-                    <div
-                        class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-semibold shadow-sm ring-1 ring-emerald-200">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                <div class="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                    <div class="relative w-full sm:w-64">
-                        <input type="text" x-model="searchQuery" placeholder="Cari user..."
-                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                        <svg class="absolute right-3 top-2.5 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                    <button @click="openCreateModal()"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 whitespace-nowrap">
-                        + Tambah User
-                    </button>
+        <div class="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            @if (session('success'))
+                <div
+                    class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-semibold shadow-sm ring-1 ring-emerald-200">
+                    {{ session('success') }}
                 </div>
+            @else
+                <div></div>
+            @endif
+
+            <div class="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div class="relative w-full sm:w-64">
+                    <input type="text" x-model="searchQuery" placeholder="Cari user..."
+                        class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <svg class="absolute right-3 top-2.5 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <button @click="openCreateModal()"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 whitespace-nowrap">
+                    + Tambah User
+                </button>
             </div>
         </div>
 
         <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
                 <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
                     <thead class="bg-neutral-200 text-xs font-semibold uppercase text-neutral-950">
                         <tr>
@@ -104,10 +104,21 @@
         </div>
 
         <div x-show="showCreateModal" x-cloak class="fixed inset-0 z-50" @keydown.escape.window="closeCreateModal()">
-            <div class="fixed inset-0 bg-gray-500/75" @click="closeCreateModal()"></div>
+            <div x-show="showCreateModal"
+                x-transition:enter="ease-in-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="ease-in-out duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-gray-500/75" @click="closeCreateModal()"></div>
             <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeCreateModal()">
-                <div class="w-full max-w-5xl bg-white rounded-lg shadow-xl overflow-hidden my-8" @click.stop>
-                    <div class="flex items-center justify-between px-8 py-2 border-b border-slate-200">
+                <div x-show="showCreateModal"
+                    x-transition:enter="ease-in-out duration-300"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="ease-in-out duration-200"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                    class="w-full max-w-5xl bg-white rounded-lg shadow-xl overflow-hidden my-8" @click.stop>
+                    <div class="flex items-center justify-between px-4 sm:px-8 py-3 border-b border-slate-200">
                         <h3 class="text-xl font-bold text-gray-900">Tambah User</h3>
                         <button type="button" @click="closeCreateModal()" class="p-2 rounded-lg hover:bg-slate-100">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,7 +129,7 @@
                     </div>
 
                     <form @submit.prevent="submitCreate()">
-                        <div class="px-8 pt-4 pb-3 space-y-3 max-h-[70vh] overflow-y-auto">
+                        <div class="px-4 sm:px-8 pt-4 pb-3 space-y-3 max-h-[70vh] overflow-y-auto">
                             <div x-show="createError" x-cloak
                                 class="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700"
                                 x-text="createError"></div>
@@ -144,29 +155,77 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Role</label>
-                                    <select x-model="createForm.level_user"
-                                        @change="handleRoleChange('create', createForm.level_user)"
-                                        class="w-full rounded-lg border border-gray-200 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                        required>
+                                    {{-- Desktop/iPad: native select --}}
+                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        x-model="createForm.level_user"
+                                        @change="handleRoleChange('create', createForm.level_user)">
                                         <option value="">-- Pilih Role --</option>
-                                        <template x-for="r in roles" :key="'create-role-' + r">
+                                        <template x-for="r in roles" :key="'cr-sel-' + r">
                                             <option :value="r" x-text="r"></option>
                                         </template>
                                     </select>
+                                    {{-- Mobile: custom dropdown --}}
+                                    <div class="sm:hidden relative" x-data="{ openRole: false }">
+                                        <button type="button" @click="openRole = !openRole"
+                                            class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                            :class="createForm.level_user ? 'text-gray-900' : 'text-gray-400'">
+                                            <span x-text="createForm.level_user || '-- Pilih Role --'"></span>
+                                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform"
+                                                :class="openRole ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                        <div x-show="openRole" x-cloak @click.outside="openRole = false"
+                                            class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                            <div @click="createForm.level_user = ''; handleRoleChange('create', ''); openRole = false"
+                                                class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">-- Pilih Role --</div>
+                                            <template x-for="r in roles" :key="'cr-dd-' + r">
+                                                <div @click="createForm.level_user = r; handleRoleChange('create', r); openRole = false"
+                                                    :class="createForm.level_user === r ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                    class="px-4 py-2 text-sm cursor-pointer" x-text="r"></div>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-sm font-semibold text-gray-900 mb-2">Instansi</label>
                                 <template x-if="isSuperAdminUser">
-                                    <select x-model="createForm.instansi_id" @change="syncSelectedLoggerAccess('create')"
-                                        class="w-full rounded-lg border border-gray-200 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                        required>
-                                        <option value="">-- Pilih Instansi --</option>
-                                        <template x-for="inst in instansiList" :key="'create-inst-' + inst.id">
-                                            <option :value="String(inst.id)" x-text="inst.nama"></option>
-                                        </template>
-                                    </select>
+                                    <div>
+                                        {{-- Desktop/iPad: native select --}}
+                                        <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                            x-model="createForm.instansi_id"
+                                            @change="syncSelectedLoggerAccess('create')">
+                                            <option value="">-- Pilih Instansi --</option>
+                                            <template x-for="inst in instansiList" :key="'ci-sel-' + inst.id">
+                                                <option :value="String(inst.id)" x-text="inst.nama"></option>
+                                            </template>
+                                        </select>
+                                        {{-- Mobile: custom dropdown --}}
+                                        <div class="sm:hidden relative" x-data="{ openInst: false }">
+                                            <button type="button" @click="openInst = !openInst"
+                                                class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                                :class="createForm.instansi_id ? 'text-gray-900' : 'text-gray-400'">
+                                                <span x-text="instansiList.find(i => String(i.id) === createForm.instansi_id)?.nama || '-- Pilih Instansi --'" class="truncate"></span>
+                                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openInst ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                            <div x-show="openInst" x-cloak @click.outside="openInst = false"
+                                                class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                                <div @click="createForm.instansi_id = ''; syncSelectedLoggerAccess('create'); openInst = false"
+                                                    class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">-- Pilih Instansi --</div>
+                                                <template x-for="inst in instansiList" :key="'ci-dd-' + inst.id">
+                                                    <div @click="createForm.instansi_id = String(inst.id); syncSelectedLoggerAccess('create'); openInst = false"
+                                                        :class="createForm.instansi_id === String(inst.id) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                        class="px-4 py-2 text-sm cursor-pointer truncate" x-text="inst.nama"></div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </template>
                                 <template x-if="!isSuperAdminUser">
                                     <input type="text" :value="currentInstansiName"
@@ -196,7 +255,7 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-3 px-8 py-3 border-t border-gray-100 bg-white">
+                        <div class="flex justify-end gap-3 px-4 sm:px-8 py-3 border-t border-gray-100 bg-white">
                             <button type="button" @click="closeCreateModal()"
                                 class="h-10 px-6 rounded-lg border border-indigo-500 text-indigo-600 font-semibold hover:bg-indigo-50">Batal</button>
                             <button type="submit" :disabled="createSubmitting"
@@ -211,10 +270,21 @@
         </div>
 
         <div x-show="showEditModal" x-cloak class="fixed inset-0 z-50" @keydown.escape.window="closeEditModal()">
-            <div class="fixed inset-0 bg-gray-500/75" @click="closeEditModal()"></div>
+            <div x-show="showEditModal"
+                x-transition:enter="ease-in-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="ease-in-out duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-gray-500/75" @click="closeEditModal()"></div>
             <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeEditModal()">
-                <div class="w-full max-w-5xl bg-white rounded-lg shadow-xl overflow-hidden my-8" @click.stop>
-                    <div class="flex items-center justify-between px-8 py-2 border-b border-slate-200">
+                <div x-show="showEditModal"
+                    x-transition:enter="ease-in-out duration-300"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="ease-in-out duration-200"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                    class="w-full max-w-5xl bg-white rounded-lg shadow-xl overflow-hidden my-8" @click.stop>
+                    <div class="flex items-center justify-between px-4 sm:px-8 py-3 border-b border-slate-200">
                         <h3 class="text-xl font-bold text-gray-900">Edit User</h3>
                         <button type="button" @click="closeEditModal()" class="p-2 rounded-lg hover:bg-slate-100">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,7 +295,7 @@
                     </div>
 
                     <form @submit.prevent="submitEdit()">
-                        <div class="px-8 pt-4 pb-3 space-y-3 max-h-[70vh] overflow-y-auto">
+                        <div class="px-4 sm:px-8 pt-4 pb-3 space-y-3 max-h-[70vh] overflow-y-auto">
                             <div x-show="editError" x-cloak
                                 class="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700"
                                 x-text="editError"></div>
@@ -253,29 +323,74 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-gray-900 mb-2">Role</label>
-                                        <select x-model="editForm.level_user"
-                                            @change="handleRoleChange('edit', editForm.level_user)"
-                                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                            required>
+                                        {{-- Desktop/iPad: native select --}}
+                                        <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                            x-model="editForm.level_user"
+                                            @change="handleRoleChange('edit', editForm.level_user)">
                                             <option value="">-- Pilih Role --</option>
-                                            <template x-for="r in roles" :key="'edit-role-' + r">
+                                            <template x-for="r in roles" :key="'er-sel-' + r">
                                                 <option :value="r" x-text="r"></option>
                                             </template>
                                         </select>
+                                        {{-- Mobile: custom dropdown --}}
+                                        <div class="sm:hidden relative" x-data="{ openRoleE: false }">
+                                            <button type="button" @click="openRoleE = !openRoleE"
+                                                class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                                :class="editForm.level_user ? 'text-gray-900' : 'text-gray-400'">
+                                                <span x-text="editForm.level_user || '-- Pilih Role --'"></span>
+                                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openRoleE ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                            <div x-show="openRoleE" x-cloak @click.outside="openRoleE = false"
+                                                class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                                <div @click="editForm.level_user = ''; handleRoleChange('edit', ''); openRoleE = false"
+                                                    class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">-- Pilih Role --</div>
+                                                <template x-for="r in roles" :key="'er-dd-' + r">
+                                                    <div @click="editForm.level_user = r; handleRoleChange('edit', r); openRoleE = false"
+                                                        :class="editForm.level_user === r ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                        class="px-4 py-2 text-sm cursor-pointer" x-text="r"></div>
+                                                </template>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Instansi</label>
                                     <template x-if="isSuperAdminUser">
-                                        <select x-model="editForm.instansi_id" @change="syncSelectedLoggerAccess('edit')"
-                                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                            required>
-                                            <option value="">-- Pilih Instansi --</option>
-                                            <template x-for="inst in instansiList" :key="'edit-inst-' + inst.id">
-                                                <option :value="String(inst.id)" x-text="inst.nama"></option>
-                                            </template>
-                                        </select>
+                                        <div>
+                                            {{-- Desktop/iPad: native select --}}
+                                            <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                                x-model="editForm.instansi_id"
+                                                @change="syncSelectedLoggerAccess('edit')">
+                                                <option value="">-- Pilih Instansi --</option>
+                                                <template x-for="inst in instansiList" :key="'ei-sel-' + inst.id">
+                                                    <option :value="String(inst.id)" x-text="inst.nama"></option>
+                                                </template>
+                                            </select>
+                                            {{-- Mobile: custom dropdown --}}
+                                            <div class="sm:hidden relative" x-data="{ openInstE: false }">
+                                                <button type="button" @click="openInstE = !openInstE"
+                                                    class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                                    :class="editForm.instansi_id ? 'text-gray-900' : 'text-gray-400'">
+                                                    <span x-text="instansiList.find(i => String(i.id) === editForm.instansi_id)?.nama || '-- Pilih Instansi --'" class="truncate"></span>
+                                                    <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openInstE ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </button>
+                                                <div x-show="openInstE" x-cloak @click.outside="openInstE = false"
+                                                    class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                                    <div @click="editForm.instansi_id = ''; syncSelectedLoggerAccess('edit'); openInstE = false"
+                                                        class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">-- Pilih Instansi --</div>
+                                                    <template x-for="inst in instansiList" :key="'ei-dd-' + inst.id">
+                                                        <div @click="editForm.instansi_id = String(inst.id); syncSelectedLoggerAccess('edit'); openInstE = false"
+                                                            :class="editForm.instansi_id === String(inst.id) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                            class="px-4 py-2 text-sm cursor-pointer truncate" x-text="inst.nama"></div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </template>
                                     <template x-if="!isSuperAdminUser">
                                         <input type="text" :value="currentInstansiName"
@@ -307,7 +422,7 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-3 px-8 py-3 border-t border-gray-100 bg-white">
+                        <div class="flex justify-end gap-3 px-4 sm:px-8 py-3 border-t border-gray-100 bg-white">
                             <button type="button" @click="closeEditModal()"
                                 class="h-10 px-6 rounded-lg border border-indigo-500 text-indigo-600 font-semibold hover:bg-indigo-50">Batal</button>
                             <button type="submit" :disabled="editSubmitting || editLoading"
@@ -322,17 +437,37 @@
         </div>
 
         <div x-show="showDeleteModal" x-cloak class="fixed inset-0 z-50" @keydown.escape.window="closeDeleteModal()">
-            <div class="fixed inset-0 bg-gray-500/75" @click="closeDeleteModal()"></div>
+            <div x-show="showDeleteModal"
+                x-transition:enter="ease-in-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="ease-in-out duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-gray-500/75" @click="closeDeleteModal()"></div>
             <div class="fixed inset-0 flex items-center justify-center p-4" @click="closeDeleteModal()">
-                <div class="w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden" @click.stop>
+                <div x-show="showDeleteModal"
+                    x-transition:enter="ease-in-out duration-300"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="ease-in-out duration-200"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                    class="w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden" @click.stop>
                     <div class="px-6 py-5">
                         <div class="flex flex-col items-center gap-2">
+                            <div class="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center">
+                                <svg class="w-14 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </div>
                             <h3 class="text-xl text-center font-bold text-blue-900">Hapus User</h3>
                         </div>
                     </div>
                     <div class="px-6 py-3">
-                        <p class="text-sm text-center text-slate-600">Yakin hapus user <span class="font-semibold"
-                                x-text="deleteData.name"></span>?</p>
+                        <p class="text-sm text-center text-slate-600">Yakin hapus user
+                            <span class="font-semibold text-slate-900"
+                                x-text="deleteData.name"></span>?
+                            </p>
                         <p class="mt-1 text-sm text-center text-red-600 font-medium">Tindakan ini tidak dapat dibatalkan.
                         </p>
                     </div>

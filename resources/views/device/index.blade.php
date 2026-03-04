@@ -145,33 +145,32 @@
         </div>
 
         {{-- DETAIL DEVICE MODAL --}}
-        <div x-show="showDetailModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="detail-modal-title"
+        <div x-show="showDetailModal" class="fixed inset-0 z-50" aria-labelledby="detail-modal-title"
             role="dialog" aria-modal="true" style="display: none;">
-            <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-                <div x-show="showDetailModal" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                    x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                    @click="closeDetailModal()">
-                </div>
+            <div x-show="showDetailModal" x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0" class="fixed inset-0 bg-slate-900/40 transition-opacity"
+                aria-hidden="true" @click="closeDetailModal()"></div>
 
-                <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
-
+            <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto"
+                @click="closeDetailModal()">
                 <div x-show="showDetailModal" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                     x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative inline-block w-full max-w-6xl transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                    class="relative w-full max-w-4xl overflow-hidden rounded-2xl bg-slate-100 text-left shadow-xl my-2 sm:my-4"
+                    @click.stop>
 
-                    <div class="flex items-start justify-between border-b border-slate-200 px-6 py-4">
+                    <div class="flex items-start justify-between border-b border-slate-200 px-6 py-5">
                         <div class="flex items-start gap-3">
-                            <div class="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 px-4 py-3">
+                            <div class="rounded-lg border border-slate-200 bg-white p-2 text-slate-700">
                                 <img src="{{ asset('icons/detail_dark_icon.svg') }}" class="h-6 w-6">
                             </div>
                             <div>
-                                <h3 id="detail-modal-title" class="text-2xl font-bold text-slate-900">Detail Device</h3>
+                                <h3 id="detail-modal-title" class="text-xl font-bold text-slate-900">Detail Device</h3>
                                 <p class="text-sm text-slate-500">Informasi lengkap tentang device.</p>
                             </div>
                         </div>
@@ -183,147 +182,131 @@
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-4 px-4 py-4 lg:grid-cols-2">
-                        <div class="space-y-4">
-                            <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
-                                <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
-                                    <img src="{{ asset('icons/identitas_icon.svg') }}" class="h-5 w-5">
-                                    <p class="text-sm font-bold text-slate-900">Identitas Device</p>
+                    <div class="space-y-3 px-3 py-4 sm:space-y-4 sm:px-6 sm:py-5 max-h-[80vh] overflow-y-auto">
+
+                        {{-- Identitas Device --}}
+                        <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+                            <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
+                                <img src="{{ asset('icons/identitas_icon.svg') }}" class="h-5 w-5">
+                                <p class="text-base font-bold text-slate-900">Identitas Device</p>
+                            </div>
+                            <div class="grid grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-3 sm:gap-6">
+                                <div>
+                                    <p class="text-xs uppercase tracking-wide text-slate-400">ID Logger</p>
+                                    <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.id_logger || '-'"></p>
                                 </div>
-                                <div class="grid grid-cols-1 gap-4 px-4 py-3 text-sm sm:grid-cols-3">
-                                    <div>
-                                        <p class="text-xs uppercase text-slate-400">ID Logger</p>
-                                        <p class="mt-1 font-semibold text-slate-900" x-text="detailData.id_logger || '-'">
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs uppercase text-slate-400">Nama Pos</p>
-                                        <p class="mt-1 font-semibold text-slate-900"
-                                            x-text="detailData.nama_lokasi || '-'"></p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs uppercase text-slate-400">Nama Logger</p>
-                                        <p class="mt-1 font-semibold text-slate-900"
-                                            x-text="detailData.nama_logger || '-'"></p>
-                                    </div>
+                                <div>
+                                    <p class="text-xs uppercase tracking-wide text-slate-400">Nama Pos</p>
+                                    <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.nama_lokasi || '-'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs uppercase tracking-wide text-slate-400">Nama Logger</p>
+                                    <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.nama_logger || '-'"></p>
                                 </div>
                             </div>
-
-                            <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
-                                <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
-                                    <img src="{{ asset('icons/lokasi_icon.svg') }}" class="h-5 w-5">
-                                    <p class="text-sm font-bold text-slate-900">Lokasi Pos</p>
-                                </div>
-                                <div class="grid grid-cols-1 gap-4 px-4 py-3 text-sm sm:grid-cols-3">
-                                    <div>
-                                        <p class="text-xs uppercase text-slate-400">Alamat</p>
-                                        <p class="mt-1 font-semibold text-slate-900" x-text="detailData.alamat || '-'">
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs uppercase text-slate-400">Latitude</p>
-                                        <p class="mt-1 font-semibold text-slate-900" x-text="detailData.latitude || '-'">
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs uppercase text-slate-400">Longitude</p>
-                                        <p class="mt-1 font-semibold text-slate-900" x-text="detailData.longitude || '-'">
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <template x-if="isAwlrKategori(detailData.id_katlogger)">
-                                <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
-                                    <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
-                                        <img src="{{ asset('icons/sub_kategori_icon.svg') }}" class="h-5 w-5">
-                                        <p class="text-sm font-bold text-slate-900">Sub Kategori</p>
-                                    </div>
-                                    <div class="grid grid-cols-1 gap-4 px-4 py-3 text-sm sm:grid-cols-4">
-                                        <div>
-                                            <p class="text-xs uppercase text-slate-400">Sub Kategori</p>
-                                            <p class="mt-1 font-semibold text-slate-900"
-                                                x-text="detailData.sub_kategori || '-'"></p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs uppercase text-slate-400">Kedalaman Sumur</p>
-                                            <p class="mt-1 font-semibold text-slate-900"
-                                                x-text="detailData.kedalaman_sumur || '-'"></p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs uppercase text-slate-400">Kedalaman Sensor</p>
-                                            <p class="mt-1 font-semibold text-slate-900"
-                                                x-text="detailData.kedalaman_sensor || '-'"></p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs uppercase text-slate-400">Kedalaman Pompa</p>
-                                            <p class="mt-1 font-semibold text-slate-900"
-                                                x-text="detailData.kedalaman_pompa || '-'"></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
                         </div>
 
-                        <div>
+                        {{-- Lokasi Pos --}}
+                        <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+                            <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
+                                <img src="{{ asset('icons/lokasi_icon.svg') }}" class="h-5 w-5">
+                                <p class="text-base font-bold text-slate-900">Lokasi Pos</p>
+                            </div>
+                            <div class="grid grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-3 sm:gap-6">
+                                <div>
+                                    <p class="text-xs uppercase tracking-wide text-slate-400">Alamat</p>
+                                    <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.alamat || '-'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs uppercase tracking-wide text-slate-400">Latitude</p>
+                                    <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.latitude || '-'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs uppercase tracking-wide text-slate-400">Longitude</p>
+                                    <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.longitude || '-'"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Sub Kategori (AWLR only) --}}
+                        <template x-if="isAwlrKategori(detailData.id_katlogger)">
                             <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                                 <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
-                                    <img src="{{ asset('icons/param_icon.svg') }}" class="h-5 w-5">
-                                    <p class="text-sm font-bold text-slate-900">Detail Parameter</p>
+                                    <img src="{{ asset('icons/sub_kategori_icon.svg') }}" class="h-5 w-5">
+                                    <p class="text-base font-bold text-slate-900">Sub Kategori</p>
                                 </div>
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-sm text-slate-700">
-                                        <thead class="bg-white text-xs uppercase text-slate-900">
+                                <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-4 sm:gap-6">
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-slate-400">Sub Kategori</p>
+                                        <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.sub_kategori || '-'"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Sumur</p>
+                                        <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_sumur || '-'"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Sensor</p>
+                                        <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_sensor || '-'"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Pompa</p>
+                                        <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_pompa || '-'"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        {{-- Detail Parameter --}}
+                        <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+                            <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
+                                <img src="{{ asset('icons/param_icon.svg') }}" class="h-5 w-5">
+                                <p class="text-base font-bold text-slate-900">Detail Parameter</p>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-slate-700">
+                                    <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left">Parameter</th>
+                                            <th class="px-4 py-3 text-left">Kolom Sensor</th>
+                                            <th class="px-4 py-3 text-left">Satuan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        <template x-if="!(detailData.params || []).length">
                                             <tr>
-                                                <th class="px-4 py-3 text-left">Parameter</th>
-                                                <th class="px-4 py-3 text-left">Kolom Sensor</th>
-                                                <th class="px-4 py-3 text-left">Satuan</th>
+                                                <td colspan="3" class="px-4 py-4 text-center text-sm text-slate-400">Tidak ada parameter</td>
                                             </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-slate-100">
-                                            <template x-if="!(detailData.params || []).length">
-                                                <tr>
-                                                    <td colspan="3"
-                                                        class="px-4 py-4 text-center text-sm text-slate-400">Tidak ada
-                                                        parameter</td>
-                                                </tr>
-                                            </template>
-                                            <template x-for="(param, index) in (detailData.params || [])"
-                                                :key="param.id_param || index">
-                                                <tr>
-                                                    {{-- <td class="px-4 py-3 font-semibold text-slate-900"
-                                                        x-text="param.nama_parameter || '-'"></td> --}}
-                                                    <td class="px-4 py-3 font-semibold text-slate-900"
-                                                        x-text="(param.nama_parameter || '-').replaceAll('_', ' ')"></td>
-                                                    <td class="px-4 py-3" x-text="param.kolom_sensor || '-'"></td>
-                                                    <td class="px-4 py-3" x-text="param.satuan || '-'"></td>
-                                                </tr>
-                                            </template>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        </template>
+                                        <template x-for="(param, index) in (detailData.params || [])" :key="param.id_param || index">
+                                            <tr>
+                                                <td class="px-4 py-3 font-semibold text-slate-900" x-text="(param.nama_parameter || '-').replaceAll('_', ' ')"></td>
+                                                <td class="px-4 py-3" x-text="param.kolom_sensor || '-'"></td>
+                                                <td class="px-4 py-3" x-text="param.satuan || '-'"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
 
         {{-- SETUP DEVICE MODAL --}}
-        <div x-show="isAddOpen" x-transition class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title"
+        <div x-show="isAddOpen" x-transition class="fixed inset-0 z-50" aria-labelledby="modal-title"
             role="dialog" aria-modal="true" style="display: none;">
 
-            <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeAddModal()">
 
                 <!-- Overlay -->
                 <div x-show="isAddOpen" x-transition.opacity
                     class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeAddModal()"></div>
 
-                <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
-
                 <!-- Modal Panel -->
                 <div x-show="isAddOpen" x-transition
-                    class="relative inline-block w-full max-w-5xl transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
+                    class="relative w-full max-w-5xl overflow-hidden rounded-lg bg-white text-left shadow-xl" @click.stop>
 
                     <!-- HEADER -->
                     <div class="flex items-center justify-between border-b px-6 py-4">
@@ -600,10 +583,11 @@
         </div>
 
         {{-- EDIT MODAL --}}
-        <div x-show="isOpen" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+        <div x-show="isOpen" class="fixed inset-0 z-50" aria-labelledby="modal-title" role="dialog"
             aria-modal="true" style="display: none;">
 
-            <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto"
+                @click="closeModal()">
 
                 <!-- Overlay -->
                 <div x-show="isOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
@@ -611,21 +595,20 @@
                     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                     class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModal()"></div>
 
-                <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
-
                 <!-- Modal Panel -->
                 <div x-show="isOpen" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                     x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative inline-block w-full max-w-6xl transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                    class="relative w-full max-w-4xl overflow-hidden rounded-lg bg-white text-left shadow-xl my-4"
+                    @click.stop>
 
                     <!-- HEADER -->
                     <div class="flex items-center justify-between border-b px-6 py-4">
-                        <h3 class="text-xl font-bold text-gray-900">Edit Device</h3>
-                        <button @click="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <h3 class="text-lg font-bold text-gray-900">Edit Device</h3>
+                        <button @click="closeModal()" class="text-gray-400 hover:text-gray-500">
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12" />
@@ -637,99 +620,111 @@
                         @csrf
                         @method('PUT')
 
-                        <div class="px-6 py-5 space-y-5 max-h-[75vh] overflow-y-auto">
+                        <div class="px-6 py-4 space-y-6 max-h-[70vh] overflow-y-auto">
                             <input type="hidden" name="latitude" x-model="editData.latitude">
                             <input type="hidden" name="longitude" x-model="editData.longitude">
 
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-900 mb-2">Nama Pos</label>
-                                <input type="hidden" name="nama_lokasi" :value="editData.nama_lokasi">
-                                <div
-                                    class="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-3 text-sm text-gray-800">
-                                    <span x-text="editData.nama_lokasi || '-'"></span>
+                            {{-- Identitas Device --}}
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                <h4 class="text-sm font-semibold text-gray-900 mb-4">Identitas Device</h4>
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700">Nama Pos</label>
+                                        <input type="hidden" name="nama_lokasi" :value="editData.nama_lokasi">
+                                        <div class="mt-1 w-full rounded-md border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-600">
+                                            <span x-text="editData.nama_lokasi || '-'"></span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700">Nama Logger</label>
+                                        <div class="relative mt-1">
+                                            <select x-model="editData.id_logger"
+                                                class="w-full appearance-none rounded-md border border-gray-300 px-3 py-2 pr-8 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                                <option value="" disabled>Pilih nama logger</option>
+                                                <option :value="editData.id_logger" x-text="editData.nama_logger"
+                                                    x-show="editData.nama_logger"></option>
+                                                <template x-for="logger in loggers" :key="logger.id_logger">
+                                                    <option :value="logger.id_logger" x-text="logger.nama_logger"></option>
+                                                </template>
+                                            </select>
+                                            <svg class="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
+                            {{-- Sub Kategori (AWLR only) --}}
                             <template x-if="isEditAwlr()">
-                                <div class="space-y-4">
-                                    <div>
-                                        <h4 class="text-sm font-semibold text-gray-900 mb-2">Sub Kategori</h4>
-                                        <div class="flex items-center gap-8">
-                                            <label class="inline-flex items-center gap-2 text-sm text-gray-800">
-                                                <input type="radio" name="sub_kategori" value="jiat"
-                                                    x-model="editData.subKategori"
-                                                    class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
-                                                JIAT
-                                            </label>
-                                            <label class="inline-flex items-center gap-2 text-sm text-gray-800">
-                                                <input type="radio" name="sub_kategori" value="non_jiat"
-                                                    x-model="editData.subKategori"
-                                                    class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
-                                                Non JIAT
-                                            </label>
-                                        </div>
+                                <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                    <h4 class="text-sm font-semibold text-gray-900 mb-4">Sub Kategori</h4>
+                                    <div class="flex items-center gap-8 mb-4">
+                                        <label class="inline-flex items-center gap-2 text-sm text-gray-800">
+                                            <input type="radio" name="sub_kategori" value="jiat"
+                                                x-model="editData.subKategori"
+                                                class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
+                                            JIAT
+                                        </label>
+                                        <label class="inline-flex items-center gap-2 text-sm text-gray-800">
+                                            <input type="radio" name="sub_kategori" value="non_jiat"
+                                                x-model="editData.subKategori"
+                                                class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
+                                            Non JIAT
+                                        </label>
                                     </div>
 
                                     <template x-if="editData.subKategori === 'jiat'">
-                                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                             <div>
-                                                <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
-                                                    Sumur</label>
-                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden">
+                                                <label class="block text-xs font-medium text-gray-700">Kedalaman Sumur</label>
+                                                <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
                                                     <input type="number" step="0.01" name="kedalaman_sumur"
                                                         x-model="editData.kedalaman_sumur"
-                                                        class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
-                                                    <span
-                                                        class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
                                                 </div>
                                             </div>
                                             <div>
-                                                <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
-                                                    Sensor</label>
-                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden">
+                                                <label class="block text-xs font-medium text-gray-700">Kedalaman Sensor</label>
+                                                <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
                                                     <input type="number" step="0.01" name="kedalaman_sensor"
                                                         x-model="editData.kedalaman_sensor"
-                                                        class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
-                                                    <span
-                                                        class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
                                                 </div>
                                             </div>
                                             <div>
-                                                <label class="block text-sm font-semibold text-gray-900 mb-2">Kedalaman
-                                                    Pompa</label>
-                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden">
+                                                <label class="block text-xs font-medium text-gray-700">Kedalaman Pompa</label>
+                                                <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
                                                     <input type="number" step="0.01" name="kedalaman_pompa"
                                                         x-model="editData.kedalaman_pompa"
-                                                        class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
-                                                    <span
-                                                        class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </template>
 
                                     <template x-if="editData.subKategori === 'non_jiat'">
-                                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                             <div>
-                                                <label class="block text-sm font-semibold text-gray-900 mb-2">Jarak Sensor
-                                                    dengan Air</label>
-                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden">
+                                                <label class="block text-xs font-medium text-gray-700">Jarak Sensor dengan Air</label>
+                                                <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
                                                     <input type="number" step="0.01" name="kedalaman_sensor"
                                                         x-model="editData.kedalaman_sensor"
-                                                        class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
-                                                    <span
-                                                        class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
                                                 </div>
                                             </div>
                                             <div>
-                                                <label class="block text-sm font-semibold text-gray-900 mb-2">Ketinggian
-                                                    Sensor</label>
-                                                <div class="flex rounded-lg border border-gray-300 overflow-hidden">
+                                                <label class="block text-xs font-medium text-gray-700">Ketinggian Sensor</label>
+                                                <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
                                                     <input type="number" step="0.01" name="kedalaman_pompa"
                                                         x-model="editData.kedalaman_pompa"
-                                                        class="w-full border-0 px-4 py-3 text-sm text-gray-800 focus:ring-0">
-                                                    <span
-                                                        class="flex items-center border-l border-gray-300 px-4 text-sm text-gray-700">m</span>
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -737,52 +732,32 @@
                                 </div>
                             </template>
 
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-900 mb-2">Nama Logger</label>
-                                <div class="relative">
-                                    <select x-model="editData.id_logger"
-                                        class="w-full appearance-none rounded-lg border border-gray-300 px-4 py-3 pr-10 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
-                                        <option value="" disabled>Pilih nama logger</option>
-                                        <option :value="editData.id_logger" x-text="editData.nama_logger"
-                                            x-show="editData.nama_logger"></option>
-                                        <template x-for="logger in loggers" :key="logger.id_logger">
-                                            <option :value="logger.id_logger" x-text="logger.nama_logger"></option>
-                                        </template>
-                                    </select>
-                                    <svg class="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                            </div>
-
                             {{-- Peta Lokasi --}}
-                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-3">Pilih Lokasi di Peta</h4>
-                                <div class="grid grid-cols-2 gap-3 mb-3">
+                                <div class="grid grid-cols-2 gap-4 mb-3">
                                     <div>
-                                        <label class="block text-xs font-semibold text-gray-600 mb-1">Latitude</label>
+                                        <label class="block text-xs font-medium text-gray-700">Latitude</label>
                                         <input type="text" x-model="editData.latitude"
                                             @input="updateEditMapFromInputs()"
                                             placeholder="-6.200000"
-                                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                            class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-semibold text-gray-600 mb-1">Longitude</label>
+                                        <label class="block text-xs font-medium text-gray-700">Longitude</label>
                                         <input type="text" x-model="editData.longitude"
                                             @input="updateEditMapFromInputs()"
                                             placeholder="106.816666"
-                                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                            class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
                                 <div id="editDeviceMap" class="h-64 rounded-lg border border-gray-300"></div>
                                 <p class="text-xs text-gray-500 mt-2">Klik peta atau geser marker untuk mengisi koordinat secara otomatis.</p>
                             </div>
 
-                            <div class="rounded-lg border border-gray-300">
-                                <div class="border-b border-gray-300 px-4 py-3 flex items-center justify-between gap-3">
-                                    <h4 class="text-xl font-semibold text-gray-900">Daftar Parameter</h4>
+                            <div class="bg-slate-50 rounded-lg border border-slate-100">
+                                <div class="border-b border-slate-200 px-4 py-3 flex items-center justify-between gap-3">
+                                    <h4 class="text-sm font-semibold text-gray-900">Daftar Parameter</h4>
                                     <button type="button" @click="applyTemplateToEdit()"
                                         :disabled="!canApplyTemplateEdit()"
                                         class="inline-flex items-center rounded-md border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50">
@@ -864,11 +839,11 @@
                         <!-- FOOTER -->
                         <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3">
                             <button type="button" @click="closeModal()"
-                                class="rounded-lg border border-indigo-300 bg-white px-6 py-2.5 text-sm font-semibold text-indigo-900 hover:bg-indigo-50">
+                                class="h-11 sm:h-auto flex-1 sm:flex-none inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
                                 Batal
                             </button>
                             <button type="submit"
-                                class="rounded-lg bg-indigo-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-indigo-900">
+                                class="h-11 sm:h-auto flex-1 sm:flex-none inline-flex justify-center rounded-md border border-transparent bg-indigo-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-800">
                                 Simpan
                             </button>
                         </div>

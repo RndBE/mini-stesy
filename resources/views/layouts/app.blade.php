@@ -4,7 +4,7 @@
 
 <body class="bg-slate-50" x-data="{ pageTitle: '{{ $title ?? 'Beranda' }}' }">
     <style>
-        @media (max-width: 768px) {
+        @media (max-width: 1023px) {
             #mainContent {
                 margin-left: 0 !important;
             }
@@ -12,7 +12,7 @@
     </style>
     <div class="min-h-screen flex">
         @include('partials.sidebar')
-        <div id="sidebarBackdrop" class="fixed inset-0 z-30 hidden bg-black/50 md:hidden"></div>
+        <div id="sidebarBackdrop" class="fixed inset-0 z-30 hidden bg-black/50 lg:hidden"></div>
 
         <div id="mainContent" class="flex min-h-screen w-full flex-col transition-all duration-300"
             style="margin-left: 16rem; width: calc(100% - 16rem);">

@@ -17,7 +17,7 @@
         @endif
 
         <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
                 <table class="w-full text-left text-sm text-slate-700 whitespace-nowrap">
                     <thead class="bg-neutral-200 text-xs font-semibold uppercase text-neutral-900">
                         <tr>
@@ -71,7 +71,7 @@
                                             </svg>
                                         </button>
                                         <button type="button"
-                                            @click="openDeleteModal({{ $item->id }}, '{{ addslashes(($item->kategori?->nama_kategori ?? '') . ' - ' . ($item->listParameter?->nama_parameter ?? '')) }}')"
+                                            @click="openDeleteModal({{ $item->id }}, '{{ addslashes(($item->kategori?->nama_kategori ?? '') . ' - ' . str_replace('_', ' ', ($item->listParameter?->nama_parameter ?? ''))) }}')"
                                             class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-slate-950 hover:bg-red-200 transition-colors"
                                             title="Hapus">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,8 +106,8 @@
                     x-transition:leave="ease-in-out duration-200"
                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-                    class="w-full max-w-4xl rounded-lg bg-white shadow-xl overflow-hidden my-8" @click.stop>
-                    <div class="flex items-center justify-between border-b border-slate-200 px-8 py-2">
+                    class="w-full max-w-4xl rounded-lg bg-white shadow-xl my-8" @click.stop>
+                    <div class="flex items-center justify-between border-b border-slate-200 px-4 sm:px-8 py-3">
                         <h3 class="text-xl font-bold text-gray-900">Tambah Template Kategori Parameter</h3>
                         <button type="button" @click="closeCreateModal()" class="p-2 rounded-lg hover:bg-slate-100">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,19 +120,39 @@
                         @csrf
                         <input type="hidden" name="form_mode" value="create">
 
-                        <div class="px-8 pt-4 pb-3 space-y-3">
+                        <div class="px-4 sm:px-8 pt-4 pb-3 space-y-3">
                             <div class="grid gap-5 md:grid-cols-2">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Kategori Logger</label>
-                                    <select name="id_katlogger" required
-                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    {{-- Desktop/iPad: native select --}}
+                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        x-model="createKatlogger">
                                         <option value="">- Pilih Kategori -</option>
-                                        @foreach ($kategoris as $kategori)
-                                            <option value="{{ $kategori->id_katlogger }}" @selected((string) old('id_katlogger') === (string) $kategori->id_katlogger)>
-                                                {{ $kategori->nama_kategori }}{{ $kategori->kepanjangan ? ' - ' . $kategori->kepanjangan : '' }}
-                                            </option>
-                                        @endforeach
+                                        <template x-for="k in kategoris" :key="'ck-sel-' + k.id_katlogger">
+                                            <option :value="String(k.id_katlogger)" x-text="k.nama_kategori + (k.kepanjangan ? ' - ' + k.kepanjangan : '')"></option>
+                                        </template>
                                     </select>
+                                    {{-- Mobile: custom dropdown --}}
+                                    <div class="sm:hidden relative" x-data="{ openCKat: false }">
+                                        <button type="button" @click="openCKat = !openCKat"
+                                            class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                            :class="createKatlogger ? 'text-gray-900' : 'text-gray-400'">
+                                            <span class="truncate" x-text="kategoris.find(k => String(k.id_katlogger) === createKatlogger)?.nama_kategori || '- Pilih Kategori -'"></span>
+                                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openCKat ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="openCKat" @click.outside="openCKat = false"
+                                            class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                            <div @click="createKatlogger = ''; openCKat = false"
+                                                class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">- Pilih Kategori -</div>
+                                            <template x-for="k in kategoris" :key="k.id_katlogger">
+                                                <div @click="createKatlogger = String(k.id_katlogger); openCKat = false"
+                                                    :class="createKatlogger === String(k.id_katlogger) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                    class="px-4 py-2 text-sm cursor-pointer truncate"
+                                                    x-text="k.nama_kategori + (k.kepanjangan ? ' - ' + k.kepanjangan : '')"></div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="id_katlogger" :value="createKatlogger">
                                     @if (old('form_mode') === 'create')
                                         @error('id_katlogger')
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -142,15 +162,35 @@
 
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">List Parameter</label>
-                                    <select name="list_parameter_id" required
-                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    {{-- Desktop/iPad: native select --}}
+                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        x-model="createParamId">
                                         <option value="">- Pilih Parameter -</option>
-                                        @foreach ($listParameters as $lp)
-                                            <option value="{{ $lp->id }}" @selected((string) old('list_parameter_id') === (string) $lp->id)>
-                                                {{ str_replace('_', ' ', $lp->nama_parameter) }}
-                                            </option>
-                                        @endforeach
+                                        <template x-for="lp in listParameters" :key="'cp-sel-' + lp.id">
+                                            <option :value="String(lp.id)" x-text="lp.nama_parameter.replaceAll('_', ' ')"></option>
+                                        </template>
                                     </select>
+                                    {{-- Mobile: custom dropdown --}}
+                                    <div class="sm:hidden relative" x-data="{ openCParam: false }">
+                                        <button type="button" @click="openCParam = !openCParam"
+                                            class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                            :class="createParamId ? 'text-gray-900' : 'text-gray-400'">
+                                            <span class="truncate" x-text="(listParameters.find(lp => String(lp.id) === createParamId)?.nama_parameter || '- Pilih Parameter -').replaceAll('_', ' ')"></span>
+                                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openCParam ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="openCParam" @click.outside="openCParam = false"
+                                            class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                            <div @click="createParamId = ''; openCParam = false"
+                                                class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">- Pilih Parameter -</div>
+                                            <template x-for="lp in listParameters" :key="lp.id">
+                                                <div @click="createParamId = String(lp.id); openCParam = false"
+                                                    :class="createParamId === String(lp.id) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                    class="px-4 py-2 text-sm cursor-pointer truncate"
+                                                    x-text="lp.nama_parameter.replaceAll('_', ' ')"></div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="list_parameter_id" :value="createParamId">
                                     @if (old('form_mode') === 'create')
                                         @error('list_parameter_id')
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -198,17 +238,34 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-900 mb-2">Group Parameter
-                                        (opsional)</label>
-                                    <select name="parameter_group_id"
-                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <label class="block text-sm font-semibold text-gray-900 mb-2">Group Parameter (opsional)</label>
+                                    {{-- Desktop/iPad: native select --}}
+                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        x-model="createGroupId">
                                         <option value="">- Ikuti default list parameter -</option>
-                                        @foreach ($groups as $group)
-                                            <option value="{{ $group->id }}" @selected((string) old('parameter_group_id') === (string) $group->id)>
-                                                {{ $group->nama_group }}
-                                            </option>
-                                        @endforeach
+                                        <template x-for="g in groups" :key="'cg-sel-' + g.id">
+                                            <option :value="String(g.id)" x-text="g.nama_group"></option>
+                                        </template>
                                     </select>
+                                    {{-- Mobile: custom dropdown --}}
+                                    <div class="sm:hidden relative" x-data="{ openCGroup: false }">
+                                        <button type="button" @click="openCGroup = !openCGroup"
+                                            class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <span class="truncate" x-text="groups.find(g => String(g.id) === createGroupId)?.nama_group || '- Ikuti default list parameter -'"></span>
+                                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openCGroup ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="openCGroup" @click.outside="openCGroup = false"
+                                            class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                            <div @click="createGroupId = ''; openCGroup = false"
+                                                class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">- Ikuti default list parameter -</div>
+                                            <template x-for="g in groups" :key="g.id">
+                                                <div @click="createGroupId = String(g.id); openCGroup = false"
+                                                    :class="createGroupId === String(g.id) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                    class="px-4 py-2 text-sm cursor-pointer truncate" x-text="g.nama_group"></div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="parameter_group_id" :value="createGroupId">
                                     @if (old('form_mode') === 'create')
                                         @error('parameter_group_id')
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -246,7 +303,7 @@
                     x-transition:leave="ease-in-out duration-200"
                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-                    class="w-full max-w-4xl rounded-lg bg-white shadow-xl overflow-hidden my-8" @click.stop>
+                    class="w-full max-w-4xl rounded-lg bg-white shadow-xl my-8" @click.stop>
                     <div class="flex items-center justify-between border-b border-slate-200 px-8 py-2">
                         <h3 class="text-xl font-bold text-gray-900">Edit Template Kategori Parameter</h3>
                         <button type="button" @click="closeEditModal()" class="p-2 rounded-lg hover:bg-slate-100">
@@ -266,15 +323,35 @@
                             <div class="grid gap-5 md:grid-cols-2">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Kategori Logger</label>
-                                    <select name="id_katlogger" x-model="editData.id_katlogger" required
-                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    {{-- Desktop/iPad: native select --}}
+                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        x-model="editData.id_katlogger">
                                         <option value="">- Pilih Kategori -</option>
-                                        @foreach ($kategoris as $kategori)
-                                            <option value="{{ $kategori->id_katlogger }}">
-                                                {{ $kategori->nama_kategori }}{{ $kategori->kepanjangan ? ' - ' . $kategori->kepanjangan : '' }}
-                                            </option>
-                                        @endforeach
+                                        <template x-for="k in kategoris" :key="'ek-sel-' + k.id_katlogger">
+                                            <option :value="String(k.id_katlogger)" x-text="k.nama_kategori + (k.kepanjangan ? ' - ' + k.kepanjangan : '')"></option>
+                                        </template>
                                     </select>
+                                    {{-- Mobile: custom dropdown --}}
+                                    <div class="sm:hidden relative" x-data="{ openEKat: false }">
+                                        <button type="button" @click="openEKat = !openEKat"
+                                            class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                            :class="editData.id_katlogger ? 'text-gray-900' : 'text-gray-400'">
+                                            <span class="truncate" x-text="kategoris.find(k => String(k.id_katlogger) === editData.id_katlogger)?.nama_kategori || '- Pilih Kategori -'"></span>
+                                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openEKat ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="openEKat" @click.outside="openEKat = false"
+                                            class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                            <div @click="editData.id_katlogger = ''; openEKat = false"
+                                                class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">- Pilih Kategori -</div>
+                                            <template x-for="k in kategoris" :key="k.id_katlogger">
+                                                <div @click="editData.id_katlogger = String(k.id_katlogger); openEKat = false"
+                                                    :class="editData.id_katlogger === String(k.id_katlogger) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                    class="px-4 py-2 text-sm cursor-pointer truncate"
+                                                    x-text="k.nama_kategori + (k.kepanjangan ? ' - ' + k.kepanjangan : '')"></div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="id_katlogger" :value="editData.id_katlogger">
                                     @if (old('form_mode') === 'edit')
                                         @error('id_katlogger')
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -284,13 +361,35 @@
 
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">List Parameter</label>
-                                    <select name="list_parameter_id" x-model="editData.list_parameter_id" required
-                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                        <option value="">Pilih Parameter</option>
-                                        @foreach ($listParameters as $lp)
-                                            <option value="{{ $lp->id }}">{{ str_replace('_', ' ', $lp->nama_parameter) }}</option>
-                                        @endforeach
+                                    {{-- Desktop/iPad: native select --}}
+                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        x-model="editData.list_parameter_id">
+                                        <option value="">- Pilih Parameter -</option>
+                                        <template x-for="lp in listParameters" :key="'ep-sel-' + lp.id">
+                                            <option :value="String(lp.id)" x-text="lp.nama_parameter.replaceAll('_', ' ')"></option>
+                                        </template>
                                     </select>
+                                    {{-- Mobile: custom dropdown --}}
+                                    <div class="sm:hidden relative" x-data="{ openEParam: false }">
+                                        <button type="button" @click="openEParam = !openEParam"
+                                            class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                            :class="editData.list_parameter_id ? 'text-gray-900' : 'text-gray-400'">
+                                            <span class="truncate" x-text="(listParameters.find(lp => String(lp.id) === editData.list_parameter_id)?.nama_parameter || '- Pilih Parameter -').replaceAll('_', ' ')"></span>
+                                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openEParam ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="openEParam" @click.outside="openEParam = false"
+                                            class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                            <div @click="editData.list_parameter_id = ''; openEParam = false"
+                                                class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">- Pilih Parameter -</div>
+                                            <template x-for="lp in listParameters" :key="lp.id">
+                                                <div @click="editData.list_parameter_id = String(lp.id); openEParam = false"
+                                                    :class="editData.list_parameter_id === String(lp.id) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                    class="px-4 py-2 text-sm cursor-pointer truncate"
+                                                    x-text="lp.nama_parameter.replaceAll('_', ' ')"></div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="list_parameter_id" :value="editData.list_parameter_id">
                                     @if (old('form_mode') === 'edit')
                                         @error('list_parameter_id')
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -336,15 +435,34 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-900 mb-2">Group Parameter
-                                        (opsional)</label>
-                                    <select name="parameter_group_id" x-model="editData.parameter_group_id"
-                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <label class="block text-sm font-semibold text-gray-900 mb-2">Group Parameter (opsional)</label>
+                                    {{-- Desktop/iPad: native select --}}
+                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        x-model="editData.parameter_group_id">
                                         <option value="">- Ikuti default list parameter -</option>
-                                        @foreach ($groups as $group)
-                                            <option value="{{ $group->id }}">{{ $group->nama_group }}</option>
-                                        @endforeach
+                                        <template x-for="g in groups" :key="'eg-sel-' + g.id">
+                                            <option :value="String(g.id)" x-text="g.nama_group"></option>
+                                        </template>
                                     </select>
+                                    {{-- Mobile: custom dropdown --}}
+                                    <div class="sm:hidden relative" x-data="{ openEGroup: false }">
+                                        <button type="button" @click="openEGroup = !openEGroup"
+                                            class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <span class="truncate" x-text="groups.find(g => String(g.id) === editData.parameter_group_id)?.nama_group || '- Ikuti default list parameter -'"></span>
+                                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openEGroup ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="openEGroup" @click.outside="openEGroup = false"
+                                            class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                            <div @click="editData.parameter_group_id = ''; openEGroup = false"
+                                                class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">- Ikuti default list parameter -</div>
+                                            <template x-for="g in groups" :key="g.id">
+                                                <div @click="editData.parameter_group_id = String(g.id); openEGroup = false"
+                                                    :class="editData.parameter_group_id === String(g.id) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                    class="px-4 py-2 text-sm cursor-pointer truncate" x-text="g.nama_group"></div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="parameter_group_id" :value="editData.parameter_group_id">
                                     @if (old('form_mode') === 'edit')
                                         @error('parameter_group_id')
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -433,6 +551,12 @@
 
             return {
                 baseUrl: @json(url('template-kategori-parameter')),
+                kategoris: @json($kategoris),
+                listParameters: @json($listParameters),
+                groups: @json($groups),
+                createKatlogger: @json((string) old('id_katlogger', '')),
+                createParamId: @json((string) old('list_parameter_id', '')),
+                createGroupId: @json((string) old('parameter_group_id', '')),
                 showCreateModal: hasErrors && oldFormMode === 'create',
                 showEditModal: hasErrors && oldFormMode === 'edit',
                 showDeleteModal: false,

@@ -23,7 +23,7 @@
         @endif
 
         <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
                 <table class="w-full text-left text-sm text-slate-700 whitespace-nowrap">
                     <thead class="bg-neutral-200 text-xs font-semibold uppercase text-neutral-900">
                         <tr>
@@ -75,7 +75,7 @@
                                             </svg>
                                         </button>
                                         <button type="button"
-                                            @click="openDeleteModal({{ $item->id }}, '{{ addslashes($item->nama_parameter) }}')"
+                                            @click="openDeleteModal({{ $item->id }}, '{{ addslashes(str_replace('_', ' ', $item->nama_parameter)) }}')"
                                             class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-slate-950 hover:bg-red-200 transition-colors"
                                             title="Hapus">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,7 +111,7 @@
                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="w-full max-w-4xl rounded-lg bg-white shadow-xl overflow-hidden my-8" @click.stop>
-                    <div class="flex items-center justify-between border-b border-slate-200 px-8 py-2">
+                    <div class="flex items-center justify-between border-b border-slate-200 px-4 sm:px-8 py-3">
                         <h3 class="text-xl font-bold text-gray-900">Tambah List Parameter</h3>
                         <button type="button" @click="closeCreateModal()" class="p-2 rounded-lg hover:bg-slate-100">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,7 +124,7 @@
                         @csrf
                         <input type="hidden" name="form_mode" value="create">
 
-                        <div class="px-8 pt-4 pb-3 space-y-3">
+                        <div class="px-4 sm:px-8 pt-4 pb-3 space-y-3 max-h-[75vh] overflow-y-auto">
                             <div class="grid gap-5 md:grid-cols-2">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Nama Parameter</label>
@@ -174,17 +174,34 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-900 mb-2">Default Group
-                                        Parameter</label>
-                                    <select name="default_parameter_group_id"
-                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <label class="block text-sm font-semibold text-gray-900 mb-2">Default Group Parameter</label>
+                                    {{-- Desktop/iPad: native select --}}
+                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        x-model="createGroupId">
                                         <option value="">- Pilih Group -</option>
-                                        @foreach ($groups as $group)
-                                            <option value="{{ $group->id }}" @selected((string) old('default_parameter_group_id') === (string) $group->id)>
-                                                {{ $group->nama_group }}
-                                            </option>
-                                        @endforeach
+                                        <template x-for="g in groups" :key="'cg-sel-' + g.id">
+                                            <option :value="String(g.id)" x-text="g.nama_group"></option>
+                                        </template>
                                     </select>
+                                    {{-- Mobile: custom dropdown --}}
+                                    <div class="sm:hidden relative" x-data="{ openCGroup: false }">
+                                        <button type="button" @click="openCGroup = !openCGroup"
+                                            class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <span class="truncate" x-text="groups.find(g => String(g.id) === createGroupId)?.nama_group || '- Pilih Group -'"></span>
+                                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openCGroup ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="openCGroup" @click.outside="openCGroup = false"
+                                            class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                            <div @click="createGroupId = ''; openCGroup = false"
+                                                class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">- Pilih Group -</div>
+                                            <template x-for="g in groups" :key="g.id">
+                                                <div @click="createGroupId = String(g.id); openCGroup = false"
+                                                    :class="createGroupId === String(g.id) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                    class="px-4 py-2 text-sm cursor-pointer truncate" x-text="g.nama_group"></div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="default_parameter_group_id" :value="createGroupId">
                                     @if (old('form_mode') === 'create')
                                         @error('default_parameter_group_id')
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -194,13 +211,13 @@
                             </div>
                         </div>
 
-                        <div class="px-8 pb-3 flex items-center gap-2">
+                        <div class="px-4 sm:px-8 pb-3 flex items-center gap-2">
                             <input type="checkbox" name="is_active" value="1" id="is_active_create"
                                 @checked(old('form_mode') === 'create' ? old('is_active', 1) : 1) class="rounded border-slate-300 text-indigo-600">
                             <label for="is_active_create" class="text-sm font-medium text-slate-700">Aktif</label>
                         </div>
 
-                        <div class="flex items-center justify-end gap-3 px-8 py-3 border-t border-gray-100 bg-white">
+                        <div class="flex items-center justify-end gap-3 px-4 sm:px-8 py-3 border-t border-gray-100 bg-white">
                             <button type="button" @click="closeCreateModal()"
                                 class="h-10 px-6 rounded-lg border border-indigo-500 text-indigo-600 font-semibold hover:bg-indigo-50">
                                 Batal
@@ -229,7 +246,7 @@
                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="w-full max-w-4xl rounded-lg bg-white shadow-xl overflow-hidden my-8" @click.stop>
-                    <div class="flex items-center justify-between border-b border-slate-200 px-8 py-2">
+                    <div class="flex items-center justify-between border-b border-slate-200 px-4 sm:px-8 py-3">
                         <h3 class="text-xl font-bold text-gray-900">Edit List Parameter</h3>
                         <button type="button" @click="closeEditModal()" class="p-2 rounded-lg hover:bg-slate-100">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,7 +262,7 @@
                         <input type="hidden" name="item_id" x-model="editData.id">
                         <input type="hidden" name="is_active" :value="editData.is_active ? 1 : 0">
 
-                        <div class="px-8 pt-4 pb-3 space-y-3">
+                        <div class="px-4 sm:px-8 pt-4 pb-3 space-y-3 max-h-[75vh] overflow-y-auto">
                             <div class="grid gap-5 md:grid-cols-2">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Nama Parameter</label>
@@ -291,16 +308,34 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-900 mb-2">Default Group
-                                        Parameter</label>
-                                    <select name="default_parameter_group_id"
-                                        x-model="editData.default_parameter_group_id"
-                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <label class="block text-sm font-semibold text-gray-900 mb-2">Default Group Parameter</label>
+                                    {{-- Desktop/iPad: native select --}}
+                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        x-model="editData.default_parameter_group_id">
                                         <option value="">- Pilih Group -</option>
-                                        @foreach ($groups as $group)
-                                            <option value="{{ $group->id }}">{{ $group->nama_group }}</option>
-                                        @endforeach
+                                        <template x-for="g in groups" :key="'eg-sel-' + g.id">
+                                            <option :value="String(g.id)" x-text="g.nama_group"></option>
+                                        </template>
                                     </select>
+                                    {{-- Mobile: custom dropdown --}}
+                                    <div class="sm:hidden relative" x-data="{ openEGroup: false }">
+                                        <button type="button" @click="openEGroup = !openEGroup"
+                                            class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <span class="truncate" x-text="groups.find(g => String(g.id) === editData.default_parameter_group_id)?.nama_group || '- Pilih Group -'"></span>
+                                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openEGroup ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="openEGroup" @click.outside="openEGroup = false"
+                                            class="w-full mt-1 bg-white border border-gray-200 rounded-lg shadow max-h-44 overflow-y-auto">
+                                            <div @click="editData.default_parameter_group_id = ''; openEGroup = false"
+                                                class="px-4 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">- Pilih Group -</div>
+                                            <template x-for="g in groups" :key="g.id">
+                                                <div @click="editData.default_parameter_group_id = String(g.id); openEGroup = false"
+                                                    :class="editData.default_parameter_group_id === String(g.id) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                    class="px-4 py-2 text-sm cursor-pointer truncate" x-text="g.nama_group"></div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="default_parameter_group_id" :value="editData.default_parameter_group_id">
                                     @if (old('form_mode') === 'edit')
                                         @error('default_parameter_group_id')
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -310,14 +345,14 @@
                             </div>
                         </div>
 
-                        <div class="px-8 pb-3 flex items-center gap-2">
+                        <div class="px-4 sm:px-8 pb-3 flex items-center gap-2">
                             <input type="checkbox" id="is_active_edit" :checked="editData.is_active"
                                 @change="editData.is_active = $event.target.checked"
                                 class="rounded border-slate-300 text-indigo-600">
                             <label for="is_active_edit" class="text-sm font-medium text-slate-700">Aktif</label>
                         </div>
 
-                        <div class="flex items-center justify-end gap-3 px-8 py-3 border-t border-gray-100 bg-white">
+                        <div class="flex items-center justify-end gap-3 px-4 sm:px-8 py-3 border-t border-gray-100 bg-white">
                             <button type="button" @click="closeEditModal()"
                                 class="h-10 px-6 rounded-lg border border-indigo-500 text-indigo-600 font-semibold hover:bg-indigo-50">
                                 Batal
@@ -401,6 +436,8 @@
 
             return {
                 baseUrl: @json(url('list-parameter')),
+                groups: @json($groups),
+                createGroupId: @json((string) old('default_parameter_group_id', '')),
                 showCreateModal: hasErrors && oldFormMode === 'create',
                 showEditModal: hasErrors && oldFormMode === 'edit',
                 showDeleteModal: false,

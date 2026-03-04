@@ -1,5 +1,14 @@
 @extends('layouts.app')
 
+@push('head')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .flatpickr-calendar { font-size: 14px; }
+        .flatpickr-day.selected, .flatpickr-day.selected:hover { background: #3730a3; border-color: #3730a3; }
+        .flatpickr-day:hover { background: #e0e7ff; }
+    </style>
+@endpush
+
 @section('content')
     <div class="space-y-3" x-data="dataPerangkat">
 
@@ -35,7 +44,7 @@
         <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap">
-                    <thead class="bg-neutral-200 text-xs font-bold text-neutral-950 uppercase">
+                    <thead class="bg-neutral-200 text-xs font-semibold text-neutral-950 uppercase">
                         <tr>
                             <th scope="col" class="px-6 py-4">No</th>
                             <th scope="col" class="px-6 py-4">ID Logger</th>
@@ -91,24 +100,23 @@
 
             </div>
         </div>
-        <div x-show="showDetailModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto"
+        <div x-show="showDetailModal" style="display: none;" class="fixed inset-0 z-50"
             aria-labelledby="detail-modal-title" role="dialog" aria-modal="true">
-            <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-                <div x-show="showDetailModal" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                    x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0" class="fixed inset-0 bg-slate-900/40 transition-opacity"
-                    aria-hidden="true" @click="closeModal()"></div>
+            <div x-show="showDetailModal" x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0" class="fixed inset-0 bg-slate-900/40 transition-opacity"
+                aria-hidden="true" @click="closeModal()"></div>
 
-                <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
+            <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeModal()">
 
                 <div x-show="showDetailModal" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                     x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative inline-block w-full max-w-4xl transform overflow-hidden rounded-2xl bg-slate-100 text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                    class="relative w-full max-w-4xl overflow-hidden rounded-2xl bg-slate-100 text-left shadow-xl my-2 sm:my-4" @click.stop>
 
                     <div class="flex items-start justify-between border-b border-slate-200 px-6 py-5">
                         <div class="flex items-start gap-3">
@@ -128,13 +136,13 @@
                         </button>
                     </div>
 
-                    <div class="space-y-4 px-4 py-5 sm:px-6">
+                    <div class="space-y-3 px-3 py-4 sm:space-y-4 sm:px-6 sm:py-5 max-h-[80vh] overflow-y-auto">
                         <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                             <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                 <img src="{{ asset('icons/identitas_icon.svg') }}" class="h-5 w-5">
                                 <p class="text-base font-bold text-slate-900">Identitas Perangkat</p>
                             </div>
-                            <div class="grid grid-cols-1 gap-4 px-4 py-4 sm:grid-cols-3 sm:gap-6">
+                            <div class="grid grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-3 sm:gap-6">
                                 <div>
                                     <p class="text-xs uppercase tracking-wide text-slate-400">Nama Perangkat</p>
                                     <p class="mt-1 text-sm font-bold text-slate-900"
@@ -157,7 +165,7 @@
                                 <img src="{{ asset('icons/gear_icon.svg') }}" class="h-5 w-5">
                                 <p class="text-base font-bold text-slate-900">Informasi Operasional</p>
                             </div>
-                            <div class="grid grid-cols-1 gap-4 px-4 py-4 sm:grid-cols-4 sm:gap-6">
+                            <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-4 sm:gap-6">
                                 <div>
                                     <p class="text-xs uppercase tracking-wide text-slate-400">Sensor</p>
                                     <p class="mt-1 text-sm font-bold text-slate-900"
@@ -185,7 +193,7 @@
                                 <img src="{{ asset('icons/penjaga_icon.svg') }}" class="h-5 w-5">
                                 <p class="text-base font-bold text-slate-900">Penjaga</p>
                             </div>
-                            <div class="grid grid-cols-1 gap-4 px-4 py-4 sm:grid-cols-2 sm:gap-6">
+                            <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-2 sm:gap-6">
                                 <div>
                                     <p class="text-xs uppercase tracking-wide text-slate-400">Nama</p>
                                     <p class="mt-1 text-sm font-bold text-slate-900"
@@ -203,24 +211,23 @@
         </div>
 
 
-        <div x-show="showCreateModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto"
+        <div x-show="showCreateModal" style="display: none;" class="fixed inset-0 z-50"
             aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-                <div x-show="showCreateModal" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                    x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                    aria-hidden="true" @click="closeCreateModal()"></div>
+            <div x-show="showCreateModal" x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                aria-hidden="true" @click="closeCreateModal()"></div>
 
-                <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
+            <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeCreateModal()">
 
                 <div x-show="showCreateModal" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                     x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative inline-block overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle">
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                    class="relative w-full max-w-2xl overflow-hidden rounded-lg bg-white text-left shadow-xl my-4" @click.stop>
 
 
                     <div class="flex items-center justify-between border-b px-6 py-4">
@@ -260,39 +267,100 @@
                                         <label for="create_kategori"
                                             class="block text-xs font-medium text-gray-700">Kategori
                                             Perangkat</label>
-                                        <select id="create_kategori" name="id_katlogger" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                        {{-- Desktop/iPad: native select --}}
+                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.id_katlogger">
                                             <option value="">Pilih Kategori</option>
                                             @foreach ($kategoris as $kategori)
-                                                <option value="{{ $kategori->id_katlogger }}">
-                                                    {{ $kategori->nama_kategori }}</option>
+                                                <option value="{{ $kategori->id_katlogger }}">{{ $kategori->nama_kategori }}</option>
                                             @endforeach
                                         </select>
+                                        {{-- Mobile: custom dropdown --}}
+                                        <div class="sm:hidden mt-1 relative" x-data="{ openCKat: false }">
+                                            <button type="button" @click="openCKat = !openCKat"
+                                                class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                :class="formData.id_katlogger ? 'text-gray-900' : 'text-gray-400'">
+                                                <span class="truncate" x-text="kategoris.find(k => String(k.id_katlogger) === String(formData.id_katlogger))?.nama_kategori || 'Pilih Kategori'"></span>
+                                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openCKat ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                            </button>
+                                            <div x-show="openCKat" @click.outside="openCKat = false"
+                                                class="w-full mt-1 bg-white border border-gray-200 rounded-md shadow max-h-44 overflow-y-auto">
+                                                <div @click="formData.id_katlogger = ''; openCKat = false"
+                                                    class="px-3 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">Pilih Kategori</div>
+                                                <template x-for="k in kategoris" :key="k.id_katlogger">
+                                                    <div @click="formData.id_katlogger = String(k.id_katlogger); openCKat = false"
+                                                        :class="String(formData.id_katlogger) === String(k.id_katlogger) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                        class="px-3 py-2 text-sm cursor-pointer truncate"
+                                                        x-text="k.nama_kategori"></div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="id_katlogger" :value="formData.id_katlogger">
                                     </div>
                                     <div>
                                         <label for="create_instansi"
                                             class="block text-xs font-medium text-gray-700">Instansi
                                         </label>
-                                        <select id="create_instansi" name="instansi_id" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                        {{-- Desktop/iPad: native select --}}
+                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.instansi_id">
                                             <option value="">Pilih Instansi</option>
                                             @foreach ($instansis as $instansi)
-                                                <option value="{{ $instansi->id }}">
-                                                    {{ $instansi->nama }}</option>
+                                                <option value="{{ $instansi->id }}">{{ $instansi->nama }}</option>
                                             @endforeach
                                         </select>
+                                        {{-- Mobile: custom dropdown --}}
+                                        <div class="sm:hidden mt-1 relative" x-data="{ openCInst: false }">
+                                            <button type="button" @click="openCInst = !openCInst"
+                                                class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                :class="formData.instansi_id ? 'text-gray-900' : 'text-gray-400'">
+                                                <span class="truncate" x-text="instansis.find(i => String(i.id) === String(formData.instansi_id))?.nama || 'Pilih Instansi'"></span>
+                                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openCInst ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                            </button>
+                                            <div x-show="openCInst" @click.outside="openCInst = false"
+                                                class="w-full mt-1 bg-white border border-gray-200 rounded-md shadow max-h-44 overflow-y-auto">
+                                                <div @click="formData.instansi_id = ''; openCInst = false"
+                                                    class="px-3 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">Pilih Instansi</div>
+                                                <template x-for="inst in instansis" :key="inst.id">
+                                                    <div @click="formData.instansi_id = String(inst.id); openCInst = false"
+                                                        :class="String(formData.instansi_id) === String(inst.id) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                        class="px-3 py-2 text-sm cursor-pointer truncate"
+                                                        x-text="inst.nama"></div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="instansi_id" :value="formData.instansi_id">
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mt-4">
                                     <div>
                                         <label for="create_jumlah_sensor" class="block text-xs font-medium text-gray-700">
                                             Jumlah Sensor</label>
-                                        <select name="jumlah_sensor" id="create_jumlah_sensor" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                        {{-- Desktop/iPad: native select --}}
+                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.jumlah_sensor">
                                             <option value="">Pilih Sensor</option>
                                             <option value="16">16 Sensor</option>
                                             <option value="19">19 Sensor</option>
                                         </select>
+                                        {{-- Mobile: custom dropdown --}}
+                                        <div class="sm:hidden mt-1 relative" x-data="{ openCSensor: false }">
+                                            <button type="button" @click="openCSensor = !openCSensor"
+                                                class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                :class="formData.jumlah_sensor ? 'text-gray-900' : 'text-gray-400'">
+                                                <span x-text="formData.jumlah_sensor ? formData.jumlah_sensor + ' Sensor' : 'Pilih Sensor'"></span>
+                                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openCSensor ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                            </button>
+                                            <div x-show="openCSensor" @click.outside="openCSensor = false"
+                                                class="w-full mt-1 bg-white border border-gray-200 rounded-md shadow">
+                                                <div @click="formData.jumlah_sensor = ''; openCSensor = false"
+                                                    class="px-3 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">Pilih Sensor</div>
+                                                <template x-for="s in sensorOptions" :key="s">
+                                                    <div @click="formData.jumlah_sensor = s; openCSensor = false"
+                                                        :class="formData.jumlah_sensor === s ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                        class="px-3 py-2 text-sm cursor-pointer"
+                                                        x-text="s + ' Sensor'"></div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="jumlah_sensor" :value="formData.jumlah_sensor">
                                     </div>
                                     <div>
                                         <label for="create_seri" class="block text-xs font-medium text-gray-700">Seri
@@ -371,14 +439,14 @@
                             </div>
 
                         </div>
-                        <div class="bg-gray-50 px-6 py-4 flex flex-row-reverse gap-3">
-                            <button type="submit"
-                                class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-900 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm">
-                                Simpan
-                            </button>
+                        <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3">
                             <button type="button" @click="closeCreateModal()"
-                                class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                class="h-11 sm:h-auto flex-1 sm:flex-none inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                 Batal
+                            </button>
+                            <button type="submit"
+                                class="h-11 sm:h-auto flex-1 sm:flex-none inline-flex justify-center rounded-md border border-transparent bg-indigo-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                Simpan
                             </button>
                         </div>
                     </form>
@@ -387,24 +455,23 @@
         </div>
 
 
-        <div x-show="showEditModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto"
+        <div x-show="showEditModal" style="display: none;" class="fixed inset-0 z-50"
             aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-                <div x-show="showEditModal" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                    x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                    aria-hidden="true" @click="closeEditModal()"></div>
+            <div x-show="showEditModal" x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                aria-hidden="true" @click="closeEditModal()"></div>
 
-                <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
+            <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeEditModal()">
 
                 <div x-show="showEditModal" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                     x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative inline-block overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle">
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                    class="relative w-full max-w-2xl overflow-hidden rounded-lg bg-white text-left shadow-xl my-4" @click.stop>
 
 
                     <div class="flex items-center justify-between border-b px-6 py-4">
@@ -445,39 +512,99 @@
                                         <label for="edit_kategori"
                                             class="block text-xs font-medium text-gray-700">Kategori
                                             Perangkat</label>
-                                        <select id="edit_kategori" name="id_katlogger" x-model="formData.id_katlogger"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                        {{-- Desktop/iPad: native select --}}
+                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.id_katlogger">
                                             <option value="">Pilih Kategori</option>
                                             @foreach ($kategoris as $kategori)
-                                                <option value="{{ $kategori->id_katlogger }}">
-                                                    {{ $kategori->nama_kategori }}</option>
+                                                <option value="{{ $kategori->id_katlogger }}">{{ $kategori->nama_kategori }}</option>
                                             @endforeach
                                         </select>
+                                        {{-- Mobile: custom dropdown --}}
+                                        <div class="sm:hidden mt-1 relative" x-data="{ openEKat: false }">
+                                            <button type="button" @click="openEKat = !openEKat"
+                                                class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                :class="formData.id_katlogger ? 'text-gray-900' : 'text-gray-400'">
+                                                <span class="truncate" x-text="kategoris.find(k => String(k.id_katlogger) === String(formData.id_katlogger))?.nama_kategori || 'Pilih Kategori'"></span>
+                                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openEKat ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                            </button>
+                                            <div x-show="openEKat" @click.outside="openEKat = false"
+                                                class="w-full mt-1 bg-white border border-gray-200 rounded-md shadow max-h-44 overflow-y-auto">
+                                                <div @click="formData.id_katlogger = ''; openEKat = false"
+                                                    class="px-3 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">Pilih Kategori</div>
+                                                <template x-for="k in kategoris" :key="k.id_katlogger">
+                                                    <div @click="formData.id_katlogger = String(k.id_katlogger); openEKat = false"
+                                                        :class="String(formData.id_katlogger) === String(k.id_katlogger) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                        class="px-3 py-2 text-sm cursor-pointer truncate"
+                                                        x-text="k.nama_kategori"></div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="id_katlogger" :value="formData.id_katlogger">
                                     </div>
                                     <div>
                                         <label for="edit_instansi"
                                             class="block text-xs font-medium text-gray-700">Instansi</label>
-                                        <select id="edit_instansi" name="instansi_id" x-model="formData.instansi_id"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                        {{-- Desktop/iPad: native select --}}
+                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.instansi_id">
                                             <option value="">Pilih Instansi</option>
                                             @foreach ($instansis as $instansi)
-                                                <option value="{{ $instansi->id }}">
-                                                    {{ $instansi->nama }}</option>
+                                                <option value="{{ $instansi->id }}">{{ $instansi->nama }}</option>
                                             @endforeach
                                         </select>
+                                        {{-- Mobile: custom dropdown --}}
+                                        <div class="sm:hidden mt-1 relative" x-data="{ openEInst: false }">
+                                            <button type="button" @click="openEInst = !openEInst"
+                                                class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                :class="formData.instansi_id ? 'text-gray-900' : 'text-gray-400'">
+                                                <span class="truncate" x-text="instansis.find(i => String(i.id) === String(formData.instansi_id))?.nama || 'Pilih Instansi'"></span>
+                                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openEInst ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                            </button>
+                                            <div x-show="openEInst" @click.outside="openEInst = false"
+                                                class="w-full mt-1 bg-white border border-gray-200 rounded-md shadow max-h-44 overflow-y-auto">
+                                                <div @click="formData.instansi_id = ''; openEInst = false"
+                                                    class="px-3 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">Pilih Instansi</div>
+                                                <template x-for="inst in instansis" :key="inst.id">
+                                                    <div @click="formData.instansi_id = String(inst.id); openEInst = false"
+                                                        :class="String(formData.instansi_id) === String(inst.id) ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                        class="px-3 py-2 text-sm cursor-pointer truncate"
+                                                        x-text="inst.nama"></div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="instansi_id" :value="formData.instansi_id">
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mt-4">
                                     <div>
                                         <label for="edit_jumlah_sensor" class="block text-xs font-medium text-gray-700">
                                             Jumlah Sensor</label>
-                                        <select name="jumlah_sensor" id="edit_jumlah_sensor"
-                                            x-model="formData.jumlah_sensor"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                        {{-- Desktop/iPad: native select --}}
+                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.jumlah_sensor">
                                             <option value="">Pilih Sensor</option>
                                             <option value="16">16 Sensor</option>
                                             <option value="19">19 Sensor</option>
                                         </select>
+                                        {{-- Mobile: custom dropdown --}}
+                                        <div class="sm:hidden mt-1 relative" x-data="{ openESensor: false }">
+                                            <button type="button" @click="openESensor = !openESensor"
+                                                class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                :class="formData.jumlah_sensor ? 'text-gray-900' : 'text-gray-400'">
+                                                <span x-text="formData.jumlah_sensor ? formData.jumlah_sensor + ' Sensor' : 'Pilih Sensor'"></span>
+                                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform" :class="openESensor ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                            </button>
+                                            <div x-show="openESensor" @click.outside="openESensor = false"
+                                                class="w-full mt-1 bg-white border border-gray-200 rounded-md shadow">
+                                                <div @click="formData.jumlah_sensor = ''; openESensor = false"
+                                                    class="px-3 py-2 text-sm text-gray-400 hover:bg-slate-50 cursor-pointer">Pilih Sensor</div>
+                                                <template x-for="s in sensorOptions" :key="s">
+                                                    <div @click="formData.jumlah_sensor = s; openESensor = false"
+                                                        :class="String(formData.jumlah_sensor) === s ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-900 hover:bg-slate-50'"
+                                                        class="px-3 py-2 text-sm cursor-pointer"
+                                                        x-text="s + ' Sensor'"></div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="jumlah_sensor" :value="formData.jumlah_sensor">
                                     </div>
                                     <div>
                                         <label for="edit_seri" class="block text-xs font-medium text-gray-700">Seri
@@ -532,7 +659,6 @@
                                             class="block text-xs font-medium text-gray-700">Tanggal Pemasangan</label>
                                         <div class="relative mt-1">
                                             <input type="date" name="tanggal_pemasangan" id="tanggal_pemasangan"
-                                                x-model="formData.tanggal_pemasangan"
                                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
                                         </div>
                                     </div>
@@ -541,7 +667,6 @@
                                             Garansi</label>
                                         <div class="relative mt-1">
                                             <input type="date" name="masa_garansi" id="masa_garansi"
-                                                x-model="formData.masa_garansi"
                                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
                                         </div>
                                     </div>
@@ -550,7 +675,6 @@
                                             kontrak</label>
                                         <div class="relative mt-1">
                                             <input type="date" name="awal_kontrak" id="awal_kontrak"
-                                                x-model="formData.awal_kontrak"
                                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
                                         </div>
                                     </div>
@@ -558,21 +682,20 @@
                             </div>
 
                         </div>
-                        <div class="bg-gray-50 px-6 py-4 flex flex-row-reverse gap-3">
-                            <button type="submit"
-                                class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-900 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm">
-                                Simpan
-                            </button>
+                        <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3">
                             <button type="button" @click="closeEditModal()"
-                                class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                class="h-11 sm:h-auto flex-1 sm:flex-none inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                 Batal
+                            </button>
+                            <button type="submit"
+                                class="h-11 sm:h-auto flex-1 sm:flex-none inline-flex justify-center rounded-md border border-transparent bg-indigo-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                Simpan
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-    </div>
 
     <script>
         document.addEventListener('alpine:init', () => {
@@ -582,6 +705,11 @@
                 showEditModal: false,
                 searchQuery: '',
                 allDevices: @json($devices),
+                kategoris: @json($kategoris),
+                instansis: @json($instansis),
+                sensorOptions: ['16', '19'],
+                _fpCreate: [],
+                _fpEdit: [],
                 detailData: {
                     nama_logger: '-',
                     seri: '-',
@@ -609,6 +737,62 @@
                     imei: '',
                 },
                 updateUrl: '',
+
+                _flatpickrOpts(onChangeFn) {
+                    return {
+                        dateFormat: 'Y-m-d',
+                        allowInput: false,
+                        disableMobile: true,
+                        locale: { firstDayOfWeek: 1 },
+                        onChange: onChangeFn,
+                    };
+                },
+
+                _initFlatpickrCreate() {
+                    this._fpCreate.forEach(fp => fp.destroy());
+                    this._fpCreate = [];
+                    if (window.innerWidth >= 768) return; // desktop/iPad: gunakan native date picker
+                    const ids = [
+                        { id: 'create_tanggal_pemasangan', field: 'tanggal_pemasangan' },
+                        { id: 'create_masa_garansi',       field: 'masa_garansi' },
+                        { id: 'create_awal_kontrak',       field: 'awal_kontrak' },
+                    ];
+                    ids.forEach(({ id, field }) => {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+                        el.type = 'text';
+                        el.readOnly = true;
+                        el.placeholder = 'Pilih tanggal';
+                        const fp = flatpickr(el, this._flatpickrOpts((_, dateStr) => {
+                            this.formData[field] = dateStr;
+                        }));
+                        if (this.formData[field]) fp.setDate(this.formData[field], false);
+                        this._fpCreate.push(fp);
+                    });
+                },
+
+                _initFlatpickrEdit() {
+                    this._fpEdit.forEach(fp => fp.destroy());
+                    this._fpEdit = [];
+                    if (window.innerWidth >= 768) return; // desktop/iPad: gunakan native date picker
+                    const ids = [
+                        { id: 'tanggal_pemasangan', field: 'tanggal_pemasangan' },
+                        { id: 'masa_garansi',       field: 'masa_garansi' },
+                        { id: 'awal_kontrak',       field: 'awal_kontrak' },
+                    ];
+                    ids.forEach(({ id, field }) => {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+                        el.type = 'text';
+                        el.readOnly = true;
+                        el.placeholder = 'Pilih tanggal';
+                        const fp = flatpickr(el, this._flatpickrOpts((_, dateStr) => {
+                            this.formData[field] = dateStr;
+                        }));
+                        if (this.formData[field]) fp.setDate(this.formData[field], false);
+                        this._fpEdit.push(fp);
+                    });
+                },
 
                 filteredDevices() {
                     const q = (this.searchQuery || '').trim();
@@ -694,10 +878,18 @@
                         awal_kontrak: '',
                     };
                     this.showCreateModal = true;
+                    this.$nextTick(() => this._initFlatpickrCreate());
                 },
 
                 closeCreateModal() {
                     this.showCreateModal = false;
+                    this._fpCreate.forEach(fp => fp.destroy());
+                    this._fpCreate = [];
+                    // Reset input types kembali ke date untuk desktop
+                    ['create_tanggal_pemasangan', 'create_masa_garansi', 'create_awal_kontrak'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el && el.type === 'text') { el.type = 'date'; el.readOnly = false; el.removeAttribute('placeholder'); }
+                    });
                 },
 
                 openEditModal(device) {
@@ -720,12 +912,25 @@
 
                     this.updateUrl = `{{ url('/data-perangkat') }}/${device.id_logger}`;
                     this.showEditModal = true;
+                    this.$nextTick(() => this._initFlatpickrEdit());
                 },
 
                 closeEditModal() {
                     this.showEditModal = false;
+                    this._fpEdit.forEach(fp => fp.destroy());
+                    this._fpEdit = [];
+                    // Reset input types kembali ke date untuk desktop
+                    ['tanggal_pemasangan', 'masa_garansi', 'awal_kontrak'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el && el.type === 'text') { el.type = 'date'; el.readOnly = false; el.removeAttribute('placeholder'); }
+                    });
                 }
             }));
         });
     </script>
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+@endpush
+
 @endsection
