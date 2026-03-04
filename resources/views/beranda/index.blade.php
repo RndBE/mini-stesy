@@ -127,7 +127,9 @@
                             $kategoriKey = strtoupper((string) ($lg->kategori?->nama_kategori ?? $kategoriName));
                             $kategoriView = match ($kategoriKey) {
                                 'AWLR' => 'beranda.categories.awlr',
-                                'ARR' => 'beranda.categories.arr',
+                                'ARR'  => 'beranda.categories.arr',
+                                'AWQR' => 'beranda.categories.awqr',
+                                'AWR'  => 'beranda.categories.awr',
                                 default => 'beranda.categories.default',
                             };
                         @endphp

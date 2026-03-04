@@ -16,7 +16,7 @@ class AnalisaController extends Controller
     {
         $logger = t_Logger::query()
             ->forUser(auth()->user())
-            ->with(['lokasi', 'params', 'jiat', 'informasi'])
+            ->with(['lokasi', 'params', 'kategori', 'jiat', 'informasi'])
             ->where('id_logger', $id_logger)
             ->firstOrFail();
 
@@ -34,6 +34,12 @@ class AnalisaController extends Controller
                 'satuan' => $param->satuan ?? '',
             ];
         });
+
+        // Default parameter: ambil yang parameter_utama = 1, fallback ke yang pertama
+        $defaultParameter = $logger->params
+            ->first(fn($p) => !empty($p->parameter_utama))?->nama_parameter
+            ?? $logger->params->first()?->nama_parameter
+            ?? '';
 
         // Get photos from foto_pos table
         $photos = DB::table('foto_pos')
@@ -62,6 +68,7 @@ class AnalisaController extends Controller
             'logger' => $logger,
             'allLoggers' => $allLoggers,
             'parameters' => $parameters,
+            'defaultParameter' => $defaultParameter,
             'photos' => $photos,
             'status' => $status,
             'lastTime' => $lastTime,

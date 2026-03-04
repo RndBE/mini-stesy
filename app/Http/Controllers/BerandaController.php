@@ -50,8 +50,9 @@ class BerandaController extends Controller
                 $lg->arr_state_perjam = null;
                 $lg->arr_state_perhari = null;
 
+                // Cari parameter hujan
                 $pRain = $lg->params->first(function ($param) {
-                    $name = strtolower(trim((string) $param->nama_parameter));
+                    $name  = strtolower(trim((string) $param->nama_parameter));
                     $utama = strtolower(trim((string) $param->parameter_utama));
                     return str_contains($name, 'hujan')
                         || str_contains($name, 'rain')
@@ -59,14 +60,14 @@ class BerandaController extends Controller
                         || str_contains($utama, 'rain');
                 });
 
-                $tableName = (string) ($lg->tabel_main ?? '');
+                $tableName  = (string) ($lg->tabel_main ?? '');
                 $rainColumn = $pRain?->kolom_sensor ? (string) $pRain->kolom_sensor : null;
 
                 if ($rainColumn && $this->canQueryRainTable($tableName, $rainColumn)) {
                     $hourStart = now()->copy()->startOfHour();
-                    $hourEnd = now()->copy()->endOfHour();
-                    $dayStart = now()->copy()->startOfDay();
-                    $dayEnd = now()->copy()->endOfDay();
+                    $hourEnd   = now()->copy()->endOfHour();
+                    $dayStart  = now()->copy()->startOfDay();
+                    $dayEnd    = now()->copy()->endOfDay();
 
                     $hourlyRain = DB::table($tableName)
                         ->where('id_logger', $lg->id_logger)
@@ -79,12 +80,13 @@ class BerandaController extends Controller
                         ->sum($rainColumn);
 
                     $lg->arr_curah_hujan_perjam = is_numeric($hourlyRain) ? (float) $hourlyRain : null;
-                    $lg->arr_curah_hujan_harian = is_numeric($dailyRain) ? (float) $dailyRain : null;
-                    $lg->arr_status_perjam = $this->resolveRainStatus($lg->id_logger, 'perjam', $lg->arr_curah_hujan_perjam);
+                    $lg->arr_curah_hujan_harian = is_numeric($dailyRain)  ? (float) $dailyRain  : null;
+                    $lg->arr_status_perjam  = $this->resolveRainStatus($lg->id_logger, 'perjam',  $lg->arr_curah_hujan_perjam);
                     $lg->arr_status_perhari = $this->resolveRainStatus($lg->id_logger, 'perhari', $lg->arr_curah_hujan_harian);
-                    $lg->arr_state_perjam = $this->resolveRainStateKey($lg->id_katlogger, $lg->arr_curah_hujan_perjam);
-                    $lg->arr_state_perhari = $this->resolveRainStateKey($lg->id_katlogger, $lg->arr_curah_hujan_harian);
+                    $lg->arr_state_perjam   = $this->resolveRainStateKey($lg->id_katlogger, $lg->arr_curah_hujan_perjam);
+                    $lg->arr_state_perhari  = $this->resolveRainStateKey($lg->id_katlogger, $lg->arr_curah_hujan_harian);
                 }
+
 
                 return $lg;
             });
