@@ -18,9 +18,9 @@
                 $loggerWaktu   = $lg->latest_waktu ? \Carbon\Carbon::parse($lg->latest_waktu) : now();
                 $loggerHour    = (int) $loggerWaktu->format('H');
                 $isPagi        = ($loggerHour >= 6 && $loggerHour < 18);
-                $waktuSuffix   = $isPagi ? '_pagi' : '_malam';
+                $waktuSuffix   = $isPagi ? '' : '_malam';
 
-                // State yang punya varian _pagi / _malam
+                // State yang punya varian  / _malam
                 $timeAwareStates = ['tidak_hujan', 'hujan_sangat_ringan', 'hujan_ringan'];
 
                 $iconStatePerJam = preg_match('/^[a-z0-9_]+$/', (string) $stateHujanPerJam)
@@ -30,7 +30,7 @@
                     ? $stateHujanHarian
                     : 'tidak_hujan';
 
-                // Tambahkan suffix _pagi/_malam untuk state yang relevan
+                // Tambahkan suffix /_malam untuk state yang relevan
                 if (in_array($iconStatePerJam, $timeAwareStates)) {
                     $iconStatePerJam .= $waktuSuffix;
                 }
@@ -38,7 +38,7 @@
                     $iconStateHarian .= $waktuSuffix;
                 }
 
-                $defaultIcon = asset('klasifikasi_hujan/tidak_hujan_pagi.png');
+                $defaultIcon = asset('klasifikasi_hujan/tidak_hujan.png');
             @endphp
 
             <div class="grid grid-cols-2 gap-4 lg:grid-cols-2 relative">

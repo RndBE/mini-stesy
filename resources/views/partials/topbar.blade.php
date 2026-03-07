@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <div class="relative z-50" x-data="{ open: false }">
+        <div class="relative z-[1100]" x-data="{ open: false }">
             <button type="button" class="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50"
                 @click="open = !open" @keydown.escape.window="open = false">
                 <img src="{{ $avatarUrl }}" class="h-8 rounded object-cover" alt="{{ $namaUser }}">

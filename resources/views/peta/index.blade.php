@@ -11,7 +11,21 @@
         /* Gunakan dynamic viewport height agar tidak terpotong address bar mobile */
         .peta-wrapper {
             height: calc(100vh - 65px);
-            height: calc(100dvh - 65px); /* modern browsers: dynamic viewport */
+            height: calc(100dvh - 65px);
+        }
+
+        /* Tombol toggle logger: tersembunyi di desktop, muncul di mobile */
+        #mobileLoggerToggleBtn {
+            display: none;
+        }
+
+        /* Di mobile: wrapper fixed height agar tidak ada ruang kosong */
+        @media (max-width: 1023px) {
+            .peta-wrapper {
+                height: calc(100dvh - 65px);
+                display: flex;
+                flex-direction: column;
+            }
         }
 
         .sidebar-item:hover {
@@ -89,41 +103,51 @@
             display: block;
         }
 
-        /* Mobile: sidebar slides in from right over map */
+        /* Mobile: sidebar tampil DI BAWAH peta, bukan slide dari kanan */
         @media (max-width: 1023px) {
+            /* Backdrop tidak diperlukan lagi */
+            #petaSidebarBackdrop { display: none !important; }
+
+            /* Toggle button tersembunyi di mobile */
+            .sidebar-toggle-btn { display: none !important; }
+
+            /* Wrapper sidebar: full width, tidak lagi 0 */
+            #petaSidebarWrapper {
+                width: 100% !important;
+                flex-shrink: 0;
+                border-top: 1px solid #e2e8f0;
+                /* animasi slide bawah */
+                overflow: hidden;
+                transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+                max-height: 0;
+            }
+            #petaSidebarWrapper.mobile-expanded {
+                max-height: 38vh;
+            }
+
+            /* Panel selalu tampil (wrapper yang dikontrol) */
             .sidebar-panel {
-                position: fixed !important;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                width: 80vw !important;
-                min-width: 0 !important;
-                max-width: 320px;
-                height: 100% !important;
-                z-index: 500;
-                transform: translateX(100%);
-                transition: transform 0.3s ease;
-                border-left: 1px solid #e2e8f0;
-                box-shadow: -4px 0 24px rgba(0,0,0,0.15);
-                white-space: normal;
+                position: static !important;
+                transform: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                max-height: 38vh;
+                border-left: none !important;
+                box-shadow: none !important;
+                white-space: normal !important;
+                display: flex !important;
+                flex-direction: column;
             }
-            .sidebar-panel.mobile-open {
-                transform: translateX(0);
-            }
+
             /* Hide width-based collapsed state on mobile */
             .sidebar-panel.collapsed {
-                width: 80vw !important;
+                width: 100% !important;
             }
-            /* Wrapper takes zero width so toggle button floats at map edge */
-            #petaSidebarWrapper {
-                width: 0 !important;
-                flex-shrink: 0;
-            }
-            /* Reposition toggle button on mobile */
-            .sidebar-toggle-btn {
-                left: -36px;
-                width: 36px;
-                height: 48px;
+
+            /* Tombol toggle logger — hanya tampil di mobile */
+            #mobileLoggerToggleBtn {
+                display: flex;
             }
         }
 
@@ -153,14 +177,40 @@
                 bottom: auto;
                 top: 12px;
                 right: 12px;
-                padding: 8px;
+                padding: 11px;
                 z-index: 100;
+                /* Glassmorphism: transparan dengan blur */
+                background: rgba(0, 0, 0, 0.28);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+                border: 1px solid rgba(255,255,255,0.22);
+                color: white;
+                border-radius: 12px;
+            }
+            .map-settings-btn:hover {
+                background: rgba(0, 0, 0, 0.45);
             }
             .map-settings-btn .btn-label {
                 display: none;
             }
             .map-settings-btn svg {
                 margin-right: 0;
+                width: 22px;
+                height: 22px;
+                stroke: white;
+            }
+            /* Tombol logger toggle: di sebelah kiri tombol pengaturan */
+            #mobileLoggerToggleBtn {
+                top: 12px;
+                right: 68px;
+                bottom: auto;
+                padding: 11px;
+            }
+
+            /* Saat sidebar kiri terbuka: tombol masuk ke belakang overlay */
+            .map-settings-btn.behind-sidebar-overlay {
+                z-index: 30 !important;
             }
         }
 
@@ -344,6 +394,40 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
+        /* Popup responsif di HP */
+        @media (max-width: 1023px) {
+            .leaflet-popup-content {
+                width: min(90vw, 340px) !important;
+            }
+            .leaflet-popup-content-wrapper {
+                max-width: 92vw;
+            }
+            .popup-header {
+                padding: 14px 14px 12px 14px;
+            }
+            .popup-title {
+                font-size: 14px;
+            }
+            .popup-body {
+                padding: 10px 14px;
+            }
+            .popup-info-row {
+                padding: 7px 0;
+            }
+            .popup-label,
+            .popup-value {
+                font-size: 12px;
+            }
+            .popup-buttons {
+                padding: 0 14px 14px 14px;
+                gap: 8px;
+            }
+            .popup-btn {
+                font-size: 12px;
+                padding: 8px 0;
+            }
+        }
+
         .leaflet-popup-close-button {
             display: none !important;
         }
@@ -465,6 +549,16 @@
             border-radius: 50%;
             background: #10b981;
         }
+
+        /* ── Bounce animation untuk marker offline ── */
+        @keyframes marker-bounce {
+            0%, 100% { transform: translateY(0);         animation-timing-function: cubic-bezier(0.8,0,1,1); }
+            50%       { transform: translateY(-10px);     animation-timing-function: cubic-bezier(0,0,0.2,1); }
+        }
+        .marker-bounce {
+            animation: marker-bounce 1.2s infinite;
+            transform-origin: bottom center;
+        }
     </style>
 @endpush
 @section('content')
@@ -472,16 +566,26 @@
         {{-- Overlay backdrop for mobile right sidebar (outside flex to avoid layout issues) --}}
         <div id="petaSidebarBackdrop" onclick="closePetaSidebar()"></div>
 
-        <div class="flex h-full w-full overflow-hidden bg-white shadow-sm ring-1 ring-slate-200"
+        {{-- Container utama: row di desktop, column di mobile --}}
+        <div class="flex h-full w-full flex-col overflow-hidden bg-white shadow-sm ring-1 ring-slate-200 lg:flex-row"
             x-data="{
                 sidebarOpen: window.innerWidth >= 1024,
+                isMobile: window.innerWidth < 1024,
                 init() {
-                    if (window.innerWidth < 1024) this.sidebarOpen = false;
+                    this.sidebarOpen = window.innerWidth >= 1024;
+                    this.isMobile    = window.innerWidth < 1024;
+                },
+                toggleMobileSidebar() {
+                    const wrap = document.getElementById('petaSidebarWrapper');
+                    if (!wrap) return;
+                    wrap.classList.toggle('mobile-expanded');
                 }
             }"
-            @close-peta-sidebar.window="sidebarOpen = false; togglePetaSidebar(false)">
-            <div class="relative flex-1">
+            @close-peta-sidebar.window="sidebarOpen = false">
+            <div class="relative flex-1 min-h-0" id="mapContainer">
                 <div id="map" class="h-full w-full"></div>
+
+                {{-- Tombol Pengaturan Peta (selalu ada) --}}
                 <button class="map-settings-btn rounded-xl" id="mapSettingsBtn">
                     <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-4 w-4 mr-2" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -489,6 +593,17 @@
                             d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                     </svg>
                     <span class="btn-label">Pengaturan Peta</span>
+                </button>
+
+                {{-- Tombol toggle Daftar Logger (hanya mobile) --}}
+                <button id="mobileLoggerToggleBtn"
+                    @click="toggleMobileSidebar()"
+                    class="map-settings-btn rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
                 </button>
             </div>
             {{-- Sidebar collapsible --}}
@@ -516,10 +631,19 @@
                 {{-- Panel sidebar --}}
                 <div :class="sidebarOpen ? 'w-96' : 'w-0'"
                     class="sidebar-panel flex flex-col border-l border-slate-200 bg-white h-full">
-                    <div class=" px-3 py-2">
-                        <span class="text-lg font-semibold text-slate-900">Daftar Logger</span>
-                        {{-- <p class="text-xs text-slate-500" id="loggerCount">{{ count($points) }} logger terdeteksi</p> --}}
-                    </div>
+                    {{-- Panel header: Daftar Logger + tombol tutup (mobile only) --}}
+                <div class="flex items-center justify-between px-3 py-2">
+                    <span class="text-lg font-semibold text-slate-900">Daftar Logger</span>
+                    {{-- Tombol X tutup sidebar, hanya tampil di mobile --}}
+                    <button
+                        @click="toggleMobileSidebar()"
+                        class="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition"
+                        title="Tutup daftar logger">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
                     <div class="px-3 mb-2 pb-3 border-slate-200">
                         <div class="relative">
                             <input type="text" id="searchLogger" placeholder="Cari logger..."
@@ -533,6 +657,26 @@
                     </div>
                     <div class="flex-1 overflow-y-auto sidebar-scroll px-3 pt-1" id="loggerList">
                         @forelse ($points as $point)
+                            @php
+                                $kat    = strtoupper($point['kategori'] ?? '');
+                                $isOnline = ($point['status'] ?? '') === 'online';
+                                $dotCls  = $isOnline ? 'bg-emerald-500' : 'bg-rose-500';
+                                $txtCls  = $isOnline ? 'text-emerald-600' : 'text-rose-600';
+                                $statusLabel = $isOnline ? 'Koneksi Terhubung' : 'Koneksi Terputus';
+
+                                // Helper: format angka tanpa trailing zeros, '—' jika null
+                                $fmt = function($v, $dec = 3) {
+                                    if (!is_numeric($v)) return '—';
+                                    $s = number_format((float)$v, $dec, '.', ',');
+                                    if (str_contains($s, '.')) {
+                                        [$int, $dec] = explode('.', $s);
+                                        $dec = rtrim($dec, '0');
+                                        return $dec !== '' ? $int . '.' . $dec : $int;
+                                    }
+                                    return $s;
+                                };
+                            @endphp
+
                             <div class="sidebar-item mb-4 rounded-lg bg-white pt-3 pb-2 px-3 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md"
                                 data-kategori="{{ $point['kategori'] }}" data-status="{{ $point['status'] }}"
                                 data-arr-state="{{ $point['arr_state'] ?? '' }}"
@@ -540,59 +684,208 @@
                                 data-logger-id="{{ strtolower($point['id_logger']) }}"
                                 onclick="focusLogger({{ $point['lat'] }}, {{ $point['lng'] }}, '{{ $point['id_logger'] }}')">
 
+                                {{-- ── Header: status + timestamp ──────────────────────── --}}
                                 <div class="flex items-center justify-between">
-                                    <div
-                                        class="flex items-center gap-2 text-xs font-semibold {{ $point['status'] === 'online' ? 'text-emerald-600' : 'text-rose-600' }}">
-                                        <span
-                                            class="h-2 w-2 rounded-full {{ $point['status'] === 'online' ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
-                                        {{ $point['status'] === 'online' ? 'Koneksi Terhubung' : 'Koneksi Terputus' }}
+                                    <div class="flex items-center gap-2 text-xs font-semibold {{ $txtCls }}">
+                                        <span class="h-2 w-2 rounded-full {{ $dotCls }}"></span>
+                                        {{ $statusLabel }}
                                     </div>
                                     <div class="text-[10px] text-slate-500">
-                                        {{ $point['last_time'] ? \Carbon\Carbon::parse($point['last_time'])->format('d M Y H:i') : '-' }}
+                                        {{ $point['last_time'] ? \Carbon\Carbon::parse($point['last_time'])->format('Y-m-d H:i') : '-' }}
                                     </div>
                                 </div>
 
-
-
+                                {{-- ── Nama + ID ─────────────────────────────────────────── --}}
                                 <div class="flex justify-between items-center mt-1 border-b border-slate-200 pb-2">
-                                    <div class="font-semibold leading-tight">
-                                        {{ $point['nama_logger'] }}
+                                    <div class="font-semibold leading-tight text-sm">{{ $point['nama_logger'] }}</div>
+                                    <div class="text-xs border border-slate-300 bg-slate-100 px-2 rounded-lg">
+                                        ID: {{ substr($point['id_logger'], -5) }}
+                                    </div>
+                                </div>
+
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                {{-- AWLR ─ JIAT                                          --}}
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                @if ($kat === 'AWLR' && ($point['sub_kategori'] ?? '') === 'jiat')
+                                    <div class="text-center my-2">
+                                        <div class="text-xl font-bold text-slate-900">
+                                            {{ is_numeric($point['kedalaman_sumur']) ? $fmt($point['kedalaman_sumur'], 3) . ' m' : '—' }}
+                                        </div>
+                                        <div class="text-xs text-slate-500">Kedalaman Air Sumur</div>
                                     </div>
 
-                                    <div class="text-xs border border-slate-300 bg-slate-100 px-2  rounded-lg">
-                                        ID : {{ substr($point['id_logger'], -5) }}
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                {{-- AWLR ─ Non-JIAT                                      --}}
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                @elseif ($kat === 'AWLR')
+                                    <div class="grid grid-cols-2 gap-x-2 my-2">
+                                        <div class="text-center">
+                                            <div class="text-lg font-bold text-slate-900">
+                                                {{ is_numeric($point['tma']) ? $fmt($point['tma'], 3) . ' m' : '—' }}
+                                            </div>
+                                            <div class="text-[10px] text-slate-500">Tinggi Muka Air</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-lg font-bold text-slate-900">
+                                                {{ is_numeric($point['debit']) ? $fmt($point['debit'], 3) . ' m³/s' : '—' }}
+                                            </div>
+                                            <div class="text-[10px] text-slate-500">Debit</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="text-center my-2">
-                                    <div class="text-xl font-bold text-slate-900">{{ $point['kedalaman_sumur'] }} m</div>
-                                    <div class="text-xs text-slate-500">Kedalaman Air Sumur</div>
-                                </div>
-                                <div class="grid grid-cols-3 text-xs  text-slate-600 border-t">
-                                    <div class="flex flex-col items-center  py-3 ">
-                                        <span class="text-blue-500 font-semibold">
-                                            {{ $point['humidity'] ?? '—' }}%
-                                        </span>
+
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                {{-- AFMR                                                  --}}
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                @elseif ($kat === 'AFMR')
+                                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
+                                        @php
+                                            $afmrRows = [
+                                                [$point['luas_penampang'],   'm²',  'Luas Penampang Basah',  $point['debit'],         'm³/s', 'Debit'],
+                                                [$point['flow_velocity'],    'm/s', 'Flow Velocity',          $point['elevasi_muka_air'], 'm',   'Elevasi Muka Air'],
+                                                [$point['jarak_sensor'],     'm',   'Jarak Sensor',           $point['elevasi_sensor'],   'm',   'Elevasi Sensor'],
+                                            ];
+                                        @endphp
+                                        @foreach ($afmrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
+                                            <div class="text-center py-0.5">
+                                                <div class="text-sm font-bold text-slate-900">
+                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ' ' . $u1 : '—' }}
+                                                </div>
+                                                <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
+                                            </div>
+                                            <div class="text-center py-0.5">
+                                                <div class="text-sm font-bold text-slate-900">
+                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '—' }}
+                                                </div>
+                                                <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                {{-- ARR                                                   --}}
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                @elseif ($kat === 'ARR')
+                                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
+                                        @php
+                                            $arrRows = [
+                                                [$point['kecepatan_angin'], 'Km',  'Kecepatan Angin',  $point['arah_angin'],   '°',  'Arah Angin'],
+                                                [$point['kecerahan'],      'K Lux','Kecerahan',        $point['arah_cahaya'],  '°',  'Arah Cahaya'],
+                                                [$point['curah_hujan'],    'mm',  'Curah Hujan 1',     $point['curah_hujan_2'],'mm', 'Curah Hujan 2'],
+                                            ];
+                                        @endphp
+                                        @foreach ($arrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
+                                            <div class="text-center py-0.5">
+                                                <div class="text-sm font-bold text-slate-900">
+                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : '—' }}
+                                                </div>
+                                                <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
+                                            </div>
+                                            <div class="text-center py-0.5">
+                                                <div class="text-sm font-bold text-slate-900">
+                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '—' }}
+                                                </div>
+                                                <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                {{-- AWR                                                   --}}
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                @elseif ($kat === 'AWR')
+                                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
+                                        @php
+                                            $awrRows = [
+                                                [$point['kecepatan_angin'],  'Km',   'Kecepatan Angin',   $point['arah_angin'],      '°',    'Arah Angin'],
+                                                [$point['temperatur_udara'], '°C',   'Temperatur Udara',  $point['kelembaban_udara'], '%',    'Kelembaban Udara'],
+                                                [$point['tekanan_udara'],    'hPa',  'Tekanan Udara',     $point['kecerahan'],        'K Lux','Kecerahan'],
+                                                [$point['arah_cahaya'],      '°',    'Arah Cahaya',       $point['curah_hujan'],      'mm',   'Curah Hujan 1'],
+                                                [$point['curah_hujan_2'],    'mm',   'Curah Hujan 2',     null,                       '',     ''],
+                                            ];
+                                        @endphp
+                                        @foreach ($awrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
+                                            <div class="text-center py-0.5">
+                                                <div class="text-sm font-bold text-slate-900">
+                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : '—' }}
+                                                </div>
+                                                <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
+                                            </div>
+                                            <div class="text-center py-0.5">
+                                                @if($l2 !== '')
+                                                    <div class="text-sm font-bold text-slate-900">
+                                                        {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '—' }}
+                                                    </div>
+                                                    <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                {{-- AWQR                                                  --}}
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                @elseif ($kat === 'AWQR')
+                                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
+                                        @php
+                                            $awqrRows = [
+                                                [$point['tma'],          'mdpl', 'Tinggi Muka Air',  $point['ph_air'],     '',    'pH Air'],
+                                                [$point['suhu_air'],     '°C',   'Suhu Air',          $point['orp'],        'mV',  'ORP'],
+                                                [$point['conductivity'], 'µS/cm','Conductivity',      $point['salinity'],   'PSU', 'Salinity'],
+                                                [$point['tds'],          '°',    'Total Dissolved Solids', $point['turbidity'], 'NTU', 'Turbidity'],
+                                            ];
+                                        @endphp
+                                        @foreach ($awqrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
+                                            <div class="text-center py-0.5">
+                                                <div class="text-sm font-bold text-slate-900">
+                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ($u1 ? ' '.$u1 : '') : '—' }}
+                                                </div>
+                                                <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
+                                            </div>
+                                            <div class="text-center py-0.5">
+                                                <div class="text-sm font-bold text-slate-900">
+                                                    {{ is_numeric($v2) ? $fmt($v2, 2) . ($u2 ? ' '.$u2 : '') : '—' }}
+                                                </div>
+                                                <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
+                                            </div>
+                                        @endforeach
+                                        @if(is_numeric($point['tinggi_sensor_awqr'] ?? null))
+                                            <div class="col-span-2 text-center py-0.5">
+                                                <div class="text-sm font-bold text-slate-900">{{ $fmt($point['tinggi_sensor_awqr'], 2) }} m</div>
+                                                <div class="text-[10px] text-slate-500">Tinggi Sensor</div>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                {{-- Fallback (kategori lain / tidak dikenal)              --}}
+                                {{-- ══════════════════════════════════════════════════════ --}}
+                                @else
+                                    <div class="text-center my-2 text-sm text-slate-500">{{ $kat ?: '-' }}</div>
+                                @endif
+
+                                {{-- ── Footer: humidity / battery / temp ────────────────── --}}
+                                <div class="grid grid-cols-3 text-xs text-slate-600 border-t mt-1">
+                                    <div class="flex flex-col items-center py-2">
+                                        <span class="text-blue-500 font-semibold">{{ $point['humidity'] !== null ? $point['humidity'].'%' : '—' }}</span>
                                         <span>humidity</span>
                                     </div>
-                                    <div class="flex flex-col items-center border-l py-3 border-r">
-                                        <span class="text-amber-500 font-semibold">
-                                            {{ $point['battery'] ?? '-' }} V
-                                        </span>
+                                    <div class="flex flex-col items-center border-l border-r py-2">
+                                        <span class="text-amber-500 font-semibold">{{ $point['battery'] !== null ? $point['battery'].' V' : '—' }}</span>
                                         <span>battery</span>
                                     </div>
-                                    <div class="flex flex-col items-center  py-3 ">
-                                        <span class="text-rose-500 font-semibold">
-                                            {{ $point['temp'] ?? '-' }} °C
-                                        </span>
+                                    <div class="flex flex-col items-center py-2">
+                                        <span class="text-rose-500 font-semibold">{{ $point['temp'] !== null ? $point['temp'].' °C' : '—' }}</span>
                                         <span>temp</span>
                                     </div>
                                 </div>
+
                             </div>
                         @empty
                             <div class="p-4 text-center text-sm text-slate-500">
                                 Tidak ada data logger.
                             </div>
                         @endforelse
+
                     </div>{{-- akhir #loggerList --}}
                 </div>{{-- akhir sidebar-panel --}}
             </div>{{-- akhir relative flex-shrink-0 --}}
@@ -671,6 +964,39 @@
                             @endif
                         </div>
                     </div>
+                    @php
+                        $afmrOnline    = collect($points)->where('kategori', 'AFMR')->where('status', 'online')->count();
+                        $afmrOffline   = collect($points)->where('kategori', 'AFMR')->where('status', 'offline')->count();
+                        $afmrPerbaikan = collect($points)->where('kategori', 'AFMR')->where('status', 'perbaikan')->count();
+                    @endphp
+                    @if($afmrOnline + $afmrOffline + $afmrPerbaikan > 0)
+                    <div class="border rounded-xl p-4 mb-4">
+                        <label class="flex items-center gap-2 font-semibold mb-3">
+                            <input type="checkbox" id="filterAFMR" checked class="accent-indigo-600">
+                            <img src="{{ asset('icons/afmr/online.svg') }}" class="h-5 w-5 mr-2 inline-block">
+                            AFMR (Automatic Flow Measurement Recorder)
+                        </label>
+                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAFMR_online" checked>
+                                <img src="{{ asset('icons/afmr/online.svg') }}" class="h-7 w-7 inline-block">
+                                Koneksi Terhubung ({{ $afmrOnline }})
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAFMR_offline" checked>
+                                <img src="{{ asset('icons/afmr/offline.svg') }}" class="h-7 w-7 inline-block">
+                                Koneksi Terputus ({{ $afmrOffline }})
+                            </label>
+                            @if($afmrPerbaikan > 0)
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" id="filterAFMR_perbaikan" checked>
+                                <img src="{{ asset('icons/afmr/perbaikan.svg') }}" class="h-7 w-7 inline-block">
+                                Perbaikan ({{ $afmrPerbaikan }})
+                            </label>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
                     @php
                         $awqrOnline    = collect($points)->where('kategori', 'AWQR')->where('status', 'online')->count();
                         $awqrOffline   = collect($points)->where('kategori', 'AWQR')->where('status', 'offline')->count();
@@ -906,6 +1232,7 @@
         const groupAWLR = L.layerGroup().addTo(map);
         const groupAWR = L.layerGroup().addTo(map);
         const groupAWQR = L.layerGroup().addTo(map);
+        const groupAFMR = L.layerGroup().addTo(map);
 
         function getGroupByKategori(kat) {
             const k = String(kat || '').toUpperCase();
@@ -913,6 +1240,7 @@
             if (k === 'AWLR') return groupAWLR;
             if (k === 'AWR') return groupAWR;
             if (k === 'AWQR') return groupAWQR;
+            if (k === 'AFMR') return groupAFMR;
             return null;
         }
 
@@ -1008,6 +1336,23 @@
             });
         }
 
+        function afmrIcon(status) {
+            const base = '/icons/afmr/';
+            const fileMap = {
+                'online'    : 'online.svg',
+                'offline'   : 'offline.svg',
+                'perbaikan' : 'perbaikan.svg'
+            };
+            const file = fileMap[String(status).toLowerCase()] || fileMap['offline'];
+            return L.icon({
+                iconUrl: base + file,
+                iconSize: [32, 40],
+                iconAnchor: [16, 40],
+                popupAnchor: [0, -36]
+            });
+        }
+
+
         points.forEach(p => {
             if (!p.lat || !p.lng) return;
             const marker = L.marker([p.lat, p.lng]);
@@ -1078,12 +1423,12 @@
                 </button>
                 </div>
             `, {
-                maxWidth: 380,
+                maxWidth: window.innerWidth < 1024
+                    ? Math.min(Math.round(window.innerWidth * 0.88), 320)
+                    : 380,
                 className: 'custom-popup'
             });
-            const g = getGroupByKategori(p.kategori);
-            if (g) g.addLayer(marker);
-            else marker.addTo(map);
+            marker.addTo(map);
             markers[p.id_logger] = marker;
             markerStore[p.id_logger] = {
                 marker,
@@ -1106,6 +1451,10 @@
             if (kategori === 'AWR') {
                 marker.setIcon(awrIcon(p.arr_state || status));
             }
+            if (kategori === 'AFMR') {
+                marker.setIcon(afmrIcon(status));
+            }
+
         });
 
         function applyKategoriFilter() {
@@ -1113,12 +1462,16 @@
             const showAWLR = document.getElementById('filterAWLR')?.checked ?? true;
             const showAWR  = document.getElementById('filterAWR')?.checked ?? true;
             const showAWQR = document.getElementById('filterAWQR')?.checked ?? true;
+            const showAFMR = document.getElementById('filterAFMR')?.checked ?? true;
             const showAWLRonline    = document.getElementById('filterAWLR_online')?.checked ?? true;
             const showAWLRoffline   = document.getElementById('filterAWLR_offline')?.checked ?? true;
             const showAWLRperbaikan = document.getElementById('filterAWLR_perbaikan')?.checked ?? true;
             const showAWQRonline    = document.getElementById('filterAWQR_online')?.checked ?? true;
             const showAWQRoffline   = document.getElementById('filterAWQR_offline')?.checked ?? true;
             const showAWQRperbaikan = document.getElementById('filterAWQR_perbaikan')?.checked ?? true;
+            const showAFMRonline    = document.getElementById('filterAFMR_online')?.checked ?? true;
+            const showAFMRoffline   = document.getElementById('filterAFMR_offline')?.checked ?? true;
+            const showAFMRperbaikan = document.getElementById('filterAFMR_perbaikan')?.checked ?? true;
             const arrStates = [
                 'tidak_hujan',
                 'hujan_sangat_ringan',
@@ -1170,6 +1523,12 @@
                     else if (String(o.status || '').toLowerCase() === 'offline')    visible = showAWQRoffline;
                     else if (String(o.status || '').toLowerCase() === 'perbaikan')  visible = showAWQRperbaikan;
                     else visible = true;
+                } else if (o.kategori === 'AFMR') {
+                    if (!showAFMR) visible = false;
+                    else if (String(o.status || '').toLowerCase() === 'online')     visible = showAFMRonline;
+                    else if (String(o.status || '').toLowerCase() === 'offline')    visible = showAFMRoffline;
+                    else if (String(o.status || '').toLowerCase() === 'perbaikan')  visible = showAFMRperbaikan;
+                    else visible = true;
                 }
                 if (visible) {
                     if (!map.hasLayer(o.marker)) o.marker.addTo(map);
@@ -1205,6 +1564,12 @@
                     else if (s === 'offline')    visible = showAWQRoffline;
                     else if (s === 'perbaikan')  visible = showAWQRperbaikan;
                     else visible = true;
+                } else if (k === 'AFMR') {
+                    if (!showAFMR) visible = false;
+                    else if (s === 'online')     visible = showAFMRonline;
+                    else if (s === 'offline')    visible = showAFMRoffline;
+                    else if (s === 'perbaikan')  visible = showAFMRperbaikan;
+                    else visible = true;
                 }
                 // Mark visibility state for search integration
                 el.setAttribute('data-filter-visible', visible ? 'true' : 'false');
@@ -1239,6 +1604,10 @@
             'filterAWQR_online',
             'filterAWQR_offline',
             'filterAWQR_perbaikan',
+            'filterAFMR',
+            'filterAFMR_online',
+            'filterAFMR_offline',
+            'filterAFMR_perbaikan',
             'filterARR_tidak_hujan',
             'filterARR_hujan_sangat_ringan',
             'filterARR_hujan_ringan',
@@ -1310,12 +1679,13 @@
         const loggerCountEl = document.getElementById('loggerCount');
         const totalLoggers = {{ count($points) }};
         if (searchInput) {
-            // Build searchable data array from sidebar items
+            // Build searchable data array dari sidebar items
             const buildSearchData = () =>
                 Array.from(document.querySelectorAll('.sidebar-item')).map(item => ({
                     el: item,
                     loggerName: item.getAttribute('data-logger-name') || '',
-                    loggerId: item.getAttribute('data-logger-id') || '',
+                    loggerId:   item.getAttribute('data-logger-id')   || '',
+                    kategori:   (item.getAttribute('data-kategori')   || '').toLowerCase(),
                 }));
 
             searchInput.addEventListener('input', function(e) {
@@ -1328,31 +1698,36 @@
                 }
 
                 const items = buildSearchData();
+                const ql = searchText.toLowerCase();
 
-                // Fuzzy on logger name
+                // Fuzzy search pada nama logger, id, dan kategori
                 const fuse = new Fuse(items, {
-                    threshold: 0.35,
-                    keys: ['loggerName']
+                    threshold: 0.45,          // lebih toleran dari 0.35
+                    ignoreLocation: true,     // cari di seluruh string
+                    keys: [
+                        { name: 'loggerName', weight: 0.6 },
+                        { name: 'loggerId',   weight: 0.3 },
+                        { name: 'kategori',   weight: 0.1 },
+                    ]
                 });
                 const fuzzyMatched = new Set(fuse.search(searchText).map(r => r.item.el));
 
-                // Exact on logger ID
-                const ql = searchText.toLowerCase();
+                // Exact/substring match pada nama, id, atau kategori (case-insensitive)
                 const exactMatched = new Set(
-                    items.filter(it => it.loggerId.toLowerCase().includes(ql)).map(it => it.el)
+                    items
+                        .filter(it =>
+                            it.loggerName.includes(ql) ||
+                            it.loggerId.includes(ql)   ||
+                            it.kategori.includes(ql)
+                        )
+                        .map(it => it.el)
                 );
 
-                items.forEach(({
-                    el
-                }) => {
+                items.forEach(({ el }) => {
+                    // Saat ada query search: tampilkan semua yang match tanpa peduli filter aktif
                     const matchesSearch = fuzzyMatched.has(el) || exactMatched.has(el);
-                    const wasVisibleByFilter = el.getAttribute('data-filter-visible') !== 'false';
-                    if (matchesSearch && wasVisibleByFilter) {
-                        el.style.display = '';
-                        visibleCount++;
-                    } else {
-                        el.style.display = 'none';
-                    }
+                    el.style.display = matchesSearch ? '' : 'none';
+                    if (matchesSearch) visibleCount++;
                 });
 
                 if (loggerCountEl) {

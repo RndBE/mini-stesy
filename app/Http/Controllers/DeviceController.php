@@ -9,6 +9,7 @@ use App\Models\t_Informasi;
 use App\Models\Instansi;
 use App\Models\t_Lokasi;
 use App\Models\Jiat_data;
+use App\Models\NonJiatData;
 use App\Models\Parameter;
 use App\Models\ParameterGroup;
 use App\Models\ListParameter;
@@ -27,7 +28,7 @@ class DeviceController extends Controller
     {
         $devices = t_Logger::query()
             ->forUser(auth()->user())
-            ->with(['lokasi', 'params', 'jiat'])
+            ->with(['lokasi', 'params', 'jiat', 'nonjiat'])
             ->orderBy('id_logger')
             ->get()
             ->map(function ($d) {
@@ -42,6 +43,7 @@ class DeviceController extends Controller
                     // 'sensor_count' => $sensorCount, // 🔥 dikirim ke blade
                     'lokasi' => $d->lokasi,
                     'jiat' => $d->jiat,
+                    'nonjiat' => $d->nonjiat,
                     'params' => $d->params->map(function ($p) {
                         return [
                             'id_param' => $p->id_param,
@@ -146,6 +148,10 @@ class DeviceController extends Controller
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
             'kedalaman_pompa'   => 'nullable|numeric',
+            'jarak_sensor_ke_air' => 'nullable|numeric',
+            'tinggi_sensor'     => 'nullable|numeric',
+            'elevasi_max'       => 'nullable|numeric',
+            'elevasi_min'       => 'nullable|numeric',
             'nama_logger'       => 'required|exists:t_logger,id_logger',
             'params'            => 'required|array|min:1',
             'params.*.nama_parameter' => 'required|string|max:255',
@@ -201,6 +207,19 @@ class DeviceController extends Controller
                             'kedalaman_pompa'  => $kedalamanPompa,
                         ]
                     );
+
+                    // Non JIAT: simpan ke nonjiat_data
+                    if ($subKategori === 'non_jiat') {
+                        NonJiatData::updateOrCreate(
+                            ['id_logger' => $logger->id_logger],
+                            [
+                                'jarak_sensor_ke_air' => (float) ($validated['jarak_sensor_ke_air'] ?? 0),
+                                'tinggi_sensor'       => (float) ($validated['tinggi_sensor'] ?? 0),
+                                'elevasi_max'         => isset($validated['elevasi_max']) ? (float) $validated['elevasi_max'] : null,
+                                'elevasi_min'         => isset($validated['elevasi_min']) ? (float) $validated['elevasi_min'] : null,
+                            ]
+                        );
+                    }
                 }
 
                 // 4. Create parameters
@@ -238,6 +257,10 @@ class DeviceController extends Controller
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
             'kedalaman_pompa'   => 'nullable|numeric',
+            'jarak_sensor_ke_air' => 'nullable|numeric',
+            'tinggi_sensor'     => 'nullable|numeric',
+            'elevasi_max'       => 'nullable|numeric',
+            'elevasi_min'       => 'nullable|numeric',
             'params'                    => 'nullable|array',
             'params.*.id_param'         => 'nullable',
             'params.*.nama_parameter'   => 'required_with:params|string|max:255',
@@ -277,6 +300,19 @@ class DeviceController extends Controller
                     'kedalaman_pompa'  => $kedalamanPompa,
                 ]
             );
+
+            // Non JIAT: simpan ke nonjiat_data
+            if ($subKategori === 'non_jiat') {
+                NonJiatData::updateOrCreate(
+                    ['id_logger' => $logger->id_logger],
+                    [
+                        'jarak_sensor_ke_air' => (float) ($request->jarak_sensor_ke_air ?? 0),
+                        'tinggi_sensor'       => (float) ($request->tinggi_sensor ?? 0),
+                        'elevasi_max'         => $request->elevasi_max !== null ? (float) $request->elevasi_max : null,
+                        'elevasi_min'         => $request->elevasi_min !== null ? (float) $request->elevasi_min : null,
+                    ]
+                );
+            }
         }
 
         $normalize = function ($v) {

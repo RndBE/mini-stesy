@@ -137,7 +137,7 @@
         $loggerWaktu = $lg->latest_waktu ? \Carbon\Carbon::parse($lg->latest_waktu) : now();
         $loggerHour = (int) $loggerWaktu->format('H');
         $isPagi = $loggerHour >= 6 && $loggerHour < 18;
-        $waktuSuffix = $isPagi ? '_pagi' : '_malam';
+        $waktuSuffix = $isPagi ? '' : '_malam';
         $timeAwareStates = ['tidak_hujan', 'hujan_sangat_ringan', 'hujan_ringan'];
 
         $stateHarian =
@@ -154,7 +154,7 @@
         if (in_array($statePerJam, $timeAwareStates)) {
             $statePerJam .= $waktuSuffix;
         }
-        $defaultRainIcon = asset('klasifikasi_hujan/tidak_hujan_pagi.png');
+        $defaultRainIcon = asset('klasifikasi_hujan/tidak_hujan.png');
 
         // ── Display formatting ─────────────────────────────────────────
         $dispKecepatan = is_numeric($kecepatanAngin) ? number_format($kecepatanAngin, 3) : '-';
@@ -193,7 +193,7 @@
                         style="max-width:min(260px, 100%)">
                         <canvas id="windCompass_{{ $lg->id_logger }}"
                             data-direction="{{ is_numeric($arahAngin) ? $arahAngin : 0 }}"
-                            class="block w-full {{ $muted ? 'opacity-60' : '' }}">
+                            class="block w-full">
                         </canvas>
                     </div>
                     {{-- Wind stats: selalu 2 kolom --}}
@@ -487,7 +487,7 @@
                 var endRad = (directionDeg - 90) * Math.PI / 180;
                 ctx.beginPath();
                 ctx.arc(cx, cy, arcR, startRad, endRad);
-                ctx.strokeStyle = muted ? '#94a3b8' : '#0000FF';
+                ctx.strokeStyle = '#0000FF';
                 ctx.lineWidth = 6;
                 ctx.lineCap = 'butt';
                 ctx.stroke();
@@ -542,7 +542,7 @@
                 ctx.lineTo(arrowLen * 0.22, arrowLen * 0.1);
                 ctx.lineTo(-arrowLen * 0.22, arrowLen * 0.1);
                 ctx.closePath();
-                ctx.fillStyle = muted ? '#94a3b8' : '#0000FF';
+                ctx.fillStyle = '#0000FF';
                 ctx.fill();
                 ctx.restore();
 
@@ -565,18 +565,31 @@
             var muted = {{ $muted ? 'true' : 'false' }};
 
             // Gambar pertama kali
-            drawWindCompass(canvasId, dir, muted);
+            drawWindCompass(canvasId, dir, false);
+
+            var _resizeTimer = null;
+
+            // Re-draw saat canvas menjadi visible (pindah tab/kategori)
+            if (typeof IntersectionObserver !== 'undefined') {
+                new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            clearTimeout(_resizeTimer);
+                            drawWindCompass(canvasId, dir, false);
+                        }
+                    });
+                }, { threshold: 0.01 }).observe(canvas);
+            }
 
             // Re-draw otomatis saat container berubah ukuran (rotasi HP, resize browser)
             if (typeof ResizeObserver !== 'undefined') {
                 var wrap = canvas.parentElement;
                 if (wrap) {
-                    var _resizeTimer = null;
                     new ResizeObserver(function() {
                         clearTimeout(_resizeTimer);
                         _resizeTimer = setTimeout(function() {
-                            drawWindCompass(canvasId, dir, muted);
-                        }, 60); // debounce 60ms agar tidak terlalu sering
+                            drawWindCompass(canvasId, dir, false);
+                        }, 30); // debounce 30ms
                     }).observe(wrap);
                 }
             }

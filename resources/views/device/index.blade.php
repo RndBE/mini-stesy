@@ -235,24 +235,55 @@
                                     <img src="{{ asset('icons/sub_kategori_icon.svg') }}" class="h-5 w-5">
                                     <p class="text-base font-bold text-slate-900">Sub Kategori</p>
                                 </div>
-                                <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-4 sm:gap-6">
-                                    <div>
-                                        <p class="text-xs uppercase tracking-wide text-slate-400">Sub Kategori</p>
-                                        <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.sub_kategori || '-'"></p>
+
+                                {{-- JIAT --}}
+                                <template x-if="detailData.sub_kategori === 'JIAT'">
+                                    <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-4 sm:gap-6">
+                                        <div>
+                                            <p class="text-xs uppercase tracking-wide text-slate-400">Sub Kategori</p>
+                                            <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.sub_kategori"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Sumur</p>
+                                            <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_sumur || '-'"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Sensor</p>
+                                            <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_sensor || '-'"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Pompa</p>
+                                            <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_pompa || '-'"></p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Sumur</p>
-                                        <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_sumur || '-'"></p>
+                                </template>
+
+                                {{-- NON JIAT --}}
+                                <template x-if="detailData.sub_kategori === 'NON JIAT'">
+                                    <div class="grid grid-cols-3 gap-3 px-4 py-4 sm:gap-6">
+                                        <div>
+                                            <p class="text-xs uppercase tracking-wide text-slate-400">Sub Kategori</p>
+                                            <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.sub_kategori"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs uppercase tracking-wide text-slate-400">Jarak Sensor dengan Air</p>
+                                            <p class="mt-1 text-sm font-bold text-slate-900"
+                                                x-text="detailData.jarak_sensor_ke_air != null ? detailData.jarak_sensor_ke_air + ' m' : '-'"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs uppercase tracking-wide text-slate-400">Tinggi Sensor</p>
+                                            <p class="mt-1 text-sm font-bold text-slate-900"
+                                                x-text="detailData.tinggi_sensor != null ? detailData.tinggi_sensor + ' m' : '-'"></p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Sensor</p>
-                                        <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_sensor || '-'"></p>
+                                </template>
+
+                                {{-- Fallback jika belum ada sub kategori --}}
+                                <template x-if="detailData.sub_kategori === '-'">
+                                    <div class="px-4 py-4">
+                                        <p class="text-sm text-slate-400">-</p>
                                     </div>
-                                    <div>
-                                        <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Pompa</p>
-                                        <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_pompa || '-'"></p>
-                                    </div>
-                                </div>
+                                </template>
                             </div>
                         </template>
 
@@ -443,8 +474,8 @@
                                                     dengan Air</label>
                                                 <div
                                                     class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
-                                                    <input type="number" step="0.01" name="kedalaman_sensor"
-                                                        x-model="addData.kedalaman_sensor"
+                                                    <input type="number" step="0.01" name="jarak_sensor_ke_air"
+                                                        x-model="addData.jarak_sensor_ke_air"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
                                                         placeholder="100">
                                                     <span
@@ -456,16 +487,43 @@
                                                     Sensor</label>
                                                 <div
                                                     class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
-                                                    <input type="number" step="0.01" name="kedalaman_pompa"
-                                                        x-model="addData.kedalaman_pompa"
+                                                    <input type="number" step="0.01" name="tinggi_sensor"
+                                                        x-model="addData.tinggi_sensor"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
                                                         placeholder="60">
                                                     <span
                                                         class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
                                                 </div>
                                             </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700 mb-2">Elevasi Maks
+                                                    (Batas Atas Peil)</label>
+                                                <div
+                                                    class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                    <input type="number" step="any" name="elevasi_max"
+                                                        x-model="addData.elevasi_max"
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                        placeholder="cth: 5.5">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700 mb-2">Elevasi Min
+                                                    (Batas Bawah Peil)</label>
+                                                <div
+                                                    class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                    <input type="number" step="any" name="elevasi_min"
+                                                        x-model="addData.elevasi_min"
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                        placeholder="cth: 0">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </template>
+
                                 </div>
                             </template>
 
@@ -712,8 +770,8 @@
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700">Jarak Sensor dengan Air</label>
                                                 <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
-                                                    <input type="number" step="0.01" name="kedalaman_sensor"
-                                                        x-model="editData.kedalaman_sensor"
+                                                    <input type="number" step="any" name="jarak_sensor_ke_air"
+                                                        x-model="editData.jarak_sensor_ke_air"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
                                                     <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
                                                 </div>
@@ -721,8 +779,28 @@
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700">Ketinggian Sensor</label>
                                                 <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
-                                                    <input type="number" step="0.01" name="kedalaman_pompa"
-                                                        x-model="editData.kedalaman_pompa"
+                                                    <input type="number" step="any" name="tinggi_sensor"
+                                                        x-model="editData.tinggi_sensor"
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700">Elevasi Maks (Batas Atas Peil)</label>
+                                                <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
+                                                    <input type="number" step="any" name="elevasi_max"
+                                                        x-model="editData.elevasi_max"
+                                                        placeholder="cth: 5.5"
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700">Elevasi Min (Batas Bawah Peil)</label>
+                                                <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
+                                                    <input type="number" step="any" name="elevasi_min"
+                                                        x-model="editData.elevasi_min"
+                                                        placeholder="cth: 0"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
                                                     <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
                                                 </div>
@@ -901,6 +979,10 @@
                     kedalaman_sumur: '',
                     kedalaman_sensor: '',
                     kedalaman_pompa: '',
+                    jarak_sensor_ke_air: '',
+                    tinggi_sensor: '',
+                    elevasi_max: '',
+                    elevasi_min: '',
                     params: []
                 },
                 addData: {
@@ -910,6 +992,10 @@
                     kedalaman_sumur: '',
                     kedalaman_sensor: '',
                     kedalaman_pompa: '',
+                    jarak_sensor_ke_air: '',
+                    tinggi_sensor: '',
+                    elevasi_max: '',
+                    elevasi_min: '',
                     selectedLogger: null,
                     id_katlogger: '',
                     sensorCount: 16,
@@ -1010,6 +1096,10 @@
                         kedalaman_sumur: '',
                         kedalaman_sensor: '',
                         kedalaman_pompa: '',
+                        jarak_sensor_ke_air: '',
+                        tinggi_sensor: '',
+                        elevasi_max: '',
+                        elevasi_min: '',
                         selectedLogger: null,
                         id_katlogger: '',
                         sensorCount: 16,
@@ -1257,8 +1347,9 @@
                 openDetailModal(device) {
                     const jiat = device?.jiat ?? null
                     const hasJiat = !!jiat
-                    const hasSumur = hasJiat && jiat.kedalaman_sumur !== null && jiat
-                        .kedalaman_sumur !== ''
+                    // Sama dengan openModal: nonjiat ada → NON JIAT, kedalaman_sumur > 0 → JIAT
+                    const isNonJiat = !!device?.nonjiat
+                    const isJiat = !isNonJiat && parseFloat(jiat?.kedalaman_sumur ?? 0) > 0
 
                     this.detailData = {
                         id_logger: device?.id_logger ?? '-',
@@ -1268,13 +1359,15 @@
                         alamat: device?.alamat ?? '-',
                         latitude: device?.lokasi?.latitude ?? '-',
                         longitude: device?.lokasi?.longitude ?? '-',
-                        sub_kategori: hasJiat ? (hasSumur ? 'JIAT' : 'NON JIAT') : '-',
+                        sub_kategori: isNonJiat ? 'NON JIAT' : (isJiat ? 'JIAT' : '-'),
                         kedalaman_sumur: hasJiat && jiat.kedalaman_sumur !== null ?
                             `${jiat.kedalaman_sumur} m` : '-',
                         kedalaman_sensor: hasJiat && jiat.kedalaman_sensor !== null ?
                             `${jiat.kedalaman_sensor} m` : '-',
                         kedalaman_pompa: hasJiat && jiat.kedalaman_pompa !== null ?
                             `${jiat.kedalaman_pompa} m` : '-',
+                        jarak_sensor_ke_air: device?.nonjiat?.jarak_sensor_ke_air != null ? parseFloat(device.nonjiat.jarak_sensor_ke_air) : null,
+                        tinggi_sensor: device?.nonjiat?.tinggi_sensor != null ? parseFloat(device.nonjiat.tinggi_sensor) : null,
                         params: Array.isArray(device?.params) ? device.params : []
                     }
 
@@ -1303,13 +1396,20 @@
                         id_katlogger: device.id_katlogger ?? '',
                         nama_lokasi: device.lokasi?.nama_lokasi ?? '',
                         nama_logger: device.nama_logger ?? '',
-                        subKategori: (device.jiat?.kedalaman_sumur ?? '') === '' ? 'non_jiat' :
-                            'jiat',
+                        // non_jiat: jika ada relasi nonjiat, ATAU kedalaman_sumur <= 0 / kosong
+                        // jiat: hanya jika kedalaman_sumur > 0 (TANPA relasi nonjiat)
+                        subKategori: device.nonjiat
+                            ? 'non_jiat'
+                            : (parseFloat(device.jiat?.kedalaman_sumur ?? 0) > 0 ? 'jiat' : 'non_jiat'),
                         latitude: device.lokasi?.latitude ?? '',
                         longitude: device.lokasi?.longitude ?? '',
                         kedalaman_sumur: device.jiat?.kedalaman_sumur ?? '',
                         kedalaman_sensor: device.jiat?.kedalaman_sensor ?? '',
-                        kedalaman_pompa: device.jiat?.kedalaman_pompa ?? ''
+                        kedalaman_pompa: device.jiat?.kedalaman_pompa ?? '',
+                        jarak_sensor_ke_air: device.nonjiat?.jarak_sensor_ke_air != null ? parseFloat(device.nonjiat.jarak_sensor_ke_air) : '',
+                        tinggi_sensor: device.nonjiat?.tinggi_sensor != null ? parseFloat(device.nonjiat.tinggi_sensor) : '',
+                        elevasi_max: device.nonjiat?.elevasi_max != null ? parseFloat(device.nonjiat.elevasi_max) : '',
+                        elevasi_min: device.nonjiat?.elevasi_min != null ? parseFloat(device.nonjiat.elevasi_min) : '',
                     })
 
                     // Kosongkan dulu biar Alpine reset DOM

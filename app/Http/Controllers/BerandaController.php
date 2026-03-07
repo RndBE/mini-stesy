@@ -20,7 +20,8 @@ class BerandaController extends Controller
         $user = $this->currentUser();
         $loggers = t_Logger::query()
             ->forUser($user)
-            ->with(['lokasi', 'kategori', 'jiat', 'params', 'temp16', 'temp19'])
+            ->whereNotNull('idlokasi')
+            ->with(['lokasi', 'kategori', 'jiat', 'nonjiat', 'params', 'temp16', 'temp19'])
             ->orderBy('nama_logger')
             ->get()
             ->map(function ($lg) {

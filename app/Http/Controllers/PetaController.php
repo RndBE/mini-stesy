@@ -133,7 +133,7 @@ class PetaController extends Controller
         // ]);
         $points = t_Logger::query()
             ->forUser(auth()->user())
-            ->with(['lokasi', 'params', 'temp16', 'temp19', 'jiat', 'klasifikasiHujan', 'kategori'])
+            ->with(['lokasi', 'params', 'temp16', 'temp19', 'jiat', 'nonjiat', 'klasifikasiHujan', 'kategori'])
             ->whereNotNull('idlokasi')
             ->get()
             ->map(function ($l) use ($thresholds) {
@@ -221,6 +221,39 @@ class PetaController extends Controller
                     'status'   => $status,
                     'last_time' => $lastTime,
                     'kedalaman_sumur' => $l->jiat?->kedalaman_sumur,
+
+                    // ── AWLR Non-JIAT ──────────────────────────────────────────────
+                    'sub_kategori' => $l->nonjiat ? 'non_jiat' : ($l->jiat && (float)($l->jiat->kedalaman_sumur ?? 0) > 0 ? 'jiat' : 'non_jiat'),
+                    'tma'          => $this->sensorVal($l->params, $latest, ['tma', 'muka_air', 'tinggi_muka', 'water_level']),
+                    'debit'        => $this->sensorVal($l->params, $latest, ['debit']),
+
+                    // ── AFMR ──────────────────────────────────────────────────────
+                    'luas_penampang'   => $this->sensorVal($l->params, $latest, ['luas', 'penampang']),
+                    'flow_velocity'    => $this->sensorVal($l->params, $latest, ['flow_velocity', 'velocity', 'kecepatan_aliran']),
+                    'elevasi_muka_air' => $this->sensorVal($l->params, $latest, ['elevasi_muka']),
+                    'jarak_sensor'     => $this->sensorVal($l->params, $latest, ['jarak_sensor']),
+                    'elevasi_sensor'   => $this->sensorVal($l->params, $latest, ['elevasi_sensor', 'tinggi_sensor']),
+
+                    // ── ARR / AWR – atmosfer ─────────────────────────────────────
+                    'curah_hujan'     => $this->sensorVal($l->params, $latest, ['hujan', 'rain', 'curah']),
+                    'curah_hujan_2'   => $this->sensorValNth($l->params, $latest, ['hujan', 'rain', 'curah'], 2),
+                    'kecepatan_angin' => $this->sensorVal($l->params, $latest, ['kecepatan_angin', 'wind_speed', 'speed_angin']),
+                    'arah_angin'      => $this->sensorVal($l->params, $latest, ['arah_angin', 'wind_dir', 'direction_angin']),
+                    'kecerahan'       => $this->sensorVal($l->params, $latest, ['kecerahan', 'brightness', 'cahaya_terang', 'light']),
+                    'arah_cahaya'     => $this->sensorVal($l->params, $latest, ['arah_cahaya', 'direction_light', 'light_dir']),
+                    'temperatur_udara'=> $this->sensorVal($l->params, $latest, ['suhu_udara', 'temperatur_udara', 'temperature_air']),
+                    'kelembaban_udara'=> $this->sensorVal($l->params, $latest, ['kelembaban_udara', 'humidity_udara', 'rh_udara']),
+                    'tekanan_udara'   => $this->sensorVal($l->params, $latest, ['tekanan', 'pressure', 'barometric']),
+
+                    // ── AWQR ─────────────────────────────────────────────────────
+                    'ph_air'      => $this->sensorVal($l->params, $latest, ['ph']),
+                    'suhu_air'    => $this->sensorVal($l->params, $latest, ['suhu_air', 'water_temp', 'temp_air']),
+                    'orp'         => $this->sensorVal($l->params, $latest, ['orp']),
+                    'conductivity'=> $this->sensorVal($l->params, $latest, ['conduct', 'konduktivitas', 'conductivity']),
+                    'salinity'    => $this->sensorVal($l->params, $latest, ['salinity', 'salinitas']),
+                    'tds'         => $this->sensorVal($l->params, $latest, ['tds', 'total_dissolved', 'dissolved_solid']),
+                    'turbidity'   => $this->sensorVal($l->params, $latest, ['turbidity', 'kekeruhan', 'turbiditas']),
+                    'tinggi_sensor_awqr' => $this->sensorVal($l->params, $latest, ['tinggi_sensor', 'elevasi_sensor', 'sensor_height']),
                 ];
             })
             ->filter(fn($p) => $p['lat'] !== null && $p['lng'] !== null)
@@ -305,6 +338,41 @@ class PetaController extends Controller
         }
 
         return $thresholdCollection->sortBy('sort_order')->first()?->state_key ?? 'tidak_hujan';
+    }
+
+    /**
+     * Cari nilai sensor berdasarkan keyword dalam nama_parameter (ambil kemunculan pertama).
+     */
+    private function sensorVal($params, $latest, array $keywords, int $nth = 1): mixed
+    {
+        if (!$latest) return null;
+
+        $count = 0;
+        foreach ($params as $p) {
+            $name = strtolower(trim((string) $p->nama_parameter));
+            foreach ($keywords as $kw) {
+                if (str_contains($name, strtolower($kw))) {
+                    $count++;
+                    if ($count === $nth) {
+                        $col = $p->kolom_sensor;
+                        if ($col && isset($latest->{$col})) {
+                            $v = $latest->{$col};
+                            return is_numeric($v) ? round((float) $v, 3) : null;
+                        }
+                    }
+                    break; // match keyword, next param
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Ambil kemunculan ke-N sensor berdasarkan keyword (untuk Curah Hujan 2, dsb).
+     */
+    private function sensorValNth($params, $latest, array $keywords, int $nth): mixed
+    {
+        return $this->sensorVal($params, $latest, $keywords, $nth);
     }
 
 }

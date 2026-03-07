@@ -82,6 +82,11 @@ class t_Logger extends Model
         return $this->hasOne(Jiat_data::class, 'id_logger', 'id_logger');
     }
 
+    public function nonjiat()
+    {
+        return $this->hasOne(NonJiatData::class, 'id_logger', 'id_logger');
+    }
+
     public function temp19()
     {
         return $this->hasOne(Temp_19s::class, 'id_logger', 'id_logger');

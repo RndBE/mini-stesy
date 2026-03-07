@@ -1,5 +1,5 @@
 {{-- <aside class="fixed inset-y-0 left-0 hidden .w-[260px] border-r border-slate-200 bg-white lg:block"> --}}
-<aside id="mainSidebar" class="fixed top-0 left-0 z-40 w-64 h-full transition-all duration-300 bg-white border-r">
+<aside id="mainSidebar" class="fixed top-0 left-0 z-[40] w-64 h-full transition-all duration-300 bg-white border-r">
     <div class="flex h-full flex-col">
         <div class="flex items-center justify-between px-6 py-5">
             <img src="{{ asset('images/beacon-logo.png') }}" alt="Beacon Engineering" class="h-full w-auto sidebar-logo">
@@ -9,7 +9,7 @@
             </button>
         </div>
 
-        <nav class="px-3 sidebar-nav">
+        <nav class="px-3 sidebar-nav flex-1 overflow-y-auto">
             <div class="space-y-2">
                 @permission('view_beranda')
                     <a href="{{ route('beranda') }}"
@@ -24,6 +24,12 @@
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('peta.lokasi') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                         <img src="{{ asset('icons/peta_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('peta.lokasi') ? 'brightness-0 invert' : '' }}" alt="Peta Lokasi">
                         <span class="sidebar-text truncate">Peta Lokasi</span>
+                    </a>
+
+                    <a href="{{ route('rekap-data.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('rekap-data.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                        <img src="{{ asset('icons/rekap_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('rekap-data.*') ? 'brightness-0 invert' : '' }}" alt="Rekap Data">
+                        <span class="sidebar-text truncate">Rekap Data</span>
                     </a>
                 @endpermission
 
@@ -176,7 +182,7 @@
     }
 
     /* Mobile responsive */
-    @media (max-width: 768px) {
+    @media (max-width: 1023px) {
         #mainSidebar {
             transform: translateX(-100%);
             width: 16rem;
@@ -189,7 +195,6 @@
 
         #mainSidebar:not(.collapsed) {
             transform: translateX(0);
-            z-index: 1000;
         }
 
         #mainSidebar.collapsed .sidebar-text,
@@ -230,7 +235,7 @@
     }
 
     /* Desktop styles for collapsed state */
-    @media (min-width: 769px) {
+    @media (min-width: 1024px) {
         #mainSidebar.collapsed {
             width: 5rem;
             /* Mini sidebar width */
@@ -283,19 +288,28 @@
     function syncSidebarBackdrop() {
         const sidebar = document.getElementById('mainSidebar');
         const backdrop = document.getElementById('sidebarBackdrop');
-        const isMobile = window.innerWidth <= 768;
+        const isMobile = window.innerWidth < 1024;
 
         if (!sidebar || !backdrop) return;
 
         const showBackdrop = isMobile && !sidebar.classList.contains('collapsed');
         backdrop.classList.toggle('hidden', !showBackdrop);
         document.body.classList.toggle('overflow-hidden', showBackdrop);
+
+        // Turunkan seluruh stacking context peta ke bawah backdrop + sidebar
+        // dengan mengatur z-index #mapContainer (parent dari tombol dan Leaflet).
+        // Backdrop: z-40, Sidebar: z-1000 → mapContainer: z-1 = semua tertutup
+        const mapContainer = document.getElementById('mapContainer');
+        if (mapContainer) {
+            mapContainer.style.zIndex = showBackdrop ? '1' : '';
+            mapContainer.style.position  = showBackdrop ? 'relative' : '';
+        }
     }
 
     function applySidebarLayout() {
         const sidebar = document.getElementById('mainSidebar');
         const mainContent = document.getElementById('mainContent');
-        const isMobile = window.innerWidth <= 768;
+        const isMobile = window.innerWidth < 1024;
 
         if (!sidebar || !mainContent) return;
 
@@ -321,10 +335,21 @@
         sidebar.classList.toggle('collapsed');
         applySidebarLayout();
         localStorage.setItem('sidebarCollapsed', String(sidebar.classList.contains('collapsed')));
+
+        // Smooth Leaflet resize selama durasi transisi sidebar (300ms)
+        if (typeof map !== 'undefined') {
+            const dur = 320, step = 16;
+            let t = 0;
+            const iv = setInterval(() => {
+                map.invalidateSize({ animate: false });
+                t += step;
+                if (t >= dur) clearInterval(iv);
+            }, step);
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const isMobile = window.innerWidth <= 768;
+        const isMobile = window.innerWidth < 1024;
         const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
 
         const sidebar = document.getElementById('mainSidebar');
@@ -334,6 +359,8 @@
         if (!sidebar || !mainContent) return;
 
         if (isMobile) {
+            // Di mobile/tablet, sidebar selalu dimulai tertutup (collapsed = hidden via translateX)
+            // Tapi jangan simpan ke localStorage supaya tidak mengganggu state desktop
             sidebar.classList.add('collapsed');
         } else if (isCollapsed) {
             sidebar.classList.add('collapsed');
@@ -345,7 +372,7 @@
 
         if (backdrop) {
             backdrop.addEventListener('click', function() {
-                const isMobileNow = window.innerWidth <= 768;
+                const isMobileNow = window.innerWidth < 1024;
                 if (!isMobileNow) return;
 
                 sidebar.classList.add('collapsed');
@@ -355,7 +382,7 @@
     });
 
     window.addEventListener('resize', function() {
-        const isMobile = window.innerWidth <= 768;
+        const isMobile = window.innerWidth < 1024;
         const sidebar = document.getElementById('mainSidebar');
         if (!sidebar) return;
 
