@@ -28,7 +28,7 @@
 
                     <a href="{{ route('rekap-data.index') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('rekap-data.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <img src="{{ asset('icons/rekap_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('rekap-data.*') ? 'brightness-0 invert' : '' }}" alt="Rekap Data">
+                        <img src="{{ asset('icons/data_perangkat_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('rekap-data.*') ? 'brightness-0 invert' : '' }}" alt="Rekap Data">
                         <span class="sidebar-text truncate">Rekap Data</span>
                     </a>
                 @endpermission

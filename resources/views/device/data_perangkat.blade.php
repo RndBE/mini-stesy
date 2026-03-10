@@ -12,7 +12,7 @@
 @section('content')
     <div class="space-y-3" x-data="dataPerangkat">
 
-        <div class="flex items-center justify-between mt-2">
+        <div class="flex items-center justify-end mt-2">
             <div class="flex flex-col sm:flex-row items-center gap-3">
                 @if (session('success'))
                     <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
@@ -22,7 +22,7 @@
                 @endif
 
                 <div class="w-full sm:w-auto flex items-center gap-3">
-                    <div class="relative w-full">
+                    <div class="relative w-full sm:w-64">
                         <input type="text" x-model="searchQuery" placeholder="Cari perangkat..."
                             class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                         <svg class="absolute right-3 top-2.5 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24"
@@ -100,7 +100,7 @@
 
             </div>
         </div>
-        <div x-show="showDetailModal" style="display: none;" class="fixed inset-0 z-50"
+        <div x-show="showDetailModal" style="display: none;" class="fixed inset-0 z-[500]"
             aria-labelledby="detail-modal-title" role="dialog" aria-modal="true">
             <div x-show="showDetailModal" x-transition:enter="ease-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
@@ -211,7 +211,7 @@
         </div>
 
 
-        <div x-show="showCreateModal" style="display: none;" class="fixed inset-0 z-50"
+        <div x-show="showCreateModal" style="display: none;" class="fixed inset-0 z-[500]"
             aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div x-show="showCreateModal" x-transition:enter="ease-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
@@ -455,7 +455,7 @@
         </div>
 
 
-        <div x-show="showEditModal" style="display: none;" class="fixed inset-0 z-50"
+        <div x-show="showEditModal" style="display: none;" class="fixed inset-0 z-[500]"
             aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div x-show="showEditModal" x-transition:enter="ease-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"

@@ -2,17 +2,15 @@
 
 @section('content')
     <div x-data="listParameterCrud()" class="space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-3 mt-3">
-            <div class="flex flex-wrap items-center gap-2">
-                <button type="button" @click="openCreateModal()"
-                    class="inline-flex items-center rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
-                    + Tambah Parameter
-                </button>
-                <a href="{{ route('parameter-group.index') }}"
-                    class="inline-flex items-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
-                    Kelola Group Parameter
-                </a>
-            </div>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 mt-3">
+            <a href="{{ route('parameter-group.index') }}"
+                class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                Kelola Group Parameter
+            </a>
+            <button type="button" @click="openCreateModal()"
+                class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
+                + Tambah Parameter
+            </button>
         </div>
 
         @if (session('success'))

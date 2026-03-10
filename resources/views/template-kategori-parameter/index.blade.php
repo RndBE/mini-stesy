@@ -2,7 +2,7 @@
 
 @section('content')
     <div x-data="templateKategoriCrud()" class="space-y-3 mt-3">
-        <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center justify-end gap-3">
             <button type="button" @click="openCreateModal()"
                 class="inline-flex items-center rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
                 + Tambah Template

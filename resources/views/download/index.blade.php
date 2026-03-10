@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="space-y-6">
+    <div class="space-y-3">
         <!-- Page Header -->
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -11,7 +11,7 @@
         </div>
 
         <div class="w-full md:w-1/2">
-            <div class="space-y-4">
+            <div class="space-y-2">
                 <!-- Android Card -->
                 {{-- <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-6">
                 <div class="flex items-start gap-4">
@@ -45,7 +45,7 @@
                     </div>
                 </div>
             </div> --}}
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-6">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-4">
                     <div class="flex items-center gap-5">
                         <div class="w-16 h-16 rounded-xl bg-slate-50 flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-slate-700" viewBox="0 0 24 24"
@@ -114,7 +114,7 @@
                     </div>
                 </div>
             </div> --}}
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-6">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-4">
                     <div class="flex items-center gap-5">
                         <div class="w-16 h-16 rounded-xl bg-slate-50 flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-slate-700" viewBox="0 0 24 24"

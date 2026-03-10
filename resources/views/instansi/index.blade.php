@@ -20,7 +20,7 @@
             : null;
     @endphp
     <div x-data="instansiData()" class="space-y-3">
-        <div class="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-start">
+        <div class="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-end">
             @if (session('success'))
                 <div
                     class="px-4 py-2 me-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-semibold shadow-sm ring-1 ring-emerald-200">

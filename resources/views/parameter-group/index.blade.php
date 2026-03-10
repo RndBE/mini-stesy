@@ -2,13 +2,13 @@
 
 @section('content')
     <div x-data="parameterGroupCrud()" class="space-y-3">
-        <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <div class="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
             <a href="{{ route('list-parameter.index') }}"
-                class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
                 Kembali ke List Parameter
             </a>
             <button type="button" @click="openCreateModal()"
-                class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
                 + Tambah Group Parameter
             </button>
         </div>

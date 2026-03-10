@@ -20,6 +20,7 @@ use App\Http\Controllers\ListParameterController;
 use App\Http\Controllers\ParameterGroupController;
 use App\Http\Controllers\TemplateKategoriParameterController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\SettingLoggerController;
 use Illuminate\Support\Facades\Http;
 
 // Route::get('/', function () {
@@ -64,6 +65,7 @@ Route::middleware(['auth'])->get('/audit-log', [AuditLogController::class, 'inde
 // Route::middleware(['auth'])->post('/audit-log/client-export', [AuditLogController::class, 'clientExport'])->name('audit-log.client-export');
 
 // Device Routes
+Route::middleware(['auth'])->get('/dashboard-setting-logger', [SettingLoggerController::class, 'index'])->name('device.setting-logger');
 Route::middleware(['auth', 'permission:view_device'])->get('/pengaturan-device', [DeviceController::class, 'index'])->name('device.index');
 Route::middleware(['auth', 'permission:manage_device'])->get('/pengaturan-device/create', [DeviceController::class, 'create'])->name('device.create');
 Route::middleware(['auth', 'permission:manage_device'])->post('/pengaturan-device', [DeviceController::class, 'store'])->name('device.store');

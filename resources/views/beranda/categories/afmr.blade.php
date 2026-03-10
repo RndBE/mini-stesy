@@ -47,7 +47,7 @@
                     $afmrWaterTopY = max($afmrScaleTopY, min($afmrScaleBotY, $afmrWaterTopY));
 
                     // Area sungai
-                    $afmrRiverX    = 140;
+                    $afmrRiverX    = 0;
                     $afmrRiverEndX = $afmrScaleX + 4;
                     $afmrRiverBotY = round($afmrScaleBotY) + 4;
                     $afmrTmaLineY  = $afmrWaterTopY;
@@ -127,8 +127,19 @@
                                   fill="#78350f" font-weight="600">{{ $v }}</text>
                         @endif
                     @endfor
-                    {{-- Label MAX jika bukan kelipatan 10 --}}
-                    @if($afmrScaleMax % 10 !== 0)
+                    {{-- Label MAX hanya jika tidak numpuk dengan major tick terakhir --}}
+                    @php
+                        $afmrLastMajorV   = floor(($afmrScaleMax - $afmrScaleMin) / 10) * 10 + $afmrScaleMin;
+                        $afmrLastMajorY   = $afmrScaleBotY - ($afmrLastMajorV - $afmrScaleMin) * $afmrPxPerUnit;
+                        $afmrMaxPixGap    = $afmrLastMajorY - $afmrScaleTopY;
+                        $afmrMaxNotOnTick = fmod(round($afmrScaleMax * 100), 200) > 1; // tick step = 2
+                        $afmrShowMax      = $afmrMaxNotOnTick && $afmrMaxPixGap > 10;
+                    @endphp
+                    @if($afmrShowMax)
+                        @php $tickLen = $afmrScaleW * 0.48; @endphp
+                        <line x1="{{ $afmrScaleX + $afmrScaleW - $tickLen }}" y1="{{ $afmrScaleTopY }}"
+                              x2="{{ $afmrScaleX + $afmrScaleW }}" y2="{{ $afmrScaleTopY }}"
+                              stroke="#92400e" stroke-width="1.2" />
                         <text x="{{ $afmrScaleX + $afmrScaleW * 0.3 }}" y="{{ $afmrScaleTopY + 3 }}"
                               font-size="7.5" text-anchor="middle"
                               font-family="ui-sans-serif, system-ui, sans-serif"
@@ -245,8 +256,8 @@
                         alt="Elevasi Muka Air" class="h-full w-full object-cover"
                         onerror="this.style.display='none'">
                 </div>
-                <div>
-                    <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400">Elevasi Muka Air</div>
+                <div class="min-w-0 overflow-hidden">
+                    <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400 truncate">Elevasi Muka Air</div>
                     <div class="flex items-baseline gap-1">
                         <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                             {{ is_numeric($elevMukaAir) ? number_format((float) $elevMukaAir, 3) : '-' }}
@@ -270,8 +281,8 @@
                         alt="Elevasi Sensor" class="h-full w-full object-cover"
                         onerror="this.style.display='none'">
                 </div>
-                <div>
-                    <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400">Elevasi Sensor</div>
+                <div class="min-w-0 overflow-hidden">
+                    <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400 truncate">Elevasi Sensor</div>
                     <div class="flex items-baseline gap-1">
                         <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                             {{ is_numeric($elevSensor) ? number_format((float) $elevSensor, 3) : '-' }}
@@ -295,8 +306,8 @@
                         alt="Jarak Sensor" class="h-full w-full object-cover"
                         onerror="this.style.display='none'">
                 </div>
-                <div>
-                    <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400">Jarak Sensor</div>
+                <div class="min-w-0 overflow-hidden">
+                    <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400 truncate">Jarak Sensor</div>
                     <div class="flex items-baseline gap-1">
                         <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                             {{ is_numeric($jarakSensor) ? number_format((float) $jarakSensor, 2) : '-' }}

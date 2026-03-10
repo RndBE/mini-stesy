@@ -29,9 +29,7 @@
 
     <div x-data="deviceEditor()" x-cloak class="mt-2 space-y-3">
 
-        <div class="flex items-center justify-between">
-
-
+        <div class="flex items-center justify-end">
             <div class="flex items-center gap-3">
                 @if (session('success'))
                     <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
@@ -297,6 +295,7 @@
                                 <table class="w-full text-sm text-slate-700">
                                     <thead class="bg-slate-50 text-xs uppercase text-slate-500">
                                         <tr>
+                                            <th class="px-3 py-3 text-center w-8">#</th>
                                             <th class="px-4 py-3 text-left">Parameter</th>
                                             <th class="px-4 py-3 text-left">Kolom Sensor</th>
                                             <th class="px-4 py-3 text-left">Satuan</th>
@@ -305,11 +304,12 @@
                                     <tbody class="divide-y divide-slate-100">
                                         <template x-if="!(detailData.params || []).length">
                                             <tr>
-                                                <td colspan="3" class="px-4 py-4 text-center text-sm text-slate-400">Tidak ada parameter</td>
+                                                <td colspan="4" class="px-4 py-4 text-center text-sm text-slate-400">Tidak ada parameter</td>
                                             </tr>
                                         </template>
                                         <template x-for="(param, index) in (detailData.params || [])" :key="param.id_param || index">
                                             <tr>
+                                                <td class="px-3 py-3 text-center text-xs font-bold text-slate-400" x-text="index + 1"></td>
                                                 <td class="px-4 py-3 font-semibold text-slate-900" x-text="(param.nama_parameter || '-').replaceAll('_', ' ')"></td>
                                                 <td class="px-4 py-3" x-text="param.kolom_sensor || '-'"></td>
                                                 <td class="px-4 py-3" x-text="param.satuan || '-'"></td>
@@ -554,8 +554,9 @@
                                     </button>
                                 </div>
                                 <div class="px-4 py-3">
-                                    <div
-                                        class="grid grid-cols-[1.6fr_1fr_0.9fr_52px] gap-3 px-1 pb-2 text-sm font-semibold text-gray-900">
+                                    {{-- Column headers: only desktop --}}
+                                    <div class="hidden sm:grid grid-cols-[24px_1.6fr_1fr_0.9fr_52px] gap-3 px-1 pb-2 text-sm font-semibold text-gray-900">
+                                        <span class="text-center text-gray-400">#</span>
                                         <span>Nama Parameter</span>
                                         <span>Kolom Sensor</span>
                                         <span>Satuan</span>
@@ -564,53 +565,71 @@
 
                                     <div class="space-y-2">
                                         <template x-for="(param, index) in addData.params" :key="index">
-                                            <div class="grid grid-cols-[1.6fr_1fr_0.9fr_52px] gap-3 items-start">
+                                            {{-- Mobile: card, Desktop: grid row --}}
+                                            <div class="rounded-lg border border-gray-100 bg-slate-50 p-3
+                                                        sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0
+                                                        sm:grid sm:grid-cols-[24px_1.6fr_1fr_0.9fr_52px] sm:gap-3 sm:items-start">
                                                 <input type="hidden" :name="'params[' + index + '][parameter_group_id]'"
                                                     x-model="param.parameter_group_id">
 
+                                                {{-- Nomor urut --}}
+                                                <div class="flex items-center justify-between mb-2 sm:mb-0 sm:justify-center sm:pt-2">
+                                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold sm:w-4 sm:h-4" x-text="index + 1"></span>
+                                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-400 sm:hidden">Parameter <span x-text="index + 1"></span></p>
+                                                </div>
+
+                                                {{-- Nama Parameter --}}
                                                 <div class="space-y-1">
+                                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Nama Parameter</p>
                                                     <select x-model="param.list_parameter_id"
                                                         @change="applyListParameterToParamRow(param, addSensorOptions)"
                                                         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 focus:border-indigo-500 focus:ring-indigo-500">
                                                         <option value="">Isi dari List Parameter (opsional)</option>
-                                                        <template x-for="lp in listParameterOptions"
-                                                            :key="'add-list-' + lp.id">
+                                                        <template x-for="lp in listParameterOptions" :key="'add-list-' + lp.id">
                                                             <option :value="String(lp.id)"
                                                                 {{-- x-text="lp.parameter_utama ? `${lp.nama_parameter} (${lp.parameter_utama})` : lp.nama_parameter"> --}}
                                                                 x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} (${(lp.parameter_utama || '').replaceAll('_',' ')})`: (lp.nama_parameter || '').replaceAll('_',' ')">
                                                             </option>
                                                         </template>
                                                     </select>
-
                                                     <input :name="'params[' + index + '][nama_parameter]'"
                                                         x-model="param.nama_parameter" type="text" required
                                                         class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
                                                 </div>
 
-                                                <select :name="'params[' + index + '][kolom_sensor]'"
-                                                    x-model="param.kolom_sensor" required
-                                                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
-                                                    <option value="">Pilih Sensor</option>
-                                                    <template x-for="sensor in addSensorOptions" :key="sensor">
-                                                        <option :value="sensor" x-text="sensor"></option>
-                                                    </template>
-                                                </select>
+                                                {{-- Kolom Sensor & Satuan: 2-col on mobile, separate cells on desktop --}}
+                                                <div class="mt-2 grid grid-cols-2 gap-2 sm:contents">
+                                                    <div>
+                                                        <p class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Kolom Sensor</p>
+                                                        <select :name="'params[' + index + '][kolom_sensor]'"
+                                                            x-model="param.kolom_sensor" required
+                                                            class="w-full rounded-lg border border-gray-300 px-2 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                                            <option value="">Pilih</option>
+                                                            <template x-for="sensor in addSensorOptions" :key="sensor">
+                                                                <option :value="sensor" x-text="sensor"></option>
+                                                            </template>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <p class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Satuan</p>
+                                                        <input :name="'params[' + index + '][satuan]'" x-model="param.satuan"
+                                                            type="text" required placeholder="cth: m"
+                                                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                                    </div>
+                                                </div>
 
-                                                <input :name="'params[' + index + '][satuan]'" x-model="param.satuan"
-                                                    type="text" required
-                                                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
-
-                                                <button type="button" @click="removeParameter(index)"
-                                                    :disabled="addData.params.length === 1"
-                                                    class="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
-                                                    title="Hapus parameter">
-                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
+                                                {{-- Delete --}}
+                                                <div class="mt-2 flex justify-end sm:mt-0 sm:block">
+                                                    <button type="button" @click="removeParameter(index)"
+                                                        :disabled="addData.params.length === 1"
+                                                        class="inline-flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                                        title="Hapus parameter">
+                                                        <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </template>
                                     </div>
@@ -695,9 +714,9 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-700">Nama Logger</label>
-                                        <div class="relative mt-1">
+                                        <div class="mt-1">
                                             <select x-model="editData.id_logger"
-                                                class="w-full appearance-none rounded-md border border-gray-300 px-3 py-2 pr-8 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
                                                 <option value="" disabled>Pilih nama logger</option>
                                                 <option :value="editData.id_logger" x-text="editData.nama_logger"
                                                     x-show="editData.nama_logger"></option>
@@ -705,10 +724,6 @@
                                                     <option :value="logger.id_logger" x-text="logger.nama_logger"></option>
                                                 </template>
                                             </select>
-                                            <svg class="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                            </svg>
                                         </div>
                                     </div>
                                 </div>
@@ -843,8 +858,9 @@
                                     </button>
                                 </div>
                                 <div class="px-4 py-3">
-                                    <div
-                                        class="grid grid-cols-[1.6fr_1fr_0.9fr_52px] gap-3 px-1 pb-2 text-sm font-semibold text-gray-900">
+                                    {{-- Column headers: only desktop --}}
+                                    <div class="hidden sm:grid grid-cols-[24px_1.6fr_1fr_0.9fr_52px] gap-3 px-1 pb-2 text-sm font-semibold text-gray-900">
+                                        <span class="text-center text-gray-400">#</span>
                                         <span>Nama Parameter</span>
                                         <span>Kolom Sensor</span>
                                         <span>Satuan</span>
@@ -854,54 +870,74 @@
                                     <div class="space-y-2">
                                         <template x-for="(param, index) in editData.params"
                                             :key="param.id_param || 'param_' + index">
-                                            <div class="grid grid-cols-[1.6fr_1fr_0.9fr_52px] gap-3 items-start">
+                                            {{-- Mobile: card, Desktop: grid row --}}
+                                            <div class="rounded-lg border border-gray-100 bg-slate-50 p-3
+                                                        sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0
+                                                        sm:grid sm:grid-cols-[24px_1.6fr_1fr_0.9fr_52px] sm:gap-3 sm:items-start">
                                                 <input type="hidden" :name="'params[' + index + '][id_param]'"
                                                     x-model="param.id_param">
                                                 <input type="hidden" :name="'params[' + index + '][parameter_group_id]'"
                                                     x-model="param.parameter_group_id">
 
+                                                {{-- Nomor urut: badge di mobile (header card), angka kecil di desktop --}}
+                                                <div class="flex items-center justify-between mb-2 sm:mb-0 sm:justify-center sm:pt-2">
+                                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold sm:w-4 sm:h-4" x-text="index + 1"></span>
+                                                    {{-- Label hanya di mobile --}}
+                                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-400 sm:hidden">Parameter <span x-text="index + 1"></span></p>
+                                                </div>
+
+                                                {{-- Nama Parameter --}}
                                                 <div class="space-y-1">
+                                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Nama Parameter</p>
                                                     <select x-model="param.list_parameter_id"
                                                         @change="applyListParameterToParamRow(param, editSensorOptions)"
                                                         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 focus:border-indigo-500 focus:ring-indigo-500">
                                                         <option value="">Isi dari List Parameter (opsional)</option>
-                                                        <template x-for="lp in listParameterOptions"
-                                                            :key="'edit-list-' + lp.id">
+                                                        <template x-for="lp in listParameterOptions" :key="'edit-list-' + lp.id">
                                                             <option :value="String(lp.id)" {{-- x-text="lp.parameter_utama ? `${lp.nama_parameter} (${lp.parameter_utama})` : lp.nama_parameter"> --}}
                                                                 x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} (${(lp.parameter_utama || '').replaceAll('_',' ')})`: (lp.nama_parameter || '').replaceAll('_',' ')">
                                                             </option>
                                                         </template>
                                                     </select>
-
                                                     <input :name="'params[' + index + '][nama_parameter]'"
                                                         x-model="param.nama_parameter"
                                                         class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
                                                 </div>
 
-                                                <select :name="'params[' + index + '][kolom_sensor]'"
-                                                    x-model="param.kolom_sensor"
-                                                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
-                                                    <option value="">Pilih Sensor</option>
-                                                    <template x-for="sensor in editSensorOptions" :key="sensor">
-                                                        <option :value="sensor" x-text="sensor"
-                                                            :selected="sensor === param.kolom_sensor"></option>
-                                                    </template>
-                                                </select>
+                                                {{-- Kolom Sensor & Satuan: 2-col on mobile, separate cells on desktop --}}
+                                                <div class="mt-2 grid grid-cols-2 gap-2 sm:contents">
+                                                    <div>
+                                                        <p class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Kolom Sensor</p>
+                                                        <select :name="'params[' + index + '][kolom_sensor]'"
+                                                            x-model="param.kolom_sensor"
+                                                            class="w-full rounded-lg border border-gray-300 px-2 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                                            <option value="">Pilih</option>
+                                                            <template x-for="sensor in editSensorOptions" :key="sensor">
+                                                                <option :value="sensor" x-text="sensor"
+                                                                    :selected="sensor === param.kolom_sensor"></option>
+                                                            </template>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <p class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Satuan</p>
+                                                        <input :name="'params[' + index + '][satuan]'" x-model="param.satuan"
+                                                            placeholder="cth: m"
+                                                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
+                                                    </div>
+                                                </div>
 
-                                                <input :name="'params[' + index + '][satuan]'" x-model="param.satuan"
-                                                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
-
-                                                <button type="button" @click="removeEditParameter(index)"
-                                                    :disabled="editData.params.length === 1"
-                                                    class="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
-                                                    title="Hapus parameter">
-                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
+                                                {{-- Delete --}}
+                                                <div class="mt-2 flex justify-end sm:mt-0 sm:block">
+                                                    <button type="button" @click="removeEditParameter(index)"
+                                                        :disabled="editData.params.length === 1"
+                                                        class="inline-flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                                        title="Hapus parameter">
+                                                        <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </template>
                                     </div>

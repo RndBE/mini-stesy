@@ -547,7 +547,7 @@
                         $scaleZeroY  = $scaleBotY;
 
                         // Area sungai
-                        $riverX = 135;
+                        $riverX = 0;
                         $riverEndX = $scaleX + 4; // menyentuh tepi kiri peil
                         $riverBotY = round($scaleZeroY) + 4; // sedikit di bawah tanda "0"
 
@@ -652,10 +652,20 @@
                                       fill="#78350f" font-weight="600">{{ $vRound }}</text>
                             @endif
                         @endfor
-                        {{-- Pastikan label MAX selalu tampil jika bukan kelipatan 10 --}}
-                        @if($scaleMax % 10 !== 0)
-                            @php $ty = $scaleTopY; @endphp
-                            <text x="{{ $scaleX + $scaleW * 0.3 }}" y="{{ $ty + 3 }}"
+                        {{-- Label MAX hanya jika tidak numpuk dengan major tick terakhir --}}
+                        @php
+                            $lastMajorV   = floor(($scaleMax - $scaleMin) / $majorStep) * $majorStep + $scaleMin;
+                            $lastMajorY   = $scaleBotY - ($lastMajorV - $scaleMin) * $pxPerUnit;
+                            $maxPixGap    = $lastMajorY - $scaleTopY; // jarak vertikal SVG unit
+                            $maxNotOnTick = fmod(round(($scaleMax - $scaleMin) * 1000), round($tickStep * 1000)) > 1;
+                            $showMaxLbl   = $maxNotOnTick && $maxPixGap > 10;
+                        @endphp
+                        @if($showMaxLbl)
+                            @php $ty = $scaleTopY; $tickLen = $scaleW * 0.48; @endphp
+                            <line x1="{{ $scaleX + $scaleW - $tickLen }}" y1="{{ $ty }}"
+                                  x2="{{ $scaleX + $scaleW }}" y2="{{ $ty }}"
+                                  stroke="#92400e" stroke-width="1.2" />
+                            <text x="{{ $scaleX + $scaleW * 0.3 }}" y="{{ $ty + 9 }}"
                                   font-size="7.5" text-anchor="middle"
                                   font-family="ui-sans-serif, system-ui, sans-serif"
                                   fill="#78350f" font-weight="600">{{ $scaleMax }}</text>
