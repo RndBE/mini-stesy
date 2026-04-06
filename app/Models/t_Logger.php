@@ -18,7 +18,12 @@ class t_Logger extends Model
         'jeda_notif',
         'idlokasi',
         'id_kategori',
-        'sensor_count'
+        'sensor_count',
+        'status_perbaikan',
+        // Kolom baru untuk integrasi Skema Irigasi AWLR/AWGC
+        'jenis_alat',         // AWLR | AWGC | OTHER
+        'node_skema_id',      // ID node di SVG skema (mis: 'BGP_1', 'WEIR_COPONG')
+        'bukaan_maksimal_cm', // Batas maksimal bukaan pintu AWGC (cm)
     ];
 
     public function instansi()
@@ -130,5 +135,43 @@ class t_Logger extends Model
     public function tingkatSiagaAwlr()
     {
         return $this->hasMany(TingkatSiagaAwlr::class, 'id_logger', 'id_logger');
+    }
+
+    public function perbaikan()
+    {
+        return $this->hasMany(Perbaikan::class, 'id_logger', 'id_logger')->latest();
+    }
+
+    /**
+     * Log historis perintah AWGC yang diberikan ke logger pintu air ini.
+     * Hanya relevan jika jenis_alat = 'AWGC'.
+     */
+    public function awgcCommandLogs()
+    {
+        return $this->hasMany(\App\Models\AwgcCommandLog::class, 'id_logger', 'id_logger')->latest();
+    }
+
+    /**
+     * Scope: Filter hanya logger bertipe AWLR.
+     */
+    public function scopeAwlr($query)
+    {
+        return $query->where('jenis_alat', 'AWLR');
+    }
+
+    /**
+     * Scope: Filter hanya logger bertipe AWGC.
+     */
+    public function scopeAwgc($query)
+    {
+        return $query->where('jenis_alat', 'AWGC');
+    }
+
+    /**
+     * Scope: Filter logger yang terhubung ke skema irigasi (ada node_skema_id).
+     */
+    public function scopeLinkedToSkema($query)
+    {
+        return $query->whereNotNull('node_skema_id');
     }
 }

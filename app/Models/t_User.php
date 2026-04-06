@@ -20,6 +20,8 @@ class t_User extends Authenticatable
         'password',
         'level_user',
         'instansi_id',
+        'status',
+        'suspend_reason',
     ];
 
     protected $hidden = [
@@ -89,5 +91,20 @@ class t_User extends Authenticatable
     public function isPegawai(): bool
     {
         return in_array(strtolower((string) $this->level_user), ['pegawai', 'user'], true);
+    }
+
+    public function isActive(): bool
+    {
+        return strtolower((string) ($this->status ?? 'aktif')) === 'aktif';
+    }
+
+    public function isSuspended(): bool
+    {
+        return strtolower((string) ($this->status ?? 'aktif')) === 'suspend';
+    }
+
+    public function isNonActive(): bool
+    {
+        return strtolower((string) ($this->status ?? 'aktif')) === 'non-aktif';
     }
 }

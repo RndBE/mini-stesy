@@ -80,13 +80,15 @@ class UserController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'nama' => 'required|string|max:100',
-            'username' => 'required|string|max:30|unique:t_user,username',
-            'password' => 'required|string|min:6',
-            'level_user' => 'required|string|max:50',
-            'instansi_id' => 'nullable|integer|exists:instansi,id',
+            'nama'          => 'required|string|max:100',
+            'username'      => 'required|string|max:30|unique:t_user,username',
+            'password'      => 'required|string|min:6',
+            'level_user'    => 'required|string|max:50',
+            'instansi_id'   => 'nullable|integer|exists:instansi,id',
             'logger_access' => 'nullable|array',
             'logger_access.*' => ['string', 'max:15', Rule::exists('t_logger', 'id_logger')],
+            'status'        => 'nullable|in:aktif,suspend,non-aktif',
+            'suspend_reason'=> 'nullable|string|max:1000',
         ]);
 
         $validated = $validator->validate();
@@ -114,11 +116,12 @@ class UserController extends Controller
         }
 
         $user = t_User::create([
-            'nama' => $validated['nama'],
-            'username' => $validated['username'],
-            'password' => Hash::make($validated['password']),
+            'nama'       => $validated['nama'],
+            'username'   => $validated['username'],
+            'password'   => Hash::make($validated['password']),
             'level_user' => $validated['level_user'],
-            'instansi_id' => $validated['instansi_id'] ?? null,
+            'instansi_id'=> $validated['instansi_id'] ?? null,
+            'status'     => 'aktif', // Default aktif saat buat user baru
         ]);
 
         $loggerIds = $request->input('logger_access', []);
@@ -155,6 +158,8 @@ class UserController extends Controller
                 ->pluck('id_logger')
                 ->map(fn($id) => (string) $id)
                 ->values(),
+            'status'         => $user->status ?? 'aktif',
+            'suspend_reason' => $user->suspend_reason ?? '',
         ]);
     }
 
@@ -166,13 +171,15 @@ class UserController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'nama' => 'required|string|max:100',
-            'username' => 'required|string|max:30|unique:t_user,username,' . $user->id_user . ',id_user',
-            'password' => 'nullable|string|min:6',
-            'level_user' => 'required|string|max:50',
-            'instansi_id' => 'nullable|integer|exists:instansi,id',
+            'nama'          => 'required|string|max:100',
+            'username'      => 'required|string|max:30|unique:t_user,username,' . $user->id_user . ',id_user',
+            'password'      => 'nullable|string|min:6',
+            'level_user'    => 'required|string|max:50',
+            'instansi_id'   => 'nullable|integer|exists:instansi,id',
             'logger_access' => 'nullable|array',
             'logger_access.*' => ['string', 'max:15', Rule::exists('t_logger', 'id_logger')],
+            'status'        => 'nullable|in:aktif,suspend,non-aktif',
+            'suspend_reason'=> 'nullable|string|max:1000',
         ]);
 
         $validated = $validator->validate();
@@ -198,11 +205,22 @@ class UserController extends Controller
         }
 
         $payload = [
-            'nama' => $validated['nama'],
-            'username' => $validated['username'],
-            'level_user' => $targetRole,
+            'nama'        => $validated['nama'],
+            'username'    => $validated['username'],
+            'level_user'  => $targetRole,
             'instansi_id' => $validated['instansi_id'] ?? null,
         ];
+
+        // Hanya Superadmin yang boleh mengubah status & pesan suspend
+        if ($currentUser->isSuperAdmin()) {
+            $newStatus = $request->input('status', $user->status ?? 'aktif');
+            $payload['status'] = $newStatus;
+            if ($newStatus === 'suspend') {
+                $payload['suspend_reason'] = $request->input('suspend_reason', '');
+            } else {
+                $payload['suspend_reason'] = null;
+            }
+        }
 
         if (!empty($validated['password'])) {
             $payload['password'] = Hash::make($validated['password']);

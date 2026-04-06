@@ -21,6 +21,8 @@ use App\Http\Controllers\ParameterGroupController;
 use App\Http\Controllers\TemplateKategoriParameterController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\SettingLoggerController;
+use App\Http\Controllers\SkemaIrigasiController;
+use App\Http\Controllers\Api\AwgcCommandController;
 use Illuminate\Support\Facades\Http;
 
 // Route::get('/', function () {
@@ -59,7 +61,25 @@ Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
 Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
     Route::get('/rekap-data', [RekapDataController::class, 'index'])->name('rekap-data.index');
     Route::get('/api/rekap-data', [RekapDataController::class, 'getData'])->name('rekap-data.api');
+    Route::get('/skema-irigasi/peta', function() {
+        return view('skema.leaflet', ['title' => 'Peta Aliran Leuwigoong']);
+    })->name('skema-irigasi.peta');
 });
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/skema-irigasi', [SkemaIrigasiController::class, 'index'])->name('skema-irigasi.index');
+    Route::get('/api/skema-irigasi/data', [SkemaIrigasiController::class, 'getData'])->name('skema-irigasi.api');
+
+    // Historis sensor node (untuk chart TMA di panel AWLR)
+    Route::get('/api/skema/node/{nodeId}/history', [SkemaIrigasiController::class, 'getNodeHistory'])->name('skema-irigasi.node-history');
+
+    // Perintah kontrol pintu air AWGC
+    Route::post('/api/awgc/command', [AwgcCommandController::class, 'store'])->name('awgc.command.store');
+    Route::get('/api/awgc/status/{commandId}', [AwgcCommandController::class, 'status'])->name('awgc.command.status');
+});
+
+// Endpoint konfirmasi dari firmware alat AWGC (tanpa auth, diamankan via token di payload)
+Route::post('/api/awgc/confirm/{commandId}', [AwgcCommandController::class, 'confirm'])->name('awgc.command.confirm');
 
 Route::middleware(['auth'])->get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 // Route::middleware(['auth'])->post('/audit-log/client-export', [AuditLogController::class, 'clientExport'])->name('audit-log.client-export');
@@ -70,6 +90,10 @@ Route::middleware(['auth', 'permission:view_device'])->get('/pengaturan-device',
 Route::middleware(['auth', 'permission:manage_device'])->get('/pengaturan-device/create', [DeviceController::class, 'create'])->name('device.create');
 Route::middleware(['auth', 'permission:manage_device'])->post('/pengaturan-device', [DeviceController::class, 'store'])->name('device.store');
 Route::middleware(['auth', 'permission:manage_device'])->put('/pengaturan-device/{id}', [DeviceController::class, 'update'])->name('device.update');
+
+// Perbaikan Logger Routes (semua user yang login bisa mengubah status perbaikan)
+Route::middleware(['auth', 'permission:view_device'])->post('/pengaturan-device/{id}/perbaikan', [DeviceController::class, 'storePerbaikan'])->name('device.perbaikan.store');
+Route::middleware(['auth', 'permission:view_device'])->put('/pengaturan-device/{id}/perbaikan/selesai', [DeviceController::class, 'selesaiPerbaikan'])->name('device.perbaikan.selesai');
 
 Route::middleware(['auth', 'permission:view_data_perangkat'])->get('/data-perangkat', [DeviceController::class, 'dataPerangkat'])->name('device.data');
 Route::middleware(['auth', 'permission:manage_data_perangkat'])->post('/data-perangkat', [DeviceController::class, 'storeDataPerangkat'])->name('device.storeDataPerangkat');

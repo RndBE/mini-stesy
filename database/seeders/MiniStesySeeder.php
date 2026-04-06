@@ -39,6 +39,7 @@ class MiniStesySeeder extends Seeder
 
         DB::table('foto_pos')->truncate();
         DB::table('jiat_data')->truncate();
+        if (Schema::hasTable('nonjiat_data')) DB::table('nonjiat_data')->truncate();
         DB::table('t_informasi')->truncate();
         DB::table('parameter_sensor')->truncate();
         if (Schema::hasTable('user_logger_access')) DB::table('user_logger_access')->truncate();
@@ -56,6 +57,7 @@ class MiniStesySeeder extends Seeder
         if (Schema::hasTable('temp_s16_latest')) DB::table('temp_s16_latest')->truncate();
         if (Schema::hasTable('logger_storage_map')) DB::table('logger_storage_map')->truncate();
         if (Schema::hasTable('ts_table_pool')) DB::table('ts_table_pool')->truncate();
+        if (Schema::hasTable('audit_logs')) DB::table('audit_logs')->truncate();
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
@@ -147,6 +149,120 @@ class MiniStesySeeder extends Seeder
             ],
         ]);
 
+        if (Schema::hasTable('audit_logs')) {
+            $seededAt = now();
+
+            DB::table('audit_logs')->insert([
+                [
+                    'user_id' => 1,
+                    'module' => 'Autentikasi',
+                    'action_type' => 'LOGIN',
+                    'activity' => 'Login berhasil',
+                    'target' => 'Aplikasi Mini Stesy',
+                    'status' => 'SUCCESS',
+                    'ip_address' => '127.0.0.1',
+                    'user_agent' => 'Seeder Script',
+                    'description' => 'Pengguna berhasil masuk ke aplikasi.',
+                    'metadata' => json_encode([
+                        'guard' => 'web',
+                        'session_regenerated' => true,
+                    ], JSON_UNESCAPED_UNICODE),
+                    'occurred_at' => $seededAt->copy()->subMinutes(55),
+                    'actor_name' => 'Super Admin',
+                    'actor_username' => 'superadmin',
+                    'actor_role' => 'superadmin',
+                    'created_at' => $seededAt,
+                    'updated_at' => $seededAt,
+                ],
+                [
+                    'user_id' => 2,
+                    'module' => 'Peta Lokasi',
+                    'action_type' => 'VIEW',
+                    'activity' => 'Membuka halaman peta lokasi',
+                    'target' => 'Halaman Peta Lokasi',
+                    'status' => 'SUCCESS',
+                    'ip_address' => '127.0.0.1',
+                    'user_agent' => 'Seeder Script',
+                    'description' => 'Pengguna meninjau daftar logger pada peta.',
+                    'metadata' => json_encode([
+                        'route' => 'peta.lokasi',
+                        'filters' => ['kategori' => 'ALL', 'status' => 'ALL'],
+                    ], JSON_UNESCAPED_UNICODE),
+                    'occurred_at' => $seededAt->copy()->subMinutes(45),
+                    'actor_name' => 'Instansi Admin',
+                    'actor_username' => 'instansi_admin',
+                    'actor_role' => 'instansi_admin',
+                    'created_at' => $seededAt,
+                    'updated_at' => $seededAt,
+                ],
+                [
+                    'user_id' => 3,
+                    'module' => 'Data Masuk',
+                    'action_type' => 'EXPORT',
+                    'activity' => 'Ekspor data sensor ke CSV',
+                    'target' => 'Logger AWLR-001',
+                    'status' => 'SUCCESS',
+                    'ip_address' => '127.0.0.1',
+                    'user_agent' => 'Seeder Script',
+                    'description' => 'Pengguna mengunduh hasil data sensor untuk kebutuhan analisis.',
+                    'metadata' => json_encode([
+                        'format' => 'csv',
+                        'records' => 1440,
+                        'date' => $seededAt->toDateString(),
+                    ], JSON_UNESCAPED_UNICODE),
+                    'occurred_at' => $seededAt->copy()->subMinutes(35),
+                    'actor_name' => 'Pegawai Contoh',
+                    'actor_username' => 'pegawai',
+                    'actor_role' => 'pegawai',
+                    'created_at' => $seededAt,
+                    'updated_at' => $seededAt,
+                ],
+                [
+                    'user_id' => 2,
+                    'module' => 'Pengaturan Device',
+                    'action_type' => 'UPDATE',
+                    'activity' => 'Perubahan konfigurasi logger',
+                    'target' => 'ID Logger 10001',
+                    'status' => 'SUCCESS',
+                    'ip_address' => '127.0.0.1',
+                    'user_agent' => 'Seeder Script',
+                    'description' => 'Konfigurasi interval pengiriman data logger diperbarui.',
+                    'metadata' => json_encode([
+                        'field_changed' => 'interval_kirim',
+                        'before' => '10 menit',
+                        'after' => '5 menit',
+                    ], JSON_UNESCAPED_UNICODE),
+                    'occurred_at' => $seededAt->copy()->subMinutes(25),
+                    'actor_name' => 'Instansi Admin',
+                    'actor_username' => 'instansi_admin',
+                    'actor_role' => 'instansi_admin',
+                    'created_at' => $seededAt,
+                    'updated_at' => $seededAt,
+                ],
+                [
+                    'user_id' => 1,
+                    'module' => 'API Integrasi',
+                    'action_type' => 'SYNC',
+                    'activity' => 'Sinkronisasi data ke endpoint eksternal',
+                    'target' => 'Forward API',
+                    'status' => 'FAILED',
+                    'ip_address' => '127.0.0.1',
+                    'user_agent' => 'Seeder Script',
+                    'description' => 'Sinkronisasi gagal karena timeout jaringan.',
+                    'metadata' => json_encode([
+                        'http_status' => 504,
+                        'retry' => 2,
+                    ], JSON_UNESCAPED_UNICODE),
+                    'occurred_at' => $seededAt->copy()->subMinutes(15),
+                    'actor_name' => 'Super Admin',
+                    'actor_username' => 'superadmin',
+                    'actor_role' => 'superadmin',
+                    'created_at' => $seededAt,
+                    'updated_at' => $seededAt,
+                ],
+            ]);
+        }
+
         DB::table('sub_user')->insert([
             ['id' => 1, 'id_user' => 1, 'nama' => 'Operator 1', 'level' => 'operator', 'no' => '081111111111', 'status' => 1],
             ['id' => 2, 'id_user' => 2, 'nama' => 'Operator 2', 'level' => 'operator', 'no' => '082222222222', 'status' => 1],
@@ -160,15 +276,22 @@ class MiniStesySeeder extends Seeder
         ]);
 
         DB::table('t_lokasi')->insert([
-            ['idlokasi' => 1, 'nama_lokasi' => 'Pos Seturan', 'latitude' => '-7.760000', 'longitude' => '110.410000', 'alamat' => 'Seturan, Yogyakarta', 'das_id' => 2],
-            ['idlokasi' => 2, 'nama_lokasi' => 'Pos Pogung', 'latitude' => '-7.770000', 'longitude' => '110.370000', 'alamat' => 'Pogung, Yogyakarta', 'das_id' => 2],
-            ['idlokasi' => 3, 'nama_lokasi' => 'Pos Sinduadi', 'latitude' => '-7.750000', 'longitude' => '110.350000', 'alamat' => 'Sinduadi, Yogyakarta', 'das_id' => 2],
-            ['idlokasi' => 4, 'nama_lokasi' => 'Pos Bantar', 'latitude' => '-7.820000', 'longitude' => '110.330000', 'alamat' => 'Bantar, Bantul', 'das_id' => 2],
+            ['idlokasi' => 1, 'nama_lokasi' => 'Pos Seturan',    'latitude' => '-7.760000', 'longitude' => '110.410000', 'alamat' => 'Seturan, Yogyakarta',   'das_id' => 2],
+            ['idlokasi' => 2, 'nama_lokasi' => 'Pos Pogung',     'latitude' => '-7.770000', 'longitude' => '110.370000', 'alamat' => 'Pogung, Yogyakarta',    'das_id' => 2],
+            ['idlokasi' => 3, 'nama_lokasi' => 'Pos Sinduadi',   'latitude' => '-7.750000', 'longitude' => '110.350000', 'alamat' => 'Sinduadi, Yogyakarta',  'das_id' => 2],
+            ['idlokasi' => 4, 'nama_lokasi' => 'Pos Bantar',     'latitude' => '-7.820000', 'longitude' => '110.330000', 'alamat' => 'Bantar, Bantul',        'das_id' => 2],
+            ['idlokasi' => 5, 'nama_lokasi' => 'Pos Kranggan',   'latitude' => '-7.790000', 'longitude' => '110.420000', 'alamat' => 'Kranggan, Sleman',      'das_id' => 1],
+            ['idlokasi' => 6, 'nama_lokasi' => 'Pos Nanggulan',  'latitude' => '-7.810000', 'longitude' => '110.290000', 'alamat' => 'Nanggulan, Kulonprogo', 'das_id' => 1],
+            ['idlokasi' => 7, 'nama_lokasi' => 'Pos Kretek',     'latitude' => '-7.960000', 'longitude' => '110.360000', 'alamat' => 'Kretek, Bantul',        'das_id' => 3],
+            ['idlokasi' => 8, 'nama_lokasi' => 'Pos Bangunjiwo', 'latitude' => '-7.840000', 'longitude' => '110.345000', 'alamat' => 'Bangunjiwo, Bantul',    'das_id' => 2],
         ]);
 
         DB::table('kategori_logger')->insert([
-            ['id_katlogger' => 1, 'nama_kategori' => 'AWLR', 'kepanjangan' => 'Automatic Water Level Recorder', 'icon_app' => 'awlr.png', 'view' => 1],
-            ['id_katlogger' => 2, 'nama_kategori' => 'ARR', 'kepanjangan' => 'Automatic Rain Recorder', 'icon_app' => 'arr.png', 'view' => 1],
+            ['id_katlogger' => 1, 'nama_kategori' => 'AWLR', 'kepanjangan' => 'Automatic Water Level Recorder',    'icon_app' => 'awlr.png', 'view' => 1],
+            ['id_katlogger' => 2, 'nama_kategori' => 'ARR',  'kepanjangan' => 'Automatic Rain Recorder',            'icon_app' => 'arr.png',  'view' => 1],
+            ['id_katlogger' => 3, 'nama_kategori' => 'AFMR', 'kepanjangan' => 'Automatic Flow Measurement Recorder','icon_app' => 'afmr.png', 'view' => 1],
+            ['id_katlogger' => 4, 'nama_kategori' => 'AWR',  'kepanjangan' => 'Automatic Weather Recorder',         'icon_app' => 'awr.png',  'view' => 1],
+            ['id_katlogger' => 5, 'nama_kategori' => 'AWQR', 'kepanjangan' => 'Automatic Water Quality Recorder',   'icon_app' => 'awqr.png', 'view' => 1],
         ]);
 
         if (Schema::hasTable('parameter_groups')) {
@@ -354,84 +477,58 @@ class MiniStesySeeder extends Seeder
 
         if ($arrKategoriId && Schema::hasTable('klasifikasi_threshold')) {
             DB::table('klasifikasi_threshold')->insert([
-                [
-                    'id_kategori' => $arrKategoriId,
-                    'state_key' => 'tidak_hujan',
-                    'state_label' => 'Tidak Hujan',
-                    'min_value' => null,
-                    'max_value' => 0.10,
-                    'icon_path' => '/icons/arr/tidak_hujan.svg',
-                    'color_hex' => '#22c55e',
-                    'sort_order' => 1,
-                ],
-                [
-                    'id_kategori' => $arrKategoriId,
-                    'state_key' => 'hujan_sangat_ringan',
-                    'state_label' => 'Hujan Sangat Ringan',
-                    'min_value' => 0.10,
-                    'max_value' => 1.00,
-                    'icon_path' => '/icons/arr/hujan_sangat_ringan.svg',
-                    'color_hex' => '#7dd3fc',
-                    'sort_order' => 2,
-                ],
-                [
-                    'id_kategori' => $arrKategoriId,
-                    'state_key' => 'hujan_ringan',
-                    'state_label' => 'Hujan Ringan',
-                    'min_value' => 1.00,
-                    'max_value' => 2.50,
-                    'icon_path' => '/icons/arr/hujan_ringan.svg',
-                    'color_hex' => '#3b82f6',
-                    'sort_order' => 3,
-                ],
-                [
-                    'id_kategori' => $arrKategoriId,
-                    'state_key' => 'hujan_sedang',
-                    'state_label' => 'Hujan Sedang',
-                    'min_value' => 2.50,
-                    'max_value' => 7.60,
-                    'icon_path' => '/icons/arr/hujan_sedang.svg',
-                    'color_hex' => '#eab308',
-                    'sort_order' => 4,
-                ],
-                [
-                    'id_kategori' => $arrKategoriId,
-                    'state_key' => 'hujan_lebat',
-                    'state_label' => 'Hujan Lebat',
-                    'min_value' => 7.60,
-                    'max_value' => 15.60,
-                    'icon_path' => '/icons/arr/hujan_lebat.svg',
-                    'color_hex' => '#f97316',
-                    'sort_order' => 5,
-                ],
-                [
-                    'id_kategori' => $arrKategoriId,
-                    'state_key' => 'hujan_sangat_lebat',
-                    'state_label' => 'Hujan Sangat Lebat',
-                    'min_value' => 15.60,
-                    'max_value' => null,
-                    'icon_path' => '/icons/arr/hujan_sangat_lebat.svg',
-                    'color_hex' => '#ef4444',
-                    'sort_order' => 6,
-                ],
-                [
-                    'id_kategori' => $arrKategoriId,
-                    'state_key' => 'koneksi_terputus',
-                    'state_label' => 'Koneksi Terputus',
-                    'min_value' => null,
-                    'max_value' => null,
-                    'icon_path' => '/icons/arr/koneksi_terputus.svg',
-                    'color_hex' => '#9ca3af',
-                    'sort_order' => 7,
-                ],
+                ['id_kategori' => $arrKategoriId, 'state_key' => 'tidak_hujan',      'state_label' => 'Tidak Hujan',       'min_value' => null,  'max_value' => 0.10,  'icon_path' => '/icons/arr/tidak_hujan.svg',       'color_hex' => '#22c55e', 'sort_order' => 1],
+                ['id_kategori' => $arrKategoriId, 'state_key' => 'hujan_sangat_ringan','state_label' => 'Hujan Sangat Ringan','min_value' => 0.10, 'max_value' => 1.00,  'icon_path' => '/icons/arr/hujan_sangat_ringan.svg','color_hex' => '#7dd3fc', 'sort_order' => 2],
+                ['id_kategori' => $arrKategoriId, 'state_key' => 'hujan_ringan',     'state_label' => 'Hujan Ringan',      'min_value' => 1.00,  'max_value' => 2.50,  'icon_path' => '/icons/arr/hujan_ringan.svg',      'color_hex' => '#3b82f6', 'sort_order' => 3],
+                ['id_kategori' => $arrKategoriId, 'state_key' => 'hujan_sedang',     'state_label' => 'Hujan Sedang',      'min_value' => 2.50,  'max_value' => 7.60,  'icon_path' => '/icons/arr/hujan_sedang.svg',      'color_hex' => '#eab308', 'sort_order' => 4],
+                ['id_kategori' => $arrKategoriId, 'state_key' => 'hujan_lebat',      'state_label' => 'Hujan Lebat',       'min_value' => 7.60,  'max_value' => 15.60, 'icon_path' => '/icons/arr/hujan_lebat.svg',       'color_hex' => '#f97316', 'sort_order' => 5],
+                ['id_kategori' => $arrKategoriId, 'state_key' => 'hujan_sangat_lebat','state_label' => 'Hujan Sangat Lebat','min_value' => 15.60, 'max_value' => null,  'icon_path' => '/icons/arr/hujan_sangat_lebat.svg','color_hex' => '#ef4444', 'sort_order' => 6],
+                ['id_kategori' => $arrKategoriId, 'state_key' => 'koneksi_terputus', 'state_label' => 'Koneksi Terputus',  'min_value' => null,  'max_value' => null,  'icon_path' => '/icons/arr/koneksi_terputus.svg',  'color_hex' => '#9ca3af', 'sort_order' => 7],
+            ]);
+        }
+
+        // Thresholds AFMR (online/offline only)
+        $afmrKategoriId = DB::table('kategori_logger')->where('nama_kategori', 'AFMR')->value('id_katlogger');
+        if ($afmrKategoriId && Schema::hasTable('klasifikasi_threshold')) {
+            DB::table('klasifikasi_threshold')->insert([
+                ['id_kategori' => $afmrKategoriId, 'state_key' => 'online',           'state_label' => 'Koneksi Terhubung', 'min_value' => null, 'max_value' => null, 'icon_path' => '/icons/afmr/online.svg',          'color_hex' => '#22c55e', 'sort_order' => 1],
+                ['id_kategori' => $afmrKategoriId, 'state_key' => 'koneksi_terputus', 'state_label' => 'Koneksi Terputus',  'min_value' => null, 'max_value' => null, 'icon_path' => '/icons/afmr/offline.svg',         'color_hex' => '#9ca3af', 'sort_order' => 2],
+            ]);
+        }
+
+        // Thresholds AWR (curah hujan per jam, mirip ARR, versi weather)
+        $awrKategoriId = DB::table('kategori_logger')->where('nama_kategori', 'AWR')->value('id_katlogger');
+        if ($awrKategoriId && Schema::hasTable('klasifikasi_threshold')) {
+            DB::table('klasifikasi_threshold')->insert([
+                ['id_kategori' => $awrKategoriId, 'state_key' => 'tidak_hujan',        'state_label' => 'Tidak Hujan',        'min_value' => null,  'max_value' => 0.10,  'icon_path' => '/icons/awr/tidak_hujan.svg',        'color_hex' => '#22c55e', 'sort_order' => 1],
+                ['id_kategori' => $awrKategoriId, 'state_key' => 'awr_sangat_ringan',  'state_label' => 'Hujan Sangat Ringan','min_value' => 0.10,  'max_value' => 1.00,  'icon_path' => '/icons/awr/sangat_ringan.svg',      'color_hex' => '#7dd3fc', 'sort_order' => 2],
+                ['id_kategori' => $awrKategoriId, 'state_key' => 'awr_ringan',         'state_label' => 'Hujan Ringan',       'min_value' => 1.00,  'max_value' => 2.50,  'icon_path' => '/icons/awr/ringan.svg',             'color_hex' => '#3b82f6', 'sort_order' => 3],
+                ['id_kategori' => $awrKategoriId, 'state_key' => 'awr_sedang',         'state_label' => 'Hujan Sedang',       'min_value' => 2.50,  'max_value' => 7.60,  'icon_path' => '/icons/awr/sedang.svg',             'color_hex' => '#eab308', 'sort_order' => 4],
+                ['id_kategori' => $awrKategoriId, 'state_key' => 'awr_lebat',          'state_label' => 'Hujan Lebat',        'min_value' => 7.60,  'max_value' => 15.60, 'icon_path' => '/icons/awr/lebat.svg',              'color_hex' => '#f97316', 'sort_order' => 5],
+                ['id_kategori' => $awrKategoriId, 'state_key' => 'awr_sangat_lebat',   'state_label' => 'Hujan Sangat Lebat', 'min_value' => 15.60, 'max_value' => null,  'icon_path' => '/icons/awr/sangat_lebat.svg',       'color_hex' => '#ef4444', 'sort_order' => 6],
+                ['id_kategori' => $awrKategoriId, 'state_key' => 'perbaikan',          'state_label' => 'Perbaikan',          'min_value' => null,  'max_value' => null,  'icon_path' => '/icons/awr/perbaikan.svg',          'color_hex' => '#a78bfa', 'sort_order' => 7],
+                ['id_kategori' => $awrKategoriId, 'state_key' => 'koneksi_terputus',   'state_label' => 'Koneksi Terputus',   'min_value' => null,  'max_value' => null,  'icon_path' => '/icons/awr/offline.svg',            'color_hex' => '#9ca3af', 'sort_order' => 8],
+            ]);
+        }
+
+        // Thresholds AWQR (online/offline only)
+        $awqrKategoriId = DB::table('kategori_logger')->where('nama_kategori', 'AWQR')->value('id_katlogger');
+        if ($awqrKategoriId && Schema::hasTable('klasifikasi_threshold')) {
+            DB::table('klasifikasi_threshold')->insert([
+                ['id_kategori' => $awqrKategoriId, 'state_key' => 'online',           'state_label' => 'Koneksi Terhubung', 'min_value' => null, 'max_value' => null, 'icon_path' => '/icons/awgr/awlr_map_pins_on.svg', 'color_hex' => '#22c55e', 'sort_order' => 1],
+                ['id_kategori' => $awqrKategoriId, 'state_key' => 'koneksi_terputus', 'state_label' => 'Koneksi Terputus',  'min_value' => null, 'max_value' => null, 'icon_path' => '/icons/awgr/awlr_map_pins_off.svg','color_hex' => '#9ca3af', 'sort_order' => 2],
             ]);
         }
 
         DB::table('t_logger')->insert([
-            ['id' => 1, 'id_logger' => '10001', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'AWLR Seturan', 'tabel_main' => 't_s19_01', 'jeda_notif' => 1, 'idlokasi' => 1, 'id_katlogger' => 1, 'sensor_count' => 19],
-            ['id' => 2, 'id_logger' => '10002', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'ARR Pogung', 'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 2, 'id_katlogger' => 2, 'sensor_count' => 16],
-            ['id' => 3, 'id_logger' => '10003', 'instansi_id' => $instansiBeaconId, 'nama_logger' => 'AWLR Sinduadi', 'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 3, 'id_katlogger' => 1, 'sensor_count' => 16],
-            ['id' => 4, 'id_logger' => '10004', 'instansi_id' => $instansiContohId, 'nama_logger' => 'ARR Bantar', 'tabel_main' => 't_s19_01', 'jeda_notif' => 1, 'idlokasi' => 4, 'id_katlogger' => 2, 'sensor_count' => 19],
+            ['id' => 1, 'id_logger' => '10001', 'instansi_id' => $instansiBeaconId,  'nama_logger' => 'AWLR Seturan',     'tabel_main' => 't_s19_01', 'jeda_notif' => 1, 'idlokasi' => 1, 'id_katlogger' => 1, 'sensor_count' => 19],
+            ['id' => 2, 'id_logger' => '10002', 'instansi_id' => $instansiBeaconId,  'nama_logger' => 'ARR Pogung',       'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 2, 'id_katlogger' => 2, 'sensor_count' => 16],
+            ['id' => 3, 'id_logger' => '10003', 'instansi_id' => $instansiBeaconId,  'nama_logger' => 'AWLR Sinduadi',    'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 3, 'id_katlogger' => 1, 'sensor_count' => 16],
+            ['id' => 4, 'id_logger' => '10004', 'instansi_id' => $instansiContohId,  'nama_logger' => 'ARR Bantar',       'tabel_main' => 't_s19_01', 'jeda_notif' => 1, 'idlokasi' => 4, 'id_katlogger' => 2, 'sensor_count' => 19],
+            ['id' => 5, 'id_logger' => '10005', 'instansi_id' => $instansiBeaconId,  'nama_logger' => 'AFMR Kranggan',    'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 5, 'id_katlogger' => 3, 'sensor_count' => 16],
+            ['id' => 6, 'id_logger' => '10006', 'instansi_id' => $instansiBeaconId,  'nama_logger' => 'AWR Nanggulan',    'tabel_main' => 't_s19_01', 'jeda_notif' => 1, 'idlokasi' => 6, 'id_katlogger' => 4, 'sensor_count' => 19],
+            ['id' => 7, 'id_logger' => '10007', 'instansi_id' => $instansiContohId,  'nama_logger' => 'AWQR Kretek',      'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 7, 'id_katlogger' => 5, 'sensor_count' => 16],
+            ['id' => 8, 'id_logger' => '10008', 'instansi_id' => $instansiContohId,  'nama_logger' => 'AWLR Non-JIAT Bangunjiwo', 'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 8, 'id_katlogger' => 1, 'sensor_count' => 16],
         ]);
 
         if (Schema::hasTable('user_logger_access')) {
@@ -456,30 +553,71 @@ class MiniStesySeeder extends Seeder
         ]);
 
         DB::table('parameter_sensor')->insert([
-            ['id_param' => 1, 'logger_id' => '10001', 'nama_parameter' => 'TMA', 'kolom_sensor' => 'sensor14', 'satuan' => 'cm', 'tipe_graf' => 'line', 'icon_app' => 'water', 'debit_awlr' => '-', 'parameter_utama' => 'tma'],
-            ['id_param' => 2, 'logger_id' => '10002', 'nama_parameter' => 'Curah Hujan', 'kolom_sensor' => 'sensor8', 'satuan' => 'mm', 'tipe_graf' => 'bar', 'icon_app' => 'rain', 'debit_awlr' => '-', 'parameter_utama' => 'hujan'],
-            ['id_param' => 3, 'logger_id' => '10003', 'nama_parameter' => 'TMA', 'kolom_sensor' => 'sensor14', 'satuan' => 'cm', 'tipe_graf' => 'line', 'icon_app' => 'water', 'debit_awlr' => '-', 'parameter_utama' => 'tma'],
-            ['id_param' => 4, 'logger_id' => '10004', 'nama_parameter' => 'Curah Hujan', 'kolom_sensor' => 'sensor8', 'satuan' => 'mm', 'tipe_graf' => 'bar', 'icon_app' => 'rain', 'debit_awlr' => '-', 'parameter_utama' => 'hujan'],
-
-            ['id_param' => 5, 'logger_id' => '10001', 'nama_parameter' => 'humidity_logger', 'kolom_sensor' => 'sensor5', 'satuan' => '%', 'tipe_graf' => 'line', 'icon_app' => 'water_percent', 'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
-            ['id_param' => 6, 'logger_id' => '10001', 'nama_parameter' => 'battery_logger', 'kolom_sensor' => 'sensor4', 'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80', 'debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
-            ['id_param' => 7, 'logger_id' => '10001', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor10', 'satuan' => '°C', 'tipe_graf' => 'line', 'icon_app' => 'thermometer', 'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
-            ['id_param' => 8, 'logger_id' => '10001', 'nama_parameter' => 'muka_air_tanah', 'kolom_sensor' => 'sensor1', 'satuan' => 'm', 'tipe_graf' => 'line', 'icon_app' => 'waves', 'debit_awlr' => '-', 'parameter_utama' => 'muka_air_tanah'],
-
-            ['id_param' => 9, 'logger_id' => '10003', 'nama_parameter' => 'humidity_logger', 'kolom_sensor' => 'sensor6', 'satuan' => '%', 'tipe_graf' => 'line', 'icon_app' => 'water_percent', 'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
-            ['id_param' => 10, 'logger_id' => '10003', 'nama_parameter' => 'battery_logger', 'kolom_sensor' => 'sensor8', 'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80', 'debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
-            ['id_param' => 11, 'logger_id' => '10003', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor11', 'satuan' => '°C', 'tipe_graf' => 'line', 'icon_app' => 'thermometer', 'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
-            ['id_param' => 12, 'logger_id' => '10003', 'nama_parameter' => 'muka_air_tanah', 'kolom_sensor' => 'sensor1', 'satuan' => 'm', 'tipe_graf' => 'line', 'icon_app' => 'waves', 'debit_awlr' => '-', 'parameter_utama' => 'muka_air_tanah'],
-
-            ['id_param' => 13, 'logger_id' => '10002', 'nama_parameter' => 'humidity_logger', 'kolom_sensor' => 'sensor3', 'satuan' => '%', 'tipe_graf' => 'line', 'icon_app' => 'water_percent', 'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
-            ['id_param' => 14, 'logger_id' => '10002', 'nama_parameter' => 'battery_logger', 'kolom_sensor' => 'sensor2', 'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80', 'debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
-            ['id_param' => 15, 'logger_id' => '10002', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor15', 'satuan' => '°C', 'tipe_graf' => 'line', 'icon_app' => 'thermometer', 'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
-            ['id_param' => 16, 'logger_id' => '10002', 'nama_parameter' => 'muka_air_tanah', 'kolom_sensor' => 'sensor1', 'satuan' => 'm', 'tipe_graf' => 'line', 'icon_app' => 'waves', 'debit_awlr' => '-', 'parameter_utama' => 'muka_air_tanah'],
-
-            ['id_param' => 17, 'logger_id' => '10004', 'nama_parameter' => 'humidity_logger', 'kolom_sensor' => 'sensor7', 'satuan' => '%', 'tipe_graf' => 'line', 'icon_app' => 'water_percent', 'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
-            ['id_param' => 18, 'logger_id' => '10004', 'nama_parameter' => 'battery_logger', 'kolom_sensor' => 'sensor5', 'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80', 'debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
-            ['id_param' => 19, 'logger_id' => '10004', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor2', 'satuan' => '°C', 'tipe_graf' => 'line', 'icon_app' => 'thermometer', 'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
-            ['id_param' => 20, 'logger_id' => '10004', 'nama_parameter' => 'muka_air_tanah', 'kolom_sensor' => 'sensor1', 'satuan' => 'm', 'tipe_graf' => 'line', 'icon_app' => 'waves', 'debit_awlr' => '-', 'parameter_utama' => 'muka_air_tanah'],
+            // ── AWLR 10001 ──────────────────────────────────────────────────────
+            ['id_param' =>  1, 'logger_id' => '10001', 'nama_parameter' => 'TMA',                'kolom_sensor' => 'sensor14', 'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'water',              'debit_awlr' => '-', 'parameter_utama' => 'tma'],
+            ['id_param' =>  5, 'logger_id' => '10001', 'nama_parameter' => 'humidity_logger',    'kolom_sensor' => 'sensor5',  'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
+            ['id_param' =>  6, 'logger_id' => '10001', 'nama_parameter' => 'battery_logger',     'kolom_sensor' => 'sensor4',  'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80','debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
+            ['id_param' =>  7, 'logger_id' => '10001', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor10', 'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
+            ['id_param' =>  8, 'logger_id' => '10001', 'nama_parameter' => 'muka_air_tanah',     'kolom_sensor' => 'sensor1',  'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'waves',              'debit_awlr' => '-', 'parameter_utama' => 'muka_air_tanah'],
+            // ── ARR 10002 ───────────────────────────────────────────────────────
+            ['id_param' =>  2, 'logger_id' => '10002', 'nama_parameter' => 'Curah Hujan',        'kolom_sensor' => 'sensor8',  'satuan' => 'mm',   'tipe_graf' => 'bar',  'icon_app' => 'rain',               'debit_awlr' => '-', 'parameter_utama' => 'hujan'],
+            ['id_param' => 13, 'logger_id' => '10002', 'nama_parameter' => 'humidity_logger',    'kolom_sensor' => 'sensor3',  'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
+            ['id_param' => 14, 'logger_id' => '10002', 'nama_parameter' => 'battery_logger',     'kolom_sensor' => 'sensor2',  'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80','debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
+            ['id_param' => 15, 'logger_id' => '10002', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor15', 'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
+            ['id_param' => 16, 'logger_id' => '10002', 'nama_parameter' => 'muka_air_tanah',     'kolom_sensor' => 'sensor1',  'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'waves',              'debit_awlr' => '-', 'parameter_utama' => 'muka_air_tanah'],
+            // ── AWLR 10003 ──────────────────────────────────────────────────────
+            ['id_param' =>  3, 'logger_id' => '10003', 'nama_parameter' => 'TMA',                'kolom_sensor' => 'sensor14', 'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'water',              'debit_awlr' => '-', 'parameter_utama' => 'tma'],
+            ['id_param' =>  9, 'logger_id' => '10003', 'nama_parameter' => 'humidity_logger',    'kolom_sensor' => 'sensor6',  'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
+            ['id_param' => 10, 'logger_id' => '10003', 'nama_parameter' => 'battery_logger',     'kolom_sensor' => 'sensor8',  'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80','debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
+            ['id_param' => 11, 'logger_id' => '10003', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor11', 'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
+            ['id_param' => 12, 'logger_id' => '10003', 'nama_parameter' => 'muka_air_tanah',     'kolom_sensor' => 'sensor1',  'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'waves',              'debit_awlr' => '-', 'parameter_utama' => 'muka_air_tanah'],
+            // ── ARR 10004 ───────────────────────────────────────────────────────
+            ['id_param' =>  4, 'logger_id' => '10004', 'nama_parameter' => 'Curah Hujan',        'kolom_sensor' => 'sensor8',  'satuan' => 'mm',   'tipe_graf' => 'bar',  'icon_app' => 'rain',               'debit_awlr' => '-', 'parameter_utama' => 'hujan'],
+            ['id_param' => 17, 'logger_id' => '10004', 'nama_parameter' => 'humidity_logger',    'kolom_sensor' => 'sensor7',  'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
+            ['id_param' => 18, 'logger_id' => '10004', 'nama_parameter' => 'battery_logger',     'kolom_sensor' => 'sensor5',  'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80','debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
+            ['id_param' => 19, 'logger_id' => '10004', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor2',  'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
+            ['id_param' => 20, 'logger_id' => '10004', 'nama_parameter' => 'muka_air_tanah',     'kolom_sensor' => 'sensor1',  'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'waves',              'debit_awlr' => '-', 'parameter_utama' => 'muka_air_tanah'],
+            // ── AFMR 10005 (t_s16_01) ───────────────────────────────────────────
+            ['id_param' => 21, 'logger_id' => '10005', 'nama_parameter' => 'luas_penampang',     'kolom_sensor' => 'sensor1',  'satuan' => 'm²',   'tipe_graf' => 'line', 'icon_app' => 'area_chart',         'debit_awlr' => '-', 'parameter_utama' => 'luas_penampang'],
+            ['id_param' => 22, 'logger_id' => '10005', 'nama_parameter' => 'debit',              'kolom_sensor' => 'sensor2',  'satuan' => 'm³/s', 'tipe_graf' => 'line', 'icon_app' => 'water',              'debit_awlr' => '-', 'parameter_utama' => 'debit'],
+            ['id_param' => 23, 'logger_id' => '10005', 'nama_parameter' => 'flow_velocity',      'kolom_sensor' => 'sensor3',  'satuan' => 'm/s',  'tipe_graf' => 'line', 'icon_app' => 'speed',              'debit_awlr' => '-', 'parameter_utama' => 'flow_velocity'],
+            ['id_param' => 24, 'logger_id' => '10005', 'nama_parameter' => 'elevasi_muka_air',   'kolom_sensor' => 'sensor4',  'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'waves',              'debit_awlr' => '-', 'parameter_utama' => 'elevasi_muka'],
+            ['id_param' => 25, 'logger_id' => '10005', 'nama_parameter' => 'jarak_sensor',       'kolom_sensor' => 'sensor5',  'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'straighten',         'debit_awlr' => '-', 'parameter_utama' => 'jarak_sensor'],
+            ['id_param' => 26, 'logger_id' => '10005', 'nama_parameter' => 'elevasi_sensor',     'kolom_sensor' => 'sensor6',  'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'height',             'debit_awlr' => '-', 'parameter_utama' => 'elevasi_sensor'],
+            ['id_param' => 27, 'logger_id' => '10005', 'nama_parameter' => 'humidity_logger',    'kolom_sensor' => 'sensor9',  'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
+            ['id_param' => 28, 'logger_id' => '10005', 'nama_parameter' => 'battery_logger',     'kolom_sensor' => 'sensor10', 'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80','debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
+            ['id_param' => 29, 'logger_id' => '10005', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor11', 'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
+            // ── AWR 10006 (t_s19_01) ────────────────────────────────────────────
+            ['id_param' => 30, 'logger_id' => '10006', 'nama_parameter' => 'kecepatan_angin',    'kolom_sensor' => 'sensor1',  'satuan' => 'Km',   'tipe_graf' => 'line', 'icon_app' => 'air',                'debit_awlr' => '-', 'parameter_utama' => 'kecepatan_angin'],
+            ['id_param' => 31, 'logger_id' => '10006', 'nama_parameter' => 'arah_angin',         'kolom_sensor' => 'sensor2',  'satuan' => '°',    'tipe_graf' => 'line', 'icon_app' => 'explore',            'debit_awlr' => '-', 'parameter_utama' => 'arah_angin'],
+            ['id_param' => 32, 'logger_id' => '10006', 'nama_parameter' => 'temperatur_udara',   'kolom_sensor' => 'sensor3',  'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'temperatur_udara'],
+            ['id_param' => 33, 'logger_id' => '10006', 'nama_parameter' => 'kelembaban_udara',   'kolom_sensor' => 'sensor4',  'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'kelembaban_udara'],
+            ['id_param' => 34, 'logger_id' => '10006', 'nama_parameter' => 'tekanan_udara',      'kolom_sensor' => 'sensor5',  'satuan' => 'hPa',  'tipe_graf' => 'line', 'icon_app' => 'compress',           'debit_awlr' => '-', 'parameter_utama' => 'tekanan'],
+            ['id_param' => 35, 'logger_id' => '10006', 'nama_parameter' => 'kecerahan',          'kolom_sensor' => 'sensor6',  'satuan' => 'K Lux','tipe_graf' => 'line', 'icon_app' => 'light_mode',         'debit_awlr' => '-', 'parameter_utama' => 'kecerahan'],
+            ['id_param' => 36, 'logger_id' => '10006', 'nama_parameter' => 'arah_cahaya',        'kolom_sensor' => 'sensor7',  'satuan' => '°',    'tipe_graf' => 'line', 'icon_app' => 'explore',            'debit_awlr' => '-', 'parameter_utama' => 'arah_cahaya'],
+            ['id_param' => 37, 'logger_id' => '10006', 'nama_parameter' => 'Curah Hujan',        'kolom_sensor' => 'sensor8',  'satuan' => 'mm',   'tipe_graf' => 'bar',  'icon_app' => 'rain',               'debit_awlr' => '-', 'parameter_utama' => 'hujan'],
+            ['id_param' => 38, 'logger_id' => '10006', 'nama_parameter' => 'humidity_logger',    'kolom_sensor' => 'sensor12', 'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
+            ['id_param' => 39, 'logger_id' => '10006', 'nama_parameter' => 'battery_logger',     'kolom_sensor' => 'sensor13', 'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80','debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
+            ['id_param' => 40, 'logger_id' => '10006', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor14', 'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
+            // ── AWLR Non-JIAT 10008 (t_s16_01) ─────────────────────────────────
+            ['id_param' => 53, 'logger_id' => '10008', 'nama_parameter' => 'tma',                'kolom_sensor' => 'sensor1',  'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'water',              'debit_awlr' => '-', 'parameter_utama' => 'tma'],
+            ['id_param' => 54, 'logger_id' => '10008', 'nama_parameter' => 'debit',              'kolom_sensor' => 'sensor2',  'satuan' => 'm³/s', 'tipe_graf' => 'line', 'icon_app' => 'waves',              'debit_awlr' => '-', 'parameter_utama' => 'debit'],
+            ['id_param' => 55, 'logger_id' => '10008', 'nama_parameter' => 'humidity_logger',    'kolom_sensor' => 'sensor4',  'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
+            ['id_param' => 56, 'logger_id' => '10008', 'nama_parameter' => 'battery_logger',     'kolom_sensor' => 'sensor5',  'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80','debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
+            ['id_param' => 57, 'logger_id' => '10008', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor6',  'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
+            // ── AWQR 10007 (t_s16_01) ───────────────────────────────────────────
+            ['id_param' => 41, 'logger_id' => '10007', 'nama_parameter' => 'tma',                'kolom_sensor' => 'sensor1',  'satuan' => 'mdpl', 'tipe_graf' => 'line', 'icon_app' => 'water',              'debit_awlr' => '-', 'parameter_utama' => 'tma'],
+            ['id_param' => 42, 'logger_id' => '10007', 'nama_parameter' => 'ph_air',             'kolom_sensor' => 'sensor2',  'satuan' => '',     'tipe_graf' => 'line', 'icon_app' => 'science',            'debit_awlr' => '-', 'parameter_utama' => 'ph'],
+            ['id_param' => 43, 'logger_id' => '10007', 'nama_parameter' => 'suhu_air',           'kolom_sensor' => 'sensor3',  'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'suhu_air'],
+            ['id_param' => 44, 'logger_id' => '10007', 'nama_parameter' => 'orp',                'kolom_sensor' => 'sensor4',  'satuan' => 'mV',   'tipe_graf' => 'line', 'icon_app' => 'electric_bolt',      'debit_awlr' => '-', 'parameter_utama' => 'orp'],
+            ['id_param' => 45, 'logger_id' => '10007', 'nama_parameter' => 'conductivity',       'kolom_sensor' => 'sensor5',  'satuan' => 'µS/cm','tipe_graf' => 'line', 'icon_app' => 'waves',              'debit_awlr' => '-', 'parameter_utama' => 'conductivity'],
+            ['id_param' => 46, 'logger_id' => '10007', 'nama_parameter' => 'salinity',           'kolom_sensor' => 'sensor6',  'satuan' => 'PSU',  'tipe_graf' => 'line', 'icon_app' => 'water_drop',         'debit_awlr' => '-', 'parameter_utama' => 'salinity'],
+            ['id_param' => 47, 'logger_id' => '10007', 'nama_parameter' => 'tds',                'kolom_sensor' => 'sensor7',  'satuan' => 'mg/L', 'tipe_graf' => 'line', 'icon_app' => 'opacity',            'debit_awlr' => '-', 'parameter_utama' => 'tds'],
+            ['id_param' => 48, 'logger_id' => '10007', 'nama_parameter' => 'turbidity',          'kolom_sensor' => 'sensor8',  'satuan' => 'NTU',  'tipe_graf' => 'line', 'icon_app' => 'blur_on',            'debit_awlr' => '-', 'parameter_utama' => 'turbidity'],
+            ['id_param' => 49, 'logger_id' => '10007', 'nama_parameter' => 'tinggi_sensor',      'kolom_sensor' => 'sensor9',  'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'height',             'debit_awlr' => '-', 'parameter_utama' => 'tinggi_sensor'],
+            ['id_param' => 50, 'logger_id' => '10007', 'nama_parameter' => 'humidity_logger',    'kolom_sensor' => 'sensor12', 'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
+            ['id_param' => 51, 'logger_id' => '10007', 'nama_parameter' => 'battery_logger',     'kolom_sensor' => 'sensor13', 'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80','debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
+            ['id_param' => 52, 'logger_id' => '10007', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor14', 'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
         ]);
 
         if (Schema::hasTable('parameter_groups') && Schema::hasColumn('parameter_sensor', 'parameter_group_id')) {
@@ -610,11 +748,28 @@ class MiniStesySeeder extends Seeder
             ['id' => 4, 'id_logger' => '10004', 'kedalaman_sumur' => 3.9, 'kedalaman_pompa' => 1.5, 'kedalaman_sensor' => 0.9],
         ]);
 
+        // Non-JIAT data untuk AWLR Bangunjiwo (10008)
+        if (Schema::hasTable('nonjiat_data')) {
+            DB::table('nonjiat_data')->insert([
+                [
+                    'id_logger'           => '10008',
+                    'jarak_sensor_ke_air' => 2.50,   // jarak sensor ke permukaan air (m)
+                    'tinggi_sensor'       => 5.00,   // tinggi sensor dari dasar sungai (m)
+                    'elevasi_max'         => 5.00,   // batas skala atas peil (m)
+                    'elevasi_min'         => 0.00,   // batas skala bawah peil (m)
+                ],
+            ]);
+        }
+
         DB::table('foto_pos')->insert([
             ['id' => 1, 'id_logger' => '10001', 'url_foto' => 'pos/10001.png', 'foto_utama' => 1],
             ['id' => 2, 'id_logger' => '10002', 'url_foto' => 'pos/10002.png', 'foto_utama' => 1],
             ['id' => 3, 'id_logger' => '10003', 'url_foto' => 'pos/10003.png', 'foto_utama' => 1],
             ['id' => 4, 'id_logger' => '10004', 'url_foto' => 'pos/10004.png', 'foto_utama' => 1],
+            ['id' => 5, 'id_logger' => '10005', 'url_foto' => 'pos/10005.png', 'foto_utama' => 1],
+            ['id' => 6, 'id_logger' => '10006', 'url_foto' => 'pos/10006.png', 'foto_utama' => 1],
+            ['id' => 7, 'id_logger' => '10007', 'url_foto' => 'pos/10007.png', 'foto_utama' => 1],
+            ['id' => 8, 'id_logger' => '10008', 'url_foto' => 'pos/10008.png', 'foto_utama' => 1],
         ]);
 
         DB::table('tingkat_siaga_awlr')->insert([
@@ -656,6 +811,10 @@ class MiniStesySeeder extends Seeder
             ['id_logger' => '10002', 'table_name' => 't_s16_01', 'sensor_count' => 16, 'active' => 1, 'created_at' => now()],
             ['id_logger' => '10003', 'table_name' => 't_s16_01', 'sensor_count' => 16, 'active' => 1, 'created_at' => now()],
             ['id_logger' => '10004', 'table_name' => 't_s19_01', 'sensor_count' => 19, 'active' => 1, 'created_at' => now()],
+            ['id_logger' => '10005', 'table_name' => 't_s16_01', 'sensor_count' => 16, 'active' => 1, 'created_at' => now()],
+            ['id_logger' => '10006', 'table_name' => 't_s19_01', 'sensor_count' => 19, 'active' => 1, 'created_at' => now()],
+            ['id_logger' => '10007', 'table_name' => 't_s16_01', 'sensor_count' => 16, 'active' => 1, 'created_at' => now()],
+            ['id_logger' => '10008', 'table_name' => 't_s16_01', 'sensor_count' => 16, 'active' => 1, 'created_at' => now()],
         ]);
 
         $now = now()->format('Y-m-d H:i:s');
@@ -857,17 +1016,21 @@ class MiniStesySeeder extends Seeder
             ]);
         }
 
-        $start = Carbon::create(2026, 1, 7, 0, 0, 0);
-        $end = Carbon::create(2026, 2, 12, 23, 0, 0);
+        $start = Carbon::create(2026, 2, 1, 0, 0, 0);
+        $end = Carbon::create(2026, 3, 6, 16, 0, 0);
 
         if (Schema::hasTable('t_s19_01')) {
             DB::table('t_s19_01')->where('id_logger', '10001')->whereBetween('waktu', [$start, $end])->delete();
             DB::table('t_s19_01')->where('id_logger', '10004')->whereBetween('waktu', [$start, $end])->delete();
+            DB::table('t_s19_01')->where('id_logger', '10006')->whereBetween('waktu', [$start, $end])->delete(); // AWR
         }
 
         if (Schema::hasTable('t_s16_01')) {
             DB::table('t_s16_01')->where('id_logger', '10002')->whereBetween('waktu', [$start, $end])->delete();
             DB::table('t_s16_01')->where('id_logger', '10003')->whereBetween('waktu', [$start, $end])->delete();
+            DB::table('t_s16_01')->where('id_logger', '10005')->whereBetween('waktu', [$start, $end])->delete(); // AFMR
+            DB::table('t_s16_01')->where('id_logger', '10007')->whereBetween('waktu', [$start, $end])->delete(); // AWQR
+            DB::table('t_s16_01')->where('id_logger', '10008')->whereBetween('waktu', [$start, $end])->delete(); // AWLR Non-JIAT
         }
 
         $badDays = [];
@@ -892,6 +1055,10 @@ class MiniStesySeeder extends Seeder
         $this->seedS16Logger10003($start, $end, $badDays);
         $this->seedS16Logger10002($start, $end, $badDays);
         $this->seedS19Logger10004($start, $end, $badDays);
+        $this->seedS16Logger10005($start, $end, $badDays); // AFMR
+        $this->seedS19Logger10006($start, $end, $badDays); // AWR
+        $this->seedS16Logger10007($start, $end, $badDays); // AWQR
+        $this->seedS16Logger10008($start, $end, $badDays); // AWLR Non-JIAT
     }
 
     private function seedS19Logger10001(Carbon $start, Carbon $end, array $badDays): void
@@ -1093,4 +1260,236 @@ class MiniStesySeeder extends Seeder
 
         if (!empty($bulk)) DB::table('t_s19_01')->insert($bulk);
     }
+
+    /**
+     * AFMR Kranggan — t_s16_01
+     * sensor1=luas_penampang, sensor2=debit, sensor3=flow_velocity,
+     * sensor4=elevasi_muka_air, sensor5=jarak_sensor, sensor6=elevasi_sensor,
+     * sensor9=humidity, sensor10=battery, sensor11=temperature
+     */
+    private function seedS16Logger10005(Carbon $start, Carbon $end, array $badDays): void
+    {
+        $intervalMinutes = 1;
+        $bulk = [];
+        $current = $start->copy();
+
+        while ($current <= $end) {
+            $dayKey = $current->format('Y-m-d');
+            $keepRate = $badDays[$dayKey] ?? 1.0;
+
+            if ($keepRate >= 1.0 || (mt_rand(1, 10000) / 10000) <= $keepRate) {
+                $time = $current->format('Y-m-d H:i:s');
+
+                // simulasi debit berfluktuasi harian (peak siang)
+                $hour   = (int) $current->format('H');
+                $factor = 1.0 + 0.3 * sin(M_PI * ($hour - 6) / 12);
+
+                $bulk[] = [
+                    'id_logger' => '10005',
+                    'waktu'     => $time,
+                    'sensor1'   => round(mt_rand(180, 220) / 1.0 * $factor, 2),  // luas penampang m²
+                    'sensor2'   => round(mt_rand(150, 190) / 1.0 * $factor, 3),  // debit m³/s
+                    'sensor3'   => round(mt_rand(70, 110) / 100, 3),              // flow velocity m/s
+                    'sensor4'   => round(mt_rand(4800, 5050) / 1000, 3),          // elevasi muka air m
+                    'sensor5'   => round(mt_rand(700, 800) / 100, 2),             // jarak sensor m
+                    'sensor6'   => round(mt_rand(1200, 1300) / 100, 3),           // elevasi sensor m
+                    'sensor7'   => mt_rand(0, 3) / 10,
+                    'sensor8'   => mt_rand(0, 3) / 10,
+                    'sensor9'   => mt_rand(55, 80),                               // humidity %
+                    'sensor10'  => mt_rand(120, 130) / 10,                        // battery V
+                    'sensor11'  => mt_rand(27, 35),                               // temperature °C
+                    'sensor12'  => mt_rand(0, 3) / 10,
+                    'sensor13'  => mt_rand(0, 3) / 10,
+                    'sensor14'  => mt_rand(0, 3) / 10,
+                    'sensor15'  => mt_rand(0, 3) / 10,
+                    'sensor16'  => mt_rand(0, 3) / 10,
+                ];
+
+                if (count($bulk) >= 500) {
+                    DB::table('t_s16_01')->insert($bulk);
+                    $bulk = [];
+                }
+            }
+
+            $current->addMinutes($intervalMinutes);
+        }
+
+        if (!empty($bulk)) DB::table('t_s16_01')->insert($bulk);
+    }
+
+    /**
+     * AWR Nanggulan — t_s19_01
+     * sensor1=kecepatan_angin, sensor2=arah_angin, sensor3=temperatur_udara,
+     * sensor4=kelembaban_udara, sensor5=tekanan_udara, sensor6=kecerahan,
+     * sensor7=arah_cahaya, sensor8=curah_hujan,
+     * sensor12=humidity, sensor13=battery, sensor14=temperature
+     */
+    private function seedS19Logger10006(Carbon $start, Carbon $end, array $badDays): void
+    {
+        $intervalMinutes = 1;
+        $bulk = [];
+        $current = $start->copy();
+
+        while ($current <= $end) {
+            $dayKey = $current->format('Y-m-d');
+            $keepRate = $badDays[$dayKey] ?? 1.0;
+
+            if ($keepRate >= 1.0 || (mt_rand(1, 10000) / 10000) <= $keepRate) {
+                $time   = $current->format('Y-m-d H:i:s');
+                $hour   = (int) $current->format('H');
+                $isPagi = $hour >= 6 && $hour < 18;
+
+                // curah hujan hanya kemungkinan tertentu
+                $isRain  = mt_rand(1, 10) <= 2;
+                $hujan   = $isRain ? mt_rand(5, 250) / 100 : 0;
+
+                $bulk[] = [
+                    'id_logger' => '10006',
+                    'waktu'     => $time,
+                    'sensor1'   => round(mt_rand(30, 150) / 1000, 3),           // kecepatan angin Km
+                    'sensor2'   => round(mt_rand(0, 36000) / 100, 1),           // arah angin °
+                    'sensor3'   => round(mt_rand(250, 340) / 10, 1),            // temperatur udara °C
+                    'sensor4'   => round(mt_rand(600, 980) / 10, 1),            // kelembaban udara %
+                    'sensor5'   => round(mt_rand(10000, 10300) / 10, 1),        // tekanan hPa
+                    'sensor6'   => $isPagi ? round(mt_rand(10, 1200) / 10, 1) : 0, // kecerahan K Lux
+                    'sensor7'   => round(mt_rand(0, 36000) / 100, 1),           // arah cahaya °
+                    'sensor8'   => $hujan,                                       // curah hujan mm
+                    'sensor9'   => mt_rand(0, 5) / 10,
+                    'sensor10'  => mt_rand(0, 5) / 10,
+                    'sensor11'  => mt_rand(0, 5) / 10,
+                    'sensor12'  => mt_rand(55, 85),                              // humidity logger %
+                    'sensor13'  => mt_rand(120, 130) / 10,                      // battery V
+                    'sensor14'  => mt_rand(27, 35),                             // temperature logger °C
+                    'sensor15'  => mt_rand(0, 5) / 10,
+                    'sensor16'  => mt_rand(0, 5) / 10,
+                    'sensor17'  => mt_rand(0, 5) / 10,
+                    'sensor18'  => mt_rand(0, 5) / 10,
+                    'sensor19'  => mt_rand(0, 5) / 10,
+                ];
+
+                if (count($bulk) >= 500) {
+                    DB::table('t_s19_01')->insert($bulk);
+                    $bulk = [];
+                }
+            }
+
+            $current->addMinutes($intervalMinutes);
+        }
+
+        if (!empty($bulk)) DB::table('t_s19_01')->insert($bulk);
+    }
+
+    /**
+     * AWQR Kretek — t_s16_01
+     * sensor1=tma, sensor2=ph_air, sensor3=suhu_air, sensor4=orp,
+     * sensor5=conductivity, sensor6=salinity, sensor7=tds, sensor8=turbidity,
+     * sensor9=tinggi_sensor, sensor12=humidity, sensor13=battery, sensor14=temperature
+     */
+    private function seedS16Logger10007(Carbon $start, Carbon $end, array $badDays): void
+    {
+        $intervalMinutes = 1;
+        $bulk = [];
+        $current = $start->copy();
+
+        while ($current <= $end) {
+            $dayKey = $current->format('Y-m-d');
+            $keepRate = $badDays[$dayKey] ?? 1.0;
+
+            if ($keepRate >= 1.0 || (mt_rand(1, 10000) / 10000) <= $keepRate) {
+                $time = $current->format('Y-m-d H:i:s');
+
+                $bulk[] = [
+                    'id_logger' => '10007',
+                    'waktu'     => $time,
+                    'sensor1'   => round(mt_rand(1400, 1600) / 100, 2),   // tma mdpl
+                    'sensor2'   => round(mt_rand(65, 85) / 10, 2),         // pH air
+                    'sensor3'   => round(mt_rand(230, 280) / 10, 1),       // suhu air °C
+                    'sensor4'   => round(mt_rand(450, 560),0),              // ORP mV
+                    'sensor5'   => round(mt_rand(50, 150) / 10, 2),        // conductivity µS/cm
+                    'sensor6'   => round(mt_rand(1, 10) / 100, 3),         // salinity PSU
+                    'sensor7'   => round(mt_rand(100, 200) / 1, 0),        // TDS mg/L
+                    'sensor8'   => round(mt_rand(10, 80) / 10, 1),         // turbidity NTU
+                    'sensor9'   => round(mt_rand(1300, 1500) / 100, 2),    // tinggi sensor m
+                    'sensor10'  => mt_rand(0, 3) / 10,
+                    'sensor11'  => mt_rand(0, 3) / 10,
+                    'sensor12'  => mt_rand(55, 85),                         // humidity logger %
+                    'sensor13'  => mt_rand(120, 130) / 10,                  // battery V
+                    'sensor14'  => mt_rand(27, 35),                         // temperature logger °C
+                    'sensor15'  => mt_rand(0, 3) / 10,
+                    'sensor16'  => mt_rand(0, 3) / 10,
+                ];
+
+                if (count($bulk) >= 500) {
+                    DB::table('t_s16_01')->insert($bulk);
+                    $bulk = [];
+                }
+            }
+
+            $current->addMinutes($intervalMinutes);
+        }
+
+        if (!empty($bulk)) DB::table('t_s16_01')->insert($bulk);
+    }
+
+    /**
+     * AWLR Non-JIAT Bangunjiwo — t_s16_01
+     * sensor1=tma (m), sensor2=debit (m³/s),
+     * sensor4=humidity, sensor5=battery, sensor6=temperature
+     * nonjiat_data: jarak_sensor_ke_air=2.5, tinggi_sensor=5, elevasi_min=0, elevasi_max=5
+     */
+    private function seedS16Logger10008(Carbon $start, Carbon $end, array $badDays): void
+    {
+        $intervalMinutes = 1;
+        $bulk  = [];
+        $current = $start->copy();
+
+        while ($current <= $end) {
+            $dayKey  = $current->format('Y-m-d');
+            $keepRate = $badDays[$dayKey] ?? 1.0;
+
+            if ($keepRate >= 1.0 || (mt_rand(1, 10000) / 10000) <= $keepRate) {
+                $time = $current->format('Y-m-d H:i:s');
+
+                // TMA: 0.5–4.5 m, naik siang hari, sedikit noise
+                $hour   = (int) $current->format('H');
+                $base   = 1.8 + 0.8 * sin(M_PI * ($hour - 6) / 12);
+                $noise  = mt_rand(-20, 20) / 100;
+                $tma    = max(0.1, round($base + $noise, 3));
+
+                // Debit: proporsional ke TMA² (Q ≈ k × H^b), k=2.5, b=2
+                $debit  = round(2.5 * pow($tma, 2), 3);
+
+                $bulk[] = [
+                    'id_logger' => '10008',
+                    'waktu'     => $time,
+                    'sensor1'   => $tma,                           // TMA (m)
+                    'sensor2'   => $debit,                         // Debit (m³/s)
+                    'sensor3'   => mt_rand(0, 2) / 10,
+                    'sensor4'   => mt_rand(55, 85),                // humidity %
+                    'sensor5'   => mt_rand(120, 130) / 10,         // battery V
+                    'sensor6'   => mt_rand(27, 35),                // temperature °C
+                    'sensor7'   => mt_rand(0, 2) / 10,
+                    'sensor8'   => mt_rand(0, 2) / 10,
+                    'sensor9'   => mt_rand(0, 2) / 10,
+                    'sensor10'  => mt_rand(0, 2) / 10,
+                    'sensor11'  => mt_rand(0, 2) / 10,
+                    'sensor12'  => mt_rand(0, 2) / 10,
+                    'sensor13'  => mt_rand(0, 2) / 10,
+                    'sensor14'  => mt_rand(0, 2) / 10,
+                    'sensor15'  => mt_rand(0, 2) / 10,
+                    'sensor16'  => mt_rand(0, 2) / 10,
+                ];
+
+                if (count($bulk) >= 500) {
+                    DB::table('t_s16_01')->insert($bulk);
+                    $bulk = [];
+                }
+            }
+
+            $current->addMinutes($intervalMinutes);
+        }
+
+        if (!empty($bulk)) DB::table('t_s16_01')->insert($bulk);
+    }
 }
+

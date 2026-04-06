@@ -351,6 +351,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const isMobile = window.innerWidth < 1024;
         const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        const isSkemaIrigasi = {{ request()->routeIs('skema-irigasi.*') ? 'true' : 'false' }};
 
         const sidebar = document.getElementById('mainSidebar');
         const mainContent = document.getElementById('mainContent');
@@ -361,6 +362,8 @@
         if (isMobile) {
             // Di mobile/tablet, sidebar selalu dimulai tertutup (collapsed = hidden via translateX)
             // Tapi jangan simpan ke localStorage supaya tidak mengganggu state desktop
+            sidebar.classList.add('collapsed');
+        } else if (isSkemaIrigasi) {
             sidebar.classList.add('collapsed');
         } else if (isCollapsed) {
             sidebar.classList.add('collapsed');

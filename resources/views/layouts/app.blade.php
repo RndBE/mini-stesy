@@ -38,8 +38,8 @@
                 @yield('content')
             </main> --}}
             @php
-                $contentPaddingClass = request()->routeIs('peta.*') ? '' : 'p-4';
-                $showFooter = !request()->routeIs('peta.lokasi');
+                $contentPaddingClass = request()->routeIs('peta.*') || request()->routeIs('skema-irigasi.*') ? '' : 'p-4';
+                $showFooter = !request()->routeIs('peta.lokasi') && !request()->routeIs('skema-irigasi.*');
             @endphp
             <main class="flex-1 min-h-[calc(100vh-5rem)] min-w-0">
                 <div class=" bg-white min-h-[calc(100vh-5rem)] min-w-0 overflow-x-hidden">

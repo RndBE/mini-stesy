@@ -65,6 +65,7 @@
                             <th scope="col" class="px-6 py-4">Latitude</th>
                             <th scope="col" class="px-6 py-4">Longitude</th>
                             <th scope="col" class="px-6 py-4">Parameter</th>
+                            <th scope="col" class="px-6 py-4 text-center">Status</th>
                             <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -90,6 +91,18 @@
                                                 x-text="(param.nama_parameter || '-').replaceAll('_', ' ')"></span>
                                         </template>
                                     </div>
+                                </td>
+                                {{-- Badge Status Perbaikan --}}
+                                <td class="whitespace-nowrap px-6 py-4 text-center">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
+                                        :class="device.status_perbaikan === 'perbaikan'
+                                            ? 'bg-orange-100 text-orange-700'
+                                            : 'bg-green-100 text-green-700'"
+                                    >
+                                        <span x-show="device.status_perbaikan !== 'perbaikan'">✓</span>
+                                        <span x-show="device.status_perbaikan === 'perbaikan'">⚠</span>
+                                        <span x-text="device.status_perbaikan === 'perbaikan' ? 'Perbaikan' : 'Normal'"></span>
+                                    </span>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 text-center">
                                     @permission('manage_device')
@@ -946,6 +959,168 @@
                                         class="mt-3 text-sm font-semibold text-indigo-800 hover:text-indigo-900">
                                         + Tambah Parameter
                                     </button>
+                                </div>
+                            </div>
+
+                            {{-- ═══════════════════════════════════════ --}}
+                            {{-- STATUS PERBAIKAN SECTION --}}
+                            {{-- ═══════════════════════════════════════ --}}
+                            <div class="rounded-lg border-2 border-orange-200 bg-orange-50"
+                                x-data="{
+                                    perbaikanLoading: false,
+                                    perbaikanError: '',
+                                    perbaikanSuccess: '',
+                                    pForm: { keterangan: '', tanggal_perbaikan: '', petugas: '' },
+
+                                    get statusPerbaikan() { return editData.status_perbaikan || 'normal'; },
+                                    get perbaikanHistory() { return editData.perbaikan_history || []; },
+
+                                    async toggleNormal() {
+                                        if (this.statusPerbaikan === 'normal') return;
+                                        this.perbaikanLoading = true;
+                                        this.perbaikanError = '';
+                                        try {
+                                            const res = await fetch(`/pengaturan-device/${editData.id_logger}/perbaikan/selesai`, {
+                                                method: 'PUT',
+                                                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                                            });
+                                            const d = await res.json();
+                                            if (d.success) {
+                                                editData.status_perbaikan = 'normal';
+                                                const dev = devices.find(x => x.id_logger === editData.id_logger);
+                                                if (dev) dev.status_perbaikan = 'normal';
+                                                this.perbaikanSuccess = 'Status berhasil dikembalikan ke Normal.';
+                                                setTimeout(() => this.perbaikanSuccess = '', 3000);
+                                            } else {
+                                                this.perbaikanError = d.message || 'Gagal mengubah status.';
+                                            }
+                                        } catch(e) { this.perbaikanError = 'Gagal menghubungi server.'; }
+                                        finally { this.perbaikanLoading = false; }
+                                    },
+
+                                    async submitPerbaikan() {
+                                        if (!this.pForm.keterangan.trim()) { this.perbaikanError = 'Keterangan harus diisi.'; return; }
+                                        if (!this.pForm.tanggal_perbaikan) { this.perbaikanError = 'Tanggal perbaikan harus diisi.'; return; }
+                                        if (!this.pForm.petugas.trim()) { this.perbaikanError = 'Petugas harus diisi.'; return; }
+                                        this.perbaikanLoading = true;
+                                        this.perbaikanError = '';
+                                        try {
+                                            const res = await fetch(`/pengaturan-device/${editData.id_logger}/perbaikan`, {
+                                                method: 'POST',
+                                                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                                                body: JSON.stringify(this.pForm),
+                                            });
+                                            const d = await res.json();
+                                            if (d.success) {
+                                                editData.status_perbaikan = 'perbaikan';
+                                                editData.perbaikan_history = d.history || editData.perbaikan_history;
+                                                const dev = devices.find(x => x.id_logger === editData.id_logger);
+                                                if (dev) { dev.status_perbaikan = 'perbaikan'; dev.perbaikan_history = d.history; }
+                                                this.pForm = { keterangan: '', tanggal_perbaikan: '', petugas: '' };
+                                                this.perbaikanSuccess = 'Catatan perbaikan berhasil disimpan!';
+                                                setTimeout(() => this.perbaikanSuccess = '', 3000);
+                                            } else {
+                                                this.perbaikanError = d.message || 'Gagal menyimpan.';
+                                                if (d.errors) this.perbaikanError = Object.values(d.errors).flat()[0];
+                                            }
+                                        } catch(e) { this.perbaikanError = 'Gagal menghubungi server.'; }
+                                        finally { this.perbaikanLoading = false; }
+                                    }
+                                }"
+                            >
+                                <div class="flex items-center justify-between border-b border-orange-200 px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        <h4 class="text-sm font-semibold text-gray-900">Status Perbaikan</h4>
+                                    </div>
+                                    <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
+                                        :class="statusPerbaikan === 'perbaikan' ? 'bg-orange-500 text-white' : 'bg-green-500 text-white'"
+                                        x-text="statusPerbaikan === 'perbaikan' ? '⚠ Sedang Perbaikan' : '✓ Normal'">
+                                    </span>
+                                </div>
+
+                                <div class="p-4 space-y-4">
+                                    <div x-show="perbaikanError" x-cloak class="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700" x-text="perbaikanError"></div>
+                                    <div x-show="perbaikanSuccess" x-cloak class="rounded-lg bg-green-50 border border-green-200 px-3 py-2 text-sm text-green-700" x-text="perbaikanSuccess"></div>
+
+                                    {{-- Toggle Buttons --}}
+                                    <div class="flex gap-2">
+                                        <button type="button" @click="toggleNormal()" :disabled="statusPerbaikan === 'normal' || perbaikanLoading"
+                                            class="flex-1 py-2.5 rounded-lg text-sm font-semibold border-2 transition-all"
+                                            :class="statusPerbaikan === 'normal' ? 'bg-green-600 border-green-600 text-white' : 'bg-white border-green-300 text-green-700 hover:bg-green-50'">
+                                            ✓ Normal
+                                        </button>
+                                        <button type="button" @click="editData.status_perbaikan = 'perbaikan'" :disabled="perbaikanLoading"
+                                            class="flex-1 py-2.5 rounded-lg text-sm font-semibold border-2 transition-all"
+                                            :class="statusPerbaikan === 'perbaikan' ? 'bg-orange-500 border-orange-500 text-white' : 'bg-white border-orange-300 text-orange-700 hover:bg-orange-50'">
+                                            ⚠ Perbaikan
+                                        </button>
+                                    </div>
+
+                                    {{-- Form perbaikan muncul saat status = perbaikan --}}
+                                    <div x-show="statusPerbaikan === 'perbaikan'" x-cloak
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 -translate-y-2"
+                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                        class="space-y-3 rounded-lg border border-orange-300 bg-white p-4">
+                                        <p class="text-xs font-semibold text-orange-700 uppercase tracking-wide">Catatan Perbaikan Baru</p>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-700 mb-1">Keterangan <span class="text-red-500">*</span></label>
+                                            <textarea x-model="pForm.keterangan" rows="3" placeholder="Contoh: Sensor rusak, baterai lemah, kalibrasi ulang..."
+                                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-orange-400 focus:ring-orange-300 resize-none"></textarea>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Perbaikan <span class="text-red-500">*</span></label>
+                                                <input type="date" x-model="pForm.tanggal_perbaikan"
+                                                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-orange-400 focus:ring-orange-300">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700 mb-1">Petugas <span class="text-red-500">*</span></label>
+                                                <input type="text" x-model="pForm.petugas" placeholder="Nama teknisi..."
+                                                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-orange-400 focus:ring-orange-300">
+                                            </div>
+                                        </div>
+                                        <button type="button" @click="submitPerbaikan()" :disabled="perbaikanLoading"
+                                            class="w-full rounded-lg bg-orange-500 py-2.5 text-sm font-semibold text-white hover:bg-orange-600 transition-colors disabled:opacity-50">
+                                            <span x-show="!perbaikanLoading">💾 Simpan Catatan Perbaikan</span>
+                                            <span x-show="perbaikanLoading" x-cloak>Menyimpan...</span>
+                                        </button>
+                                    </div>
+
+                                    {{-- Riwayat Perbaikan --}}
+                                    <template x-if="perbaikanHistory.length > 0">
+                                        <div>
+                                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Riwayat Perbaikan</p>
+                                            <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
+                                                <template x-for="(item, i) in perbaikanHistory" :key="item.id || i">
+                                                    <div class="rounded-lg border border-gray-200 bg-white px-3 py-2.5">
+                                                        <div class="flex items-start justify-between gap-2">
+                                                            <div class="flex-1 min-w-0">
+                                                                <p class="text-sm font-medium text-gray-900 leading-snug" x-text="item.keterangan"></p>
+                                                                <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500">
+                                                                    <span>📅 <span x-text="item.tanggal_perbaikan"></span></span>
+                                                                    <span>👤 <span x-text="item.petugas"></span></span>
+                                                                    <span>🕐 <span x-text="item.created_at"></span></span>
+                                                                </div>
+                                                            </div>
+                                                            <span class="flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold"
+                                                                :class="item.status_akhir === 'selesai' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'"
+                                                                x-text="item.status_akhir === 'selesai' ? 'Selesai' : 'Proses'">
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template x-if="perbaikanHistory.length === 0">
+                                        <p class="text-center text-xs text-gray-400 py-2">Belum ada riwayat perbaikan untuk logger ini.</p>
+                                    </template>
                                 </div>
                             </div>
                         </div>

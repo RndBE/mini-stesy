@@ -14,11 +14,12 @@
         $usersPayload = $users
             ->map(function ($u) {
                 return [
-                    'id_user' => $u->id_user,
-                    'nama' => $u->nama,
-                    'username' => $u->username,
+                    'id_user'    => $u->id_user,
+                    'nama'       => $u->nama,
+                    'username'   => $u->username,
                     'level_user' => $u->level_user,
-                    'instansi' => $u->instansi?->nama ?? '-',
+                    'instansi'   => $u->instansi?->nama ?? '-',
+                    'status'     => $u->status ?? 'aktif',
                 ];
             })
             ->values();
@@ -61,6 +62,7 @@
                             <th class="px-6 py-4">Username</th>
                             <th class="px-6 py-4">Role</th>
                             <th class="px-6 py-4">Instansi</th>
+                            <th class="px-6 py-4 text-center">Status</th>
                             <th class="px-6 py-4 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -72,6 +74,16 @@
                                 <td class="px-6 py-4" x-text="u.username"></td>
                                 <td class="px-6 py-4" x-text="u.level_user"></td>
                                 <td class="px-6 py-4" x-text="u.instansi || '-' "></td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                                        :class="{
+                                            'bg-green-100 text-green-800': (u.status || 'aktif') === 'aktif',
+                                            'bg-yellow-100 text-yellow-800': u.status === 'suspend',
+                                            'bg-red-100 text-red-800': u.status === 'non-aktif'
+                                        }"
+                                        x-text="u.status === 'suspend' ? 'Suspend' : (u.status === 'non-aktif' ? 'Non-Aktif' : 'Aktif')"
+                                    ></span>
+                                </td>
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
                                         <button @click="openEditModal(u.id_user)"
@@ -95,7 +107,7 @@
                             </tr>
                         </template>
                         <tr x-show="filteredUsers().length === 0">
-                            <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500">Data tidak ditemukan.
+                            <td colspan="7" class="px-6 py-8 text-center text-sm text-slate-500">Data tidak ditemukan.
                             </td>
                         </tr>
                     </tbody>
@@ -419,6 +431,41 @@
                                             class="text-xs text-slate-500">Logger belum tersedia untuk instansi ini.</div>
                                     </div>
                                 </div>
+
+                                {{-- Status Akun: HANYA tampil untuk Superadmin --}}
+                                <template x-if="isSuperAdminUser">
+                                    <div class="border border-slate-200 rounded-lg p-4 bg-slate-50 space-y-3">
+                                        <label class="block text-sm font-semibold text-gray-900">Status Akun</label>
+                                        <div class="flex gap-2">
+                                            <button type="button"
+                                                @click="editForm.status = 'aktif'"
+                                                :class="editForm.status === 'aktif' ? 'bg-green-600 text-white ring-2 ring-green-400' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'"
+                                                class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all">
+                                                ✓ Aktif
+                                            </button>
+                                            <button type="button"
+                                                @click="editForm.status = 'suspend'"
+                                                :class="editForm.status === 'suspend' ? 'bg-yellow-500 text-white ring-2 ring-yellow-300' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'"
+                                                class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all">
+                                                ⏸ Suspend
+                                            </button>
+                                            <button type="button"
+                                                @click="editForm.status = 'non-aktif'"
+                                                :class="editForm.status === 'non-aktif' ? 'bg-red-600 text-white ring-2 ring-red-400' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'"
+                                                class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all">
+                                                ✕ Non-Aktif
+                                            </button>
+                                        </div>
+                                        {{-- Textarea pesan suspend, hanya muncul jika status = suspend --}}
+                                        <div x-show="editForm.status === 'suspend'" x-cloak>
+                                            <label class="block text-xs font-semibold text-yellow-700 mb-1">Pesan untuk User (wajib diisi):</label>
+                                            <textarea x-model="editForm.suspend_reason" rows="3"
+                                                placeholder="Contoh: Akun Anda di-suspend karena belum menyelesaikan administrasi bulan ini. Hubungi admin untuk informasi lebih lanjut."
+                                                class="w-full rounded-lg border border-yellow-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"></textarea>
+                                        </div>
+                                        <p class="text-xs text-slate-500">Hanya Superadmin yang dapat mengubah status akun.</p>
+                                    </div>
+                                </template>
                             </div>
                         </div>
 
@@ -527,6 +574,8 @@
                     level_user: '',
                     instansi_id: '',
                     logger_access: [],
+                    status: 'aktif',
+                    suspend_reason: '',
                 },
                 deleteData: {
                     id: null,
@@ -744,6 +793,8 @@
                         this.editForm.instansi_id = data.user.instansi_id ? String(data.user.instansi_id) : '';
                         this.editForm.logger_access = Array.isArray(data.logger_access_ids) ?
                             data.logger_access_ids.map((x) => String(x)) : [];
+                        this.editForm.status = data.status || 'aktif';
+                        this.editForm.suspend_reason = data.suspend_reason || '';
 
                         this.syncSelectedLoggerAccess('edit');
                     } catch (e) {
@@ -801,6 +852,11 @@
                         this.editForm.logger_access.forEach((id) => formData.append('logger_access[]', id));
                         formData.append('_token', '{{ csrf_token() }}');
                         formData.append('_method', 'PUT');
+                        // Kirim status & suspend_reason (controller akan filter hanya untuk superadmin)
+                        formData.append('status', this.editForm.status || 'aktif');
+                        if (this.editForm.status === 'suspend') {
+                            formData.append('suspend_reason', this.editForm.suspend_reason || '');
+                        }
 
                         const response = await fetch(`/users/${this.editForm.id}`, {
                             method: 'POST',

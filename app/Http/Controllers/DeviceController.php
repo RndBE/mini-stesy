@@ -15,6 +15,7 @@ use App\Models\ParameterGroup;
 use App\Models\ListParameter;
 use App\Models\TemplateKategoriParameter;
 use App\Models\List_das;
+use App\Models\Perbaikan;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -28,32 +29,43 @@ class DeviceController extends Controller
     {
         $devices = t_Logger::query()
             ->forUser(auth()->user())
-            ->with(['lokasi', 'params', 'jiat', 'nonjiat'])
+            ->with(['lokasi', 'params', 'jiat', 'nonjiat', 'perbaikan'])
             ->orderBy('id_logger')
             ->get()
             ->map(function ($d) {
 
                 return [
-                    'id_logger' => $d->id_logger,
-                    'nama_logger' => $d->nama_logger,
-                    'id_katlogger' => $d->id_katlogger,
-                    'alamat' => $d->lokasi->alamat ?? '-',
-                    'nama_lokasi' => $d->lokasi->nama_lokasi ?? '-',
-                    'tabel_main' => $d->tabel_main,
-                    // 'sensor_count' => $sensorCount, // 🔥 dikirim ke blade
-                    'lokasi' => $d->lokasi,
-                    'jiat' => $d->jiat,
-                    'nonjiat' => $d->nonjiat,
-                    'params' => $d->params->map(function ($p) {
+                    'id_logger'          => $d->id_logger,
+                    'nama_logger'        => $d->nama_logger,
+                    'id_katlogger'       => $d->id_katlogger,
+                    'alamat'             => $d->lokasi->alamat ?? '-',
+                    'nama_lokasi'        => $d->lokasi->nama_lokasi ?? '-',
+                    'tabel_main'         => $d->tabel_main,
+                    'lokasi'             => $d->lokasi,
+                    'jiat'               => $d->jiat,
+                    'nonjiat'            => $d->nonjiat,
+                    'params'             => $d->params->map(function ($p) {
                         return [
-                            'id_param' => $p->id_param,
-                            'nama_parameter' => $p->nama_parameter,
-                            'kolom_sensor' => $p->kolom_sensor,
-                            'satuan' => $p->satuan,
+                            'id_param'           => $p->id_param,
+                            'nama_parameter'     => $p->nama_parameter,
+                            'kolom_sensor'       => $p->kolom_sensor,
+                            'satuan'             => $p->satuan,
                             'parameter_group_id' => $p->parameter_group_id,
                         ];
                     })->values(),
-                    'sensor_count' => $d->sensor_count ?? (str_contains($d->tabel_main, '19') ? 19 : 16),
+                    'sensor_count'       => $d->sensor_count ?? (str_contains($d->tabel_main, '19') ? 19 : 16),
+                    'status_perbaikan'   => $d->status_perbaikan ?? 'normal',
+                    'perbaikan_history'  => $d->perbaikan
+                        ->take(5)
+                        ->map(fn($p) => [
+                            'id'                => $p->id_perbaikan,
+                            'keterangan'        => $p->keterangan,
+                            'tanggal_perbaikan' => $p->tanggal_perbaikan?->format('d M Y') ?? '-',
+                            'petugas'           => $p->petugas,
+                            'status_akhir'      => $p->status_akhir,
+                            'created_by'        => $p->created_by ?? '-',
+                            'created_at'        => optional($p->created_at)->format('d M Y, H:i') ?? '-',
+                        ])->values(),
                 ];
             });
 
@@ -361,6 +373,84 @@ class DeviceController extends Controller
         }
 
         return back()->with('success', 'Data device berhasil diperbarui');
+    }
+
+    /**
+     * Simpan catatan perbaikan dan set status logger menjadi 'perbaikan'
+     */
+    public function storePerbaikan(Request $request, $id)
+    {
+        $request->validate([
+            'keterangan'        => 'required|string|max:2000',
+            'tanggal_perbaikan' => 'required|date',
+            'petugas'           => 'required|string|max:255',
+        ]);
+
+        $logger = t_Logger::query()
+            ->forUser(auth()->user())
+            ->where('id_logger', $id)
+            ->firstOrFail();
+
+        // Simpan catatan perbaikan
+        Perbaikan::create([
+            'id_logger'         => $logger->id_logger,
+            'keterangan'        => $request->keterangan,
+            'tanggal_perbaikan' => $request->tanggal_perbaikan,
+            'petugas'           => $request->petugas,
+            'status_akhir'      => 'sedang_perbaikan',
+            'created_by'        => auth()->user()->nama ?? auth()->user()->username ?? '-',
+        ]);
+
+        // Update status logger
+        $logger->status_perbaikan = 'perbaikan';
+        $logger->save();
+
+        // Ambil history terbaru untuk dikembalikan ke frontend
+        $history = Perbaikan::where('id_logger', $id)
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn($p) => [
+                'id'                => $p->id_perbaikan,
+                'keterangan'        => $p->keterangan,
+                'tanggal_perbaikan' => $p->tanggal_perbaikan?->format('d M Y') ?? '-',
+                'petugas'           => $p->petugas,
+                'status_akhir'      => $p->status_akhir,
+                'created_by'        => $p->created_by ?? '-',
+                'created_at'        => optional($p->created_at)->format('d M Y, H:i') ?? '-',
+            ])->values();
+
+        return response()->json([
+            'success'         => true,
+            'message'         => 'Catatan perbaikan berhasil disimpan.',
+            'status_perbaikan'=> 'perbaikan',
+            'history'         => $history,
+        ]);
+    }
+
+    /**
+     * Set status logger kembali ke normal
+     */
+    public function selesaiPerbaikan(Request $request, $id)
+    {
+        $logger = t_Logger::query()
+            ->forUser(auth()->user())
+            ->where('id_logger', $id)
+            ->firstOrFail();
+
+        // Update semua catatan yang sedang_perbaikan menjadi selesai
+        Perbaikan::where('id_logger', $id)
+            ->where('status_akhir', 'sedang_perbaikan')
+            ->update(['status_akhir' => 'selesai']);
+
+        $logger->status_perbaikan = 'normal';
+        $logger->save();
+
+        return response()->json([
+            'success'          => true,
+            'message'          => 'Status logger kembali ke normal.',
+            'status_perbaikan' => 'normal',
+        ]);
     }
 
     public function dataPerangkat()

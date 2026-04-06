@@ -61,6 +61,33 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Cek status akun setelah berhasil login
+        $user = Auth::user();
+        if ($user) {
+            $status = strtolower((string) ($user->status ?? 'aktif'));
+
+            if ($status === 'non-aktif') {
+                Auth::logout();
+                // Flash ke session agar modal muncul di halaman login
+                session()->flash('nonaktif_reason', 'Akun Anda telah dinonaktifkan. Silakan hubungi administrator untuk informasi lebih lanjut.');
+                session()->flash('nonaktif_username', $this->input('username'));
+                throw ValidationException::withMessages([
+                    'username' => 'Akun Anda tidak aktif.',
+                ]);
+            }
+
+            if ($status === 'suspend') {
+                $reason = $user->suspend_reason ?? 'Akun Anda sedang di-suspend. Harap selesaikan administrasi terlebih dahulu.';
+                Auth::logout();
+                // Simpan pesan suspend ke session agar bisa ditampilkan di modal
+                session()->flash('suspended_reason', $reason);
+                session()->flash('suspended_username', $this->input('username'));
+                throw ValidationException::withMessages([
+                    'username' => 'Akun Anda sedang di-suspend.',
+                ]);
+            }
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 
