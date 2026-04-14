@@ -719,8 +719,8 @@
                             @click.stop>
 
                             {{-- Modal Header --}}
-                            <div class="flex items-start justify-between border-b border-slate-200 px-6 py-5">
-                                <div class="flex items-start gap-2">
+                            <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+                                <div class="flex items-center gap-2">
                                     <div class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700">
                                         <img src="{{ asset('icons/pump.svg') }}"
                                              class="h-6 w-6"
