@@ -68,6 +68,7 @@ Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/skema-irigasi', [SkemaIrigasiController::class, 'index'])->name('skema-irigasi.index');
+    Route::get('/skema-irigasi/kontrol/{node_id}', [SkemaIrigasiController::class, 'kontrolPintu'])->name('skema-irigasi.kontrol');
     Route::get('/api/skema-irigasi/data', [SkemaIrigasiController::class, 'getData'])->name('skema-irigasi.api');
 
     // Historis sensor node (untuk chart TMA di panel AWLR)

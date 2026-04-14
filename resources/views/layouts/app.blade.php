@@ -10,18 +10,11 @@
             }
         }
 
-        /*
-         * Pastikan semua modal (role=dialog) selalu di atas elemen topbar (z-200)
-         * dan tombol-tombol peta (z-100). Tidak perlu ubah z-index di setiap halaman.
-         */
+        
         [role="dialog"].fixed {
             z-index: 500 !important;
         }
-
-        /*
-         * Saat sidebar mobile terbuka, body mendapat class overflow-hidden.
-         * Turunkan z-index logo agar berada di belakang sidebar (z-40) dan backdrop (z-30).
-         */
+        
         body.overflow-hidden #topbarLogoWrapper {
             z-index: 20 !important;
         }

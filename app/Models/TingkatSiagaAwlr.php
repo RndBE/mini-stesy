@@ -23,4 +23,13 @@ class TingkatSiagaAwlr extends Model
     {
         return $this->belongsTo(t_Logger::class, 'id_logger', 'id_logger');
     }
+
+    /**
+     * Accessor: controller menggunakan ->nilai_batas
+     * sedangkan kolom DB bernama 'nilai'.
+     */
+    public function getNilaiBatasAttribute(): ?float
+    {
+        return $this->nilai !== null ? (float)$this->nilai : null;
+    }
 }

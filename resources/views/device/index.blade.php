@@ -249,7 +249,7 @@
 
                                 {{-- JIAT --}}
                                 <template x-if="detailData.sub_kategori === 'JIAT'">
-                                    <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-4 sm:gap-6">
+                                    <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-5 sm:gap-6">
                                         <div>
                                             <p class="text-xs uppercase tracking-wide text-slate-400">Sub Kategori</p>
                                             <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.sub_kategori"></p>
@@ -265,6 +265,10 @@
                                         <div>
                                             <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Pompa</p>
                                             <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_pompa || '-'"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs uppercase tracking-wide text-slate-400">Kontrol Pump</p>
+                                            <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.has_pump_label || '-'"></p>
                                         </div>
                                     </div>
                                 </template>
@@ -338,7 +342,9 @@
             </div>
         </div>
 
+
         {{-- SETUP DEVICE MODAL --}}
+
         <div x-show="isAddOpen" x-transition class="fixed inset-0 z-50" aria-labelledby="modal-title"
             role="dialog" aria-modal="true" style="display: none;">
 
@@ -437,45 +443,78 @@
                                     </div>
 
                                     <template x-if="addData.subKategori === 'jiat'">
-                                        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
-                                                    Sumur</label>
-                                                <div
-                                                    class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
-                                                    <input type="number" step="0.01" name="kedalaman_sumur"
-                                                        x-model="addData.kedalaman_sumur"
-                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
-                                                        placeholder="100">
-                                                    <span
-                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                        <div>
+                                            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
+                                                        Sumur</label>
+                                                    <div
+                                                        class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                        <input type="number" step="0.01" name="kedalaman_sumur"
+                                                            x-model="addData.kedalaman_sumur"
+                                                            class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                            placeholder="100">
+                                                        <span
+                                                            class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
+                                                        Sensor</label>
+                                                    <div
+                                                        class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                        <input type="number" step="0.01" name="kedalaman_sensor"
+                                                            x-model="addData.kedalaman_sensor"
+                                                            class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                            placeholder="55">
+                                                        <span
+                                                            class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
+                                                        Pompa</label>
+                                                    <div
+                                                        class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                        <input type="number" step="0.01" name="kedalaman_pompa"
+                                                            x-model="addData.kedalaman_pompa"
+                                                            class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                            placeholder="60">
+                                                        <span
+                                                            class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
-                                                    Sensor</label>
-                                                <div
-                                                    class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
-                                                    <input type="number" step="0.01" name="kedalaman_sensor"
-                                                        x-model="addData.kedalaman_sensor"
-                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
-                                                        placeholder="55">
-                                                    <span
-                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman
-                                                    Pompa</label>
-                                                <div
-                                                    class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
-                                                    <input type="number" step="0.01" name="kedalaman_pompa"
-                                                        x-model="addData.kedalaman_pompa"
-                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
-                                                        placeholder="60">
-                                                    <span
-                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
-                                                </div>
+                                            <input type="hidden" name="has_pump" :value="addData.subKategori === 'jiat' && addData.has_pump ? 1 : 0">
+                                            <div class="mt-4 rounded-xl border border-slate-200 bg-white shadow-sm ring-1 ring-slate-100 p-4 transition-all duration-300 hover:shadow-md"
+                                                :class="addData.has_pump ? 'border-emerald-200 bg-emerald-50/50' : '' ">
+                                                <label class="flex items-center justify-between gap-4 cursor-pointer">
+                                                    <div class="flex flex-col">
+                                                        <span class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                                            Kontrol Pump
+                                                            <span class="hidden sm:inline-flex text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full transition-colors duration-300"
+                                                                :class="addData.has_pump ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'"
+                                                                x-text="addData.has_pump ? 'Aktif' : 'Nonaktif'">
+                                                            </span>
+                                                        </span>
+                                                        <span class="mt-1 text-xs text-slate-500 leading-relaxed max-w-sm">
+                                                            Aktifkan opsi ini untuk memunculkan aksi kontrol pump pada tabel device.
+                                                        </span>
+                                                    </div>
+
+                                                    <button type="button"
+                                                        @click="addData.has_pump = !addData.has_pump"
+                                                        :aria-pressed="addData.has_pump"
+                                                        class="relative inline-flex h-7 w-14 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 hover:brightness-110"
+                                                        :class="addData.has_pump ? 'bg-emerald-500' : 'bg-slate-300'"
+                                                        role="switch">
+                                                        <span class="sr-only">Aktifkan Kontrol Pump</span>
+                                                        <span aria-hidden="true"
+                                                            class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition-transform duration-300 ease-out"
+                                                            :class="addData.has_pump ? 'translate-x-7' : 'translate-x-0'">
+                                                        </span>
+                                                    </button>
+                                                </label>
                                             </div>
                                         </div>
                                     </template>
@@ -762,33 +801,66 @@
                                     </div>
 
                                     <template x-if="editData.subKategori === 'jiat'">
-                                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700">Kedalaman Sumur</label>
-                                                <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
-                                                    <input type="number" step="0.01" name="kedalaman_sumur"
-                                                        x-model="editData.kedalaman_sumur"
-                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
-                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                        <div>
+                                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700">Kedalaman Sumur</label>
+                                                    <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
+                                                        <input type="number" step="0.01" name="kedalaman_sumur"
+                                                            x-model="editData.kedalaman_sumur"
+                                                            class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                        <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700">Kedalaman Sensor</label>
+                                                    <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
+                                                        <input type="number" step="0.01" name="kedalaman_sensor"
+                                                            x-model="editData.kedalaman_sensor"
+                                                            class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                        <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700">Kedalaman Pompa</label>
+                                                    <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
+                                                        <input type="number" step="0.01" name="kedalaman_pompa"
+                                                            x-model="editData.kedalaman_pompa"
+                                                            class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                        <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700">Kedalaman Sensor</label>
-                                                <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
-                                                    <input type="number" step="0.01" name="kedalaman_sensor"
-                                                        x-model="editData.kedalaman_sensor"
-                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
-                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-medium text-gray-700">Kedalaman Pompa</label>
-                                                <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
-                                                    <input type="number" step="0.01" name="kedalaman_pompa"
-                                                        x-model="editData.kedalaman_pompa"
-                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
-                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
-                                                </div>
+                                            <input type="hidden" name="has_pump" :value="editData.subKategori === 'jiat' && editData.has_pump ? 1 : 0">
+                                            <div class="mt-4 rounded-xl border border-slate-200 bg-white shadow-sm ring-1 ring-slate-100 p-4 transition-all duration-300 hover:shadow-md"
+                                                :class="editData.has_pump ? 'border-emerald-200 bg-emerald-50/50' : '' ">
+                                                <label class="flex items-center justify-between gap-4 cursor-pointer">
+                                                    <div class="flex flex-col">
+                                                        <span class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                                            Kontrol Pump
+                                                            <span class="hidden sm:inline-flex text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full transition-colors duration-300"
+                                                                :class="editData.has_pump ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'"
+                                                                x-text="editData.has_pump ? 'Aktif' : 'Nonaktif'">
+                                                            </span>
+                                                        </span>
+                                                        <span class="mt-1 text-xs text-slate-500 leading-relaxed max-w-sm">
+                                                            Aktifkan opsi ini untuk memunculkan aksi kontrol pump pada tabel device.
+                                                        </span>
+                                                    </div>
+
+                                                    <button type="button"
+                                                        @click="editData.has_pump = !editData.has_pump"
+                                                        :aria-pressed="editData.has_pump"
+                                                        class="relative inline-flex h-7 w-14 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 hover:brightness-110"
+                                                        :class="editData.has_pump ? 'bg-emerald-500' : 'bg-slate-300'"
+                                                        role="switch">
+                                                        <span class="sr-only">Aktifkan Kontrol Pump</span>
+                                                        <span aria-hidden="true"
+                                                            class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition-transform duration-300 ease-out"
+                                                            :class="editData.has_pump ? 'translate-x-7' : 'translate-x-0'">
+                                                        </span>
+                                                    </button>
+                                                </label>
                                             </div>
                                         </div>
                                     </template>
@@ -1149,6 +1221,7 @@
                 searchQuery: '',
                 allDevices: @json($devices),
                 showDetailModal: false,
+                showPumpModal: false,
                 isOpen: false,
                 isAddOpen: false,
                 ready: false,
@@ -1173,6 +1246,7 @@
                     latitude: '',
                     longitude: '',
                     sub_kategori: '-',
+                    has_pump_label: '-',
                     kedalaman_sumur: '-',
                     kedalaman_sensor: '-',
                     kedalaman_pompa: '-',
@@ -1185,6 +1259,7 @@
                     nama_lokasi: '',
                     nama_logger: '',
                     subKategori: 'jiat',
+                    has_pump: false,
                     latitude: '',
                     longitude: '',
                     kedalaman_sumur: '',
@@ -1200,6 +1275,7 @@
                     latitude: '',
                     longitude: '',
                     subKategori: '',
+                    has_pump: false,
                     kedalaman_sumur: '',
                     kedalaman_sensor: '',
                     kedalaman_pompa: '',
@@ -1225,6 +1301,21 @@
                     longitude: '',
                     params: []
                 },
+                pumpControlData: {
+                    id_logger: '',
+                    nama_lokasi: '',
+                    nama_logger: '',
+                    preview_state: 'off'
+                },
+                pumpWorkflow: {
+                    target_state: 'off',
+                    command_name: '',
+                    visible: false,
+                    running: false,
+                    success: false,
+                    steps: []
+                },
+                pumpWorkflowTimers: [],
 
                 filteredDevices() {
                     const devices = Array.isArray(this.allDevices) ? this.allDevices : [];
@@ -1304,6 +1395,7 @@
                         latitude: '',
                         longitude: '',
                         subKategori: '',
+                        has_pump: false,
                         kedalaman_sumur: '',
                         kedalaman_sensor: '',
                         kedalaman_pompa: '',
@@ -1495,12 +1587,14 @@
                             }
                         } else {
                             this.addData.subKategori = ''
+                            this.addData.has_pump = false
                             this.addData.kedalaman_sumur = ''
                             this.addData.kedalaman_sensor = ''
                             this.addData.kedalaman_pompa = ''
                         }
                     } else {
                         this.addData.subKategori = ''
+                        this.addData.has_pump = false
                         this.addData.kedalaman_sumur = ''
                         this.addData.kedalaman_sensor = ''
                         this.addData.kedalaman_pompa = ''
@@ -1520,6 +1614,10 @@
 
                 isEditAwlr() {
                     return this.isAwlrKategori(this.editData.id_katlogger)
+                },
+
+                canControlPump(device) {
+                    return !!(!device?.nonjiat && Number(device?.jiat?.has_pump ?? 0))
                 },
 
                 addParameter() {
@@ -1571,6 +1669,7 @@
                         latitude: device?.lokasi?.latitude ?? '-',
                         longitude: device?.lokasi?.longitude ?? '-',
                         sub_kategori: isNonJiat ? 'NON JIAT' : (isJiat ? 'JIAT' : '-'),
+                        has_pump_label: this.canControlPump(device) ? 'Aktif' : 'Tidak aktif',
                         kedalaman_sumur: hasJiat && jiat.kedalaman_sumur !== null ?
                             `${jiat.kedalaman_sumur} m` : '-',
                         kedalaman_sensor: hasJiat && jiat.kedalaman_sensor !== null ?
@@ -1587,6 +1686,165 @@
 
                 closeDetailModal() {
                     this.showDetailModal = false
+                },
+
+                openPumpModal(device) {
+                    this.pumpControlData = {
+                        id_logger: device?.id_logger ?? '',
+                        nama_lokasi: device?.nama_lokasi ?? '',
+                        nama_logger: device?.nama_logger ?? '',
+                        preview_state: 'off'
+                    }
+
+                    this.resetPumpWorkflow()
+                    this.showPumpModal = true
+                },
+
+                closePumpModal() {
+                    this.resetPumpWorkflow()
+                    this.showPumpModal = false
+                },
+
+                setPumpPreviewState(state) {
+                    this.pumpControlData.preview_state = state === 'on' ? 'on' : 'off'
+                },
+
+                clearPumpWorkflowTimers() {
+                    this.pumpWorkflowTimers.forEach((timerId) => window.clearTimeout(timerId))
+                    this.pumpWorkflowTimers = []
+                },
+
+                resetPumpWorkflow() {
+                    this.clearPumpWorkflowTimers()
+                    this.pumpWorkflow = {
+                        target_state: 'off',
+                        command_name: '',
+                        visible: false,
+                        running: false,
+                        success: false,
+                        steps: []
+                    }
+                },
+
+                buildPumpWorkflowSteps(commandName) {
+                    return [{
+                            key: 'confirm',
+                            title: 'Confirm action',
+                            subtitle: `Sent command: ${commandName}`,
+                            status: 'done'
+                        },
+                        {
+                            key: 'mqtt',
+                            title: 'Connecting to MQTT broker',
+                            subtitle: 'Connecting...',
+                            status: 'active'
+                        },
+                        {
+                            key: 'logger',
+                            title: 'Connecting to logger',
+                            subtitle: 'Waiting for device session...',
+                            status: 'pending'
+                        },
+                        {
+                            key: 'ack',
+                            title: 'Receiving acknowledgment',
+                            subtitle: 'Waiting response from logger...',
+                            status: 'pending'
+                        }
+                    ]
+                },
+
+                pumpWorkflowPercent() {
+                    const steps = this.pumpWorkflow.steps || []
+                    if (!steps.length) return 0
+
+                    const doneCount = steps.filter((step) => step.status === 'done').length
+                    const activeBonus = steps.some((step) => step.status === 'active') ? 0.65 : 0
+
+                    return Math.round(((doneCount + activeBonus) / steps.length) * 100)
+                },
+
+                pumpWorkflowCardClasses(status) {
+                    if (status === 'done') {
+                        return 'border-emerald-200 bg-emerald-50/70'
+                    }
+
+                    if (status === 'active') {
+                        return 'border-emerald-200 bg-emerald-50/40 shadow-[0_0_0_1px_rgba(16,185,129,0.05)]'
+                    }
+
+                    return 'border-slate-200 bg-white/70 opacity-80'
+                },
+
+                pumpWorkflowIconWrapClasses(status) {
+                    if (status === 'done') {
+                        return 'bg-emerald-100'
+                    }
+
+                    if (status === 'active') {
+                        return 'bg-emerald-100/80'
+                    }
+
+                    return 'bg-slate-100'
+                },
+
+                pumpWorkflowActiveBarWidth(index) {
+                    const widthMap = {
+                        0: 100,
+                        1: 52,
+                        2: 68,
+                        3: 84
+                    }
+
+                    return widthMap[index] ?? 55
+                },
+
+                markPumpStep(stepKey, status, subtitle = null) {
+                    this.pumpWorkflow.steps = this.pumpWorkflow.steps.map((step) => {
+                        if (step.key !== stepKey) return step
+
+                        return {
+                            ...step,
+                            status,
+                            subtitle: subtitle ?? step.subtitle
+                        }
+                    })
+                },
+
+                runPumpAction(targetState) {
+                    const nextState = targetState === 'on' ? 'on' : 'off'
+                    const commandName = nextState === 'on' ? 'turn_on_pump' : 'turn_off_pump'
+
+                    this.resetPumpWorkflow()
+                    this.pumpWorkflow = {
+                        target_state: nextState,
+                        command_name: commandName,
+                        visible: true,
+                        running: true,
+                        success: false,
+                        steps: this.buildPumpWorkflowSteps(commandName)
+                    }
+
+                    this.pumpWorkflowTimers.push(window.setTimeout(() => {
+                        this.markPumpStep('mqtt', 'done', 'MQTT connected')
+                        this.markPumpStep('logger', 'active', 'Connecting...')
+                    }, 1100))
+
+                    this.pumpWorkflowTimers.push(window.setTimeout(() => {
+                        this.markPumpStep('logger', 'done', 'Logger connected')
+                        this.markPumpStep('ack', 'active', 'Receiving acknowledgment...')
+                    }, 2400))
+
+                    this.pumpWorkflowTimers.push(window.setTimeout(() => {
+                        this.markPumpStep('ack', 'done', 'Acknowledgment received')
+                        this.pumpWorkflow.running = false
+                        this.pumpWorkflow.success = true
+                        this.setPumpPreviewState(nextState)
+                    }, 3900))
+
+                    this.pumpWorkflowTimers.push(window.setTimeout(() => {
+                        this.pumpWorkflow.visible = false
+                    }, 6100))
                 },
 
                 openModal(device) {
@@ -1612,6 +1870,7 @@
                         subKategori: device.nonjiat
                             ? 'non_jiat'
                             : (parseFloat(device.jiat?.kedalaman_sumur ?? 0) > 0 ? 'jiat' : 'non_jiat'),
+                        has_pump: !!Number(device.jiat?.has_pump ?? 0),
                         latitude: device.lokasi?.latitude ?? '',
                         longitude: device.lokasi?.longitude ?? '',
                         kedalaman_sumur: device.jiat?.kedalaman_sumur ?? '',

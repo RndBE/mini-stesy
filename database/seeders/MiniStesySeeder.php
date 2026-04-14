@@ -742,10 +742,10 @@ class MiniStesySeeder extends Seeder
         ]);
 
         DB::table('jiat_data')->insert([
-            ['id' => 1, 'id_logger' => '10001', 'kedalaman_sumur' => 5.5, 'kedalaman_pompa' => 2.0, 'kedalaman_sensor' => 1.2],
-            ['id' => 2, 'id_logger' => '10002', 'kedalaman_sumur' => 4.2, 'kedalaman_pompa' => 1.7, 'kedalaman_sensor' => 1.0],
-            ['id' => 3, 'id_logger' => '10003', 'kedalaman_sumur' => 6.1, 'kedalaman_pompa' => 2.4, 'kedalaman_sensor' => 1.4],
-            ['id' => 4, 'id_logger' => '10004', 'kedalaman_sumur' => 3.9, 'kedalaman_pompa' => 1.5, 'kedalaman_sensor' => 0.9],
+            ['id' => 1, 'id_logger' => '10001', 'kedalaman_sumur' => 5.5, 'kedalaman_pompa' => 2.0, 'kedalaman_sensor' => 1.2, 'has_pump' => true],
+            ['id' => 2, 'id_logger' => '10002', 'kedalaman_sumur' => 4.2, 'kedalaman_pompa' => 1.7, 'kedalaman_sensor' => 1.0, 'has_pump' => true],
+            ['id' => 3, 'id_logger' => '10003', 'kedalaman_sumur' => 6.1, 'kedalaman_pompa' => 2.4, 'kedalaman_sensor' => 1.4, 'has_pump' => true],
+            ['id' => 4, 'id_logger' => '10004', 'kedalaman_sumur' => 3.9, 'kedalaman_pompa' => 1.5, 'kedalaman_sensor' => 0.9, 'has_pump' => true],
         ]);
 
         // Non-JIAT data untuk AWLR Bangunjiwo (10008)
@@ -1492,4 +1492,3 @@ class MiniStesySeeder extends Seeder
         if (!empty($bulk)) DB::table('t_s16_01')->insert($bulk);
     }
 }
-

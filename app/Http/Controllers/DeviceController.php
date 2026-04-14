@@ -157,6 +157,7 @@ class DeviceController extends Controller
             'latitude'          => 'required|numeric',
             'longitude'         => 'required|numeric',
             'sub_kategori'      => 'nullable|in:jiat,non_jiat',
+            'has_pump'          => 'nullable|boolean',
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
             'kedalaman_pompa'   => 'nullable|numeric',
@@ -207,6 +208,9 @@ class DeviceController extends Controller
                     $kedalamanSumur = $subKategori === 'jiat'
                         ? (float) ($validated['kedalaman_sumur'] ?? 0)
                         : 0.0;
+                    $hasPump = $subKategori === 'jiat'
+                        ? (bool) ($validated['has_pump'] ?? false)
+                        : false;
 
                     $kedalamanSensor = (float) ($validated['kedalaman_sensor'] ?? 0);
                     $kedalamanPompa = (float) ($validated['kedalaman_pompa'] ?? 0);
@@ -217,6 +221,7 @@ class DeviceController extends Controller
                             'kedalaman_sumur'  => $kedalamanSumur,
                             'kedalaman_sensor' => $kedalamanSensor,
                             'kedalaman_pompa'  => $kedalamanPompa,
+                            'has_pump'         => $hasPump,
                         ]
                     );
 
@@ -266,6 +271,7 @@ class DeviceController extends Controller
             'latitude'          => 'nullable|numeric',
             'longitude'         => 'nullable|numeric',
             'sub_kategori'      => 'nullable|in:jiat,non_jiat',
+            'has_pump'          => 'nullable|boolean',
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
             'kedalaman_pompa'   => 'nullable|numeric',
@@ -300,6 +306,9 @@ class DeviceController extends Controller
             $kedalamanSumur = $subKategori === 'jiat'
                 ? (float) ($request->kedalaman_sumur ?? 0)
                 : 0.0;
+            $hasPump = $subKategori === 'jiat'
+                ? (bool) $request->boolean('has_pump')
+                : false;
 
             $kedalamanSensor = (float) ($request->kedalaman_sensor ?? 0);
             $kedalamanPompa = (float) ($request->kedalaman_pompa ?? 0);
@@ -310,6 +319,7 @@ class DeviceController extends Controller
                     'kedalaman_sumur'  => $kedalamanSumur,
                     'kedalaman_sensor' => $kedalamanSensor,
                     'kedalaman_pompa'  => $kedalamanPompa,
+                    'has_pump'         => $hasPump,
                 ]
             );
 

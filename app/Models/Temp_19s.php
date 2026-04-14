@@ -35,4 +35,23 @@ class Temp_19s extends Model
     {
         return $this->belongsTo(t_Logger::class, 'id_logger','id_logger');
     }
+
+    /**
+     * Accessor: controller menggunakan ->s1, ->s2, ->s3
+     * sedangkan kolom DB bernama sensor1, sensor2, sensor3.
+     */
+    public function getS1Attribute(): ?float
+    {
+        return $this->sensor1 !== null ? (float)$this->sensor1 : null;
+    }
+
+    public function getS2Attribute(): ?float
+    {
+        return $this->sensor2 !== null ? (float)$this->sensor2 : null;
+    }
+
+    public function getS3Attribute(): ?float
+    {
+        return $this->sensor3 !== null ? (float)$this->sensor3 : null;
+    }
 }

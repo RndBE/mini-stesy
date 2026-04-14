@@ -686,6 +686,276 @@
                 </svg>
                 <span class="hidden sm:inline">Informasi</span>
             </button>
+
+            @if($logger->jiat?->has_pump)
+            {{-- Tombol Kontrol Pompa (hanya untuk JIAT yang has_pump = 1) --}}
+            <div x-data="pumpControlApp()">
+                <button @click="openPumpModal()"
+                    class="bg-amber-50 border border-amber-200 items-center rounded-lg flex px-3 sm:px-4 text-amber-700 py-2 sm:py-3 hover:bg-amber-100 text-sm transition-colors">
+                    <img src="{{ asset('icons/pump.svg') }}"
+                         class="h-5 w-5 sm:me-2 flex-shrink-0"
+                         style="filter: invert(52%) sepia(60%) saturate(700%) hue-rotate(5deg) brightness(95%) contrast(90%);"
+                         alt="Pump Icon" />
+                    <span class="hidden sm:inline font-semibold">Kontrol Pompa</span>
+                </button>
+
+                {{-- ===== PUMP CONTROL MODAL ===== --}}
+                <div x-show="showPumpModal" class="fixed inset-0 z-[1100]" role="dialog" aria-modal="true" style="display:none;">
+                    {{-- Overlay --}}
+                    <div x-show="showPumpModal"
+                        x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                        x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                        class="fixed inset-0 bg-slate-900/40 transition-opacity" @click="closePumpModal()"></div>
+
+                    <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closePumpModal()">
+                        <div x-show="showPumpModal"
+                            x-transition:enter="ease-out duration-300"
+                            x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                            x-transition:leave="ease-in duration-200"
+                            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                            x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                            class="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-white text-left shadow-xl"
+                            @click.stop>
+
+                            {{-- Modal Header --}}
+                            <div class="flex items-start justify-between border-b border-slate-200 px-6 py-5">
+                                <div class="flex items-start gap-2">
+                                    <div class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700">
+                                        <img src="{{ asset('icons/pump.svg') }}"
+                                             class="h-6 w-6"
+                                             style="filter: invert(52%) sepia(60%) saturate(700%) hue-rotate(5deg) brightness(95%) contrast(90%);"
+                                             alt="Pump Icon" />
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-slate-900">Kontrol Pompa Air</h3>
+                                        <p class="text-sm text-slate-500">Panel kontrol pompa untuk logger JIAT ini.</p>
+                                    </div>
+                                </div>
+                                <button @click="closePumpModal()"
+                                    :disabled="pumpRunning"
+                                    class="transition-colors"
+                                    :class="pumpRunning ? 'text-slate-300 cursor-not-allowed' : 'text-slate-500 hover:text-slate-700'">
+                                    <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {{-- Modal Body --}}
+                            <div class="space-y-2 px-6 py-5">
+                                {{-- Info Logger --}}
+                                <div class="grid grid-cols-1 gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-slate-400">Nama Pos</p>
+                                        <p class="mt-1 text-sm font-bold text-slate-900">{{ $logger->lokasi->nama_lokasi ?? '-' }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-slate-400">ID Logger</p>
+                                        <p class="mt-1 text-sm font-bold text-slate-900">{{ $logger->id_logger }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-slate-400">Nama Logger</p>
+                                        <p class="mt-1 text-sm font-bold text-slate-900">{{ $logger->nama_logger }}</p>
+                                    </div>
+                                </div>
+
+                                {{-- Status & Kontrol --}}
+                                <div class="rounded-xl border border-slate-200 bg-white p-4">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div>
+                                            <p class="text-sm font-semibold text-slate-900">Status Pompa</p>
+                                            <p class="mt-1 text-xs text-slate-500">Status pada panel ini masih berupa kontrol tampilan lokal.</p>
+                                        </div>
+                                        <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300"
+                                            :class="pumpRunning ? 'bg-amber-100 text-amber-700 animate-pulse' : pumpState === 'on' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'"
+                                            x-text="pumpRunning ? (pumpTargetState === 'on' ? '⚙ Starting...' : '⚙ Stopping...') : pumpState === 'on' ? 'Pump ON' : 'Pump OFF'"></span>
+                                    </div>
+
+                                    {{-- Visual Submersible + Tombol Aksi --}}
+                                    <div class="mt-6 flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-stretch">
+
+                                        {{-- Animasi Submersible Pump --}}
+                                        <div class="relative flex w-full flex-col items-center justify-center rounded-xl bg-gradient-to-b from-[#0b132b] to-[#0a2342] p-4 sm:w-1/3 shadow-[inset_0_4px_20px_rgba(0,0,0,0.8)] overflow-hidden"
+                                             :class="pumpRunning ? 'animate-[pump-shake_0.45s_ease-in-out_infinite]' : ''">
+                                            {{-- Deep Water Background --}}
+                                            <div class="absolute inset-x-0 bottom-0 transition-all duration-[2500ms] ease-in-out border-t-2"
+                                                :class="pumpState === 'on' && !pumpRunning ? 'top-[20%] bg-[#0077b6]/30 border-[#00b4d8]/60 shadow-[0_-5px_20px_rgba(0,180,216,0.2)]' : pumpRunning ? 'top-[18%] bg-amber-900/20 border-amber-400/40 shadow-[0_-5px_20px_rgba(245,158,11,0.15)]' : 'top-[25%] bg-slate-800/60 border-slate-600/50 shadow-none'">
+                                                {{-- Bubbles ON state --}}
+                                                <div class="absolute inset-0 overflow-hidden transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
+                                                     :class="pumpState === 'on' && !pumpRunning ? 'opacity-100' : 'opacity-0'">
+                                                    <div class="absolute bottom-4 left-[20%] w-1.5 h-1.5 rounded-full bg-cyan-200 animate-[ping_2s_linear_infinite]"></div>
+                                                    <div class="absolute bottom-10 right-[30%] w-2 h-2 rounded-full bg-cyan-300 animate-[ping_2.5s_linear_infinite]" style="animation-delay:0.5s"></div>
+                                                    <div class="absolute bottom-20 left-[40%] w-1 h-1 rounded-full bg-cyan-100 animate-[ping_1.5s_linear_infinite]" style="animation-delay:1.2s"></div>
+                                                </div>
+                                                {{-- Bubbles STARTING state (lebih lambat, amber) --}}
+                                                <div class="absolute inset-0 overflow-hidden transition-opacity duration-[800ms] ease-in-out pointer-events-none"
+                                                     :class="pumpRunning ? 'opacity-100' : 'opacity-0'">
+                                                    <div class="absolute bottom-3 left-[25%] w-1 h-1 rounded-full bg-amber-300 animate-[ping_3s_linear_infinite]"></div>
+                                                    <div class="absolute bottom-8 right-[35%] w-1.5 h-1.5 rounded-full bg-amber-200 animate-[ping_4s_linear_infinite]" style="animation-delay:1s"></div>
+                                                    <div class="absolute bottom-16 left-[45%] w-1 h-1 rounded-full bg-yellow-200 animate-[ping_3.5s_linear_infinite]" style="animation-delay:2s"></div>
+                                                </div>
+                                            </div>
+                                            <div class="relative flex h-40 w-28 items-end justify-center z-10 mt-2">
+                                                <div class="absolute left-2 top-0 bottom-[1.8rem] w-3 flex flex-col items-center z-0">
+                                                    <div class="w-2.5 h-full bg-gradient-to-r from-slate-800 via-slate-600 to-slate-800 border-x border-slate-900 shadow-md"></div>
+                                                    {{-- Air mengalir: saat starting setengah naik warna amber, saat on penuh cyan --}}
+                                                    <div class="absolute bottom-0 w-1.5 transition-all duration-[1500ms] ease-in-out origin-bottom"
+                                                         :class="pumpRunning ? 'h-[50%] opacity-80 bg-amber-400 shadow-[0_0_6px_#f59e0b]' : pumpState === 'on' ? 'h-full opacity-100 bg-cyan-300 shadow-[0_0_8px_#22d3ee]' : 'h-0 opacity-0 bg-cyan-300 shadow-none'"></div>
+                                                </div>
+                                                <div class="absolute left-1.5 bottom-[1.5rem] w-4 h-3 bg-gradient-to-r from-slate-700 to-slate-600 border border-slate-900 rounded-sm z-10 transition-all duration-[1000ms] ease-in-out"
+                                                     :class="pumpRunning ? 'shadow-[0_0_8px_#f59e0b]' : pumpState === 'on' ? 'shadow-[0_0_8px_#00b4d8]' : 'shadow-[0_2px_5px_rgba(0,0,0,0.5)]'">
+                                                    <div class="w-full h-0.5 mt-0.5 transition-colors duration-[1000ms] ease-in-out"
+                                                         :class="pumpRunning ? 'bg-amber-400' : pumpState === 'on' ? 'bg-[#00f8ff]' : 'bg-slate-500'"></div>
+                                                </div>
+                                                <div class="absolute left-2.5 bottom-1 h-5 w-6 border-l-[10px] border-b-[10px] border-slate-700 border-opacity-90 rounded-bl-xl z-0 shadow-lg"></div>
+                                                <div class="absolute left-[8px] bottom-[2px] h-6 w-7 border-l-2 border-b-2 border-slate-900 rounded-bl-xl z-20 pointer-events-none"></div>
+                                                <div class="relative w-[3.5rem] h-[8.5rem] flex flex-col items-center bg-gradient-to-r from-[#2a3a4c] via-[#4a5f78] to-[#1e2a38] border-x-2 border-[#0d1622] rounded-sm shadow-2xl z-10">
+                                                    <div class="w-[85%] h-6 border-b-2 border-[#0d1622] flex justify-center items-end bg-gradient-to-r from-[#1c2836] to-[#2d3f54]">
+                                                        <div class="w-[40%] h-full bg-gradient-to-r from-slate-800 to-slate-600 border-x border-slate-950"></div>
+                                                    </div>
+                                                    {{-- Glow Ring Atas: amber saat starting, cyan saat on, abu saat off --}}
+                                                    <div class="w-[105%] h-1.5 rounded-full transition-colors duration-[800ms] ease-in-out z-20 border"
+                                                         :class="pumpRunning ? 'border-transparent shadow-[0_0_12px_#f59e0b] animate-[pump-flicker_0.7s_ease-in-out_infinite] bg-amber-400' : pumpState === 'on' ? 'bg-[#00f8ff] border-transparent shadow-[0_0_15px_#00f8ff]' : 'bg-slate-700 border-slate-800 shadow-none'"></div>
+                                                    <div class="w-full flex-grow flex items-center justify-center relative shadow-[inset_4px_0_10px_rgba(255,255,255,0.1),inset_-6px_0_15px_rgba(0,0,0,0.6)]">
+                                                        <div class="w-5 h-[4.5rem] bg-[#070b12] rounded-full border border-slate-800 shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col justify-end p-[1.5px]">
+                                                            {{-- Indikator fluida: 50% kuning saat starting, 85% cyan saat on, 15% abu saat off --}}
+                                                            <div class="relative w-full rounded-full transition-all duration-[1500ms] ease-in-out overflow-hidden flex flex-col justify-end"
+                                                                 :class="pumpRunning ? 'h-[45%]' : pumpState === 'on' ? 'h-[85%] shadow-[0_0_10px_#00f8ff]' : 'h-[15%] shadow-none'">
+                                                                {{-- Fluida Nyala (ON) --}}
+                                                                <div class="absolute inset-0 w-full h-full bg-gradient-to-b from-[#00f8ff] to-[#0077b6] transition-opacity duration-[1000ms] ease-in-out"
+                                                                     :class="pumpState === 'on' && !pumpRunning ? 'opacity-100 animate-[pulse_1.5s_infinite]' : 'opacity-0'"></div>
+                                                                {{-- Fluida Starting (amber surge) --}}
+                                                                <div class="absolute inset-0 w-full h-full bg-gradient-to-b from-amber-300 to-amber-600 transition-opacity duration-[800ms] ease-in-out"
+                                                                     :class="pumpRunning ? 'opacity-100 animate-[pulse_0.8s_infinite]' : 'opacity-0'"></div>
+                                                                {{-- Fluida Mati (OFF) --}}
+                                                                <div class="absolute inset-0 w-full h-full bg-slate-600 transition-opacity duration-[1000ms] ease-in-out"
+                                                                     :class="!pumpRunning && pumpState !== 'on' ? 'opacity-100' : 'opacity-0'"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {{-- Glow Ring Bawah: amber saat starting, cyan saat on, abu saat off --}}
+                                                    <div class="w-[105%] h-1.5 rounded-full transition-colors duration-[800ms] ease-in-out z-20 border"
+                                                         :class="pumpRunning ? 'border-transparent shadow-[0_0_12px_#f59e0b] animate-[pump-flicker_0.7s_ease-in-out_infinite_0.35s] bg-amber-400' : pumpState === 'on' ? 'bg-[#00f8ff] border-transparent shadow-[0_0_15px_#00f8ff]' : 'bg-slate-700 border-slate-800 shadow-none'"></div>
+                                                    <div class="w-[90%] h-5 bg-gradient-to-r from-[#1c2836] to-[#2d3f54] border-x border-b border-[#0d1622] rounded-b-md flex flex-col justify-between items-center shadow-lg pb-1">
+                                                        <div class="w-full h-1.5 border-b border-slate-800 opacity-50"></div>
+                                                        <div class="flex w-[70%] justify-between">
+                                                            <div class="w-1.5 h-2 bg-[#070b12] rounded-sm"></div>
+                                                            <div class="w-1.5 h-2 bg-[#070b12] rounded-sm"></div>
+                                                            <div class="w-1.5 h-2 bg-[#070b12] rounded-sm"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {{-- Status Floating Badge --}}
+                                            <div class="absolute top-3 right-3 rounded bg-[#0b132b]/80 backdrop-blur-sm border px-2 py-1 flex items-center justify-center z-40 transition-all duration-500"
+                                                 :class="pumpRunning ? 'border-amber-700/60' : 'border-cyan-900/50'">
+                                                <div class="w-1.5 h-1.5 rounded-full mr-1.5 transition-all duration-500"
+                                                     :class="pumpRunning ? 'bg-amber-400 shadow-[0_0_5px_#f59e0b] animate-[pump-flicker_0.7s_ease-in-out_infinite]' : pumpState === 'on' ? 'bg-[#00f8ff] shadow-[0_0_5px_#00f8ff] animate-pulse' : 'bg-slate-500'"></div>
+                                                <span class="text-[9px] font-bold tracking-widest uppercase transition-colors duration-500 mt-0.5"
+                                                      :class="pumpRunning ? 'text-amber-300' : pumpState === 'on' ? 'text-cyan-300' : 'text-slate-400'"
+                                                      x-text="pumpRunning ? (pumpTargetState === 'on' ? 'Starting' : 'Stopping') : pumpState === 'on' ? 'Active' : 'Standby'"></span>
+                                            </div>
+                                            {{-- Overlay kilat cahaya saat starting (flash effect) --}}
+                                            <div class="absolute inset-0 rounded-xl pointer-events-none transition-opacity duration-500"
+                                                 :class="pumpRunning ? 'animate-[pump-flash_1.8s_ease-in-out_infinite] bg-amber-400/5' : 'opacity-0'"></div>
+                                        </div>
+
+                                        {{-- Tombol Start / Stop --}}
+                                        <div class="flex w-full flex-col justify-center space-y-4 sm:w-2/3">
+                                            <button type="button" @click="runPumpAction('on')"
+                                                class="group relative flex items-center justify-between rounded-xl bg-emerald-600 px-5 py-4 shadow-md transition-all hover:bg-emerald-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                                                :disabled="pumpRunning || pumpState === 'on'">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="flex h-3 w-3 rounded-full bg-emerald-300"
+                                                        :class="pumpRunning && pumpTargetState === 'on' ? 'animate-pulse' : 'group-hover:animate-pulse'"></span>
+                                                    <div class="text-left">
+                                                        <p class="text-sm font-bold text-white uppercase tracking-wider">Start Pump</p>
+                                                        <p class="mt-0.5 text-xs text-emerald-100"
+                                                            x-text="pumpRunning && pumpTargetState === 'on' ? 'Sending command...' : 'Kirim perintah untuk menyalakan'"></p>
+                                                    </div>
+                                                </div>
+                                                <svg class="h-6 w-6 text-emerald-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </button>
+
+                                            <button type="button" @click="runPumpAction('off')"
+                                                class="group relative flex items-center justify-between rounded-xl bg-red-600 px-5 py-4 shadow-md transition-all hover:bg-red-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                                                :disabled="pumpRunning || pumpState === 'off'">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="flex h-3 w-3 rounded-full bg-red-300"
+                                                        :class="pumpRunning && pumpTargetState === 'off' ? 'animate-pulse' : ''"></span>
+                                                    <div class="text-left">
+                                                        <p class="text-sm font-bold text-white uppercase tracking-wider">Stop Pump</p>
+                                                        <p class="mt-0.5 text-xs text-red-100"
+                                                            x-text="pumpRunning && pumpTargetState === 'off' ? 'Sending command...' : 'Hentikan seketika mekanisme pompa'"></p>
+                                                    </div>
+                                                </div>
+                                                <svg class="h-6 w-6 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10h6v4H9z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {{-- Progress Workflow --}}
+                                    <div x-show="pumpWorkflowVisible" x-cloak
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 translate-y-2"
+                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                        class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                        <div class="mb-3 flex items-start justify-between gap-3">
+                                            <div>
+                                                <p class="text-sm font-semibold text-slate-900">Progress</p>
+                                                <p class="mt-1 text-xs text-slate-500"
+                                                    x-text="pumpRunning ? 'Menjalankan urutan simulasi koneksi...' : 'Seluruh tahap operasional pompa telah selesai.'"></p>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Overall Progress</p>
+                                                <p class="mt-1 text-sm font-semibold text-slate-700" x-text="`${pumpPercent()}%`"></p>
+                                            </div>
+                                        </div>
+                                        <div class="mb-4 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                                            <div class="h-full rounded-full bg-emerald-500 transition-all duration-500" :style="`width: ${pumpPercent()}%`"></div>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <template x-for="(step, index) in pumpSteps" :key="step.key">
+                                                <div class="rounded-xl border p-3 transition"
+                                                    :class="step.status === 'done' ? 'border-emerald-200 bg-emerald-50/70' : step.status === 'active' ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-white/70 opacity-80'">
+                                                    <div class="flex items-center gap-2.5">
+                                                        <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl"
+                                                            :class="step.status === 'done' ? 'bg-emerald-100' : step.status === 'active' ? 'bg-emerald-100/80' : 'bg-slate-100'">
+                                                            <template x-if="step.status === 'done'">
+                                                                <svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 010 1.42l-7.2 7.2a1 1 0 01-1.415 0l-3-3a1 1 0 111.414-1.42l2.293 2.295 6.493-6.495a1 1 0 011.415 0z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </template>
+                                                            <template x-if="step.status === 'active'">
+                                                                <span class="inline-block h-4 w-4 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></span>
+                                                            </template>
+                                                            <template x-if="step.status === 'pending'">
+                                                                <span class="h-2 w-2 rounded-full bg-slate-300"></span>
+                                                            </template>
+                                                        </div>
+                                                        <div class="min-w-0 flex-1">
+                                                            <p class="text-sm font-semibold" :class="step.status === 'pending' ? 'text-slate-500' : 'text-slate-900'" x-text="step.title"></p>
+                                                            <p class="mt-0.5 text-xs" :class="step.status === 'pending' ? 'text-slate-400' : 'text-slate-500'" x-text="step.subtitle"></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
             <button
                 class="bg-white border items-center border-[#303481] text-[#303481] rounded-lg flex px-3 sm:px-4 py-2 sm:py-3 hover:bg-[#eaebff] text-sm"
                 onclick="openDocModal()">
@@ -3302,4 +3572,104 @@
             })()
         })
     </script>
+
+    {{-- ===== ALPINE.JS PUMP CONTROL COMPONENT (hanya render jika has_pump) ===== --}}
+    @if($logger->jiat?->has_pump)
+    <script>
+        function pumpControlApp() {
+            return {
+                showPumpModal: false,
+                pumpState: 'off',
+                pumpRunning: false,
+                pumpTargetState: 'off',
+                pumpWorkflowVisible: false,
+                pumpSteps: [],
+                pumpTimers: [],
+
+                openPumpModal() {
+                    this.showPumpModal = true
+                },
+
+                closePumpModal() {
+                    // Tidak bisa tutup saat proses pengiriman perintah sedang berjalan
+                    if (this.pumpRunning) return
+                    // Hanya reset workflow UI, BUKAN pumpState agar status on/off tetap tersimpan
+                    this.pumpTimers.forEach(t => clearTimeout(t))
+                    this.pumpTimers = []
+                    this.pumpWorkflowVisible = false
+                    this.pumpSteps = []
+                    this.showPumpModal = false
+                },
+
+                pumpPercent() {
+                    if (!this.pumpSteps.length) return 0
+                    const done = this.pumpSteps.filter(s => s.status === 'done').length
+                    const active = this.pumpSteps.some(s => s.status === 'active') ? 0.65 : 0
+                    return Math.round(((done + active) / this.pumpSteps.length) * 100)
+                },
+
+                resetPump() {
+                    this.pumpTimers.forEach(t => clearTimeout(t))
+                    this.pumpTimers = []
+                    this.pumpRunning = false
+                    this.pumpWorkflowVisible = false
+                    this.pumpSteps = []
+                },
+
+                runPumpAction(target) {
+                    this.resetPump()
+                    this.pumpTargetState = target
+                    this.pumpRunning = true
+                    this.pumpWorkflowVisible = true
+                    const cmd = target === 'on' ? 'turn_on_pump' : 'turn_off_pump'
+
+                    this.pumpSteps = [
+                        { key: 'confirm', title: 'Confirm action', subtitle: `Sent command: ${cmd}`, status: 'done' },
+                        { key: 'mqtt',   title: 'Connecting to MQTT broker', subtitle: 'Connecting...', status: 'active' },
+                        { key: 'logger', title: 'Connecting to logger', subtitle: 'Waiting for device session...', status: 'pending' },
+                        { key: 'ack',    title: 'Receiving acknowledgment', subtitle: 'Waiting response from logger...', status: 'pending' },
+                    ]
+
+                    const mark = (key, status, subtitle) => {
+                        this.pumpSteps = this.pumpSteps.map(s => s.key === key ? {...s, status, subtitle: subtitle ?? s.subtitle} : s)
+                    }
+
+                    this.pumpTimers.push(setTimeout(() => { mark('mqtt','done','MQTT connected'); mark('logger','active','Connecting...') }, 1100))
+                    this.pumpTimers.push(setTimeout(() => { mark('logger','done','Logger connected'); mark('ack','active','Receiving acknowledgment...') }, 2400))
+                    this.pumpTimers.push(setTimeout(() => {
+                        mark('ack','done','Acknowledgment received')
+                        this.pumpRunning = false
+                        this.pumpState = target
+                    }, 3900))
+                    this.pumpTimers.push(setTimeout(() => { this.pumpWorkflowVisible = false }, 6100))
+                }
+            }
+        }
+
+        // Inject custom keyframes untuk animasi pompa
+        ;(function() {
+            const style = document.createElement('style')
+            style.textContent = `
+                @keyframes pump-flicker {
+                    0%, 100% { opacity: 1; }
+                    30% { opacity: 0.3; }
+                    60% { opacity: 0.85; }
+                    80% { opacity: 0.2; }
+                }
+                @keyframes pump-shake {
+                    0%, 100% { transform: translateX(0) rotate(0deg); }
+                    20% { transform: translateX(-1.5px) rotate(-0.4deg); }
+                    40% { transform: translateX(1.5px) rotate(0.4deg); }
+                    60% { transform: translateX(-1px) rotate(-0.2deg); }
+                    80% { transform: translateX(1px) rotate(0.2deg); }
+                }
+                @keyframes pump-flash {
+                    0%, 100% { opacity: 0; }
+                    50% { opacity: 1; }
+                }
+            `
+            document.head.appendChild(style)
+        })()
+    </script>
+    @endif
 @endpush

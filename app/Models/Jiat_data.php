@@ -15,6 +15,7 @@ class Jiat_data extends Model
         'kedalaman_sumur',
         'kedalaman_pompa',
         'kedalaman_sensor',
+        'has_pump',
     ];
 
     public function logger()

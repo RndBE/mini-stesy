@@ -203,11 +203,37 @@ class DataMasukController extends Controller
             $row[$k] = $request->input($k);
         }
 
-        \Illuminate\Support\Facades\DB::table($tableMain)->insert($row);
+        // Merge dengan snapshot terkini agar kolom NOT NULL tidak kosong
+        // Sensor yang tidak dikirim alat ini diisi dari nilai sebelumnya (bukan null/0)
+        $existing = \Illuminate\Support\Facades\DB::table($tableTemp)
+            ->where('id_logger', $id)
+            ->first();
 
+        $merged = $existing ? (array) $existing : [];
+
+        foreach ($row as $col => $val) {
+            // Hanya update kolom yang ada nilainya (tidak null) dari request
+            if ($val !== null) {
+                $merged[$col] = $val;
+            }
+        }
+
+        // Pastikan id_logger dan waktu selalu terupdate
+        $merged['id_logger'] = $id;
+        $merged['waktu']     = $row['waktu'];
+
+        // Hapus kolom yang tidak ada di tabel (misal kolom tambahan dari cast array)
+        // Ini memastikan insert tidak error karena kolom asing
+        $allowedCols = array_merge(['id_logger', 'waktu'], array_map(fn($i) => 'sensor'.$i, range(1, $maxSensor)));
+        $merged = array_intersect_key($merged, array_flip($allowedCols));
+
+        // Insert ke tabel besar (histori permanen) — pakai data merged agar tidak ada null
+        \Illuminate\Support\Facades\DB::table($tableMain)->insert($merged);
+
+        // Update tabel latest (snapshot dashboard) — pakai data merged yang sama
         \Illuminate\Support\Facades\DB::table($tableTemp)->updateOrInsert(
             ['id_logger' => $id],
-            $row
+            $merged
         );
 
         $payload = $row;
