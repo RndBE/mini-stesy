@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\t_Logger;
-use App\Models\Kategori_Logger;
+use App\Models\Kategori_logger;
 use App\Models\t_Informasi;
 use App\Models\Instansi;
 use App\Models\t_Lokasi;
@@ -502,7 +502,7 @@ class DeviceController extends Controller
                 ];
             });
 
-        $kategoris = Kategori_Logger::orderBy('nama_kategori')->get();
+        $kategoris = Kategori_logger::orderBy('nama_kategori')->get();
         $instansis = Instansi::orderBy('nama')->get();
 
         return view('device.data_perangkat', [
@@ -796,7 +796,7 @@ class DeviceController extends Controller
         static $cache = null;
 
         if ($cache === null) {
-            $cache = Kategori_Logger::query()
+            $cache = Kategori_logger::query()
                 ->whereRaw('UPPER(nama_kategori) = ?', ['AWLR'])
                 ->pluck('id_katlogger')
                 ->map(fn($id) => (int) $id)
