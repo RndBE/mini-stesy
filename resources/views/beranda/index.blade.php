@@ -1,5 +1,50 @@
 @extends('layouts.app')
 @section('content')
+    <style>
+        @media (min-width: 768px) {
+            .md\:col-span-3 {
+                grid-column: span 3 / span 3;
+            }
+
+            .md\:col-span-4 {
+                grid-column: span 4 / span 4;
+            }
+
+            .md\:col-span-8 {
+                grid-column: span 8 / span 8;
+            }
+
+            .md\:col-span-9 {
+                grid-column: span 9 / span 9;
+            }
+
+            .md\:grid-cols-1 {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+
+            .md\:border-r {
+                border-right-width: 1px;
+            }
+
+            .md\:border-slate-200 {
+                --tw-border-opacity: 1;
+                border-color: rgb(226 232 240 / var(--tw-border-opacity, 1));
+            }
+
+            .md\:pr-2 {
+                padding-right: 0.5rem;
+            }
+
+            .md\:pr-4 {
+                padding-right: 1rem;
+            }
+
+            .md\:text-left {
+                text-align: left;
+            }
+        }
+    </style>
+
     @php
         $kategoriTabs = $groupedLoggers
             ->map(function ($items, $key) {
