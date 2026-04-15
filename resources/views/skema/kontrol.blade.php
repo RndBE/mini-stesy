@@ -51,9 +51,7 @@
         <div class="w-full lg:w-[350px] flex-shrink-0 flex flex-col gap-4">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 w-full flex-1">
                 <h2 class="text-lg font-bold text-slate-800 mb-4">Panel Kontrol</h2>
-
-                {{-- Info Saluran --}}
-                @if(isset($node['saluran']))
+@if(isset($node['saluran']))
                 <div class="mb-4 bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-2">
                     <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-wide">Saluran</p>
                     <p class="text-sm font-semibold text-indigo-900 leading-tight mt-0.5">{{ $node['saluran'] }}</p>
@@ -62,9 +60,7 @@
                     @endif
                 </div>
                 @endif
-
-                {{-- Debit & TMA Cards --}}
-                @if(isset($node['tma_hulu_cm']) || isset($node['debit_m3s']))
+@if(isset($node['tma_hulu_cm']) || isset($node['debit_m3s']))
                 <div class="grid grid-cols-2 gap-2 mb-5">
                     @if(isset($node['tma_hulu_cm']))
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
@@ -84,23 +80,21 @@
                     <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-center col-span-1">
                         <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-wide">Debit</p>
                         <p class="text-xl font-bold text-emerald-800 leading-none mt-1">{{ number_format($node['debit_m3s'], 2) }}</p>
-                        <p class="text-[10px] text-emerald-400 mt-0.5">m³/dtk</p>
+                        <p class="text-[10px] text-emerald-400 mt-0.5">mÂ³/dtk</p>
                     </div>
                     @endif
                     @if(isset($node['kapasitas_m3s']))
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center col-span-1">
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Kapasitas</p>
                         <p class="text-xl font-bold text-slate-700 leading-none mt-1">{{ number_format($node['kapasitas_m3s'], 2) }}</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">m³/dtk</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">mÂ³/dtk</p>
                     </div>
                     @endif
                 </div>
                 @endif
 
                 <hr class="border-slate-200 mb-4">
-
-                {{-- Pilih Pintu --}}
-                <div class="mb-5">
+<div class="mb-5">
                     <label class="block text-sm font-medium text-slate-700 mb-2">Pilih Pintu</label>
                     <div class="relative">
                         <select x-model="selectedGateId" class="block w-full pl-3 pr-10 py-2.5 text-sm border-indigo-200 bg-indigo-50/50 rounded-lg focus:outline-none focus:ring-0 focus:border-indigo-400 appearance-none text-indigo-900 font-semibold">
@@ -113,9 +107,7 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- Elevasi Pintu Card --}}
-                <div class="bg-slate-50/50 border border-slate-100 rounded-xl p-4 mb-4">
+<div class="bg-slate-50/50 border border-slate-100 rounded-xl p-4 mb-4">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="font-bold text-slate-700 text-sm">Bukaan Pintu Saat Ini</h3>
                         @if(isset($node['last_time']))
@@ -138,11 +130,8 @@
 
             </div>
         </div>
-
-        {{-- ===== WORKFLOW PROGRESS MODAL ===== --}}
-        <div x-show="workflowVisible" x-cloak class="fixed inset-0 z-[200]" role="dialog" aria-modal="true" style="display:none;">
-            {{-- Overlay --}}
-            <div x-show="workflowVisible"
+<div x-show="workflowVisible" x-cloak class="fixed inset-0 z-[200]" role="dialog" aria-modal="true" style="display:none;">
+<div x-show="workflowVisible"
                 x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                 x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                 class="fixed inset-0 bg-slate-900/40 transition-opacity"
@@ -158,13 +147,10 @@
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="relative w-full max-w-sm rounded-2xl bg-white shadow-2xl overflow-hidden"
                     @click.stop>
-
-                    {{-- Modal Header --}}
-                    <div class="px-6 pt-6 pb-4 border-b border-slate-100">
+<div class="px-6 pt-6 pb-4 border-b border-slate-100">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                {{-- Icon: spinner saat running, centang saat sukses, X saat error --}}
-                                <div class="flex h-10 w-10 items-center justify-center rounded-xl"
+<div class="flex h-10 w-10 items-center justify-center rounded-xl"
                                     :class="workflowRunning ? 'bg-indigo-100' : workflowSuccess ? 'bg-emerald-100' : 'bg-red-100'">
                                     <template x-if="workflowRunning">
                                         <span class="inline-block h-5 w-5 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin"></span>
@@ -187,8 +173,7 @@
                                        x-text="workflowRunning ? 'Menunggu respons dari logger...' : workflowSuccess ? 'Perintah kontrol berhasil dieksekusi.' : 'Periksa koneksi dan coba lagi.'"></p>
                                 </div>
                             </div>
-                            {{-- Tombol tutup hanya aktif saat tidak loading --}}
-                            <button @click="workflowVisible = false"
+<button @click="workflowVisible = false"
                                 class="ml-2 flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition-colors"
                                 :class="workflowRunning ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-100 hover:text-slate-700'"
                                 :disabled="workflowRunning">
@@ -198,9 +183,7 @@
                             </button>
                         </div>
                     </div>
-
-                    {{-- Progress Bar --}}
-                    <div class="px-6 pt-4">
+<div class="px-6 pt-4">
                         <div class="flex items-center justify-between mb-1.5">
                             <span class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Overall Progress</span>
                             <span class="text-xs font-bold"
@@ -213,9 +196,7 @@
                                  :style="`width: ${workflowPercent()}%`"></div>
                         </div>
                     </div>
-
-                    {{-- Steps --}}
-                    <div class="px-6 py-4 space-y-2">
+<div class="px-6 py-4 space-y-2">
                         <template x-for="step in workflowSteps" :key="step.key">
                             <div class="rounded-xl border p-3 transition-all"
                                 :class="step.status === 'done' ? 'border-emerald-200 bg-emerald-50/60' : step.status === 'active' ? 'border-indigo-200 bg-indigo-50/50' : step.status === 'error' ? 'border-red-200 bg-red-50/50' : 'border-slate-100 bg-slate-50/60 opacity-60'">
@@ -251,9 +232,7 @@
                             </div>
                         </template>
                     </div>
-
-                    {{-- Footer Button (muncul saat selesai) --}}
-                    <div x-show="!workflowRunning" class="px-6 pb-5">
+<div x-show="!workflowRunning" class="px-6 pb-5">
                         <button @click="workflowVisible = false"
                             class="w-full py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95"
                             :class="workflowSuccess ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'">
@@ -326,19 +305,15 @@
 </div>
 
 @push('scripts')
-{{-- Include SweetAlert2 for notifications --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function gateControl() {
         return {
-            // Initial array of gates compiled from backend
             gates: @json($node['gates'] ?? [['sensor_id' => 'sensor1', 'name' => 'Pintu Utama', 'bukaan_persen' => $node['bukaan_persen'] ?? 0]]),
             selectedGateId: '',
             currentValue: 0,
             targetValue: 0,
             idLogger: '{{ $node['id_logger'] ?? '' }}',
-
-            // Workflow state
             workflowVisible: false,
             workflowRunning: false,
             workflowSuccess: false,
@@ -365,7 +340,6 @@
                 let gate = this.gates.find(g => g.sensor_id === this.selectedGateId);
                 if (gate) {
                     let max = gate.max_cm || 100;
-                    // Konversi nilai cm historis dari database menjadi persen
                     let percentage = Math.round((gate.bukaan_persen / max) * 100);
                     if (percentage < 0) percentage = 0;
                     if (percentage > 100) percentage = 100;
@@ -390,8 +364,6 @@
                     this.targetValue -= 1;
                 }
             },
-
-            // --- Workflow helpers ---
             workflowPercent() {
                 if (!this.workflowSteps.length) return 0
                 const done = this.workflowSteps.filter(s => s.status === 'done').length
@@ -412,9 +384,6 @@
                     s.key === key ? { ...s, status, subtitle: subtitle ?? s.subtitle } : s
                 )
             },
-
-            // Visualization logic: 
-            // targetValue is already 0-100%. 0 = closed (height 100).
             getGateVisualHeight() {
                 let percent = this.targetValue;
                 let barrierHeight = 100 - percent; 
@@ -440,8 +409,6 @@
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (!result.isConfirmed) return
-
-                    // Reset & mulai workflow
                     this.resetWorkflow()
                     this.workflowVisible = true
                     this.workflowRunning = true
@@ -451,19 +418,15 @@
                     const targetPct  = this.targetValue
 
                     this.workflowSteps = [
-                        { key: 'confirm', title: 'Confirm action',            subtitle: `Target: ${targetGate} → ${targetPct}%`,   status: 'done'   },
+                        { key: 'confirm', title: 'Confirm action',            subtitle: `Target: ${targetGate} â†’ ${targetPct}%`,   status: 'done'   },
                         { key: 'mqtt',   title: 'Connecting to MQTT broker',  subtitle: 'Connecting...',                           status: 'active' },
                         { key: 'logger', title: 'Connecting to logger',        subtitle: 'Waiting for device session...',           status: 'pending' },
                         { key: 'ack',    title: 'Sending command & waiting ACK', subtitle: 'Waiting response from logger...',      status: 'pending' },
                     ]
-
-                    // Step 1 → mqtt connected after 1.1s
                     this.workflowTimers.push(setTimeout(() => {
                         this.markStep('mqtt', 'done', 'MQTT connected')
                         this.markStep('logger', 'active', 'Connecting...')
                     }, 1100))
-
-                    // Step 2 → logger connected after 2.4s, fire actual API
                     this.workflowTimers.push(setTimeout(() => {
                         this.markStep('logger', 'done', 'Logger connected')
                         this.markStep('ack', 'active', 'Sending command...')
@@ -498,8 +461,6 @@
                                 if (gateIndex !== -1) {
                                     this.gates[gateIndex].bukaan_persen = Math.round((this.targetValue / 100) * this.activeMaxBukaan)
                                 }
-
-                                // Auto-hide setelah 5 detik
                                 this.workflowTimers.push(setTimeout(() => {
                                     this.workflowVisible = false
                                 }, 5000))

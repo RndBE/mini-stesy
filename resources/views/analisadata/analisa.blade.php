@@ -4,8 +4,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         [x-cloak] { display: none !important; }
-        /* ── Select2 Tailwind-style override ── */
-        .select2-container--default .select2-selection--single {
+.select2-container--default .select2-selection--single {
             border: 1px solid #cbd5e1;
             border-radius: 0.5rem;
             height: 36px;
@@ -276,9 +275,7 @@
         .data-table tbody tr:hover {
             background: #f9fafb;
         }
-
-        /* Info Panel */
-        .info-panel {
+.info-panel {
             position: fixed;
             top: 0;
             right: -100vw;
@@ -365,9 +362,7 @@
             color: #111827;
             font-weight: 500;
         }
-
-        /* Documentation Modal */
-        .doc-modal {
+.doc-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -524,7 +519,7 @@
     <div class="info-panel rounded-lg" id="infoPanel">
         <div class="info-panel-header">
             <div class="info-panel-title">Informasi Logger</div>
-            <button class="info-panel-close" onclick="closeInfoPanel()">×</button>
+            <button class="info-panel-close" onclick="closeInfoPanel()">Ã—</button>
         </div>
         <div class="info-panel-body">
             <div class="info-item mb-2 pb-1">
@@ -569,7 +564,7 @@
         <div class="doc-modal-content" onclick="event.stopPropagation()">
             <div class="doc-modal-header">
                 <div class="doc-modal-title">Dokumentasi</div>
-                <button class="doc-modal-close" onclick="closeDocModal()">×</button>
+                <button class="doc-modal-close" onclick="closeDocModal()">Ã—</button>
             </div>
             <div class="doc-modal-body">
                 @if ($photos->count() > 0)
@@ -627,7 +622,7 @@
         <div class="doc-modal-content" style="max-width: 900px;" onclick="event.stopPropagation()">
             <div class="doc-modal-header">
                 <div class="doc-modal-title">Jumlah Data Masuk 30 Hari Terakhir</div>
-                <button class="doc-modal-close" onclick="closeDataMasukModal()">×</button>
+                <button class="doc-modal-close" onclick="closeDataMasukModal()">Ã—</button>
             </div>
             <div class="doc-modal-body">
                 <div style="height: 400px;">
@@ -664,8 +659,7 @@
         </div>
 
         <div class="flex gap-2 flex-shrink-0">
-            {{-- Tombol Filter: hanya muncul di mobile --}}
-            <button @click="filterOpen = !filterOpen"
+<button @click="filterOpen = !filterOpen"
                 :class="filterOpen ? 'bg-[#303481] text-white border-[#303481]' : 'bg-slate-100 text-slate-700 border-slate-300'"
                 class="md:hidden border items-center rounded-lg flex px-3 py-2 text-sm transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -688,8 +682,7 @@
             </button>
 
             @if($logger->jiat?->has_pump)
-            {{-- Tombol Kontrol Pompa (hanya untuk JIAT yang has_pump = 1) --}}
-            <div x-data="pumpControlApp()">
+<div x-data="pumpControlApp()">
                 <button @click="openPumpModal()"
                     class="bg-amber-50 border border-amber-200 items-center rounded-lg flex px-3 sm:px-4 text-amber-700 py-2 sm:py-3 hover:bg-amber-100 text-sm transition-colors">
                     <img src="{{ asset('icons/pump.svg') }}"
@@ -698,11 +691,8 @@
                          alt="Pump Icon" />
                     <span class="hidden sm:inline font-semibold">Kontrol Pompa</span>
                 </button>
-
-                {{-- ===== PUMP CONTROL MODAL ===== --}}
-                <div x-show="showPumpModal" class="fixed inset-0 z-[1100]" role="dialog" aria-modal="true" style="display:none;">
-                    {{-- Overlay --}}
-                    <div x-show="showPumpModal"
+<div x-show="showPumpModal" class="fixed inset-0 z-[1100]" role="dialog" aria-modal="true" style="display:none;">
+<div x-show="showPumpModal"
                         x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                         x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                         class="fixed inset-0 bg-slate-900/40 transition-opacity" @click="closePumpModal()"></div>
@@ -717,9 +707,7 @@
                             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                             class="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-white text-left shadow-xl"
                             @click.stop>
-
-                            {{-- Modal Header --}}
-                            <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+<div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
                                 <div class="flex items-center gap-2">
                                     <div class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700">
                                         <img src="{{ asset('icons/pump.svg') }}"
@@ -740,11 +728,8 @@
                                     </svg>
                                 </button>
                             </div>
-
-                            {{-- Modal Body --}}
-                            <div class="space-y-2 px-6 py-5">
-                                {{-- Info Logger --}}
-                                <div class="grid grid-cols-1 gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
+<div class="space-y-2 px-6 py-5">
+<div class="grid grid-cols-1 gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
                                     <div>
                                         <p class="text-xs uppercase tracking-wide text-slate-400">Nama Pos</p>
                                         <p class="mt-1 text-sm font-bold text-slate-900">{{ $logger->lokasi->nama_lokasi ?? '-' }}</p>
@@ -758,35 +743,26 @@
                                         <p class="mt-1 text-sm font-bold text-slate-900">{{ $logger->nama_logger }}</p>
                                     </div>
                                 </div>
-
-                                {{-- Status & Kontrol --}}
-                                <div class="rounded-xl border border-slate-200 bg-white p-4">
+<div class="rounded-xl border border-slate-200 bg-white p-4">
                                     <div class="flex items-center justify-between gap-4">
                                         <div>
                                             <p class="text-sm font-semibold text-slate-900">Status Pompa</p>
                                         </div>
                                         <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300"
                                             :class="pumpRunning ? 'bg-amber-100 text-amber-700 animate-pulse' : pumpState === 'on' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'"
-                                            x-text="pumpRunning ? (pumpTargetState === 'on' ? '⚙ Starting...' : '⚙ Stopping...') : pumpState === 'on' ? 'Pump ON' : 'Pump OFF'"></span>
+                                            x-text="pumpRunning ? (pumpTargetState === 'on' ? 'âš™ Starting...' : 'âš™ Stopping...') : pumpState === 'on' ? 'Pump ON' : 'Pump OFF'"></span>
                                     </div>
-
-                                    {{-- Visual Submersible + Tombol Aksi --}}
-                                    <div class="mt-6 flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-stretch">
-
-                                        {{-- Animasi Submersible Pump --}}
-                                        <div class="relative flex w-full flex-col items-center justify-center rounded-xl bg-gradient-to-b from-[#0b132b] to-[#0a2342] p-4 sm:w-1/3 shadow-[inset_0_4px_20px_rgba(0,0,0,0.8)] overflow-hidden">
-                                            {{-- Deep Water Background --}}
-                                            <div class="absolute inset-x-0 bottom-0 transition-all duration-[2500ms] ease-in-out border-t-2"
+<div class="mt-6 flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-stretch">
+<div class="relative flex w-full flex-col items-center justify-center rounded-xl bg-gradient-to-b from-[#0b132b] to-[#0a2342] p-4 sm:w-1/3 shadow-[inset_0_4px_20px_rgba(0,0,0,0.8)] overflow-hidden">
+<div class="absolute inset-x-0 bottom-0 transition-all duration-[2500ms] ease-in-out border-t-2"
                                                 :class="pumpState === 'on' && !pumpRunning ? 'top-[20%] bg-[#0077b6]/30 border-[#00b4d8]/60 shadow-[0_-5px_20px_rgba(0,180,216,0.2)]' : pumpRunning ? 'top-[18%] bg-amber-900/20 border-amber-400/40 shadow-[0_-5px_20px_rgba(245,158,11,0.15)]' : 'top-[25%] bg-slate-800/60 border-slate-600/50 shadow-none'">
-                                                {{-- Bubbles ON state --}}
-                                                <div class="absolute inset-0 overflow-hidden transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
+<div class="absolute inset-0 overflow-hidden transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
                                                      :class="pumpState === 'on' && !pumpRunning ? 'opacity-100' : 'opacity-0'">
                                                     <div class="absolute bottom-4 left-[20%] w-1.5 h-1.5 rounded-full bg-cyan-200 animate-[ping_2s_linear_infinite]"></div>
                                                     <div class="absolute bottom-10 right-[30%] w-2 h-2 rounded-full bg-cyan-300 animate-[ping_2.5s_linear_infinite]" style="animation-delay:0.5s"></div>
                                                     <div class="absolute bottom-20 left-[40%] w-1 h-1 rounded-full bg-cyan-100 animate-[ping_1.5s_linear_infinite]" style="animation-delay:1.2s"></div>
                                                 </div>
-                                                {{-- Bubbles STARTING state (lebih lambat, amber) --}}
-                                                <div class="absolute inset-0 overflow-hidden transition-opacity duration-[800ms] ease-in-out pointer-events-none"
+<div class="absolute inset-0 overflow-hidden transition-opacity duration-[800ms] ease-in-out pointer-events-none"
                                                      :class="pumpRunning ? 'opacity-100' : 'opacity-0'">
                                                     <div class="absolute bottom-3 left-[25%] w-1 h-1 rounded-full bg-amber-300 animate-[ping_3s_linear_infinite]"></div>
                                                     <div class="absolute bottom-8 right-[35%] w-1.5 h-1.5 rounded-full bg-amber-200 animate-[ping_4s_linear_infinite]" style="animation-delay:1s"></div>
@@ -796,8 +772,7 @@
                                             <div class="relative flex h-40 w-28 items-end justify-center z-10 mt-2">
                                                 <div class="absolute left-2 top-0 bottom-[1.8rem] w-3 flex flex-col items-center z-0">
                                                     <div class="w-2.5 h-full bg-gradient-to-r from-slate-800 via-slate-600 to-slate-800 border-x border-slate-900 shadow-md"></div>
-                                                    {{-- Air mengalir: saat starting setengah naik warna amber, saat on penuh cyan --}}
-                                                    <div class="absolute bottom-0 w-1.5 transition-all duration-[1500ms] ease-in-out origin-bottom"
+<div class="absolute bottom-0 w-1.5 transition-all duration-[1500ms] ease-in-out origin-bottom"
                                                          :class="pumpRunning ? 'h-[50%] opacity-80 bg-amber-400 shadow-[0_0_6px_#f59e0b]' : pumpState === 'on' ? 'h-full opacity-100 bg-cyan-300 shadow-[0_0_8px_#22d3ee]' : 'h-0 opacity-0 bg-cyan-300 shadow-none'"></div>
                                                 </div>
                                                 <div class="absolute left-1.5 bottom-[1.5rem] w-4 h-3 bg-gradient-to-r from-slate-700 to-slate-600 border border-slate-900 rounded-sm z-10 transition-all duration-[1000ms] ease-in-out"
@@ -809,38 +784,29 @@
                                                 <div class="absolute left-[8px] bottom-[2px] h-6 w-7 border-l-2 border-b-2 border-slate-900 rounded-bl-xl z-20 pointer-events-none"></div>
                                                 <div class="relative w-[3.5rem] h-[8.5rem] flex flex-col items-center bg-gradient-to-r from-[#2a3a4c] via-[#4a5f78] to-[#1e2a38] border-x-2 border-[#0d1622] rounded-sm shadow-2xl z-10">
                                                     <div class="w-[85%] h-6 border-b-2 border-[#0d1622] overflow-hidden relative">
-                                                        {{-- Gradient dasar silinder --}}
-                                                        <div class="absolute inset-0 bg-gradient-to-r from-[#1c2836] via-[#3a4f6b] to-[#1c2836]"></div>
-                                                        {{-- Tekstur rotor (garis-garis) yang memutar --}}
-                                                        <div class="absolute inset-0 opacity-60 mix-blend-multiply"
+<div class="absolute inset-0 bg-gradient-to-r from-[#1c2836] via-[#3a4f6b] to-[#1c2836]"></div>
+<div class="absolute inset-0 opacity-60 mix-blend-multiply"
                                                              :class="pumpState === 'on' && !pumpRunning ? 'animate-[rotor-spin_0.2s_linear_infinite]' : ''"
                                                              style="background: repeating-linear-gradient(90deg, #000 0px, #000 6px, transparent 6px, transparent 15px); background-size: 15px 100%;">
                                                         </div>
-                                                        {{-- Bayangan melengkung untuk efek 3D --}}
-                                                        <div class="absolute inset-0 bg-gradient-to-r from-[#000]/90 via-transparent to-[#000]/90 pointer-events-none"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-[#000]/90 via-transparent to-[#000]/90 pointer-events-none"></div>
                                                     </div>
-                                                    {{-- Glow Ring Atas: amber saat starting, cyan saat on, abu saat off --}}
-                                                    <div class="w-[105%] h-1.5 rounded-full transition-colors duration-[800ms] ease-in-out z-20 border"
+<div class="w-[105%] h-1.5 rounded-full transition-colors duration-[800ms] ease-in-out z-20 border"
                                                          :class="pumpRunning ? 'border-transparent shadow-[0_0_12px_#f59e0b] animate-[pump-flicker_0.7s_ease-in-out_infinite] bg-amber-400' : pumpState === 'on' ? 'bg-[#00f8ff] border-transparent shadow-[0_0_15px_#00f8ff]' : 'bg-slate-700 border-slate-800 shadow-none'"></div>
                                                     <div class="w-full flex-grow flex items-center justify-center relative shadow-[inset_4px_0_10px_rgba(255,255,255,0.1),inset_-6px_0_15px_rgba(0,0,0,0.6)]">
                                                         <div class="w-5 h-[4.5rem] bg-[#070b12] rounded-full border border-slate-800 shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col justify-end p-[1.5px]">
-                                                            {{-- Indikator fluida: 50% kuning saat starting, 85% cyan saat on, 15% abu saat off --}}
-                                                            <div class="relative w-full rounded-full transition-all duration-[1500ms] ease-in-out overflow-hidden flex flex-col justify-end"
+<div class="relative w-full rounded-full transition-all duration-[1500ms] ease-in-out overflow-hidden flex flex-col justify-end"
                                                                  :class="pumpRunning ? 'h-[45%]' : pumpState === 'on' ? 'h-[85%] shadow-[0_0_10px_#00f8ff]' : 'h-[15%] shadow-none'">
-                                                                {{-- Fluida Nyala (ON) --}}
-                                                                <div class="absolute inset-0 w-full h-full bg-gradient-to-b from-[#00f8ff] to-[#0077b6] transition-opacity duration-[1000ms] ease-in-out"
+<div class="absolute inset-0 w-full h-full bg-gradient-to-b from-[#00f8ff] to-[#0077b6] transition-opacity duration-[1000ms] ease-in-out"
                                                                      :class="pumpState === 'on' && !pumpRunning ? 'opacity-100 animate-[pulse_1.5s_infinite]' : 'opacity-0'"></div>
-                                                                {{-- Fluida Starting (amber surge) --}}
-                                                                <div class="absolute inset-0 w-full h-full bg-gradient-to-b from-amber-300 to-amber-600 transition-opacity duration-[800ms] ease-in-out"
+<div class="absolute inset-0 w-full h-full bg-gradient-to-b from-amber-300 to-amber-600 transition-opacity duration-[800ms] ease-in-out"
                                                                      :class="pumpRunning ? 'opacity-100 animate-[pulse_0.8s_infinite]' : 'opacity-0'"></div>
-                                                                {{-- Fluida Mati (OFF) --}}
-                                                                <div class="absolute inset-0 w-full h-full bg-slate-600 transition-opacity duration-[1000ms] ease-in-out"
+<div class="absolute inset-0 w-full h-full bg-slate-600 transition-opacity duration-[1000ms] ease-in-out"
                                                                      :class="!pumpRunning && pumpState !== 'on' ? 'opacity-100' : 'opacity-0'"></div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    {{-- Glow Ring Bawah: amber saat starting, cyan saat on, abu saat off --}}
-                                                    <div class="w-[105%] h-1.5 rounded-full transition-colors duration-[800ms] ease-in-out z-20 border"
+<div class="w-[105%] h-1.5 rounded-full transition-colors duration-[800ms] ease-in-out z-20 border"
                                                          :class="pumpRunning ? 'border-transparent shadow-[0_0_12px_#f59e0b] animate-[pump-flicker_0.7s_ease-in-out_infinite_0.35s] bg-amber-400' : pumpState === 'on' ? 'bg-[#00f8ff] border-transparent shadow-[0_0_15px_#00f8ff]' : 'bg-slate-700 border-slate-800 shadow-none'"></div>
                                                     <div class="w-[90%] h-5 bg-gradient-to-r from-[#1c2836] to-[#2d3f54] border-x border-b border-[#0d1622] rounded-b-md flex flex-col justify-between items-center shadow-lg pb-1">
                                                         <div class="w-full h-1.5 border-b border-slate-800 opacity-50"></div>
@@ -852,8 +818,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            {{-- Status Floating Badge --}}
-                                            <div class="absolute top-3 right-3 rounded bg-[#0b132b]/80 backdrop-blur-sm border px-2 py-1 flex items-center justify-center z-40 transition-all duration-500"
+<div class="absolute top-3 right-3 rounded bg-[#0b132b]/80 backdrop-blur-sm border px-2 py-1 flex items-center justify-center z-40 transition-all duration-500"
                                                  :class="pumpRunning ? 'border-amber-700/60' : 'border-cyan-900/50'">
                                                 <div class="w-1.5 h-1.5 rounded-full mr-1.5 transition-all duration-500"
                                                      :class="pumpRunning ? 'bg-amber-400 shadow-[0_0_5px_#f59e0b] animate-[pump-flicker_0.7s_ease-in-out_infinite]' : pumpState === 'on' ? 'bg-[#00f8ff] shadow-[0_0_5px_#00f8ff] animate-pulse' : 'bg-slate-500'"></div>
@@ -861,13 +826,10 @@
                                                       :class="pumpRunning ? 'text-amber-300' : pumpState === 'on' ? 'text-cyan-300' : 'text-slate-400'"
                                                       x-text="pumpRunning ? (pumpTargetState === 'on' ? 'Starting' : 'Stopping') : pumpState === 'on' ? 'Running' : 'Standby'"></span>
                                             </div>
-                                            {{-- Overlay kilat cahaya saat starting (flash effect) --}}
-                                            <div class="absolute inset-0 rounded-xl pointer-events-none transition-opacity duration-500"
+<div class="absolute inset-0 rounded-xl pointer-events-none transition-opacity duration-500"
                                                  :class="pumpRunning ? 'animate-[pump-flash_1.8s_ease-in-out_infinite] bg-amber-400/5' : 'opacity-0'"></div>
                                         </div>
-
-                                        {{-- Tombol Start / Stop --}}
-                                        <div class="flex w-full flex-col justify-center space-y-4 sm:w-2/3">
+<div class="flex w-full flex-col justify-center space-y-4 sm:w-2/3">
                                             <button type="button" @click="runPumpAction('on')"
                                                 class="group relative flex items-center justify-between rounded-xl bg-emerald-600 px-5 py-4 shadow-md transition-all hover:bg-emerald-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                                                 :disabled="pumpRunning || pumpState === 'on'">
@@ -880,13 +842,11 @@
                                                             x-text="pumpRunning && pumpTargetState === 'on' ? 'Sending command...' : 'Kirim perintah untuk menyalakan'"></p>
                                                     </div>
                                                 </div>
-                                                {{-- Normal Icon --}}
-                                                <svg x-show="!(pumpRunning && pumpTargetState === 'on')" class="h-6 w-6 text-emerald-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<svg x-show="!(pumpRunning && pumpTargetState === 'on')" class="h-6 w-6 text-emerald-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
-                                                {{-- Loading Spinner --}}
-                                                <svg x-show="pumpRunning && pumpTargetState === 'on'" style="display: none;" class="h-6 w-6 animate-spin text-emerald-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+<svg x-show="pumpRunning && pumpTargetState === 'on'" style="display: none;" class="h-6 w-6 animate-spin text-emerald-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                                                 </svg>
@@ -904,22 +864,18 @@
                                                             x-text="pumpRunning && pumpTargetState === 'off' ? 'Sending command...' : 'Hentikan seketika mekanisme pompa'"></p>
                                                     </div>
                                                 </div>
-                                                {{-- Normal Icon --}}
-                                                <svg x-show="!(pumpRunning && pumpTargetState === 'off')" class="h-6 w-6 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<svg x-show="!(pumpRunning && pumpTargetState === 'off')" class="h-6 w-6 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10h6v4H9z" />
                                                 </svg>
-                                                {{-- Loading Spinner --}}
-                                                <svg x-show="pumpRunning && pumpTargetState === 'off'" style="display: none;" class="h-6 w-6 animate-spin text-red-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+<svg x-show="pumpRunning && pumpTargetState === 'off'" style="display: none;" class="h-6 w-6 animate-spin text-red-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                                                 </svg>
                                             </button>
                                         </div>
                                     </div>
-
-                                    {{-- Progress Workflow --}}
-                                    <div x-show="pumpWorkflowVisible" x-cloak
+<div x-show="pumpWorkflowVisible" x-cloak
                                         x-transition:enter="transition ease-out duration-200"
                                         x-transition:enter-start="opacity-0 translate-y-2"
                                         x-transition:enter-end="opacity-100 translate-y-0"
@@ -991,9 +947,7 @@
         </div>
     </div>
     <div class="analysis-container grid grid-cols-1 md:grid-cols-12 gap-3">
-
-        {{-- Filter Panel: hidden di mobile hingga diklik, selalu tampil di md+ --}}
-        <div :class="filterOpen ? 'block' : 'hidden md:block'"
+<div :class="filterOpen ? 'block' : 'hidden md:block'"
             class="col-span-1 md:col-span-5 xl:col-span-3 2xl:col-span-2">
             <div class="border rounded-lg px-4 py-3">
 
@@ -1046,7 +1000,7 @@
                                     <div class="flex items-center justify-between gap-2">
                                         <button type="button" id="dpPrev"
                                             class="h-8 w-8 rounded-lg border border-slate-50 hover:bg-slate-50 flex items-center justify-center">
-                                            <span class="text-slate-600">‹</span>
+                                            <span class="text-slate-600">â€¹</span>
                                         </button>
 
                                         <div class="flex items-center gap-2">
@@ -1096,7 +1050,7 @@
 
                                         <button type="button" id="dpNext"
                                             class="h-8 w-8 rounded-lg border border-slate-50 hover:bg-slate-50 flex items-center justify-center">
-                                            <span class="text-slate-600">›</span>
+                                            <span class="text-slate-600">â€º</span>
                                         </button>
                                     </div>
 
@@ -1180,7 +1134,7 @@
                                     <div class="flex items-center justify-between">
                                         <button type="button" id="ypPrev"
                                             class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">
-                                            <span class="text-slate-600">‹</span>
+                                            <span class="text-slate-600">â€¹</span>
                                         </button>
 
                                         <div class="text-xs font-semibold text-slate-700 bg-slate-100 rounded-full px-4 py-1"
@@ -1188,7 +1142,7 @@
 
                                         <button type="button" id="ypNext"
                                             class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">
-                                            <span class="text-slate-600">›</span>
+                                            <span class="text-slate-600">â€º</span>
                                         </button>
                                     </div>
 
@@ -1223,7 +1177,7 @@
                                                 class="h-9 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-sm text-slate-700">
                                             </div>
                                         </div>
-                                        <div class="w-8 flex items-center justify-center text-slate-700">→</div>
+                                        <div class="w-8 flex items-center justify-center text-slate-700">â†’</div>
                                         <div class="flex-1">
                                             <div id="rpEndBox"
                                                 class="h-9 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-sm text-slate-700">
@@ -1239,7 +1193,7 @@
                                         <div class="rounded-xl border border-slate-200 p-3">
                                             <div class="flex items-center justify-between">
                                                 <button type="button" id="rpPrev"
-                                                    class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">‹</button>
+                                                    class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">â€¹</button>
 
                                                 <div class="flex items-center gap-2">
                                                     <div class="relative">
@@ -1278,7 +1232,7 @@
                                                 </div>
 
                                                 <button type="button" id="rpNext"
-                                                    class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">›</button>
+                                                    class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">â€º</button>
                                             </div>
 
                                             <div class="mt-3 grid grid-cols-7 gap-1 text-xs text-slate-500">
@@ -1411,37 +1365,31 @@
         <div class="col-span-1 md:col-span-7 xl:col-span-9 2xl:col-span-10">
             <div class="border rounded-lg ">
                 <div class="chart-section ps-3 pe-3 pt-3 pb-0 mb-0">
-
-                    {{-- Rainfall Summary + Legend (hanya tampil saat tipe_graf = bar) --}}
-                    <div id="rainfallHeader" class="hidden mb-3">
+<div id="rainfallHeader" class="hidden mb-3">
                         <div class="flex flex-col md:flex-row gap-3">
-                            {{-- Card Akumulasi --}}
-                            <div
+<div
                                 class="relative overflow-hidden flex items-start gap-4 bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-sm min-w-[240px]">
                                 <div class="z-10">
                                     <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1"
                                         id="rainfallCardLabel">AKUMULASI CURAH HUJAN</div>
-                                    <div class="text-xs text-slate-400 mb-1" id="rainfallCardDate">—</div>
+                                    <div class="text-xs text-slate-400 mb-1" id="rainfallCardDate">â€”</div>
                                     <div class="flex items-baseline gap-1">
                                         <span class="text-3xl font-bold text-slate-800"
                                             id="rainfallCardTotal">0.000</span>
                                         <span class="text-sm font-semibold text-slate-500">mm</span>
                                     </div>
-                                    <div class="mt-1 text-xs font-medium" id="rainfallCardCategory">—</div>
+                                    <div class="mt-1 text-xs font-medium" id="rainfallCardCategory">â€”</div>
                                 </div>
                                 <img id="rainfallCardIcon" src="{{ asset('klasifikasi_hujan/tidak_hujan.png') }}"
                                     onerror="this.onerror=null;this.src='{{ asset('klasifikasi_hujan/tidak_hujan.png') }}';"
                                     alt="Status Hujan"
                                     class="pointer-events-none absolute right-[-0.5rem] top-6 h-24 w-24 object-contain opacity-90">
                             </div>
-
-                            {{-- Legend Intensitas (dirender dinamis dari DB) --}}
-                            <div class="flex-1 bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-sm">
+<div class="flex-1 bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-sm">
                                 <div class="text-xl font-bold text-slate-700 mb-2">Keterangan Intensitas Hujan Per Jam:
                                 </div>
                                 <div id="rainfallLegendItems" class="flex flex-wrap gap-x-5 gap-y-1">
-                                    {{-- akan diisi JS dari data.klasifikasi --}}
-                                </div>
+</div>
                             </div>
                         </div>
                     </div>
@@ -1467,25 +1415,23 @@
                         $phDisplayAwgr = is_numeric($latestPhAwgr) ? number_format((float)$latestPhAwgr, 2) : '-';
                         $phTimeDisplayAwgr = $latestPhTimeAwgr ? date('d-m-Y H:i:s', strtotime($latestPhTimeAwgr)) : '-';
                         $phVal = is_numeric($latestPhAwgr) ? (float)$latestPhAwgr : null;
-                        $phClassLabel = $phVal !== null ? ($phVal >= 6 && $phVal <= 9 ? 'Kelas I – III' : ($phVal >= 5 ? 'Kelas IV' : 'Di Luar Baku Mutu')) : '';
+                        $phClassLabel = $phVal !== null ? ($phVal >= 6 && $phVal <= 9 ? 'Kelas I â€“ III' : ($phVal >= 5 ? 'Kelas IV' : 'Di Luar Baku Mutu')) : '';
                         $phClassColor = $phVal !== null ? ($phVal >= 6 && $phVal <= 9 ? '#3b82f6' : ($phVal >= 5 ? '#ef4444' : '#6b7280')) : '#6b7280';
                     @endphp
-                    {{-- Universal AWQR Parameter Panel — konten diupdate JS sesuai parameter dipilih --}}
-                    <div id="awqrParamHeader" class="hidden mb-3">
+<div id="awqrParamHeader" class="hidden mb-3">
                         <div class="flex flex-col md:flex-row gap-3">
-                            {{-- Card Nilai --}}
-                            <div class="relative overflow-hidden flex-shrink-0 bg-white border border-slate-200 rounded-xl px-5 py-2 shadow-sm" style="min-width:290px">
+<div class="relative overflow-hidden flex-shrink-0 bg-white border border-slate-200 rounded-xl px-5 py-2 shadow-sm" style="min-width:290px">
                                 <div class="z-10 relative">
                                     <div class="flex items-start justify-between gap-4 mt-2">
                                         <div>
                                             <div class="text-xs font-semibold text-slate-700 uppercase tracking-wide" id="awqrParamLabel">NILAI PARAMETER</div>
                                             <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
                                                 <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 16 16" stroke="currentColor"><rect x="1" y="2" width="14" height="13" rx="2" stroke-width="1.5"/><path d="M1 6h14" stroke-width="1.5"/><path d="M5 1v3M11 1v3" stroke-width="1.5" stroke-linecap="round"/></svg>
-                                                <span id="awqrParamTimeSpan">—</span>
+                                                <span id="awqrParamTimeSpan">â€”</span>
                                             </div>
                                         </div>
                                         <div class="text-right leading-none">
-                                            <span class="text-3xl font-bold text-slate-800" id="awqrParamValue">—</span>
+                                            <span class="text-3xl font-bold text-slate-800" id="awqrParamValue">â€”</span>
                                             <span class="text-xs text-slate-400 ml-1" id="awqrParamUnit"></span>
                                         </div>
                                     </div>
@@ -1498,12 +1444,10 @@
                                     <img src="{{ asset('icons/gelombang.svg') }}" class="w-full h-full object-cover object-center" alt="">
                                 </div>
                             </div>
-                            {{-- Keterangan (diisi JS) --}}
-                            <div class="flex-1 bg-white border border-slate-200 rounded-xl px-5 py-2 shadow-sm">
+<div class="flex-1 bg-white border border-slate-200 rounded-xl px-5 py-2 shadow-sm">
                                 <div class="text-base font-bold text-slate-700 mb-2">Keterangan:</div>
                                 <div class="flex flex-wrap gap-x-8 gap-y-3" id="awqrKeteranganItems">
-                                    {{-- Diisi JS --}}
-                                </div>
+</div>
                             </div>
                         </div>
                     </div>
@@ -1517,9 +1461,7 @@
                 </div>
                 <div class="data-table-section ps-3 pe-3">
                     <div class="table-title" id="tableTitle">{{ date('F Y') }}</div>
-
-                    {{-- Tabel Utama (line chart) --}}
-                    <div id="mainTableWrap" class="w-full overflow-hidden rounded-lg border border-slate-300 mb-3">
+<div id="mainTableWrap" class="w-full overflow-hidden rounded-lg border border-slate-300 mb-3">
                         <table class="data-table ">
                             <thead class="bg-neutral-300 text-neutral-950 font-semibold uppercase text-xs">
                                 <tr>
@@ -1538,9 +1480,7 @@
                             </tbody>
                         </table>
                     </div>
-
-                    {{-- Tabel Intensitas Curah Hujan (bar chart) --}}
-                    <div id="rainfallTableWrap"
+<div id="rainfallTableWrap"
                         class="hidden w-full overflow-hidden rounded-lg border border-slate-300 mb-3">
                         <table class="data-table w-full">
                             <thead class="bg-neutral-300 text-neutral-950 font-semibold uppercase text-xs">
@@ -1581,8 +1521,6 @@
                 loadData();
             };
             let parameterUsesSelect2 = false;
-
-            // Init Select2 untuk dropdown logger
             if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
                 $('#loggerSelect').select2({
                     width: '100%',
@@ -1667,16 +1605,12 @@
 
             const hasParamOption = (value) => options.some((opt) => opt.value === value);
             const firstValidParam = options.find((opt) => String(opt.value || '').trim() !== '')?.value || '';
-
-            // Parameter utama dari controller (parameter_utama = 1 di DB)
             const defaultParam = '{{ $defaultParameter ?? '' }}';
 
             let initialParam = '';
             if (paramFromUrl && hasParamOption(paramFromUrl)) {
-                // Prioritas 1: dari URL ?parameter=
                 initialParam = paramFromUrl;
             } else if (defaultParam && hasParamOption(defaultParam)) {
-                // Prioritas 2: parameter_utama = 1 dari controller
                 initialParam = defaultParam;
             } else if (paramSelectEl && String(paramSelectEl.value || '').trim() !== '') {
                 initialParam = paramSelectEl.value;
@@ -2000,8 +1934,6 @@
             if (v === null || v === undefined || v === '') return '-';
             return `${v}${unit}`;
         }
-
-        // ─── Rainfall helpers ────────────────────────────────────────────────
         function getRainfallColor(val) {
             if (val === null || val === undefined) return 'rgba(200,200,200,0.3)';
             if (val <= 0) return '#84C450'; // Tidak Hujan
@@ -2040,10 +1972,8 @@
         }
 
         function getRainfallIconState(total, klasifikasi) {
-            // Gunakan thresholds dari DB jika tersedia
             if (Array.isArray(klasifikasi) && klasifikasi.length) {
                 const sorted = [...klasifikasi].sort((a, b) => a.debit_air - b.debit_air);
-                // Mapping intensitas label → icon filename slug
                 const slugMap = {
                     'tidak hujan': 'tidak_hujan',
                     'hujan sangat ringan': 'hujan_sangat_ringan',
@@ -2059,7 +1989,6 @@
                 const slug = slugMap[(matched.intensitas ?? '').toLowerCase().trim()];
                 return slug ?? 'tidak_hujan';
             }
-            // Fallback hardcoded
             if (total <= 0) return 'tidak_hujan';
             if (total < 1) return 'hujan_sangat_ringan';
             if (total < 5) return 'hujan_ringan';
@@ -2109,22 +2038,16 @@
                 return;
             }
             header.classList.remove('hidden');
-
-            // Render legend dinamis dari data DB
             renderRainfallLegend(data.klasifikasi ?? []);
 
             const total = data.akumulasi ?? 0;
             document.getElementById('rainfallCardTotal').textContent = total.toFixed(3);
-
-            // Update icon image
             const iconEl = document.getElementById('rainfallCardIcon');
             const iconState = getRainfallIconState(total, data.klasifikasi ?? []);
             if (iconEl) {
                 iconEl.src = `{{ asset('klasifikasi_hujan') }}/${iconState}.png`;
                 iconEl.alt = iconState.replace(/_/g, ' ');
             }
-
-            // Date label
             const range = document.querySelector('input[name="range"]:checked')?.value ?? 'day';
             const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
                 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
@@ -2150,23 +2073,16 @@
             catEl.textContent = cat.label;
             catEl.style.color = cat.color;
         }
-        // ─────────────────────────────────────────────────────────────────────
-
-        // ─── AWQR Universal Parameter Panel ────────────────────────────────────
         const _isAwgr = @php
             echo (strtoupper($logger->kategori_logger ?? $logger->kategori?->nama_kategori ?? '') === 'AWQR') ? 'true' : 'false';
         @endphp;
-
-        // Definisi keterangan untuk setiap parameter AWQR
         const _awqrParamDefs = {
-            // Tinggi Muka Air
             tinggi_muka_air: {
                 aliases: ['tinggi_muka_air','tinggi muka air','water level','tma'],
                 label: 'TINGGI MUKA AIR', unit: 'm',
                 classify: () => null,
                 keterangan: [] // tidak ada klasifikasi baku mutu
             },
-            // pH Air
             ph_air: {
                 aliases: ['ph_air','ph air','ph','ph_water'],
                 label: 'NILAI pH AIR', unit: '',
@@ -2180,7 +2096,6 @@
                     { color: '#E62421', label: 'Kelas IV',        range: '5 \u2013 9' },
                 ]
             },
-            // Suhu Air
             suhu_air: {
                 aliases: ['suhu_air','suhu air','suhu','temperature','temp','water_temperature'],
                 label: 'SUHU AIR', unit: '\u00b0C',
@@ -2193,7 +2108,6 @@
                     { color: '#F97316', label: 'Di Luar Rentang', range: '< 25 atau > 30 \u00b0C' },
                 ]
             },
-            // ORP
             orp: {
                 aliases: ['orp'],
                 label: 'NILAI ORP', unit: 'mV',
@@ -2205,7 +2119,6 @@
                     { color: '#F97316', label: 'Waspada', range: '\u2265 200 mV' },
                 ]
             },
-            // Conductivity
             conductivity: {
                 aliases: ['conductivity','konduktivitas','electrical_conductivity','ec'],
                 label: 'NILAI CONDUCTIVITY', unit: '\u03bcS/cm',
@@ -2217,7 +2130,6 @@
                     { color: '#F97316', label: 'Kelas II \u2013 IV', range: '\u2265 1000 \u03bcS/cm' },
                 ]
             },
-            // Salinity
             salinity: {
                 aliases: ['salinity','salinitas'],
                 label: 'NILAI SALINITY', unit: 'PSU',
@@ -2226,7 +2138,6 @@
                     { color: '#009CD9', label: 'Kelas I \u2013 III', range: 'Mendekati Nol' },
                 ]
             },
-            // Total Dissolved Solids
             tds: {
                 aliases: ['tds','total_dissolved_solids','dissolved_solids','total dissolved solids'],
                 label: 'TOTAL DISSOLVED SOLIDS', unit: 'mg/L',
@@ -2238,7 +2149,6 @@
                     { color: '#F97316', label: 'Kelas IV',           range: '\u2265 1000 mg/L' },
                 ]
             },
-            // Turbidity
             turbidity: {
                 aliases: ['turbidity','kekeruhan'],
                 label: 'NILAI TURBIDITY', unit: 'NTU',
@@ -2250,7 +2160,6 @@
                     { color: '#F97316', label: 'Kelas II \u2013 IV', range: '\u2265 5 NTU' },
                 ]
             },
-            // Tinggi Sensor
             tinggi_sensor: {
                 aliases: ['tinggi_sensor','tinggi sensor','sensor height','sensor_height'],
                 label: 'TINGGI SENSOR', unit: 'm',
@@ -2291,7 +2200,6 @@
         }
 
         function updatePhAirPanel(data) {
-            // alias ke fungsi universal agar backward-compatible
             updateAwqrParamPanel(data);
         }
 
@@ -2304,8 +2212,6 @@
             const sel      = document.getElementById('parameterSelect');
             const paramVal = String(sel ? sel.value : '').toLowerCase().trim();
             if (!paramVal) { panel.classList.add('hidden'); return; }
-
-            // Temukan definisi parameter
             let def = null;
             for (const key of Object.keys(_awqrParamDefs)) {
                 const d = _awqrParamDefs[key];
@@ -2316,13 +2222,9 @@
             if (!def) { panel.classList.add('hidden'); return; }
 
             panel.classList.remove('hidden');
-
-            // Hitung rerata
             const chartArr = Array.isArray(data && data.chartData) ? data.chartData : [];
             const valid    = chartArr.filter(v => v !== null && v !== undefined && !isNaN(Number(v))).map(Number);
             const avg      = valid.length > 0 ? valid.reduce((a, b) => a + b, 0) / valid.length : null;
-
-            // Update elemen
             const lblEl  = document.getElementById('awqrParamLabel');
             const valEl  = document.getElementById('awqrParamValue');
             const unitEl = document.getElementById('awqrParamUnit');
@@ -2337,8 +2239,6 @@
             if (timeEl) timeEl.textContent = _getTimeLbl();
             if (valEl)  valEl.textContent  = avg !== null ? avg.toFixed(2) : '\u2014';
             if (ktEl)   ktEl.innerHTML     = _buildKeteranganHtml(def.keterangan);
-
-            // Badge klasifikasi
             const cls = avg !== null ? def.classify(avg) : null;
             if (badgeEl) badgeEl.style.display = cls ? '' : 'none';
             if (cls) {
@@ -2346,7 +2246,6 @@
                 if (clsEl) { clsEl.textContent = cls.label; clsEl.style.color = cls.color; }
             }
         }
-        // ─────────────────────────────────────────────────────────────────────
 
 
 
@@ -2360,8 +2259,6 @@
             const rangeNode = document.querySelector('input[name="range"]:checked');
             const range = rangeNode ? rangeNode.value : 'day';
             const isBar = (data.tipe_graf === 'bar');
-
-            // ── Rebuild chart if type changed (ensures correct x-axis offset) ──
             const neededType = isBar ? 'bar' : 'line';
             if (currentChartType !== neededType) {
                 buildChart(isBar);
@@ -2396,7 +2293,6 @@
             chart.data.labels = filteredLabels;
 
             if (isBar) {
-                // Bar chart: strip null slots so bars align perfectly with labels
                 const barLabels = [];
                 const barValues = [];
                 for (let i = 0; i < (filteredLabels || []).length; i++) {
@@ -2441,7 +2337,6 @@
             const isAllEmpty = !hasAnyDataPayload(data);
 
             if (isBar) {
-                // Show rainfall table, hide main table
                 mainWrap?.classList.add('hidden');
                 rfWrap?.classList.remove('hidden');
 
@@ -2450,8 +2345,6 @@
                         '<tr><td colspan="2" class="text-center py-10 text-slate-400">Tidak ada data</td></tr>';
                     return;
                 }
-
-                // Filter to visible labels
                 let visibleLabels;
                 if (range === 'custom' || range === 'month') {
                     visibleLabels = null; // show all non-null
@@ -2484,8 +2377,6 @@
                 rbody.innerHTML = html;
                 return;
             }
-
-            // ── Line chart: use main table ──
             mainWrap?.classList.remove('hidden');
             rfWrap?.classList.add('hidden');
 
@@ -2740,10 +2631,8 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Helper: posisikan panel fixed di bawah trigger wrap
             function positionPanel(anchorWrap, panel) {
                 const rect = anchorWrap.getBoundingClientRect();
-                // Ukur dimensi panel: sementara buat invisible untuk bisa mengukur
                 const wasHidden = panel.classList.contains('hidden');
                 if (wasHidden) {
                     panel.style.visibility = 'hidden';
@@ -2759,12 +2648,10 @@
                 const winH = window.innerHeight;
                 let top = rect.bottom + 8;
                 let left = rect.left;
-                // Jangan sampai keluar batas kanan layar
                 if (left + panelWidth > winW - 8) {
                     left = winW - panelWidth - 8;
                 }
                 if (left < 8) left = 8;
-                // Jika tidak muat di bawah, tampilkan di atas
                 if (top + panelH > winH - 8) {
                     top = rect.top - panelH - 8;
                     if (top < 8) top = 8;
@@ -2772,10 +2659,6 @@
                 panel.style.top = top + 'px';
                 panel.style.left = left + 'px';
             }
-
-            // =========================
-            // 1) DATE PICKER (HARI) - KODE KAMU (dpWrap)
-            // =========================
             const wrap = document.getElementById('dpWrap')
             const input = document.getElementById('dateInput')
             const btn = document.getElementById('dpBtn')
@@ -2992,10 +2875,6 @@
                 if (monthMenu) monthMenu.addEventListener('click', (e) => e.stopPropagation())
                 if (yearMenu) yearMenu.addEventListener('click', (e) => e.stopPropagation())
             }
-
-            // =========================
-            // 2) MONTH PICKER (BULAN) - mpWrap
-            // =========================
             ;
             (function initMonthPicker() {
                 const wrap = document.getElementById('mpWrap')
@@ -3111,10 +2990,6 @@
                 buildYearMenu()
                 setText()
             })()
-
-            // =========================
-            // 3) YEAR PICKER (TAHUN) - ypWrap
-            // =========================
             ;
             (function initYearPicker() {
                 const wrap = document.getElementById('ypWrap')
@@ -3295,9 +3170,6 @@
                 let tempEnd = new Date(appliedEnd.getFullYear(), appliedEnd.getMonth(), appliedEnd.getDate())
 
                 let viewLeft = new Date(tempStart.getFullYear(), tempStart.getMonth(), 1)
-
-                // picking=false: klik berikutnya menjadi START (termasuk klik ketiga/reset)
-                // picking=true: klik berikutnya menjadi END
                 let picking = false
                 let hoverDate = null
 
@@ -3356,12 +3228,8 @@
                         const isE = key(cur) === key(tempEnd)
                         const isSE = isS && isE
                         const inRange = !isSE && isBetween(cur, tempStart, tempEnd)
-
-                        // ── Outer wrapper: full-width grid cell ────────────────
                         const wrapper = document.createElement('div')
                         wrapper.className = 'relative h-9 flex items-center justify-center cursor-pointer'
-
-                        // ── Strip background behind the circle ─────────────────
                         if (!isSE && (inRange || isS || isE)) {
                             const strip = document.createElement('div')
                             strip.className = 'absolute inset-y-0 bg-[#E9EAFB] pointer-events-none'
@@ -3370,8 +3238,6 @@
                             else          strip.style.cssText = 'left:0;right:0'
                             wrapper.appendChild(strip)
                         }
-
-                        // ── Inner circle / day number ──────────────────────────
                         const circle = document.createElement('div')
                         circle.textContent = String(d)
                         if (isS || isE) {
@@ -3388,12 +3254,10 @@
                             const clicked = new Date(y, m, d)
 
                             if (!picking) {
-                                // ── Klik Pertama (Start) ──
                                 tempStart = clicked
                                 tempEnd = clicked
                                 picking = true
                             } else {
-                                // ── Klik Kedua (End) ──
                                 tempEnd = clicked
                                 if (tempEnd.getTime() < tempStart.getTime()) {
                                     const t = tempStart
@@ -3589,9 +3453,7 @@
             })()
         })
     </script>
-
-    {{-- ===== ALPINE.JS PUMP CONTROL COMPONENT (hanya render jika has_pump) ===== --}}
-    @if($logger->jiat?->has_pump)
+@if($logger->jiat?->has_pump)
     <script>
         function pumpControlApp() {
             return {
@@ -3608,9 +3470,7 @@
                 },
 
                 closePumpModal() {
-                    // Tidak bisa tutup saat proses pengiriman perintah sedang berjalan
                     if (this.pumpRunning) return
-                    // Hanya reset workflow UI, BUKAN pumpState agar status on/off tetap tersimpan
                     this.pumpTimers.forEach(t => clearTimeout(t))
                     this.pumpTimers = []
                     this.pumpWorkflowVisible = false
@@ -3639,8 +3499,6 @@
                     this.pumpRunning = true
                     this.pumpWorkflowVisible = true
                     const cmd = target === 'on' ? 'turn_on_pump' : 'turn_off_pump'
-
-                    // 1. Ganti teks pada deklarasi awal step
                     this.pumpSteps = [
                         { key: 'confirm', title: 'Send command', subtitle: `Sent command: ${cmd}`, status: 'done' },
                         { key: 'mqtt',   title: 'Connecting to logger', subtitle: 'Mencoba terhubung...', status: 'active' },
@@ -3651,21 +3509,14 @@
                     const mark = (key, status, subtitle) => {
                         this.pumpSteps = this.pumpSteps.map(s => s.key === key ? {...s, status, subtitle: subtitle ?? s.subtitle} : s)
                     }
-
-                    // 2. Ganti teks update dinamis di dalam mark()
-                    // Langkah 2 (mqtt) selesai, Langkah 3 (logger) mulai berjalan
                     this.pumpTimers.push(setTimeout(() => { 
                         mark('mqtt', 'done', 'Connected to logger') 
                         mark('logger', 'active', 'Menunggu respon...') 
                     }, 1100))
-                    
-                    // Langkah 3 (logger) selesai, Langkah 4 (ack) mulai berjalan
                     this.pumpTimers.push(setTimeout(() => { 
                         mark('logger', 'done', 'Respon diterima') 
                         mark('ack', 'active', 'Validasi eksekusi...') 
                     }, 2400))
-                    
-                    // Langkah 4 (ack) selesai, Pompa diubah jadi ON/OFF
                     this.pumpTimers.push(setTimeout(() => {
                         mark('ack', 'done', 'Acknowledgment received')
                         this.pumpRunning = false
@@ -3676,8 +3527,6 @@
                 }
             }
         }
-
-        // Inject custom keyframes untuk animasi pompa
         ;(function() {
             const style = document.createElement('style')
             style.textContent = `

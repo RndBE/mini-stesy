@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    {{-- <div class="space-y-6" x-data="tingkatSiagaAwlrTable(@js($rows), @json(csrf_token()))"> --}}
-    <div class="space-y-6" x-data="tingkatSiagaAwlrTable" x-init="init(@js($rows), @js(csrf_token()))">
+<div class="space-y-6" x-data="tingkatSiagaAwlrTable" x-init="init(@js($rows), @js(csrf_token()))">
         <div class="flex flex-col items-start justify-end gap-3 sm:flex-row sm:items-center">
             <div class="w-full sm:w-80">
                 <div class="relative w-full">
@@ -365,15 +364,11 @@
                 filteredRows() {
                     const q = (this.searchQuery || '').trim();
                     if (!q) return this.allRows;
-
-                    // Fuzzy on name fields
                     const fuse = new Fuse(this.allRows, {
                         threshold: 0.35,
                         keys: ['nama_pos', 'nama_lokasi']
                     });
                     const fuzzyResults = fuse.search(q).map(r => r.item);
-
-                    // Exact on ID field
                     const ql = q.toLowerCase();
                     const exactResults = this.allRows.filter(row =>
                         row.id_logger && String(row.id_logger).toLowerCase().includes(ql)

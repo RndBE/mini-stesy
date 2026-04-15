@@ -173,16 +173,14 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Default Group Parameter</label>
-                                    {{-- Desktop/iPad: native select --}}
-                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         x-model="createGroupId">
                                         <option value="">- Pilih Group -</option>
                                         <template x-for="g in groups" :key="'cg-sel-' + g.id">
                                             <option :value="String(g.id)" x-text="g.nama_group"></option>
                                         </template>
                                     </select>
-                                    {{-- Mobile: custom dropdown --}}
-                                    <div class="sm:hidden relative" x-data="{ openCGroup: false }">
+<div class="sm:hidden relative" x-data="{ openCGroup: false }">
                                         <button type="button" @click="openCGroup = !openCGroup"
                                             class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                             <span class="truncate" x-text="groups.find(g => String(g.id) === createGroupId)?.nama_group || '- Pilih Group -'"></span>
@@ -307,16 +305,14 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Default Group Parameter</label>
-                                    {{-- Desktop/iPad: native select --}}
-                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         x-model="editData.default_parameter_group_id">
                                         <option value="">- Pilih Group -</option>
                                         <template x-for="g in groups" :key="'eg-sel-' + g.id">
                                             <option :value="String(g.id)" x-text="g.nama_group"></option>
                                         </template>
                                     </select>
-                                    {{-- Mobile: custom dropdown --}}
-                                    <div class="sm:hidden relative" x-data="{ openEGroup: false }">
+<div class="sm:hidden relative" x-data="{ openEGroup: false }">
                                         <button type="button" @click="openEGroup = !openEGroup"
                                             class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                             <span class="truncate" x-text="groups.find(g => String(g.id) === editData.default_parameter_group_id)?.nama_group || '- Pilih Group -'"></span>
@@ -441,7 +437,6 @@
                 showDeleteModal: false,
                 editData: {
                     id: @json(old('item_id')),
-                    // nama_parameter: @json(old('form_mode') === 'edit' ? old('nama_parameter') : ''),
                     nama_parameter: @json($oldNamaParam),
                     parameter_utama: @json(old('form_mode') === 'edit' ? old('parameter_utama') : ''),
                     default_satuan: @json(old('form_mode') === 'edit' ? old('default_satuan') : ''),

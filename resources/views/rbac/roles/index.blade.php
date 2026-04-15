@@ -80,9 +80,7 @@
                 </table>
             </div>
         </div>
-
-        {{-- Create Modal --}}
-        <div x-show="showCreateModal" x-cloak class="fixed inset-0 z-50" role="dialog" aria-modal="true"
+<div x-show="showCreateModal" x-cloak class="fixed inset-0 z-50" role="dialog" aria-modal="true"
             @keydown.escape.window="closeCreateModal()">
 
             <div x-show="showCreateModal" x-transition:enter="ease-in-out duration-300" x-transition:enter-start="opacity-0"
@@ -158,10 +156,7 @@
                 </div>
             </div>
         </div>
-
-
-        {{-- Delete Confirmation Modal --}}
-        <div x-cloak x-show="showDeleteModal" class="fixed inset-0 z-50" role="dialog" aria-modal="true"
+<div x-cloak x-show="showDeleteModal" class="fixed inset-0 z-50" role="dialog" aria-modal="true"
             @keydown.escape.window="closeDeleteModal()">
 
             <div x-show="showDeleteModal" x-transition:enter="ease-in-out duration-300"
@@ -215,9 +210,7 @@
                 </div>
             </div>
         </div>
-
-        {{-- Edit Modal --}}
-        <div x-show="showEditModal" x-cloak class="fixed inset-0 z-50" role="dialog" aria-modal="true"
+<div x-show="showEditModal" x-cloak class="fixed inset-0 z-50" role="dialog" aria-modal="true"
             @keydown.escape.window="closeEditModal()">
 
             <div x-show="showEditModal" x-transition:enter="ease-in-out duration-300"
@@ -335,8 +328,6 @@
                 filteredRoles() {
                     const q = (this.searchQuery || '').trim();
                     if (!q) return this.allRoles;
-
-                    // role_name is a short code — exact match is more predictable
                     const ql = q.toLowerCase();
                     return this.allRoles.filter(role =>
                         role.role_name && role.role_name.toLowerCase().includes(ql)
@@ -349,7 +340,6 @@
                         permissions: []
                     };
                     this.createError = '';
-                    // Uncheck all checkboxes
                     document.querySelectorAll('#createRoleForm input[type="checkbox"]').forEach(cb => cb.checked = false);
                     this.showCreateModal = true;
                 },
@@ -366,8 +356,6 @@
                 async submitCreate() {
                     this.createSubmitting = true;
                     this.createError = '';
-
-                    // Collect checked permissions
                     const checkedPermissions = Array.from(
                         document.querySelectorAll('#createRoleForm input[name="permissions[]"]:checked')
                     ).map(cb => parseInt(cb.value));
@@ -391,7 +379,6 @@
                         if (response.ok && data.success) {
                             window.location.reload();
                         } else {
-                            // Handle validation errors
                             if (data.errors) {
                                 const firstError = Object.values(data.errors)[0];
                                 this.createError = Array.isArray(firstError) ? firstError[0] : firstError;

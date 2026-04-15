@@ -1,7 +1,5 @@
 <div class="grid grid-cols-3 gap-2 md:grid-cols-1 md:gap-2">
-
-    {{-- HUMIDITY --}}
-    <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
         class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-300 px-2 py-2 sm:px-3 sm:py-2.5">
         <div class="flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3">
             <div class="flex-shrink-0 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
@@ -16,9 +14,7 @@
             </div>
         </div>
     </a>
-
-    {{-- BATTERY --}}
-    <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
         class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-green-300 px-2 py-2 sm:px-3 sm:py-2.5">
         <div class="flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3">
             <div class="flex-shrink-0 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
@@ -33,9 +29,7 @@
             </div>
         </div>
     </a>
-
-    {{-- TEMPERATURE --}}
-    <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
         class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-orange-300 px-2 py-2 sm:px-3 sm:py-2.5">
         <div class="flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3">
             <div class="flex-shrink-0 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
@@ -45,7 +39,7 @@
             <div class="leading-tight text-center md:text-left min-w-0 w-full overflow-hidden">
                 <div class="text-[8px] sm:text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
                 <div class="text-sm sm:text-base md:text-xl font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                    {{ $temp ?? '-' }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">°C</span>
+                    {{ $temp ?? '-' }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">Â°C</span>
                 </div>
             </div>
         </div>

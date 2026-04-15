@@ -5,8 +5,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <style>
-    /* Custom Map Styling for Light Theme (similar to peta index) */
-    #leaflet-map {
+#leaflet-map {
         height: 100% !important;
         width: 100% !important;
         min-height: 80vh;
@@ -23,9 +22,7 @@
     .leaflet-popup-tip {
         background: white;
     }
-
-    /* Override info panel to be light theme */
-    #info-panel {
+#info-panel {
         background: white !important;
         border: 1px solid #e2e8f0 !important;
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
@@ -93,8 +90,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        
-        // 1. Inisialisasi Peta Leaflet
         const map = L.map('leaflet-map', {
             center: [-7.2278, 107.9086],
             zoom: 12,
@@ -104,18 +99,12 @@
         L.control.zoom({
             position: 'bottomright'
         }).addTo(map);
-
-        // 2. Tambahkan Tile Layer (Berdasarkan tema peta/index.blade.php - Light OSM)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors',
             maxZoom: 19
         }).addTo(map);
-
-        // Force peta untuk merender ulang dimensinya supaya tidak ada layar putih/abu
         setTimeout(() => { map.invalidateSize(); }, 500);
         window.addEventListener('resize', () => map.invalidateSize());
-
-        // Referensi UI DSS Panel
         const infoPanel = document.getElementById('info-panel');
         const infoName = document.getElementById('info-name');
         const infoType = document.getElementById('info-type');
@@ -124,8 +113,6 @@
         document.getElementById('close-info').addEventListener('click', () => {
             infoPanel.classList.add('hidden');
         });
-
-        // 3. Fungsi untuk mewarnai/styling data GeoJSON Sungai (Tiru warna cyan biru terang)
         function styleFeature(feature) {
             const props = feature.properties;
             if (props.type === 'sungai' || props.type === 'sungai_utama') {
@@ -138,8 +125,6 @@
             }
             return { color: '#0ea5e9' };
         }
-
-        // 5. Muat Data GeoJSON dan tambahkan interaksi
         fetch("{{ asset('geojson/leuwigoong.json') }}")
             .then(res => {
                 if(!res.ok) throw new Error("HTTP " + res.status);
@@ -192,8 +177,6 @@
                         });
                     }
                 }).addTo(map);
-
-                // Fit bounds kalau ada layernya
                 if (Object.keys(geoJsonLayer._layers).length > 0) {
                     map.fitBounds(geoJsonLayer.getBounds(), { padding: [50, 50] });
                 }

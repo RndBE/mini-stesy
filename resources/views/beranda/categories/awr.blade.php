@@ -2,7 +2,6 @@
     @include('beranda.categories.partials.logger_header')
 
     @php
-        // ── Resolve AWR sensor parameters ──────────────────────────────
         $awrSensorMap = [
             'kecepatan_angin' => [
                 'label' => 'KECEPATAN ANGIN',
@@ -12,7 +11,7 @@
             ],
             'arah_angin' => [
                 'label' => 'ARAH ANGIN',
-                'satuan' => '°',
+                'satuan' => 'Ã‚Â°',
                 'icon' => 'icons/awr/arah_angin.svg',
                 'terms' => ['wind_direction', 'arah_angin', 'wind direction', 'wind_dir', 'wd'],
             ],
@@ -35,7 +34,7 @@
             ],
             'arah_cahaya' => [
                 'label' => 'ARAH',
-                'satuan' => '°',
+                'satuan' => 'Ã‚Â°',
                 'icon' => 'icons/awr/arah.svg',
                 'terms' => [
                     'arah_cahaya',
@@ -52,7 +51,7 @@
             ],
             'temperatur' => [
                 'label' => 'TEMPERATUR',
-                'satuan' => '°C',
+                'satuan' => 'Ã‚Â°C',
                 'icon' => 'icons/awr/temper.svg',
                 'terms' => [
                     'temperatur',
@@ -77,8 +76,6 @@
                 'terms' => ['humidity', 'kelembaban', 'rh', 'relative_humidity', 'rha', 'hum'],
             ],
         ];
-
-        // Kata kunci parameter internal logger yang harus diabaikan (bukan sensor cuaca AWR)
         $loggerInternalKeys = ['_logger', 'battery', 'battery_logger', 'humidity_logger', 'temperature_logger'];
 
         $awrValues = [];
@@ -88,8 +85,6 @@
                 $namePar = strtolower(trim($p->nama_parameter));
                 $kolom = strtolower(trim($p->kolom_sensor ?? ''));
                 $utama = strtolower(trim($p->parameter_utama ?? ''));
-
-                // Abaikan parameter internal logger
                 foreach ($loggerInternalKeys as $internalKey) {
                     if (str_contains($namePar, $internalKey) || str_contains($utama, $internalKey)) {
                         return false;
@@ -120,8 +115,6 @@
                 'value' => is_numeric($rawVal) ? (float) $rawVal : null,
             ];
         }
-
-        // ── Shorthand values ───────────────────────────────────────────
         $kecepatanAngin = $awrValues['kecepatan_angin']['value'];
         $arahAngin = $awrValues['arah_angin']['value'];
         $kecerahan = $awrValues['kecerahan']['value'];
@@ -129,8 +122,6 @@
         $temperatur = $awrValues['temperatur']['value'];
         $tekananUdara = $awrValues['tekanan_udara']['value'];
         $kelembaban = $awrValues['kelembaban']['value'];
-
-        // ── Hujan: identik dengan ARR (SUM dari controller) ───────────
         $akuHarian = is_numeric($curahHujanHarian ?? null) ? (float) $curahHujanHarian : null;
         $akuPerJam = is_numeric($curahHujanPerJam ?? null) ? (float) $curahHujanPerJam : null;
 
@@ -155,8 +146,6 @@
             $statePerJam .= $waktuSuffix;
         }
         $defaultRainIcon = asset('klasifikasi_hujan/tidak_hujan.png');
-
-        // ── Display formatting ─────────────────────────────────────────
         $dispKecepatan = is_numeric($kecepatanAngin) ? number_format($kecepatanAngin, 3) : '-';
         $dispArahAngin = is_numeric($arahAngin) ? number_format($arahAngin, 2) : '-';
         $dispAkuHarian = is_numeric($akuHarian) ? number_format($akuHarian, 3) : '-';
@@ -169,8 +158,6 @@
 
         $statusHarian = $statusHujanHarian ?? ($stateHujanHarian ?? '-');
         $statusPerJam = $statusHujanPerJam ?? ($stateHujanPerJam ?? '-');
-
-        // Helper: route for a sensor
         $awrRoute = function ($key) use ($awrValues, $lg) {
             $param = $awrValues[$key]['param'] ?? null;
             return $param
@@ -180,24 +167,18 @@
     @endphp
 
     <div class="px-4 py-3 space-y-3">
-
-        {{-- ── ROW 1: Angin (kiri) | Hujan + Cahaya stacked (kanan) ─── --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            {{-- ANGIN --}}
-            <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
                 <div class="text-sm font-semibold text-slate-700 mb-3">Angin</div>
                 <div class="flex flex-col items-center gap-4">
-                    {{-- Wind Compass: tengah, max-width adaptif --}}
-                    <div id="compassWrap_{{ $lg->id_logger }}" class="relative select-none w-full mx-auto"
+<div id="compassWrap_{{ $lg->id_logger }}" class="relative select-none w-full mx-auto"
                         style="max-width:min(260px, 100%)">
                         <canvas id="windCompass_{{ $lg->id_logger }}"
                             data-direction="{{ is_numeric($arahAngin) ? $arahAngin : 0 }}"
                             class="block w-full">
                         </canvas>
                     </div>
-                    {{-- Wind stats: selalu 2 kolom --}}
-                    <div class="grid grid-cols-2 gap-3 w-full">
+<div class="grid grid-cols-2 gap-3 w-full">
                         <a href="{{ $awrRoute('kecepatan_angin') }}"
                             class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 hover:shadow-md hover:border-blue-300 transition-all {{ $muted ? 'grayscale opacity-70' : '' }}">
                             <img src="{{ asset('icons/awr/kecepatan_angin.svg') }}" onerror="this.style.display='none'"
@@ -220,23 +201,18 @@
                                 </div>
                                 <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
                                     {{ $dispArahAngin }}<span
-                                        class="text-[10px] font-bold text-slate-400 ml-0.5">°</span>
+                                        class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°</span>
                                 </div>
                             </div>
                         </a>
                     </div>
                 </div>
             </div>
-
-            {{-- KANAN: Hujan (atas) + Cahaya (bawah) --}}
-            <div class="flex flex-col gap-4">
-
-                {{-- HUJAN --}}
-                <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white flex-1">
+<div class="flex flex-col gap-4">
+<div class="rounded-xl border border-slate-200 px-4 py-3 bg-white flex-1">
                     <div class="text-sm font-semibold text-slate-700 mb-3">Hujan</div>
                     <div class="grid grid-cols-2 gap-3">
-                        {{-- Akumulasi Harian --}}
-                        <div class="relative overflow-hidden rounded-xl border px-3 py-3 text-center">
+<div class="relative overflow-hidden rounded-xl border px-3 py-3 text-center">
                             <div class="text-[10px] font-semibold tracking-wide text-slate-700 uppercase">AKUMULASI
                                 HARIAN</div>
                             <img src="{{ asset('klasifikasi_hujan/' . $stateHarian . '.png') }}"
@@ -251,8 +227,7 @@
                                 {{ $statusHarian !== '-' ? strtoupper($statusHarian) : 'TIDAK ADA DATA' }}
                             </div>
                         </div>
-                        {{-- Akumulasi 1 Jam --}}
-                        <div class="relative overflow-hidden rounded-xl border px-3 py-3 text-center">
+<div class="relative overflow-hidden rounded-xl border px-3 py-3 text-center">
                             <div class="text-[10px] font-semibold tracking-wide text-slate-700 uppercase">AKUMULASI 1
                                 JAM</div>
                             <img src="{{ asset('klasifikasi_hujan/' . $statePerJam . '.png') }}"
@@ -269,9 +244,7 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- CAHAYA --}}
-                <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
+<div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
                     <div class="text-sm font-semibold text-slate-700 mb-3">Cahaya</div>
                     <div class="grid grid-cols-2 gap-3">
                         <a href="{{ $awrRoute('kecerahan') }}"
@@ -295,18 +268,16 @@
                                 <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase">ARAH</div>
                                 <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
                                     {{ $dispArahCahaya }}<span
-                                        class="text-[10px] font-bold text-slate-400 ml-0.5">°</span>
+                                        class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°</span>
                                 </div>
                             </div>
                         </a>
                     </div>
                 </div>
 
-            </div>{{-- akhir kolom kanan --}}
+            </div>
         </div>
-
-        {{-- ── ROW 2: Udara — full width ──────────────────────────────── --}}
-        <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
+<div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
             <div class="text-sm font-semibold text-slate-700 mb-3">Udara</div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <a href="{{ $awrRoute('temperatur') }}"
@@ -318,7 +289,7 @@
                         <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             TEMPERATUR</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $dispTemperatur }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
+                            {{ $dispTemperatur }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°C</span>
                         </div>
                     </div>
                 </a>
@@ -353,8 +324,7 @@
         <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
             <div class="text-sm font-semibold text-slate-700 mb-3">Logger</div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {{-- HUMIDITY --}}
-                <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
                     class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 shadow-sm transition-all hover:shadow-md hover:border-blue-300">
                     <div
                         class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
@@ -369,9 +339,7 @@
                         </div>
                     </div>
                 </a>
-
-                {{-- BATTERY --}}
-                <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
                     class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 shadow-sm transition-all hover:shadow-md hover:border-green-300">
                     <div
                         class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
@@ -386,9 +354,7 @@
                         </div>
                     </div>
                 </a>
-
-                {{-- TEMPERATURE --}}
-                <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
                     class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 shadow-sm transition-all hover:shadow-md hover:border-orange-300">
                     <div
                         class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
@@ -399,7 +365,7 @@
                         <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             TEMPERATURE</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
+                            {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°C</span>
                         </div>
                     </div>
                 </a>
@@ -408,14 +374,10 @@
 
     </div>
 </div>
-
-{{-- ── Wind Compass Script ───────────────────────────────────────────── --}}
 <script>
     (function() {
         var COMPASS_IMG_SRC = '{{ asset('icons/awr/kompas.svg') }}';
         var DPR = window.devicePixelRatio || 1;
-
-        // Pre-load gambar sekali, dipakai semua kompas di halaman
         var _compassImg = null;
         var _compassImgReady = false;
         var _compassImgFailed = false;
@@ -450,8 +412,6 @@
             };
             img.src = COMPASS_IMG_SRC;
         }
-
-        // Setup canvas agar tajam di layar HiDPI/Retina
         function setupHiDPI(canvas, cssSize) {
             canvas.width = cssSize * DPR;
             canvas.height = cssSize * DPR;
@@ -465,8 +425,6 @@
         function drawWindCompass(canvasId, directionDeg, muted) {
             var canvas = document.getElementById(canvasId);
             if (!canvas) return;
-
-            // CSS_SIZE mengikuti lebar container agar responsif
             var wrap = canvas.parentElement;
             var CSS_SIZE = wrap ? wrap.offsetWidth : 220;
             CSS_SIZE = Math.max(160, Math.min(CSS_SIZE, 320)); // min 160, max 320
@@ -480,8 +438,6 @@
 
             getCompassImg(function(img) {
                 ctx.clearRect(0, 0, w, h);
-
-                // ── Layer 1: Arc arah angin (di bawah SVG agar masuk alur ring) ──
                 var arcR = R * 0.84;
                 var startRad = -Math.PI / 2;
                 var endRad = (directionDeg - 90) * Math.PI / 180;
@@ -491,12 +447,9 @@
                 ctx.lineWidth = 6;
                 ctx.lineCap = 'butt';
                 ctx.stroke();
-
-                // ── Layer 2: Gambar SVG kompas di atas arc ────────────────────────
                 if (img) {
                     ctx.drawImage(img, 0, 0, w, h);
                 } else {
-                    // ── Fallback: gambar manual ───────────────────────────────────
                     ctx.beginPath();
                     ctx.arc(cx, cy, R, 0, Math.PI * 2);
                     ctx.strokeStyle = '#cbd5e1';
@@ -525,12 +478,10 @@
                     ctx.textBaseline = 'middle';
                     [0, 45, 90, 135, 180, 225, 270, 315].forEach(function(deg) {
                         var rad = (deg - 90) * Math.PI / 180;
-                        ctx.fillText(deg + '°', cx + R * 0.70 * Math.cos(rad), cy + R * 0.70 * Math
+                        ctx.fillText(deg + 'Ã‚Â°', cx + R * 0.70 * Math.cos(rad), cy + R * 0.70 * Math
                             .sin(rad));
                     });
                 }
-
-                // ── Layer 3: Panah segitiga (di atas SVG) ────────────────────────
                 var arrowRad = (directionDeg - 90) * Math.PI / 180;
                 var arrowLen = R * 0.38;
                 ctx.save();
@@ -545,12 +496,6 @@
                 ctx.fillStyle = '#0000FF';
                 ctx.fill();
                 ctx.restore();
-
-                // ── Layer 4: Titik tengah ─────────────────────────────────────────
-                // ctx.beginPath();
-                // ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-                // ctx.fillStyle = '#475569';
-                // ctx.fill();
             });
         }
 
@@ -563,13 +508,9 @@
 
             var dir = parseFloat(canvas.dataset.direction) || 0;
             var muted = {{ $muted ? 'true' : 'false' }};
-
-            // Gambar pertama kali
             drawWindCompass(canvasId, dir, false);
 
             var _resizeTimer = null;
-
-            // Re-draw saat canvas menjadi visible (pindah tab/kategori)
             if (typeof IntersectionObserver !== 'undefined') {
                 new IntersectionObserver(function(entries) {
                     entries.forEach(function(entry) {
@@ -580,8 +521,6 @@
                     });
                 }, { threshold: 0.01 }).observe(canvas);
             }
-
-            // Re-draw otomatis saat container berubah ukuran (rotasi HP, resize browser)
             if (typeof ResizeObserver !== 'undefined') {
                 var wrap = canvas.parentElement;
                 if (wrap) {

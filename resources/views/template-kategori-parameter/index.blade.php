@@ -124,16 +124,14 @@
                             <div class="grid gap-5 md:grid-cols-2">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Kategori Logger</label>
-                                    {{-- Desktop/iPad: native select --}}
-                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         x-model="createKatlogger">
                                         <option value="">- Pilih Kategori -</option>
                                         <template x-for="k in kategoris" :key="'ck-sel-' + k.id_katlogger">
                                             <option :value="String(k.id_katlogger)" x-text="k.nama_kategori + (k.kepanjangan ? ' - ' + k.kepanjangan : '')"></option>
                                         </template>
                                     </select>
-                                    {{-- Mobile: custom dropdown --}}
-                                    <div class="sm:hidden relative" x-data="{ openCKat: false }">
+<div class="sm:hidden relative" x-data="{ openCKat: false }">
                                         <button type="button" @click="openCKat = !openCKat"
                                             class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                             :class="createKatlogger ? 'text-gray-900' : 'text-gray-400'">
@@ -162,16 +160,14 @@
 
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">List Parameter</label>
-                                    {{-- Desktop/iPad: native select --}}
-                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         x-model="createParamId">
                                         <option value="">- Pilih Parameter -</option>
                                         <template x-for="lp in listParameters" :key="'cp-sel-' + lp.id">
                                             <option :value="String(lp.id)" x-text="lp.nama_parameter.replaceAll('_', ' ')"></option>
                                         </template>
                                     </select>
-                                    {{-- Mobile: custom dropdown --}}
-                                    <div class="sm:hidden relative" x-data="{ openCParam: false }">
+<div class="sm:hidden relative" x-data="{ openCParam: false }">
                                         <button type="button" @click="openCParam = !openCParam"
                                             class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                             :class="createParamId ? 'text-gray-900' : 'text-gray-400'">
@@ -239,16 +235,14 @@
 
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Group Parameter (opsional)</label>
-                                    {{-- Desktop/iPad: native select --}}
-                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         x-model="createGroupId">
                                         <option value="">- Ikuti default list parameter -</option>
                                         <template x-for="g in groups" :key="'cg-sel-' + g.id">
                                             <option :value="String(g.id)" x-text="g.nama_group"></option>
                                         </template>
                                     </select>
-                                    {{-- Mobile: custom dropdown --}}
-                                    <div class="sm:hidden relative" x-data="{ openCGroup: false }">
+<div class="sm:hidden relative" x-data="{ openCGroup: false }">
                                         <button type="button" @click="openCGroup = !openCGroup"
                                             class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                             <span class="truncate" x-text="groups.find(g => String(g.id) === createGroupId)?.nama_group || '- Ikuti default list parameter -'"></span>
@@ -323,16 +317,14 @@
                             <div class="grid gap-5 md:grid-cols-2">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Kategori Logger</label>
-                                    {{-- Desktop/iPad: native select --}}
-                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         x-model="editData.id_katlogger">
                                         <option value="">- Pilih Kategori -</option>
                                         <template x-for="k in kategoris" :key="'ek-sel-' + k.id_katlogger">
                                             <option :value="String(k.id_katlogger)" x-text="k.nama_kategori + (k.kepanjangan ? ' - ' + k.kepanjangan : '')"></option>
                                         </template>
                                     </select>
-                                    {{-- Mobile: custom dropdown --}}
-                                    <div class="sm:hidden relative" x-data="{ openEKat: false }">
+<div class="sm:hidden relative" x-data="{ openEKat: false }">
                                         <button type="button" @click="openEKat = !openEKat"
                                             class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                             :class="editData.id_katlogger ? 'text-gray-900' : 'text-gray-400'">
@@ -361,16 +353,14 @@
 
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">List Parameter</label>
-                                    {{-- Desktop/iPad: native select --}}
-                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         x-model="editData.list_parameter_id">
                                         <option value="">- Pilih Parameter -</option>
                                         <template x-for="lp in listParameters" :key="'ep-sel-' + lp.id">
                                             <option :value="String(lp.id)" x-text="lp.nama_parameter.replaceAll('_', ' ')"></option>
                                         </template>
                                     </select>
-                                    {{-- Mobile: custom dropdown --}}
-                                    <div class="sm:hidden relative" x-data="{ openEParam: false }">
+<div class="sm:hidden relative" x-data="{ openEParam: false }">
                                         <button type="button" @click="openEParam = !openEParam"
                                             class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                             :class="editData.list_parameter_id ? 'text-gray-900' : 'text-gray-400'">
@@ -436,16 +426,14 @@
 
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Group Parameter (opsional)</label>
-                                    {{-- Desktop/iPad: native select --}}
-                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         x-model="editData.parameter_group_id">
                                         <option value="">- Ikuti default list parameter -</option>
                                         <template x-for="g in groups" :key="'eg-sel-' + g.id">
                                             <option :value="String(g.id)" x-text="g.nama_group"></option>
                                         </template>
                                     </select>
-                                    {{-- Mobile: custom dropdown --}}
-                                    <div class="sm:hidden relative" x-data="{ openEGroup: false }">
+<div class="sm:hidden relative" x-data="{ openEGroup: false }">
                                         <button type="button" @click="openEGroup = !openEGroup"
                                             class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                             <span class="truncate" x-text="groups.find(g => String(g.id) === editData.parameter_group_id)?.nama_group || '- Ikuti default list parameter -'"></span>

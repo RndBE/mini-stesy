@@ -118,9 +118,7 @@
             </div>
         </section>
     </div>
-
-    {{-- Modal Akun Suspend (muncul otomatis jika login ditolak karena suspend) --}}
-    @if(session('suspended_reason'))
+@if(session('suspended_reason'))
     <div
         x-data="{ show: true }"
         x-show="show"
@@ -176,9 +174,7 @@
         </div>
     </div>
     @endif
-
-    {{-- Modal Akun Non-Aktif (muncul otomatis jika login ditolak karena non-aktif) --}}
-    @if(session('nonaktif_reason'))
+@if(session('nonaktif_reason'))
     <div
         x-data="{ show: true }"
         x-show="show"

@@ -2,15 +2,9 @@
 
 @section('content')
 <div x-data="settingLogger()" class="space-y-4">
-
-    {{-- ═══════════════════════════════════════════════════════════
-         DEVICE HEADER (Ruijie Cloud style — gradient card)
-    ══════════════════════════════════════════════════════════════ --}}
-    <div class="rounded-xl overflow-hidden shadow-md" style="background: linear-gradient(135deg, #303481 0%, #1a1d5e 60%, #10134B 100%);">
+<div class="rounded-xl overflow-hidden shadow-md" style="background: linear-gradient(135deg, #303481 0%, #1a1d5e 60%, #10134B 100%);">
         <div class="px-6 py-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-
-            {{-- Left: Identity --}}
-            <div class="flex items-start gap-4">
+<div class="flex items-start gap-4">
                 <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur-sm border border-white/20">
                     <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
@@ -21,7 +15,7 @@
                     <div class="flex items-center gap-2 flex-wrap">
                         <h1 class="text-lg font-bold text-white leading-tight">Pos AWLR Sungai Brantas</h1>
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-400/30 text-blue-100 border border-blue-300/30">
-                            AWLR – Non JIAT
+                            AWLR Ã¢â‚¬â€œ Non JIAT
                         </span>
                     </div>
                     <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-blue-100/80">
@@ -33,14 +27,12 @@
                             </svg>
                             Jl. Ahmad Yani No. 12, Malang
                         </span>
-                        <span class="text-blue-300/50">·</span>
+                        <span class="text-blue-300/50">Ã‚Â·</span>
                         <span class="font-mono text-xs text-blue-200/70">ID: BCN-AWLR-0042</span>
                     </div>
                 </div>
             </div>
-
-            {{-- Center: Status + Last Update --}}
-            <div class="flex items-center gap-4 flex-wrap">
+<div class="flex items-center gap-4 flex-wrap">
                 <div class="flex items-center gap-1.5">
                     <span class="relative flex h-2.5 w-2.5">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -51,14 +43,11 @@
                 <div class="h-4 w-px bg-white/20 hidden sm:block"></div>
                 <div class="text-xs text-blue-100/70">
                     <span class="text-blue-200/50">Last update</span><br>
-                    <span class="font-semibold text-white/80">10 Mar 2026 · 10:32:05</span>
+                    <span class="font-semibold text-white/80">10 Mar 2026 Ã‚Â· 10:32:05</span>
                 </div>
             </div>
-
-            {{-- Right: Action Buttons --}}
-            <div class="flex items-center gap-2 flex-shrink-0">
-                {{-- Sync --}}
-                <button
+<div class="flex items-center gap-2 flex-shrink-0">
+<button
                     class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold text-white border border-white/25 bg-white/10 hover:bg-white/20 transition-all duration-200 backdrop-blur-sm"
                     title="Sync data dari logger">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -67,8 +56,7 @@
                     </svg>
                     Sync
                 </button>
-                {{-- Restart --}}
-                <button
+<button
                     class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold text-red-300 border border-red-400/30 bg-red-500/10 hover:bg-red-500/25 transition-all duration-200 backdrop-blur-sm"
                     title="Restart logger">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,8 +65,7 @@
                     </svg>
                     Restart
                 </button>
-                {{-- Save --}}
-                <button
+<button
                     class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-white bg-white/20 hover:bg-white/30 border border-white/30 transition-all duration-200 shadow-sm"
                     title="Simpan pengaturan">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -90,14 +77,8 @@
             </div>
         </div>
     </div>
-
-    {{-- ═══════════════════════════════════════════════════════════
-         STATUS SUMMARY CARDS (5 cards)
-    ══════════════════════════════════════════════════════════════ --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-
-        {{-- Battery --}}
-        <div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+<div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Baterai</span>
                 <div class="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center">
@@ -114,9 +95,7 @@
             </div>
             <p class="mt-1 text-[11px] text-slate-400">12.4 V</p>
         </div>
-
-        {{-- Signal --}}
-        <div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
+<div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Sinyal</span>
                 <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
@@ -131,11 +110,9 @@
                     <div class="flex-1 rounded-sm {{ $loop->index < 4 ? 'bg-blue-400' : 'bg-slate-200' }}" style="height: {{ $h * 2 }}px"></div>
                 @endforeach
             </div>
-            <p class="mt-1 text-[11px] text-slate-400">Kuat · 4G</p>
+            <p class="mt-1 text-[11px] text-slate-400">Kuat Ã‚Â· 4G</p>
         </div>
-
-        {{-- Sensor Aktif --}}
-        <div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
+<div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Sensor</span>
                 <div class="w-7 h-7 rounded-lg bg-violet-50 flex items-center justify-center">
@@ -151,9 +128,7 @@
             </div>
             <p class="mt-1 text-[11px] text-slate-400">1 sensor nonaktif</p>
         </div>
-
-        {{-- Interval --}}
-        <div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
+<div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Interval</span>
                 <div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
@@ -166,9 +141,7 @@
             <p class="text-2xl font-bold text-slate-900">15<span class="text-sm font-semibold text-slate-400 ml-0.5">mnt</span></p>
             <p class="mt-3 text-[11px] text-slate-400">Kirim data setiap 15 menit</p>
         </div>
-
-        {{-- Firmware --}}
-        <div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
+<div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Firmware</span>
                 <div class="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center">
@@ -187,14 +160,8 @@
             </span>
         </div>
     </div>
-
-    {{-- ═══════════════════════════════════════════════════════════
-         MAIN PANEL: Sidebar + Content
-    ══════════════════════════════════════════════════════════════ --}}
-    <div class="flex gap-4 items-start">
-
-        {{-- ── Sidebar Tab ── --}}
-        <div class="flex-shrink-0 w-44 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+<div class="flex gap-4 items-start">
+<div class="flex-shrink-0 w-44 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="px-3 py-2.5 border-b border-slate-100">
                 <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Pengaturan</p>
             </div>
@@ -224,12 +191,8 @@
                 @endforeach
             </nav>
         </div>
-
-        {{-- ── Content Panel ── --}}
-        <div class="flex-1 min-w-0">
-
-            {{-- ┌─────────── TAB: UMUM ───────────┐ --}}
-            <div x-show="activeTab === 'umum'" x-transition:enter="transition ease-out duration-150"
+<div class="flex-1 min-w-0">
+<div x-show="activeTab === 'umum'" x-transition:enter="transition ease-out duration-150"
                 x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="flex items-center gap-2 border-b border-slate-100 px-5 py-4">
@@ -274,9 +237,7 @@
                     </div>
                 </div>
             </div>
-
-            {{-- ┌─────────── TAB: SENSOR ───────────┐ --}}
-            <div x-show="activeTab === 'sensor'" x-transition:enter="transition ease-out duration-150"
+<div x-show="activeTab === 'sensor'" x-transition:enter="transition ease-out duration-150"
                 x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
@@ -301,9 +262,9 @@
                                 @php
                                     $sensors = [
                                         ['name' => 'TMA (Tinggi Muka Air)', 'col' => 'sensor_1', 'unit' => 'm',   'calib' => '+0.00', 'active' => true],
-                                        ['name' => 'Debit Air',              'col' => 'sensor_2', 'unit' => 'm³/s','calib' => '+0.00', 'active' => true],
+                                        ['name' => 'Debit Air',              'col' => 'sensor_2', 'unit' => 'mÃ‚Â³/s','calib' => '+0.00', 'active' => true],
                                         ['name' => 'Curah Hujan',            'col' => 'sensor_3', 'unit' => 'mm',  'calib' => '-0.05', 'active' => true],
-                                        ['name' => 'Suhu Air',               'col' => 'sensor_4', 'unit' => '°C',  'calib' => '+0.00', 'active' => false],
+                                        ['name' => 'Suhu Air',               'col' => 'sensor_4', 'unit' => 'Ã‚Â°C',  'calib' => '+0.00', 'active' => false],
                                     ];
                                 @endphp
                                 @foreach ($sensors as $i => $sensor)
@@ -334,9 +295,7 @@
                     </div>
                 </div>
             </div>
-
-            {{-- ┌─────────── TAB: KOMUNIKASI ───────────┐ --}}
-            <div x-show="activeTab === 'komunikasi'" x-transition:enter="transition ease-out duration-150"
+<div x-show="activeTab === 'komunikasi'" x-transition:enter="transition ease-out duration-150"
                 x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="flex items-center gap-2 border-b border-slate-100 px-5 py-4">
@@ -371,9 +330,9 @@
                             <div class="space-y-1.5">
                                 <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">QoS Level</label>
                                 <select class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-800 focus:border-[#303481] focus:ring-1 focus:ring-[#303481] outline-none transition">
-                                    <option>0 – At most once</option>
-                                    <option selected>1 – At least once</option>
-                                    <option>2 – Exactly once</option>
+                                    <option>0 Ã¢â‚¬â€œ At most once</option>
+                                    <option selected>1 Ã¢â‚¬â€œ At least once</option>
+                                    <option>2 Ã¢â‚¬â€œ Exactly once</option>
                                 </select>
                             </div>
                         </div>
@@ -398,9 +357,7 @@
                     </div>
                 </div>
             </div>
-
-            {{-- ┌─────────── TAB: ALARM ───────────┐ --}}
-            <div x-show="activeTab === 'alarm'" x-transition:enter="transition ease-out duration-150"
+<div x-show="activeTab === 'alarm'" x-transition:enter="transition ease-out duration-150"
                 x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="flex items-center gap-2 border-b border-slate-100 px-5 py-4">
@@ -408,8 +365,7 @@
                         <h2 class="text-base font-bold text-slate-900">Konfigurasi Alarm</h2>
                     </div>
                     <div class="px-5 py-5 space-y-5">
-                        {{-- Threshold batas --}}
-                        <div>
+<div>
                             <p class="text-xs font-bold uppercase tracking-wide text-slate-400 mb-3">Batas Nilai Sensor (TMA)</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 @foreach([['label' => 'Batas Siaga 1 (Kritis)', 'val' => '3.50', 'color' => 'red'], ['label' => 'Batas Siaga 2 (Waspada)', 'val' => '2.80', 'color' => 'amber'], ['label' => 'Batas Siaga 3 (Normal Tinggi)', 'val' => '2.00', 'color' => 'yellow'], ['label' => 'Batas Normal', 'val' => '0.50', 'color' => 'emerald']] as $threshold)
@@ -427,9 +383,7 @@
                                 @endforeach
                             </div>
                         </div>
-
-                        {{-- Notifikasi --}}
-                        <div class="border-t border-slate-100 pt-5">
+<div class="border-t border-slate-100 pt-5">
                             <p class="text-xs font-bold uppercase tracking-wide text-slate-400 mb-3">Notifikasi</p>
                             <div class="space-y-3">
                                 @foreach([['label' => 'Notifikasi Email', 'desc' => 'Kirim email saat alarm terpicu', 'checked' => true], ['label' => 'Notifikasi WhatsApp', 'desc' => 'Kirim pesan WA saat alarm terpicu', 'checked' => true], ['label' => 'Bunyi Alarm Lokal', 'desc' => 'Aktifkan buzzer pada logger', 'checked' => false]] as $notif)
@@ -449,9 +403,7 @@
                     </div>
                 </div>
             </div>
-
-            {{-- ┌─────────── TAB: DAYA ───────────┐ --}}
-            <div x-show="activeTab === 'daya'" x-transition:enter="transition ease-out duration-150"
+<div x-show="activeTab === 'daya'" x-transition:enter="transition ease-out duration-150"
                 x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="flex items-center gap-2 border-b border-slate-100 px-5 py-4">
@@ -496,9 +448,7 @@
                     </div>
                 </div>
             </div>
-
-            {{-- ┌─────────── TAB: MAINTENANCE ───────────┐ --}}
-            <div x-show="activeTab === 'maintenance'" x-transition:enter="transition ease-out duration-150"
+<div x-show="activeTab === 'maintenance'" x-transition:enter="transition ease-out duration-150"
                 x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="flex items-center gap-2 border-b border-slate-100 px-5 py-4">
@@ -506,9 +456,7 @@
                         <h2 class="text-base font-bold text-slate-900">Maintenance & Diagnostik</h2>
                     </div>
                     <div class="px-5 py-5 space-y-5">
-
-                        {{-- Firmware Info --}}
-                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+<div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                             <p class="text-xs font-bold uppercase tracking-wide text-slate-400 mb-3">Informasi Firmware</p>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 @foreach([['label' => 'Versi Firmware', 'val' => 'v2.4.1'], ['label' => 'Build Date', 'val' => '2026-01-15'], ['label' => 'Uptime', 'val' => '14 hari'], ['label' => 'Free Memory', 'val' => '64 KB']] as $info)
@@ -519,9 +467,7 @@
                                 @endforeach
                             </div>
                         </div>
-
-                        {{-- Action Buttons --}}
-                        <div>
+<div>
                             <p class="text-xs font-bold uppercase tracking-wide text-slate-400 mb-3">Tindakan</p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <button class="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all group text-left">
@@ -574,8 +520,8 @@
                 </div>
             </div>
 
-        </div>{{-- end content panel --}}
-    </div>{{-- end main panel --}}
+        </div>
+    </div>
 </div>
 
 @push('scripts')

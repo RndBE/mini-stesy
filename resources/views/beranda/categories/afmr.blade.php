@@ -1,65 +1,42 @@
 <div class="overflow-visible rounded-lg border border-slate-200 bg-white shadow-sm">
     @include('beranda.categories.partials.logger_header')
-
-    {{-- AFMR: UI Sungai --}}
-    <div class="p-5 space-y-4">
-
-        {{-- Baris atas: SVG kiri + Data Pengukuran kanan --}}
-        <div class="grid grid-cols-12 gap-4">
-
-            {{-- Kiri: SVG ilustrasi AFMR --}}
-            <div class="col-span-12 md:col-span-9 space-y-3 md:border-r md:border-slate-200 md:pr-2">
+<div class="p-5 space-y-4">
+<div class="grid grid-cols-12 gap-4">
+<div class="col-span-12 md:col-span-9 space-y-3 md:border-r md:border-slate-200 md:pr-2">
                 @php
-                    // ===== Skala dinamis dari elevasi sensor (tinggi peil) =====
                     $afmrScaleMin = 0;
                     $afmrScaleMax = (is_numeric($elevSensor) && (float)$elevSensor > 0)
                         ? (float) $elevSensor
                         : 40; // fallback
-
-                    // Klem nilai elevasi muka air ke range skala
                     $afmrTmaVal = is_numeric($elevMukaAir)
                         ? max($afmrScaleMin, min($afmrScaleMax, (float) $elevMukaAir))
                         : $afmrScaleMin;
-
-                    // Dimensi tiang_afmr.svg (310x304), fit ke h=260
                     $afmrTiangX = 0;
                     $afmrTiangY = 0;
                     $afmrTiangW = 265;
                     $afmrTiangH = 260;
-
-                    // Dimensi peil.svg (38x174), fit ke h=185
                     $afmrScaleH = 185;
-                    $afmrScaleW = round($afmrScaleH * (38 / 174)); // ≈40
+                    $afmrScaleW = round($afmrScaleH * (38 / 174)); // Ã¢â€°Ë†40
                     $afmrScaleX = 457;
                     $afmrScaleY = 76;
-
-                    // Kalibrasi koordinat sesuai peil.svg viewBox=174, inner rect y=1.5–168
-                    $afmrSf          = $afmrScaleH / 174; // ≈1.063
+                    $afmrSf          = $afmrScaleH / 174; // Ã¢â€°Ë†1.063
                     $afmrTopNativeY  = 5.0;   // y native = scaleMax
                     $afmrBotNativeY  = 166.0;  // y native = scaleMin
 
                     $afmrScaleTopY   = $afmrScaleY + $afmrTopNativeY * $afmrSf;
                     $afmrScaleBotY   = $afmrScaleY + $afmrBotNativeY * $afmrSf;
                     $afmrPxPerUnit   = ($afmrScaleBotY - $afmrScaleTopY) / ($afmrScaleMax - $afmrScaleMin);
-
-                    // Posisi permukaan air
                     $afmrWaterTopY = $afmrScaleBotY - ($afmrTmaVal - $afmrScaleMin) * $afmrPxPerUnit;
                     $afmrWaterTopY = max($afmrScaleTopY, min($afmrScaleBotY, $afmrWaterTopY));
-
-                    // Area sungai
                     $afmrRiverX    = 0;
                     $afmrRiverEndX = $afmrScaleX + 4;
                     $afmrRiverBotY = round($afmrScaleBotY) + 4;
                     $afmrTmaLineY  = $afmrWaterTopY;
-
-                    // Warna SVG
                     $afmrWaterOpac = '0.85';
                     $afmrWaveOpac  = '0.70';
                     $afmrRiverFill = 'url(#afmrRiverGrad-' . $lg->id_logger . ')';
                     $afmrLineClr   = '#0284c7';
                     $afmrTiangOpac = '1';
-
-                    // Titik tengah gelombang
                     $afmrWx1 = $afmrRiverX + 20;
                     $afmrWx2 = round(($afmrRiverX + $afmrRiverEndX) / 2 - 40);
                     $afmrWx3 = round(($afmrRiverX + $afmrRiverEndX) / 2 + 40);
@@ -79,37 +56,27 @@
                             <stop offset="100%" stop-color="#92400e" />
                         </linearGradient>
                     </defs>
-
-                    {{-- ===== AIR SUNGAI (DINAMIS) ===== --}}
-                    <path d="M{{ $afmrRiverX }},{{ $afmrWaterTopY }}
+<path d="M{{ $afmrRiverX }},{{ $afmrWaterTopY }}
                             Q{{ round(($afmrRiverX + $afmrRiverEndX) / 2) }},{{ $afmrWaterTopY - 8 }}
                             {{ $afmrRiverEndX }},{{ $afmrWaterTopY }}
                             L{{ $afmrRiverEndX }},{{ $afmrRiverBotY }}
                             L{{ $afmrRiverX }},{{ $afmrRiverBotY }} Z"
                         fill="{{ $afmrRiverFill }}" opacity="{{ $afmrWaterOpac }}" />
-
-                    {{-- Gelombang permukaan --}}
-                    <path d="M{{ $afmrWx1 }},{{ $afmrWaterTopY }}
+<path d="M{{ $afmrWx1 }},{{ $afmrWaterTopY }}
                             Q{{ $afmrWx2 }},{{ $afmrWaterTopY - 5 }} {{ round(($afmrWx1 + $afmrWx2) / 2 + 20) }},{{ $afmrWaterTopY }}
                             Q{{ $afmrWx3 }},{{ $afmrWaterTopY + 4 }} {{ $afmrWx4 }},{{ $afmrWaterTopY - 2 }}"
                         fill="none" stroke="#bae6fd" stroke-width="1.8" opacity="{{ $afmrWaveOpac }}" />
-
-                    {{-- ===== TIANG AFMR SVG ===== --}}
-                    <image href="{{ asset('sungai/tiang_afmr.svg') }}"
+<image href="{{ asset('sungai/tiang_afmr.svg') }}"
                         x="{{ $afmrTiangX }}" y="{{ $afmrTiangY }}"
                         width="{{ $afmrTiangW }}" height="{{ $afmrTiangH }}"
                         preserveAspectRatio="xMinYMax meet"
                         opacity="{{ $afmrTiangOpac }}" />
 
-                    {{-- ===== PEIL SCALE (DINAMIS, PURE SVG) ===== --}}
-                    {{-- Background dari file --}}
                     <image href="{{ asset('sumur/peil.svg') }}"
                         x="{{ $afmrScaleX }}" y="{{ $afmrScaleY }}"
                         width="{{ $afmrScaleW }}" height="{{ $afmrScaleH }}"
                         preserveAspectRatio="xMidYMid meet" />
-
-                    {{-- Tick marks + angka (label setiap 10, minor setiap 2) --}}
-                    @for ($v = $afmrScaleMin; $v <= $afmrScaleMax; $v += 2)
+@for ($v = $afmrScaleMin; $v <= $afmrScaleMax; $v += 2)
                         @php
                             $ty      = $afmrScaleBotY - ($v - $afmrScaleMin) * $afmrPxPerUnit;
                             $isMajor = $v % 10 === 0;
@@ -127,8 +94,7 @@
                                   fill="#78350f" font-weight="600">{{ $v }}</text>
                         @endif
                     @endfor
-                    {{-- Label MAX hanya jika tidak numpuk dengan major tick terakhir --}}
-                    @php
+@php
                         $afmrLastMajorV   = floor(($afmrScaleMax - $afmrScaleMin) / 10) * 10 + $afmrScaleMin;
                         $afmrLastMajorY   = $afmrScaleBotY - ($afmrLastMajorV - $afmrScaleMin) * $afmrPxPerUnit;
                         $afmrMaxPixGap    = $afmrLastMajorY - $afmrScaleTopY;
@@ -145,9 +111,7 @@
                               font-family="ui-sans-serif, system-ui, sans-serif"
                               fill="#78350f" font-weight="600">{{ $afmrScaleMax }}</text>
                     @endif
-
-                    {{-- ===== GARIS INDIKATOR ELEVASI DI PEIL ===== --}}
-                    <line x1="{{ $afmrScaleX - 8 }}" y1="{{ $afmrTmaLineY }}"
+<line x1="{{ $afmrScaleX - 8 }}" y1="{{ $afmrTmaLineY }}"
                         x2="{{ $afmrScaleX + $afmrScaleW + 2 }}" y2="{{ $afmrTmaLineY }}"
                         stroke="{{ $afmrLineClr }}" stroke-width="2"
                         stroke-dasharray="{{ $isOnline ? 'none' : '4 3' }}" />
@@ -156,13 +120,9 @@
                 </svg>
 
             </div>
-
-            {{-- Kanan: Data Pengukuran (vertikal) --}}
-            <div class="col-span-12 md:col-span-3 flex flex-col justify-start gap-2">
+<div class="col-span-12 md:col-span-3 flex flex-col justify-start gap-2">
                 <div class="text-sm font-semibold text-slate-700">Data Pengukuran</div>
-
-                {{-- Luas Penampang Basah --}}
-                @php
+@php
                     $luasUrl = $pLuas
                         ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pLuas->nama_parameter)
                         : route('analisa.index', $lg->id_logger);
@@ -180,13 +140,11 @@
                             <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                                 {{ is_numeric($luasPenampang) ? number_format((float) $luasPenampang, 2) : '-' }}
                             </span>
-                            <span class="text-xs font-semibold text-slate-400">m²</span>
+                            <span class="text-xs font-semibold text-slate-400">mÃ‚Â²</span>
                         </div>
                     </div>
                 </a>
-
-                {{-- Debit --}}
-                @php
+@php
                     $afmrDebitUrl = $pAfmrDebit
                         ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pAfmrDebit->nama_parameter)
                         : route('analisa.index', $lg->id_logger);
@@ -204,13 +162,11 @@
                             <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                                 {{ is_numeric($afmrDebit) ? number_format((float) $afmrDebit, 2) : '-' }}
                             </span>
-                            <span class="text-xs font-semibold text-slate-400">m³/s</span>
+                            <span class="text-xs font-semibold text-slate-400">mÃ‚Â³/s</span>
                         </div>
                     </div>
                 </a>
-
-                {{-- Flow Velocity --}}
-                @php
+@php
                     $flowVelocityUrl = $pFlowVelocity
                         ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pFlowVelocity->nama_parameter)
                         : route('analisa.index', $lg->id_logger);
@@ -239,11 +195,8 @@
                 </a>
             </div>
         </div>
-
-        {{-- Baris info: Elevasi Muka Air | Elevasi Sensor | Jarak Sensor --}}
-        <div class="grid grid-cols-3 gap-3">
-            {{-- Elevasi Muka Air --}}
-            @php
+<div class="grid grid-cols-3 gap-3">
+@php
                 $elevMukaAirUrl = $pElevMukaAir
                     ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pElevMukaAir->nama_parameter)
                     : route('analisa.index', $lg->id_logger);
@@ -266,9 +219,7 @@
                     </div>
                 </div>
             </a>
-
-            {{-- Elevasi Sensor --}}
-            @php
+@php
                 $elevSensorUrl = $pElevSensor
                     ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pElevSensor->nama_parameter)
                     : route('analisa.index', $lg->id_logger);
@@ -291,9 +242,7 @@
                     </div>
                 </div>
             </a>
-
-            {{-- Jarak Sensor --}}
-            @php
+@php
                 $jarakSensorUrl = $pJarakSensor
                     ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pJarakSensor->nama_parameter)
                     : route('analisa.index', $lg->id_logger);
@@ -317,13 +266,10 @@
                 </div>
             </a>
         </div>
-
-        {{-- Baris bawah: Logger health cards --}}
-        <div class="border-t border-slate-100 pt-3">
+<div class="border-t border-slate-100 pt-3">
             <div class="text-sm font-semibold text-slate-700 mb-2">Logger</div>
             <div class="grid grid-cols-3 gap-2">
-                {{-- HUMIDITY --}}
-                <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
                     class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-300 px-3 py-2.5">
                     <div class="flex items-center gap-2">
                         <div class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
@@ -338,9 +284,7 @@
                         </div>
                     </div>
                 </a>
-
-                {{-- BATTERY --}}
-                <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
                     class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-green-300 px-3 py-2.5">
                     <div class="flex items-center gap-2">
                         <div class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
@@ -355,9 +299,7 @@
                         </div>
                     </div>
                 </a>
-
-                {{-- TEMPERATURE --}}
-                <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
                     class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-orange-300 px-3 py-2.5">
                     <div class="flex items-center gap-2">
                         <div class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
@@ -367,7 +309,7 @@
                         <div class="leading-tight min-w-0">
                             <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
                             <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
+                                {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°C</span>
                             </div>
                         </div>
                     </div>

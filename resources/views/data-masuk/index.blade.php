@@ -288,7 +288,6 @@
                 },
 
                 getColumnKey(colName) {
-                    // Convert "Muka Air Tanah" to "muka air tanah" (lowercase, with spaces preserved for matching)
                     return colName.toLowerCase();
                 },
 
@@ -354,14 +353,8 @@
                         alert('Tidak ada data untuk diekspor.');
                         return;
                     }
-
-                    // Create workbook data
                     let csvContent = '\uFEFF'; // BOM for UTF-8
-
-                    // Add header
                     csvContent += ['No', 'tanggal', 'Waktu', ...this.columns].join(',') + '\n';
-
-                    // Add data
                     this.tableData.forEach((row, idx) => {
                         const rowData = [
                             idx + 1,
@@ -373,8 +366,6 @@
                         ];
                         csvContent += rowData.join(',') + '\n';
                     });
-
-                    // Create blob and download
                     const blob = new Blob([csvContent], {
                         type: 'text/csv;charset=utf-8;'
                     });

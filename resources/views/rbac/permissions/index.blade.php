@@ -264,7 +264,6 @@
                 filteredPermissions() {
                     const q = (this.searchQuery || '').trim().toLowerCase();
                     if (!q) return this.allPermissions;
-                    // permission_name is a technical code — exact match
                     return this.allPermissions.filter(p =>
                         p.permission_name && p.permission_name.toLowerCase().includes(q)
                     );

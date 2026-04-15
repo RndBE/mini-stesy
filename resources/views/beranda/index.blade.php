@@ -235,13 +235,9 @@
                                 is_numeric($lg->jiat?->kedalaman_sumur) && is_numeric($mukaAir)
                                     ? $lg->jiat?->kedalaman_sumur - $mukaAir
                                     : null;
-
-                            // AWLR sub-kategori: jiat jika ada kedalaman_sumur > 0
                             $subKategoriAwlr = (is_numeric($lg->jiat?->kedalaman_sumur) && (float)$lg->jiat->kedalaman_sumur > 0)
                                 ? 'jiat'
                                 : 'non_jiat';
-
-                            // Parameter TMA dan Debit untuk non-jiat
                             $pTma = $lg->params->first(function ($param) {
                                 $n = strtolower(trim((string) $param->nama_parameter));
                                 $u = strtolower(trim((string) $param->parameter_utama));
@@ -255,8 +251,6 @@
                             });
                             $tma   = $latest && $pTma   && $pTma->kolom_sensor   ? $latest->{$pTma->kolom_sensor}   ?? null : null;
                             $debit = $latest && $pDebit && $pDebit->kolom_sensor ? $latest->{$pDebit->kolom_sensor} ?? null : null;
-
-                            // ===== AFMR Parameters =====
                             $pElevMukaAir = $lg->params->first(function ($param) {
                                 $n = strtolower(trim((string) $param->nama_parameter));
                                 $u = strtolower(trim((string) $param->parameter_utama));
@@ -341,13 +335,11 @@
                             'dataAir'         => $dataAir,
                             'muted'           => $muted,
                             'iconClass'       => $iconClass,
-                            // AWLR fields
                             'subKategoriAwlr' => $subKategoriAwlr ?? 'non_jiat',
                             'pTma'            => $pTma ?? null,
                             'pDebit'          => $pDebit ?? null,
                             'tma'             => $tma ?? null,
                             'debit'           => $debit ?? null,
-                            // AFMR fields
                             'pElevMukaAir'    => $pElevMukaAir   ?? null,
                             'pElevSensor'     => $pElevSensor    ?? null,
                             'pJarakSensor'    => $pJarakSensor   ?? null,

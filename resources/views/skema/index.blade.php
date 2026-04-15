@@ -40,9 +40,7 @@
                 <div id="panel-page-main" class="flex flex-col flex-1 min-h-0">
                     <!-- Area Konten Bisa Digulir -->
                     <div class="flex-1 overflow-y-auto custom-scrollbar pb-2">
-
-                    {{-- STATISTIK IRIGASI SESUAI KEBUTUHAN LAHAN --}}
-                    <div id="panel-statistik-wrap" class="hidden">
+<div id="panel-statistik-wrap" class="hidden">
                         <div class="flex justify-between items-center px-4 py-3 border-b border-slate-800/80 text-slate-400">
                             <span class="text-xs font-medium">Luas Area Layanan</span>
                             <div><span class="font-bold text-[#38bdf8] text-base" id="panel-luas-area">-</span> <span class="text-[10px]">Ha.</span></div>
@@ -68,9 +66,7 @@
                             </div>
                         </div>
                     </div>
-
-                    {{-- AWLR Sensor Info --}}
-                    <div id="panel-awlr-wrap" class="hidden px-4 py-4 border-b border-slate-800/80 text-center relative overflow-hidden">
+<div id="panel-awlr-wrap" class="hidden px-4 py-4 border-b border-slate-800/80 text-center relative overflow-hidden">
                         <div class="absolute inset-0 bg-gradient-to-b from-fuchsia-900/10 to-transparent"></div>
                         <div class="relative z-10 w-full">
                             <div class="text-[9px] font-bold text-fuchsia-400 uppercase tracking-widest mb-1.5 flex items-center justify-center gap-1">
@@ -82,9 +78,7 @@
                                 <span class="text-sm font-semibold text-fuchsia-500">cm</span>
                             </div>
                             <div id="panel-awlr-status" class="mt-3 inline-flex px-3 py-1 rounded-sm text-[10px] font-black tracking-widest uppercase mb-4"></div>
-                            
-                            {{-- Chart Historis TMA --}}
-                            <div class="mt-2 w-full h-28 relative bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 shadow-inner">
+<div class="mt-2 w-full h-28 relative bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 shadow-inner">
                                 <div id="awlr-chart-loading" class="absolute inset-0 flex items-center justify-center hidden bg-slate-900/80 z-20 rounded-lg backdrop-blur-sm">
                                     <span class="text-[10px] text-fuchsia-400 animate-pulse font-bold tracking-widest uppercase">Memuat Grafik...</span>
                                 </div>
@@ -92,16 +86,12 @@
                             </div>
                         </div>
                     </div>
-
-                    {{-- Saluran info --}}
-                    <div id="panel-saluran-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
+<div id="panel-saluran-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
                         <div class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Saluran</div>
                         <div id="panel-saluran-name" class="text-xs font-semibold text-slate-200"></div>
                         <div id="panel-elevasi-val" class="text-[9px] text-slate-400 mt-0.5"></div>
                     </div>
-
-                    {{-- TMA Hulu / Hilir --}}
-                    <div id="panel-tma-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
+<div id="panel-tma-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
                         <div class="grid grid-cols-3 gap-2">
                             <div class="text-center">
                                 <div class="text-[9px] font-bold text-sky-400 uppercase tracking-wide mb-1">TMA Hulu</div>
@@ -120,22 +110,19 @@
                             </div>
                         </div>
                     </div>
-
-                    {{-- Debit & Pemenuhan --}}
-                    <div id="panel-debit-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
+<div id="panel-debit-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
                         <div class="flex justify-between items-baseline mb-2">
                             <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Debit Aktual</span>
                             <div>
                                 <span class="font-black text-xl text-[#0ea5e9] drop-shadow-[0_0_5px_#0ea5e9]" id="panel-debit-val">0</span>
-                                <span class="text-[10px] text-slate-500"> m³/dtk</span>
+                                <span class="text-[10px] text-slate-500"> mÃ‚Â³/dtk</span>
                             </div>
                         </div>
                         <div class="flex justify-between items-baseline mb-1.5">
                             <span class="text-[9px] text-slate-300">Kapasitas Rencana</span>
-                            <span class="text-xs text-slate-300 font-mono"><span id="panel-kapasitas-val">-</span> m³/dtk</span>
+                            <span class="text-xs text-slate-300 font-mono"><span id="panel-kapasitas-val">-</span> mÃ‚Â³/dtk</span>
                         </div>
-                        {{-- Progress bar pemenuhan --}}
-                        <div class="w-full bg-slate-700 rounded-full h-1.5 mb-1">
+<div class="w-full bg-slate-700 rounded-full h-1.5 mb-1">
                             <div id="panel-debit-bar" class="h-1.5 rounded-full bg-emerald-400 transition-all duration-500" style="width:0%"></div>
                         </div>
                         <div class="flex justify-between items-center">
@@ -143,55 +130,47 @@
                             <span id="panel-debit-pct" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-400">-</span>
                         </div>
                     </div>
-
-                    {{-- Simulasi Water Balance --}}
-                    <div id="panel-wb-wrap" class="hidden px-4 py-3 border-b border-slate-800/80 bg-slate-900/40">
+<div id="panel-wb-wrap" class="hidden px-4 py-3 border-b border-slate-800/80 bg-slate-900/40">
                         <div class="text-[9px] font-bold text-orange-400 border-b border-orange-900/30 pb-1 mb-2 uppercase tracking-widest flex items-center gap-1.5">
-                            📊 Simulasi Kinerja (Water Balance)
+                            Ã°Å¸â€œÅ  Simulasi Kinerja (Water Balance)
                         </div>
                         <div class="grid grid-cols-2 gap-3 mb-2">
                             <div class="bg-slate-800/70 p-1.5 rounded border border-slate-700/50">
                                 <span class="block text-[9px] text-slate-400 mb-0.5">Q Perintah</span>
-                                <span class="font-mono text-sm text-slate-200"><span id="panel-wb-perintah">0</span> <span class="text-[9px] text-slate-500">m³/s</span></span>
+                                <span class="font-mono text-sm text-slate-200"><span id="panel-wb-perintah">0</span> <span class="text-[9px] text-slate-500">mÃ‚Â³/s</span></span>
                             </div>
                             <div class="bg-slate-800/70 p-1.5 rounded border border-emerald-900/30">
                                 <span class="block text-[9px] text-emerald-500/80 mb-0.5">Q Terukur</span>
-                                <span class="font-mono text-sm text-emerald-400"><span id="panel-wb-terukur">0</span> <span class="text-[9px] text-emerald-700">m³/s</span></span>
+                                <span class="font-mono text-sm text-emerald-400"><span id="panel-wb-terukur">0</span> <span class="text-[9px] text-emerald-700">mÃ‚Â³/s</span></span>
                             </div>
                         </div>
                         <div class="flex flex-col gap-1.5 p-2 bg-slate-800/40 rounded border border-slate-800">
                             <div class="flex justify-between items-center">
                                 <span class="text-[10px] text-slate-400">Error Deviasi</span>
-                                <span class="font-mono text-xs font-bold" id="panel-wb-err-parent"><span id="panel-wb-err-val">0</span> m³/s (<span id="panel-wb-err-pct">0</span>%)</span>
+                                <span class="font-mono text-xs font-bold" id="panel-wb-err-parent"><span id="panel-wb-err-val">0</span> mÃ‚Â³/s (<span id="panel-wb-err-pct">0</span>%)</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-[10px] text-slate-400">Selisih Vol. (1 Jam)</span>
-                                <span class="font-mono text-xs font-bold" id="panel-wb-vol-parent"><span id="panel-wb-vol">0</span> m³</span>
+                                <span class="font-mono text-xs font-bold" id="panel-wb-vol-parent"><span id="panel-wb-vol">0</span> mÃ‚Â³</span>
                             </div>
                             <div id="panel-wb-status" class="mt-1.5 px-2 py-1.5 rounded text-[10px] font-bold tracking-wider uppercase text-center border">
                                 STABIL
                             </div>
                         </div>
                     </div>
-
-                    {{-- Status Pintu (AWGC gates) --}}
-                    <div id="panel-gates-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
+<div id="panel-gates-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
                         <div class="text-[9px] font-bold text-slate-300 uppercase tracking-widest mb-2">Status Pintu Air</div>
                         <div id="panel-gates-list" class="space-y-1.5"></div>
                     </div>
-
-                    {{-- Saluran Hilir --}}
-                    <div id="panel-destinations-wrap" class="px-4 pt-2.5 pb-4 text-slate-400 text-xs bg-slate-900 border-b border-slate-800/80">
+<div id="panel-destinations-wrap" class="px-4 pt-2.5 pb-4 text-slate-400 text-xs bg-slate-900 border-b border-slate-800/80">
                         <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Menuju Selanjutnya</div>
                         <div id="panel-destinations-list" class="space-y-1.5"></div>
                     </div>
 
                     </div> <!-- Penutup area scroll -->
-
-                    {{-- Tombol Bawah Tetap --}}
-                    <div id="container-btn-control" class="hidden px-4 py-3 bg-slate-800 z-10 border-t border-slate-700/80 flex-shrink-0 shadow-[0_-5px_15px_rgba(0,0,0,0.3)]">
+<div id="container-btn-control" class="hidden px-4 py-3 bg-slate-800 z-10 border-t border-slate-700/80 flex-shrink-0 shadow-[0_-5px_15px_rgba(0,0,0,0.3)]">
                         <button id="btn-show-control" class="w-full py-2.5 rounded shadow flex items-center justify-center gap-2 font-bold text-xs transition-colors bg-cyan-900/40 hover:bg-cyan-800/60 text-cyan-300 border border-cyan-700/50 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)]">
-                            ⚙️ Buka Kontrol Mesin Pintu
+                            Ã¢Å¡â„¢Ã¯Â¸Â Buka Kontrol Mesin Pintu
                         </button>
                     </div>
                 </div>
@@ -263,15 +242,15 @@
             <span id="api-status-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
             <span id="api-status-text" class="text-[10px] font-semibold text-slate-400">Menghubungkan...</span>
             <span class="text-slate-700">|</span>
-            <span class="text-[10px] text-slate-500">Update: <span id="api-last-update" class="text-slate-400 font-mono">-</span></span>
+            <span class="text-[10px] text-slate-500">Update:Ã‚Â <span id="api-last-update" class="text-slate-400 font-mono">-</span></span>
             <span class="text-slate-700">|</span>
-            <span class="text-[10px] text-slate-500">Aktif: <span id="api-node-count" class="text-emerald-400 font-mono font-bold">-</span> node</span>
+            <span class="text-[10px] text-slate-500">Aktif:Ã‚Â <span id="api-node-count" class="text-emerald-400 font-mono font-bold">-</span>Ã‚Â node</span>
         </div>
 
         <!-- Banner Error Koneksi (muncul dari atas saat API gagal) -->
         <div id="api-error-banner" class="hidden absolute top-0 left-0 right-0 flex items-center justify-center gap-3 py-2 px-4 bg-red-900/95 border-b border-red-700 shadow-lg" style="z-index: 60;">
             <svg class="w-4 h-4 text-red-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
-            <span class="text-sm font-semibold text-red-200">Koneksi ke server terputus — Data sensor tidak dapat diperbarui</span>
+            <span class="text-sm font-semibold text-red-200">Koneksi ke server terputus Ã¢â‚¬â€ Data sensor tidak dapat diperbarui</span>
             <button onclick="document.getElementById('api-error-banner').classList.add('hidden')" class="ml-auto text-red-400 hover:text-white text-lg leading-none">&times;</button>
         </div>
     </div>
@@ -279,8 +258,7 @@
 
 @push('scripts')
     <style>
-        /* SCROLLBAR ELEGAN UNTUK PANEL */
-        .custom-scrollbar::-webkit-scrollbar {
+.custom-scrollbar::-webkit-scrollbar {
             width: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
@@ -344,18 +322,14 @@
                 }
             }
             @endverbatim
-
-            /* Partikel utama air yang bergerak normal */
-            .flow-line-1 {
+.flow-line-1 {
                 animation: flow-1 1.2s linear infinite;
                 stroke-dasharray: 0, 54;
                 stroke-linecap: round;
                 filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
                 opacity: 0.9;
             }
-
-            /* Partikel percikan kecil dengan jeda lebih jauh */
-            .flow-line-2 {
+.flow-line-2 {
                 animation: flow-2 1.8s linear infinite;
                 stroke-dasharray: 0, 67;
                 stroke-linecap: round;
@@ -396,9 +370,7 @@
                 transform-origin: 0px 0px; /* Fix scaling miring di SVG */
                 pointer-events: none; /* Supaya tidak menghalangi event klik pada pintu aslinya */
             }
-
-            /* Efek Hover Ping Pratinjau Jarak Jauh (Kuning/Putih Terang) */
-            @keyframes hover-ping {
+@keyframes hover-ping {
                 0% { transform: scale(0.8); opacity: 1; stroke-width: 4px; }
                 100% { transform: scale(var(--hover-scale, 2.5)); opacity: 0; stroke-width: 1px; }
             }
@@ -420,8 +392,6 @@
                 const edgesLayerAnim = document.getElementById('edges-layer-anim');
                 const nodesLayer = document.getElementById('nodes-layer');
                 const infoPanel = document.getElementById('info-panel');
-
-                // Initialize Panzoom
                 let w = svgContainer.clientWidth || 1000;
                 const panzoomInstance = panzoom(svgContainer, {
                     maxZoom: 3,
@@ -434,25 +404,18 @@
                 document.getElementById('close-info').addEventListener('click', (e) => {
                     e.stopPropagation();
                     infoPanel.classList.add('hidden');
-                    // Bersihkan efek ping 
                     document.querySelectorAll('.active-ping-circle').forEach(el => el.remove());
                     if (typeof removeHoverPing === 'function') removeHoverPing(); // Hapus jejak kuning hover
                     activeNodeData = null;
                 });
-
-                // Mencegah scroll di dalam panel malah membuat SVG background zoom out/in
                 infoPanel.addEventListener('wheel', (e) => {
                     e.stopPropagation();
                 }, { passive: false });
-
-                // Helper memunculkan Radar Ping
                 const drawRadarPing = (group, nodeType = 'sensor_awlr') => {
                     document.querySelectorAll('.active-ping-circle').forEach(el => el.remove());
                     if (typeof removeHoverPing === 'function') removeHoverPing(); // Langsung matikan hover kuning jika node jadi "aktif"
                     
                     if (!group) return;
-
-                    // Cek tipe kotak: Pintu air, Bendung, atau Junction yang memiliki kode BM (Bagi Mutap)
                     const isRectShape = ['gate_awgc', 'weir_main', 'weir_large', 'weir_small'].includes(nodeType) || group.id.includes('-BM');
 
                     const createPing = () => {
@@ -460,7 +423,6 @@
                         ping.setAttribute("class", "active-ping-circle");
                         
                         if (isRectShape) {
-                            // Sesuaikan ukuran dinamis berdasarkan jenis pintu/bendung
                             let bx = "-16", by = "-16", bw = "32", bh = "32"; // default gate_awgc
                             if (nodeType === 'weir_large') {
                                 bx = "-25"; by = "-25"; bw = "50"; bh = "50";
@@ -475,9 +437,6 @@
                             ping.setAttribute("width", bw);
                             ping.setAttribute("height", bh);    
                             ping.setAttribute("rx", "1"); // Sudut ketat
-                            
-                            // Hitung rasio scale berdasarkan daya jangkau rambatan keluar (padding yang seragam).
-                            // Untuk radar (biru), rambatan mekar keluar sejauh kurang lebih 40px dari setiap sisi.
                             const targetSize = parseFloat(bw) + 52; // bw + (26px * 2 sisi)
                             const scaleFactor = targetSize / parseFloat(bw);
                             ping.style.setProperty('--ping-scale', scaleFactor.toFixed(2));
@@ -492,18 +451,12 @@
                     const ping1 = createPing();
                     const ping2 = createPing();
                     ping2.style.animationDelay = "0.75s"; // Setengah jeda (biar 2 riak bergantian)
-
-                    // Selipkan di belakang (anak elemen pertama di group)
                     group.insertBefore(ping2, group.firstChild);
                     group.insertBefore(ping1, group.firstChild);
                 };
-
-                // Helper memunculkan Radar Hover Pratinjau
                 const drawHoverPing = (group, nodeType = 'sensor_awlr') => {
                     document.querySelectorAll('.hover-ping-circle').forEach(el => el.remove());
                     if (!group) return;
-
-                    // Sama dengan di atas, cek status kotak
                     const isRectShape = ['gate_awgc', 'weir_main', 'weir_large', 'weir_small'].includes(nodeType) || group.id.includes('-BM');
 
                     const ping = document.createElementNS("http://www.w3.org/2000/svg", isRectShape ? "rect" : "circle");
@@ -524,8 +477,6 @@
                         ping.setAttribute("width", bw);
                         ping.setAttribute("height", bh);
                         ping.setAttribute("rx", "1");
-                        
-                        // Ramabatan untuk hover (kuning) mekar keluar sejauh kurang lebih 24px dari setiap sisi.
                         const targetSize = parseFloat(bw) + 48; // bw + (24px * 2 sisi)
                         const scaleFactor = targetSize / parseFloat(bw);
                         ping.style.setProperty('--hover-scale', scaleFactor.toFixed(2));
@@ -541,8 +492,6 @@
                 const removeHoverPing = () => {
                     document.querySelectorAll('.hover-ping-circle').forEach(el => el.remove());
                 };
-
-                // ─── State Global ────────────────────────────────────────────────
                 let currentTopologyData = {
                     nodes: [],
                     edges: []
@@ -551,8 +500,6 @@
                 let activeCommandId = null; // ID perintah AWGC yang sedang berjalan
                 let awlrChartInstance = null; // Instance Chart.js untuk panel AWLR
                 let commandPollInterval = null; // Interval polling status AWGC
-
-                // ─── Status Dot Online/Offline ───────────────────────────────────
                 const setStatusDot = (isOnline) => {
                     const dot = document.getElementById('panel-status-dot');
                     const text = document.getElementById('panel-status-text');
@@ -568,8 +515,6 @@
                         text.className = 'text-[9px] text-red-400 font-semibold';
                     }
                 };
-
-                // ─── Number Animation Helper ────────────────────────────────────
                 const animateNumber = (elementId, newValue, isFloat = false, formatFn = null) => {
                     const el = document.getElementById(elementId);
                     if (!el || newValue === undefined || newValue === null) return;
@@ -609,8 +554,6 @@
                     
                     el.animFrame = requestAnimationFrame(step);
                 };
-
-                // ─── showInfoPanel — Conditional Rendering ───────────────────────
                 const showInfoPanel = (node) => {
                     if (node.type === 'title' || node.type === 'label_text') return;
 
@@ -622,40 +565,20 @@
                     } else {
                         document.querySelectorAll('.active-ping-circle').forEach(el => el.remove());
                     }
-
-                    // Isi header yang selalu ada
                     document.getElementById('info-title').textContent = node.label || node.nama_logger || node.id;
                     document.getElementById('info-source').textContent = node.source_name || 'Saluran Irigasi';
-
-                    // Online/offline indicator
                     if (node.id_logger) {
-                        // Khusus AWGC, kita tetap tampilkan UI "ONLINE" sesuai node.is_online
-                        // (Yang telah di-set true terus menerus dari backend)
                         setStatusDot(node.is_online !== false);
                     } else {
                         document.getElementById('panel-status-dot').classList.add('hidden');
                         document.getElementById('panel-status-text').classList.add('hidden');
                     }
-
-                    // Badge selalu DSS — menggunakan tema warna cyan terang yang lebih hidup (tidak hitam putih)
                     const badge = document.getElementById('panel-type-badge');
                     badge.textContent = 'DSS';
                         badge.className = 'text-[9px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full bg-cyan-900/80 text-cyan-300 border border-cyan-500/50 shadow-[0_0_8px_rgba(6,182,212,0.3)]';
-
-                    // Selalu pastikan tampilan panel Info Utama muncul
                     document.getElementById('panel-page-main').classList.remove('hidden');
-
-                    // Tampilkan tombol "Buka Kontrol Pintu" untuk semua node yang punya saluran hilir
-                    // (akan diupdate setelah destList dirender di bawah)
-                    // Hapus inisialisasi data kontrol modal lama karena sekarang pindah halaman
-
-                    // Selalu render Info Default
                     const infoAreaEl = document.getElementById('info-area');
                     if (infoAreaEl) infoAreaEl.textContent = '-';
-
-                    // ── Render data panel dinamis berdasarkan node ──────────────
-                    
-                    // Statistik Lahan
                     const statWrap = document.getElementById('panel-statistik-wrap');
                     if (node.panel_luas_area !== undefined && node.panel_luas_area > 0) {
                         document.getElementById('panel-luas-area').textContent = node.panel_luas_area;
@@ -667,8 +590,6 @@
                     } else {
                         statWrap.classList.add('hidden');
                     }
-
-                    // Saluran info
                     const saluranWrap = document.getElementById('panel-saluran-wrap');
                     if (node.panel_saluran) {
                         document.getElementById('panel-saluran-name').textContent = node.panel_saluran;
@@ -677,8 +598,6 @@
                     } else {
                         saluranWrap.classList.add('hidden');
                     }
-
-                    // ── AWLR Sensor Info Dinamis
                     const awlrWrap = document.getElementById('panel-awlr-wrap');
                     if (node.jenis_alat === 'AWLR' && node.tma !== undefined) {
                         animateNumber('panel-awlr-tma', node.tma, true);
@@ -695,16 +614,12 @@
                         stsBadge.textContent = node.status_siaga ? node.status_siaga.toUpperCase() : 'NORMAL';
                         
                         awlrWrap.classList.remove('hidden');
-
-                        // Panggil render chart historis 6 jam
                         if (typeof loadAwlrChart === 'function') {
                             loadAwlrChart(node.id);
                         }
                     } else {
                         awlrWrap.classList.add('hidden');
                     }
-
-                    // TMA Hulu / Hilir / Selisih
                     const tmaWrap = document.getElementById('panel-tma-wrap');
                     if (node.panel_tma_hulu !== undefined) {
                         document.getElementById('panel-tma-hulu').textContent    = node.panel_tma_hulu;
@@ -715,8 +630,6 @@
                     } else {
                         tmaWrap.classList.add('hidden');
                     }
-
-                    // Debit & Progress bar pemenuhan
                     const debitWrap = document.getElementById('panel-debit-wrap');
                     if (node.jenis_alat !== 'AWLR' && node.panel_debit !== undefined) {
                         const pct     = node.panel_pct_debit ?? 0;
@@ -730,26 +643,22 @@
                         if (pct >= 80) {
                             barEl.className = 'h-1.5 rounded-full bg-emerald-400 transition-all duration-500 ease-out';
                             pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-400';
-                            suffix = ' — Normal';
+                            suffix = ' Ã¢â‚¬â€ Normal';
                         } else if (pct >= 50) {
                             barEl.className = 'h-1.5 rounded-full bg-yellow-400 transition-all duration-500 ease-out';
                             pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-yellow-900/60 text-yellow-400';
-                            suffix = ' — Kurang';
+                            suffix = ' Ã¢â‚¬â€ Kurang';
                         } else {
                             barEl.className = 'h-1.5 rounded-full bg-red-500 transition-all duration-500 ease-out';
                             pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-900/60 text-red-400';
-                            suffix = ' — Kritis';
+                            suffix = ' Ã¢â‚¬â€ Kritis';
                         }
-                        
-                        // Animate text persentase pemenuhan beserta imbuhan
                         animateNumber('panel-debit-pct', pct, false, (val) => `${val}%${suffix}`);
                         
                         debitWrap.classList.remove('hidden');
                     } else {
                         debitWrap.classList.add('hidden');
                     }
-
-                    // Water Balance Simulation Panel Update
                     const wbWrap = document.getElementById('panel-wb-wrap');
                     if (node.jenis_alat !== 'AWLR' && node.panel_q_perintah !== undefined) {
                         document.getElementById('panel-wb-perintah').textContent = node.panel_q_perintah;
@@ -780,8 +689,6 @@
                     } else {
                         if (wbWrap) wbWrap.classList.add('hidden');
                     }
-
-                    // Status Pintu (AWGC gates)
                     const gatesWrap = document.getElementById('panel-gates-wrap');
                     const gatesList = document.getElementById('panel-gates-list');
                     gatesList.innerHTML = '';
@@ -805,8 +712,6 @@
                     } else {
                         gatesWrap.classList.add('hidden');
                     }
-
-                        // ── Render daftar tujuan aliran (outgoing edges) ────────
                         const destList = document.getElementById('panel-destinations-list');
                         const destWrap = document.getElementById('panel-destinations-wrap');
                         destList.innerHTML = '';
@@ -815,8 +720,6 @@
                             if (destWrap) destWrap.classList.add('hidden');
                         } else {
                             if (destWrap) destWrap.classList.remove('hidden');
-                            
-                            // Filter edge keluar dari node ini (termasuk saluran primer, sekunder, dan tersier)
                             const outgoing = (currentTopologyData.edges || []).filter(e =>
                                 e.source === node.id
                             );
@@ -827,7 +730,6 @@
                             outgoing.forEach(edge => {
                                 const targetNode = (currentTopologyData.nodes || []).find(n => n.id === edge.target);
                                 if (!targetNode) return;
-                                // Skip jika target hanya node label visual (Kecuali untuk saluran Tersier yang ujungnya memang ke arah hamparan areal)
                                 if (edge.type !== 'tertiary' && (targetNode.type === 'label_yellow' || targetNode.type === 'label_text')) return;
 
                                 const lblNode = (currentTopologyData.nodes || []).find(n =>
@@ -840,8 +742,6 @@
                                         ? targetNode.label
                                         : targetNode.id;
                                 const saluran = targetNode.source_name || '';
-
-                                // Badge warna berdasarkan tipe edge
                                 let typeBadge;
                                 if (edge.type === 'primary') typeBadge = { cls: 'bg-blue-900/80 text-blue-300 border-blue-500/50 shadow-[0_0_5px_rgba(59,130,246,0.3)]', txt: 'Primer' };
                                 else if (edge.type === 'tertiary') typeBadge = { cls: 'bg-teal-900/80 text-teal-300 border-teal-500/50 shadow-[0_0_5px_rgba(20,184,166,0.3)]', txt: 'Tersier' };
@@ -861,26 +761,17 @@
                                 `;
 
                                 row.addEventListener('click', () => {
-                                    // BERSUHKAN EFEK KUNING SEBELUM HTML DIHANCURKAN
                                     removeHoverPing();
-
-                                    // 1. Ganti tampilan panel 
                                     showInfoPanel(targetNode);
-
-                                    // 2. Geser kamera perlahan tepat ke koordinat target
                                     if (typeof panzoomInstance !== 'undefined') {
                                         const svgContainer = document.getElementById('panzoom-container');
                                         const transform = panzoomInstance.getTransform();
-                                        
-                                        // Posisikan node persis di tengah layar
                                         const targetX = (svgContainer.clientWidth / 2) - (targetNode.x * transform.scale);
                                         const targetY = (svgContainer.clientHeight / 2) - (targetNode.y * transform.scale) + 50; // +50 agar tidak tertutup judul
                                         
                                         panzoomInstance.smoothMoveTo(targetX, targetY);
                                     }
                                 });
-
-                                // Event Preview Hover
                                 row.addEventListener('mouseenter', () => {
                                     const targetGroup = document.getElementById(`node-g-${targetNode.id}`);
                                     drawHoverPing(targetGroup, targetNode.type);
@@ -892,15 +783,11 @@
 
                                 destList.appendChild(row);
                             });
-
-                            // Jika semua target adalah label, tampilkan pesan kosong
                             if (destList.children.length === 0) {
                                 destList.innerHTML = '<span class="text-slate-600 italic">Tidak ada saluran hilir</span>';
                             }
                         }
                         }
-
-                        // Tampilkan tombol kontrol pintu jika ada saluran hilir (outgoing > 0 dan hasil render list > 0)
                         if (node.jenis_alat !== 'AWLR' && destList.children.length > 0 && !destList.querySelector('.italic')) {
                             document.getElementById('container-btn-control').classList.remove('hidden');
                         } else {
@@ -909,15 +796,11 @@
 
                     infoPanel.classList.remove('hidden');
                 };
-
-                // ─── Eksekusi Navigasi Kontrol Pintu Air ───────────────────────
                 document.getElementById('btn-show-control').addEventListener('click', () => {
                     if (activeNodeData && activeNodeData.id) {
                         window.location.href = `/skema-irigasi/kontrol/${activeNodeData.id}`;
                     }
                 });
-
-                // ─── Fetch Data Topology ─────────────────────────────────────────
                 let lastDataHash = "";
 
                 function fetchTopologyData() {
@@ -925,12 +808,8 @@
                         .then(res => res.json())
                         .then(data => {
                             currentTopologyData = data;
-                            
-                            // Hitung riwayat status grafik (hanya refresh vektor saat status simulasi/fisik pipa berubah)
-                            // Ini menghindari efek glitch animasi air me-reset setiap 3 detik
                             const currentHash = data.nodes.map(n => {
                                 const gatePct = (n.gates && n.gates.length > 0) ? n.gates[0].bukaan_persen : 0;
-                                // Sertakan TMA agar perubahan sensor AWLR otomatis me-refresh ikon di SVG
                                 const tmaVal  = n.tma !== undefined ? parseFloat(n.tma).toFixed(1) : '0';
                                 return `${n.id}_${n.status}_${gatePct}_${tmaVal}`;
                             }).join('|');
@@ -939,8 +818,6 @@
                                 drawNetwork(data.nodes, data.edges);
                                 lastDataHash = currentHash;
                             }
-
-                            // ── Update Status Bar Koneksi ──
                             const dotEl  = document.getElementById('api-status-dot');
                             const txtEl  = document.getElementById('api-status-text');
                             const timeEl = document.getElementById('api-last-update');
@@ -949,12 +826,8 @@
                             if (txtEl)  txtEl.textContent = 'Terhubung';
                             if (timeEl) timeEl.textContent = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
                             if (cntEl)  cntEl.textContent = data.nodes.filter(n => n.is_online).length;
-
-                            // Sembunyikan banner error jika server kembali online
                             document.getElementById('api-error-banner')?.classList.add('hidden');
                             apiFailCount = 0;
-
-                            // Jika panel sedang terbuka, perbarui info angkanya (TMA, Debit)
                             if (activeNodeData) {
                                 if (activeNodeData.type === 'edge') {
                                     const updatedEdge = data.edges.find(e =>
@@ -987,8 +860,6 @@
                                     Object.assign(activeNodeData, updatedNode);
                                     if (document.getElementById('panel-tma-hulu')) document.getElementById('panel-tma-hulu').textContent = updatedNode.panel_tma_hulu ?? '-';
                                     if (document.getElementById('panel-tma-hilir')) document.getElementById('panel-tma-hilir').textContent = updatedNode.panel_tma_hilir ?? '-';
-                                    
-                                    // Sinkronisasikan Animasi Debit, Kapasitas, Bar, & Persentase Pemenuhan secara realtime
                                     if (updatedNode.panel_debit !== undefined) {
                                         const pct     = updatedNode.panel_pct_debit ?? 0;
                                         const barEl   = document.getElementById('panel-debit-bar');
@@ -1001,24 +872,20 @@
                                         if (pct >= 80) {
                                             if (barEl) barEl.className = 'h-1.5 rounded-full bg-emerald-400 transition-all duration-500 ease-out';
                                             if (pctEl) pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-400';
-                                            suffix = ' — Normal';
+                                            suffix = ' Ã¢â‚¬â€ Normal';
                                         } else if (pct >= 50) {
                                             if (barEl) barEl.className = 'h-1.5 rounded-full bg-yellow-400 transition-all duration-500 ease-out';
                                             if (pctEl) pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-yellow-900/60 text-yellow-400';
-                                            suffix = ' — Kurang';
+                                            suffix = ' Ã¢â‚¬â€ Kurang';
                                         } else {
                                             if (barEl) barEl.className = 'h-1.5 rounded-full bg-red-500 transition-all duration-500 ease-out';
                                             if (pctEl) pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-900/60 text-red-400';
-                                            suffix = ' — Kritis';
+                                            suffix = ' Ã¢â‚¬â€ Kritis';
                                         }
                                         if (pctEl) animateNumber('panel-debit-pct', pct, false, (val) => `${val}%${suffix}`);
                                     }
-
-                                    // ── Sinkronisasi Panel AWLR (TMA & Siaga Badge) secara realtime ──
                                     if (updatedNode.jenis_alat === 'AWLR' && updatedNode.tma !== undefined) {
                                         animateNumber('panel-awlr-tma', updatedNode.tma, true);
-
-                                        // Update badge status siaga
                                         const siaga   = updatedNode.status_siaga || 'Normal';
                                         const classBySiaga = {
                                             'Normal' : 'bg-emerald-900/60 text-emerald-400 border-emerald-700/50',
@@ -1034,8 +901,6 @@
                                             stsBadge.textContent = siaga;
                                         }
                                     }
-
-                                    // ── Sinkronisasi Indikator Status Pintu AWGC di panel ──
                                     const gatesList = document.getElementById('panel-gates-list');
                                     if (updatedNode.jenis_alat === 'AWGC' && updatedNode.gates && gatesList) {
                                         gatesList.innerHTML = '';
@@ -1056,14 +921,10 @@
                         .catch(err => {
                             console.error('[Skema] Gagal fetch topologi:', err);
                             apiFailCount++;
-
-                            // Update Status Bar ke error
                             const dotEl = document.getElementById('api-status-dot');
                             const txtEl = document.getElementById('api-status-text');
                             if (dotEl)  { dotEl.className = 'w-2 h-2 rounded-full bg-red-500'; dotEl.style.animation = ''; }
                             if (txtEl)  txtEl.textContent = 'Gagal terhubung';
-
-                            // Tampilkan banner error setelah 2x gagal berturut-turut
                             if (apiFailCount >= 2) {
                                 document.getElementById('api-error-banner')?.classList.remove('hidden');
                             }
@@ -1071,15 +932,10 @@
                 }
 
                 let apiFailCount = 0; // Counter kegagalan fetch berturut-turut
-
-                // Panggil pertama kali saat halaman dimuat
                 fetchTopologyData();
-
-                // POLLING: Ambil data secara otomatis setiap 3 detik (sebagai fungsi transisi realtime tanpa Websocket)
                 setInterval(fetchTopologyData, 3000);
 
                 function drawNetwork(nodes, edges) {
-                    // Jangan hapus edge jika sudah ada agar bisa diberi efek perlahan (CSS Transition)
                     if (!window.isSkemaEdgeRendered) {
                         edgesLayerBg.innerHTML = '';
                         edgesLayerFg.innerHTML = '';
@@ -1087,14 +943,10 @@
                     }
                     edgesLayerAnim.innerHTML = '';
                     nodesLayer.innerHTML = '';
-
-                    // Logika BFS: Salurkan AIr dari Hulu ke Hilir dengan Status: full, trickle, dry
                     const nodeFlow = {};
                     const edgeFlow = {};
                     nodes.forEach(n => nodeFlow[n.id] = 'dry');
                     edges.forEach(e => edgeFlow[`${e.source}-${e.target}`] = 'dry');
-
-                    // Sumber utama Bendung selalu punya air
                     nodeFlow['WEIR_COPONG'] = 'full';
 
                     const q = [{
@@ -1107,8 +959,6 @@
                             flow: currFlow
                         } = q.shift();
                         const currNode = nodes.find(n => n.id === currId);
-
-                        // Propagasi warna berdasarkan status yang sudah dihitung di backend (panel_pct_debit)
                         let outgoingFlow = currFlow;
                         if (currNode) {
                             if (currNode.status === 'overflow') {
@@ -1134,9 +984,6 @@
                             const eId = `${edge.source}-${edge.target}`;
 
                             let eFlow = outgoingFlow;
-                            
-                            // OVERRIDE: Gunakan perhitungan persentase aktual PIPA (edge) yang di-inject dari backend
-                            // Ini memastikan percabangan memiliki warna animasinya sendiri-sendiri, independen dari pintu lainnya.
                             if (edge.panel_pct_debit !== undefined) {
                                 let pct = edge.panel_pct_debit;
                                 if (pct >= 135) eFlow = 'overflow';
@@ -1177,39 +1024,25 @@
                             }
                         });
                     }
-
-                    // Design Colors matching Tabo Tabo exactly (Utama/Primer)
                     const COLOR_LINE_BORDER = "#303481"; // Biru Tua Pekat
                     const COLOR_LINE_INNER = "#00a2ffff"; // Biru Cerah
                     const COLOR_WEIR_INNER = "#58c0fdff";
-
-                    // Design Colors khusus Sekunder (Dikembalikan ke orientasi warna orisinilnya)
                     const SEC_LINE_BORDER = "#595D9A";
                     const SEC_LINE_INNER = "#86cfffff";
-
-                    // Design Colors khusus Tersier (Biru Abu-abu Pucat)
                     const TER_LINE_BORDER = "#4a7a9c";
                     const TER_LINE_INNER = "#a3dfff";
-
-                    // Design Colors untuk Rembesan/Genangan (Coklat)
                     const TRICKLE_LINE_BORDER = "#8B4513";
                     const TRICKLE_LINE_INNER = "#cd9959";
                     const TRICKLE_WEIR_INNER = "#deb887";
-
-                    // Design Colors untuk Siaga/Deras (Oranye)
                     const HIGH_LINE_BORDER = "#B26B00";
                     const HIGH_LINE_INNER = "#FFAA00";
                     const HIGH_WEIR_INNER = "#FFB84D";
-
-                    // Design Colors untuk Overflow/Banjir (Magenta/Ungu)
                     const OVERFLOW_LINE_BORDER = "#800080";
                     const OVERFLOW_LINE_INNER = "#FF00FF";
                     const OVERFLOW_WEIR_INNER = "#FFA6FF";
 
                     const COLOR_LABEL_BG = "#ffcb4d";
                     const COLOR_TEXT_DARK = "#1a3656";
-
-                    // Warnaan Pipa Kosong / Mati / Tertutup
                     const DRY_LINE_BORDER = "#8f9fb0";
                     const DRY_LINE_INNER = "#cad6e0";
                     const CLOSED_NODE_BORDER = "#dc2626"; // Merah
@@ -1246,9 +1079,6 @@
                         if (!endpointNode) return '-';
                         return endpointNode.label ? endpointNode.label.replace('\n', ' ') : endpointNode.id;
                     };
-
-                    // 1. Draw Edges
-                    // We draw edges twice: first the thick background border, then the slightly thinner inner color
                     edges.forEach(edge => {
                         const sourceNode = nodes.find(n => n.id === edge.source);
                         const targetNode = nodes.find(n => n.id === edge.target);
@@ -1303,7 +1133,6 @@
                                     path = document.createElementNS("http://www.w3.org/2000/svg", "path");
                                     if (!isFlowAnim) {
                                         path.setAttribute("id", pathId);
-                                        // Efek Fading Color
                                         path.style.transition = "stroke 2s ease, stroke-width 2s ease";
                                     }
                                 }
@@ -1313,15 +1142,9 @@
                                 path.setAttribute("stroke", stroke);
                                 path.setAttribute("stroke-width", width);
                                 path.setAttribute("fill", "none");
-
-                                // Deteksi kemiringan pipa (jika x dan y dua-duanya berubah)
                                 const dx = Math.abs(p1.x - p2.x);
                                 const dy = Math.abs(p1.y - p2.y);
                                 const isDiagonal = dx > 1 && dy > 1;
-
-                                // Alteri line-cap:
-                                // Pipa Lurus (Horizontal/Vertikal): 'round' 
-                                // Pipa Miring (Diagonal): 'butt' 
                                 let strokeType = isDiagonal ? "butt" : "round";
 
                                 path.setAttribute("stroke-linecap", isFlowAnim ? "round" : strokeType);
@@ -1365,7 +1188,6 @@
 
                                     return;
                                 } else {
-                                    // Update metadata secara live di pipa agar panel popupnya ikut terupdate saat diklik
                                     path.dataset.statusInfo = flowState === 'overflow' ? ' (Meluap/Banjir!)' :
                                         flowState === 'high' ? ' (Siaga/Deras)' :
                                         flowState === 'trickle' ? ' (Arus Lemah)' :
@@ -1379,7 +1201,6 @@
                                     path.dataset.edgeName = edge.type === 'primary' ? 'Saluran Primer Copong' : ((targetDisplayNode?.source_name) || 'Saluran Sekunder');
 
                                     if (isNew) {
-                                        // Membuat saluran air bisa diklik (bind event sekali saja)
                                         path.style.cursor = 'pointer';
                                         path.addEventListener('click', (e) => {
                                             e.stopPropagation();
@@ -1426,34 +1247,22 @@
                             }
                         }
                     });
-
-                    // 2. Draw Nodes
                     nodes.forEach(node => {
-                        // FIX: Membuang skip sensor_awlr agar ikonnya muncul!
 
                         const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
                         group.setAttribute("transform", `translate(${node.x}, ${node.y})`);
                         group.setAttribute("id", `node-g-${node.id}`);
-
-                        // Gambar kembali ping jika node ini sedang terpilih
                         if (activeNodeData && activeNodeData.id === node.id) {
                             setTimeout(() => drawRadarPing(group, node.type), 10);
                         }
-
-                        // Add click behavior to interactive nodes
                         if (node.type !== 'title' && node.type !== 'label_text') {
                             group.style.cursor = 'pointer';
                             group.classList.add('node-hoverable');
-                            
-                            // Event klik untuk membuka panel
                             group.addEventListener('click', (e) => {
                                 e.stopPropagation(); // Stop panzoom from taking the click
                                 showInfoPanel(node);
                             });
-
-                            // Event hover untuk memunculkan efek animasi ping kuning
                             group.addEventListener('mouseenter', () => {
-                                // Jangan pasang animasi hover kuning jika node ini sedang 'aktif' (sudah diklik biru)
                                 if (!activeNodeData || activeNodeData.id !== node.id) {
                                     drawHoverPing(group, node.type);
                                 }
@@ -1511,12 +1320,8 @@
                             text.setAttribute("font-size", "16");
                             text.setAttribute("font-weight", "bold");
                             text.setAttribute("fill", COLOR_TEXT_DARK);
-                            
-                            // Anti-aliasing fix agar teks tidak blur saat ada animasi hover di dekatnya
                             text.style.textRendering = "geometricPrecision";
                             text.style.webkitFontSmoothing = "antialiased";
-
-                            // Fitur baru: Memutar teks (miring atau vertikal)
                             if (node.rotation) {
                                 text.setAttribute("transform", `rotate(${node.rotation})`);
                             }
@@ -1581,7 +1386,6 @@
                             group.appendChild(text);
                         } else if (node.type === 'junction') {
                             if (node.id.includes('BM')) {
-                                // Jika ID mengandung 'BM', gambar kotak kecil menyesuaikan lebar pipa
                                 const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                                 rect.setAttribute("x", "-14");
                                 rect.setAttribute("y", "-14");
@@ -1592,7 +1396,6 @@
                                 rect.setAttribute("stroke-width", "2");
                                 group.appendChild(rect);
                             } else {
-                                // Gambar lingkaran persimpangan mungil yang seolah "masuk" di dalam pipa
                                 const circleOuter = document.createElementNS("http://www.w3.org/2000/svg",
                                     "circle");
                                 circleOuter.setAttribute("r", "8");
@@ -1600,16 +1403,12 @@
                                 circleOuter.setAttribute("stroke", borderColor);
                                 circleOuter.setAttribute("stroke-width", "2");
                                 group.appendChild(circleOuter);
-
-                                // Hitung jumlah saluran (edges) yang terhubung ke titik ini
                                 let connectedEdgesCount = 0;
                                 edges.forEach(edge => {
                                     if (edge.source === node.id || edge.target === node.id) {
                                         connectedEdgesCount++;
                                     }
                                 });
-
-                                // Tampilkan titik tengah (inner dot) HANYA jika saluran terhubung >= 3
                                 if (connectedEdgesCount >= 3) {
                                     const circleInner = document.createElementNS("http://www.w3.org/2000/svg",
                                         "circle");
@@ -1642,11 +1441,6 @@
                             group.appendChild(rect);
                             group.appendChild(text);
                         }
-                        /* else if (node.type === 'sensor_awlr') { */ // blok ini sekarang aktif di bawah
-                        // ─────────────────────────────────────────────────────────
-                        // NODE TYPE: SENSOR_AWLR (Sensor Tinggi Muka Air)
-                        // Bentuk: Lingkaran berdenyut dengan ikon gelombang
-                        // ─────────────────────────────────────────────────────────
                         else if (node.type === 'sensor_awlr') {
                             const isOnline = node.is_online !== false;
                             const siaga = node.status_siaga || 'Normal';
@@ -1657,8 +1451,6 @@
                                 'Banjir': '#ef4444',
                                 'Kering': '#94a3b8',
                             } [siaga] || '#22c55e';
-
-                            // Cincin luar berdenyut (hanya jika online)
                             if (isOnline) {
                                 const pulse = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                                 pulse.setAttribute("r", "18");
@@ -1668,16 +1460,12 @@
                             <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/>`;
                                 group.appendChild(pulse);
                             }
-
-                            // Lingkaran utama
                             const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                             circle.setAttribute("r", "13");
                             circle.setAttribute("fill", isOnline ? sensorColor + '25' : '#334155');
                             circle.setAttribute("stroke", isOnline ? sensorColor : '#64748b');
                             circle.setAttribute("stroke-width", "2.5");
                             group.appendChild(circle);
-
-                            // Teks label AWLR
                             const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
                             lbl.setAttribute("text-anchor", "middle");
                             lbl.setAttribute("y", "4");
@@ -1687,8 +1475,6 @@
                             lbl.style.textRendering = "geometricPrecision";
                             lbl.textContent = 'AWLR';
                             group.appendChild(lbl);
-
-                            // TMA value di bawah node
                             if (node.tma !== undefined) {
                                 const tmaText = document.createElementNS("http://www.w3.org/2000/svg", "text");
                                 tmaText.setAttribute("text-anchor", "middle");
@@ -1701,10 +1487,6 @@
                                 group.appendChild(tmaText);
                             }
                         }
-                        // ─────────────────────────────────────────────────────────
-                        // NODE TYPE: GATE_AWGC (Pintu Air Bermotor)
-                        // Bentuk: Segi enam / ikon pintu air
-                        // ─────────────────────────────────────────────────────────
                         else if (node.type === 'gate_awgc') {
                             const bukaan = node.bukaan_persen ?? 0;
                             const isOnline = node.is_online !== false;
@@ -1715,8 +1497,6 @@
                                 bukaan < 80 ? '#0ea5e9' // Biru = Normal
                                 :
                                 '#8b5cf6'; // Ungu = Bukaan Besar
-
-                            // Background segiempat dengan sudut tumpul
                             const gateRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                             gateRect.setAttribute("x", "-16");
                             gateRect.setAttribute("y", "-16");
@@ -1727,8 +1507,6 @@
                             gateRect.setAttribute("stroke", isOnline ? gateColor : '#475569');
                             gateRect.setAttribute("stroke-width", "2.5");
                             group.appendChild(gateRect);
-
-                            // Simbol pintu (garis vertikal = palang pintu)
                             const gateBar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                             const barHeight = Math.round(20 * (1 - bukaan / 100)); // Makin tutup makin tinggi
                             gateBar.setAttribute("x", "-3");
@@ -1738,8 +1516,6 @@
                             gateBar.setAttribute("rx", "2");
                             gateBar.setAttribute("fill", isOnline ? gateColor : '#475569');
                             group.appendChild(gateBar);
-
-                            // Label AWGC
                             const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
                             lbl.setAttribute("text-anchor", "middle");
                             lbl.setAttribute("y", "26");
@@ -1748,8 +1524,6 @@
                             lbl.setAttribute("fill", isOnline ? gateColor : '#64748b');
                             lbl.textContent = 'AWGC';
                             group.appendChild(lbl);
-
-                            // Persentase bukaan
                             const pctText = document.createElementNS("http://www.w3.org/2000/svg", "text");
                             pctText.setAttribute("text-anchor", "middle");
                             pctText.setAttribute("y", "36");
@@ -1762,16 +1536,10 @@
                         nodesLayer.appendChild(group);
                     });
                 }
-
-                // ─────────────────────────────────────────────────────────────────
-                // AWLR CHART — Load historis TMA 6 jam via API
-                // ─────────────────────────────────────────────────────────────────
                 async function loadAwlrChart(nodeId) {
                     const loading = document.getElementById('awlr-chart-loading');
                     const canvas = document.getElementById('awlr-chart');
                     loading.classList.remove('hidden');
-
-                    // Destroy chart lama jika ada
                     if (awlrChartInstance) {
                         awlrChartInstance.destroy();
                         awlrChartInstance = null;
@@ -1787,8 +1555,6 @@
                         }
 
                         loading.classList.add('hidden');
-
-                        // Dynamically load Chart.js jika belum ada
                         if (!window.Chart) {
                             await new Promise((resolve) => {
                                 const s = document.createElement('script');
@@ -1850,16 +1616,12 @@
                         console.error('[Skema AWLR] Chart error:', e);
                     }
                 }
-
-                // ─────────────────────────────────────────────────────────────────
-                // AWGC COMMAND — Kirim perintah buka/tutup ke logger fisik
-                // ─────────────────────────────────────────────────────────────────
                 function resetAwgcButton() {
                     const btn = document.getElementById('awgc-btn-send');
                     btn.disabled = false;
                     btn.className =
                         'w-full py-2.5 rounded-lg font-bold text-sm transition-all duration-200 bg-[#0ea5e9] hover:bg-[#0284c7] active:scale-95 text-white shadow-lg shadow-cyan-900/50';
-                    document.getElementById('awgc-btn-text').textContent = '⚡ Terapkan Posisi Pintu';
+                    document.getElementById('awgc-btn-text').textContent = 'Ã¢Å¡Â¡ Terapkan Posisi Pintu';
                     document.getElementById('awgc-command-status').classList.add('hidden');
                     if (commandPollInterval) {
                         clearInterval(commandPollInterval);
@@ -1875,12 +1637,10 @@
                     const txtEl = document.getElementById('awgc-btn-text');
                     const statusBox = document.getElementById('awgc-command-status');
                     const statusText = document.getElementById('awgc-command-status-text');
-
-                    // Kunci tombol → loading state
                     btn.disabled = true;
                     btn.className =
                         'w-full py-2.5 rounded-lg font-bold text-sm bg-slate-700 text-slate-400 cursor-not-allowed';
-                    txtEl.textContent = '⏳ Mengirim perintah...';
+                    txtEl.textContent = 'Ã¢ÂÂ³ Mengirim perintah...';
                     statusBox.classList.remove('hidden');
                     statusText.textContent = 'Menyambung ke MQTT broker...';
                     statusText.className = 'text-slate-400';
@@ -1903,7 +1663,7 @@
                         const json = await res.json();
 
                         if (!json.success) {
-                            txtEl.textContent = '❌ Gagal Dikirim';
+                            txtEl.textContent = 'Ã¢ÂÅ’ Gagal Dikirim';
                             statusText.textContent = json.message || 'Terjadi kesalahan.';
                             statusText.className = 'text-red-400';
                             setTimeout(resetAwgcButton, 4000);
@@ -1911,12 +1671,10 @@
                         }
 
                         activeCommandId = json.command_id;
-                        txtEl.textContent = '📡 Menunggu Konfirmasi Alat...';
+                        txtEl.textContent = 'Ã°Å¸â€œÂ¡ Menunggu Konfirmasi Alat...';
                         statusText.textContent =
                             `Perintah terkirim (ID: ${activeCommandId}). Menunggu respons...`;
                         statusText.className = 'text-yellow-400';
-
-                        // Polling status setiap 3 detik
                         commandPollInterval = setInterval(async () => {
                             try {
                                 const pRes = await fetch(`/api/awgc/status/${activeCommandId}`);
@@ -1927,19 +1685,18 @@
                                     commandPollInterval = null;
 
                                     if (pJson.status === 'success') {
-                                        txtEl.textContent = '✅ Berhasil Dieksekusi';
+                                        txtEl.textContent = 'Ã¢Å“â€¦ Berhasil Dieksekusi';
                                         btn.className =
                                             'w-full py-2.5 rounded-lg font-bold text-sm bg-emerald-700 text-white cursor-not-allowed';
                                         statusText.textContent = 'Pintu bergerak ke posisi ' +
                                             target + '%';
                                         statusText.className = 'text-emerald-400';
-                                        // Update gauge bar secara visual
                                         document.getElementById('awgc-bukaan-value').textContent =
                                             target;
                                         document.getElementById('awgc-bukaan-bar').style.width =
                                             target + '%';
                                     } else {
-                                        txtEl.textContent = '⚠️ Gagal di Alat';
+                                        txtEl.textContent = 'Ã¢Å¡Â Ã¯Â¸Â Gagal di Alat';
                                         btn.className =
                                             'w-full py-2.5 rounded-lg font-bold text-sm bg-red-900/60 text-red-300 cursor-not-allowed';
                                         statusText.textContent = pJson.pesan_error ||
@@ -1954,27 +1711,19 @@
                         }, 3000);
 
                     } catch (e) {
-                        txtEl.textContent = '❌ Error Jaringan';
+                        txtEl.textContent = 'Ã¢ÂÅ’ Error Jaringan';
                         statusText.textContent = 'Periksa koneksi internet Anda.';
                         statusText.className = 'text-red-400';
                         setTimeout(resetAwgcButton, 4000);
                     }
                 };
-
-                // ─────────────────────────────────────────────────────────────────
-                // WEBSOCKET — Laravel Echo Real-Time Listener
-                // Aktif hanya jika VITE_ENABLE_ECHO=true di .env
-                // ─────────────────────────────────────────────────────────────────
                 @if (env('VITE_ENABLE_ECHO') === 'true')
                     if (window.Echo) {
                         window.Echo.channel('sensor.data')
                             .listen('SensorDataUpdated', (payload) => {
                                 console.log('[Skema WS] Event diterima:', payload);
-
-                                // Update node di cache data topologi
                                 const nodeIdx = currentTopologyData.nodes.findIndex(n => n.id === payload.node_id);
                                 if (nodeIdx !== -1) {
-                                    // Merge payload ke node data
                                     Object.assign(currentTopologyData.nodes[nodeIdx], {
                                         tma: payload.tma,
                                         bukaan_persen: payload.bukaan_persen,
@@ -1983,17 +1732,11 @@
                                         is_online: true,
                                         last_time: payload.waktu,
                                     });
-
-                                    // Tangkap bukaan aktual maupun target dari bypass simulasi
                                     const actualPercent = payload.bukaan_persen !== undefined ? payload.bukaan_persen : payload.target_persen;
-
-                                    // Update struktur gates jika ada
                                     if (actualPercent !== undefined) {
                                         if (currentTopologyData.nodes[nodeIdx].gates && currentTopologyData.nodes[nodeIdx].gates.length > 0) {
                                             currentTopologyData.nodes[nodeIdx].gates[0].bukaan_persen = actualPercent;
                                         }
-                                        
-                                        // Inject manual "status" pada node dan jalurnya agar dibaca oleh fungsi bfsCalculateFlow
                                         let newStatus = 'open';
                                         if (actualPercent <= 0) {
                                             newStatus = 'closed';
@@ -2001,25 +1744,17 @@
                                             newStatus = 'trickle';
                                         }
                                         currentTopologyData.nodes[nodeIdx].status = newStatus;
-
-                                        // UPDATE STATUS PADA EDGES (Paling Penting untuk merubah aliran downstream)
                                         currentTopologyData.edges.forEach(edge => {
                                             if (edge.source === payload.node_id) {
                                                 edge.status = newStatus;
                                             }
                                         });
                                     }
-
-                                    // Selalu re-render (sekarang memakai mode update atribut, bukan innerHTML= '')
                                     drawNetwork(currentTopologyData.nodes, currentTopologyData.edges);
-
-                                    // Jika panel yang terbuka adalah node ini, refresh panelnya
                                     if (activeNodeData && activeNodeData.id === payload.node_id) {
                                         showInfoPanel(currentTopologyData.nodes[nodeIdx]);
                                     }
                                 }
-
-                                // Handle konfirmasi perintah AWGC
                                 if (payload.event_type === 'command_confirmed' && payload.command_id ==
                                     activeCommandId) {
                                     if (commandPollInterval) {
@@ -2030,19 +1765,17 @@
                                     const txtEl = document.getElementById('awgc-btn-text');
                                     const statusText = document.getElementById('awgc-command-status-text');
                                     if (isSuccess) {
-                                        txtEl.textContent = '✅ Berhasil (via WebSocket)';
+                                        txtEl.textContent = 'Ã¢Å“â€¦ Berhasil (via WebSocket)';
                                         statusText.textContent = 'Pintu bergerak ke posisi ' + payload
                                             .bukaan_persen + '%';
                                         statusText.className = 'text-emerald-400';
                                     } else {
-                                        txtEl.textContent = '⚠️ Gagal (via WebSocket)';
+                                        txtEl.textContent = 'Ã¢Å¡Â Ã¯Â¸Â Gagal (via WebSocket)';
                                         statusText.className = 'text-red-400';
                                     }
                                     setTimeout(resetAwgcButton, 5000);
                                 }
                             });
-
-                        // Deteksi koneksi terputus
                         window.Echo.connector.socket.on('disconnect', () => {
                             console.warn('[Skema WS] WebSocket disconnected');
                         });

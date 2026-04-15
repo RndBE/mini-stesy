@@ -1,4 +1,3 @@
-{{-- <aside class="fixed inset-y-0 left-0 hidden .w-[260px] border-r border-slate-200 bg-white lg:block"> --}}
 <aside id="mainSidebar" class="fixed top-0 left-0 z-[40] w-64 h-full transition-all duration-300 bg-white border-r">
     <div class="flex h-full flex-col">
         <div class="flex items-center justify-between px-6 py-5">
@@ -165,24 +164,21 @@
                 </button>
             </form>
 
-            <div class="mt-4 px-3 text-[11px] text-slate-400 sidebar-footer">© Beacon Engineering {{ now()->year }}
+            <div class="mt-4 px-3 text-[11px] text-slate-400 sidebar-footer">Ã‚Â© Beacon Engineering {{ now()->year }}
             </div>
         </div>
     </div>
 </aside>
 
 <style>
-    /* Hide elements until Alpine.js is ready */
-    [x-cloak] {
+[x-cloak] {
         display: none !important;
     }
 
     #mainSidebar.collapsed .sidebar-icon {
         margin-left: 0 !important;
     }
-
-    /* Mobile responsive */
-    @media (max-width: 1023px) {
+@media (max-width: 1023px) {
         #mainSidebar {
             transform: translateX(-100%);
             width: 16rem;
@@ -233,26 +229,21 @@
         }
 
     }
-
-    /* Desktop styles for collapsed state */
-    @media (min-width: 1024px) {
+@media (min-width: 1024px) {
         #mainSidebar.collapsed {
             width: 5rem;
-            /* Mini sidebar width */
-            transform: none;
+transform: none;
         }
 
         #mainSidebar.collapsed .sidebar-text,
         #mainSidebar.collapsed .sidebar-logo,
         #mainSidebar.collapsed .sidebar-footer {
             display: none;
-            /* Hide text and other elements */
-        }
+}
 
         #mainSidebar.collapsed .sidebar-nav a {
             justify-content: center;
-            /* Center icons */
-            padding-left: 0;
+padding-left: 0;
             padding-right: 0;
         }
 
@@ -273,15 +264,11 @@
         #mainSidebar.collapsed .sidebar-parent-chevron {
             display: none;
         }
-
-        /* Center brand icon if needed or hide header content strictly */
-        #mainSidebar.collapsed .px-6.py-5 {
+#mainSidebar.collapsed .px-6.py-5 {
             justify-content: center;
             padding: 1.25rem 0;
         }
-
-        /* Show a small logo or icon when collapsed if available, else standard logo hidden */
-    }
+}
 </style>
 
 <script>
@@ -295,10 +282,6 @@
         const showBackdrop = isMobile && !sidebar.classList.contains('collapsed');
         backdrop.classList.toggle('hidden', !showBackdrop);
         document.body.classList.toggle('overflow-hidden', showBackdrop);
-
-        // Turunkan seluruh stacking context peta ke bawah backdrop + sidebar
-        // dengan mengatur z-index #mapContainer (parent dari tombol dan Leaflet).
-        // Backdrop: z-40, Sidebar: z-1000 → mapContainer: z-1 = semua tertutup
         const mapContainer = document.getElementById('mapContainer');
         if (mapContainer) {
             mapContainer.style.zIndex = showBackdrop ? '1' : '';
@@ -335,8 +318,6 @@
         sidebar.classList.toggle('collapsed');
         applySidebarLayout();
         localStorage.setItem('sidebarCollapsed', String(sidebar.classList.contains('collapsed')));
-
-        // Smooth Leaflet resize selama durasi transisi sidebar (300ms)
         if (typeof map !== 'undefined') {
             const dur = 320, step = 16;
             let t = 0;
@@ -360,8 +341,6 @@
         if (!sidebar || !mainContent) return;
 
         if (isMobile) {
-            // Di mobile/tablet, sidebar selalu dimulai tertutup (collapsed = hidden via translateX)
-            // Tapi jangan simpan ke localStorage supaya tidak mengganggu state desktop
             sidebar.classList.add('collapsed');
         } else if (isSkemaIrigasi) {
             sidebar.classList.add('collapsed');

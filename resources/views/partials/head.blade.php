@@ -6,9 +6,7 @@
     <title>{{'Smart Telemetry System' }}</title>
 
     <meta http-equiv="refresh" content="600">
-
-    {{-- <link rel="icon" href="{{ asset('images/title.ico') }}"> --}}
-    <link rel="icon" href="https://be-jogja.com/assets/dist/img/title.ico">
+<link rel="icon" href="https://be-jogja.com/assets/dist/img/title.ico">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

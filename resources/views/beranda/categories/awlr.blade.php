@@ -2,10 +2,8 @@
     @include('beranda.categories.partials.logger_header')
 
     @if (($subKategoriAwlr ?? 'non_jiat') === 'jiat')
-        {{-- =========================================================== --}}
-        {{-- JIAT: UI Sumur (existing) --}}
-        {{-- =========================================================== --}}
-        <div class="grid grid-cols-12 gap-4 p-5 md:grid-cols-12">
+
+<div class="grid grid-cols-12 gap-4 p-5 md:grid-cols-12">
             <div class="col-span-12 md:col-span-8 space-y-3 md:border-r md:border-slate-200 md:pr-2">
                 <div class="text-md font-semibold text-slate-700">Data Sumur</div>
 
@@ -376,9 +374,7 @@
                                     </div>
                                 </div>
                             </div>
-
-                            {{-- LEFT: DATA AIR TANAH --}}
-                            @php
+@php
                                 $analisaUrl = $pMukaAir
                                     ? route('analisa.index', $lg->id_logger) .
                                         '?parameter=' .
@@ -396,9 +392,7 @@
                                     <span class="text-xs font-semibold text-slate-400">m</span>
                                 </div>
                             </div>
-
-                            {{-- LEFT: ELEVASI SENSOR --}}
-                            <div style="position:absolute; left:0; top:{{ $elevSensY }}px; width:{{ $cW }}px; z-index:60;"
+<div style="position:absolute; left:0; top:{{ $elevSensY }}px; width:{{ $cW }}px; z-index:60;"
                                 class="rounded-lg border-2 px-2 py-1.5 {{ $isOnline ? 'border-rose-300 bg-rose-50' : 'border-slate-300 bg-slate-100 grayscale' }}">
                                 <div
                                     class="text-[9px] font-bold uppercase tracking-wide {{ $isOnline ? 'text-rose-700' : 'text-slate-500' }}">
@@ -409,9 +403,7 @@
                                     <span class="text-xs font-semibold text-slate-400">m</span>
                                 </div>
                             </div>
-
-                            {{-- RIGHT: MUKA AIR TANAH --}}
-                            <a href="{{ $analisaUrl }}"
+<a href="{{ $analisaUrl }}"
                                 style="position:absolute; right:0; top:{{ $mukaAirY }}px; width:{{ $cW }}px; z-index:60;"
                                 class="block rounded-lg border-2 px-2 py-1.5 transition-all hover:scale-105 hover:shadow-md {{ $isOnline ? 'border-sky-300 bg-sky-50 hover:border-sky-400' : 'border-slate-300 bg-slate-100 grayscale hover:shadow-sm' }}">
                                 <div
@@ -423,9 +415,7 @@
                                     <span class="text-xs font-semibold text-slate-400">m</span>
                                 </div>
                             </a>
-
-                            {{-- RIGHT: ELEVASI POMPA --}}
-                            <div style="position:absolute; right:0; top:{{ $elevPompaY }}px; width:{{ $cW }}px; z-index:60;"
+<div style="position:absolute; right:0; top:{{ $elevPompaY }}px; width:{{ $cW }}px; z-index:60;"
                                 class="rounded-lg border-2 px-2 py-1.5 {{ $isOnline ? 'border-amber-300 bg-amber-50' : 'border-slate-300 bg-slate-100 grayscale' }}">
                                 <div
                                     class="text-[9px] font-bold uppercase tracking-wide {{ $isOnline ? 'text-amber-700' : 'text-slate-500' }}">
@@ -437,8 +427,8 @@
                                 </div>
                             </div>
 
-                        </div>{{-- end infographic container --}}
-                    </div>{{-- end overflow-x-auto wrapper --}}
+                        </div>
+                    </div>
 
                     <script>
                         (function() {
@@ -492,16 +482,10 @@
             </div>
         </div>
     @else
-        {{-- NON-JIAT: UI Sungai (sesuai gambar) --}}
-        <div class="p-5 space-y-4">
-
-            {{-- Baris atas: SVG kiri + Data Pengukuran kanan --}}
-            <div class="grid grid-cols-12 gap-4">
-
-                {{-- Kiri: SVG ilustrasi AWLR sungai --}}
-                <div class="col-span-12 md:col-span-9 space-y-3 md:border-r md:border-slate-200 md:pr-2">
+<div class="p-5 space-y-4">
+<div class="grid grid-cols-12 gap-4">
+<div class="col-span-12 md:col-span-9 space-y-3 md:border-r md:border-slate-200 md:pr-2">
                     @php
-                        // ===== Skala dinamis dari nonjiat->elevasi_min & elevasi_max =====
                         $scaleMin = is_numeric($lg->nonjiat?->elevasi_min)
                             ? (float) $lg->nonjiat->elevasi_min
                             : 0; // fallback 0 jika belum diset
@@ -509,52 +493,32 @@
                             ? (float) $lg->nonjiat->elevasi_max
                             : $scaleMin + 40; // fallback +40 dari min jika belum diset
                         $scaleMid = ($scaleMin + $scaleMax) / 2; // titik tengah (bagi 2)
-
-                        // Klem nilai TMA ke range [scaleMin, scaleMax]
                         $tmaVal = is_numeric($tma)
                             ? max($scaleMin, min($scaleMax, (float) $tma))
                             : $scaleMin;
-
-                        // Dimensi tiang_tanah.svg (306x304), fit ke h=260
                         $tiangX = 0;
                         $tiangY = 0;
                         $tiangW = 262;
                         $tiangH = 260;
-
-                        // Dimensi peil.svg (38x174), fit ke h=185
                         $scaleH = 185;
-                        $scaleW = round($scaleH * (38 / 174)); // ≈40
+                        $scaleW = round($scaleH * (38 / 174)); // Ã¢â€°Ë†40
                         $scaleX = 457;
                         $scaleY = 76;
-
-                        // peil.svg viewBox 174px, inner rect y=1.5–168
-                        $sf = $scaleH / 174; // ≈1.063
+                        $sf = $scaleH / 174; // Ã¢â€°Ë†1.063
                         $peilTopNativeY = 5.0;   // y native mark MAX
                         $peilBotNativeY = 166.0;  // y native mark MIN
 
                         $scaleTopY = $scaleY + $peilTopNativeY * $sf; // rendered y = scaleMax
                         $scaleBotY = $scaleY + $peilBotNativeY * $sf; // rendered y = scaleMin
-
-                        // px per 1 unit (linear)
                         $pxPerUnit = ($scaleBotY - $scaleTopY) / ($scaleMax - $scaleMin);
-
-                        // Posisi permukaan air
                         $waterTopY = $scaleBotY - ($tmaVal - $scaleMin) * $pxPerUnit;
                         $waterTopY = max($scaleTopY, min($scaleBotY, $waterTopY));
-
-                        // Alias agar tidak merubah nama variabel yang dipakai di bawah
                         $scaleFortyY = $scaleTopY;
                         $scaleZeroY  = $scaleBotY;
-
-                        // Area sungai
                         $riverX = 0;
                         $riverEndX = $scaleX + 4; // menyentuh tepi kiri peil
                         $riverBotY = round($scaleZeroY) + 4; // sedikit di bawah tanda "0"
-
-                        // Garis indikator TMA sejajar dengan waterTopY (sudah dikalibrasi)
                         $tmaLineY = $waterTopY;
-
-                        // SVG ilustrasi selalu berwarna (online maupun offline)
                         $waterOpac = '0.85';
                         $waveOpac  = '0.70';
                         $riverFill = 'url(#riverGrad-' . $lg->id_logger . ')';
@@ -582,17 +546,13 @@
                                     height="{{ $scaleH }}" />
                             </clipPath>
                         </defs>
-
-                        {{-- ===== AIR SUNGAI (DINAMIS) ===== --}}
-                        <path d="M{{ $riverX }},{{ $waterTopY }}
+<path d="M{{ $riverX }},{{ $waterTopY }}
                                 Q{{ round(($riverX + $riverEndX) / 2) }},{{ $waterTopY - 8 }}
                                 {{ $riverEndX }},{{ $waterTopY }}
                                 L{{ $riverEndX }},{{ $riverBotY }}
                                 L{{ $riverX }},{{ $riverBotY }} Z" fill="{{ $riverFill }}"
                             opacity="{{ $waterOpac }}" />
-
-                        {{-- Gelombang permukaan --}}
-                        @php
+@php
                             $wx1 = $riverX + 20;
                             $wx2 = round(($riverX + $riverEndX) / 2 - 40);
                             $wx3 = round(($riverX + $riverEndX) / 2 + 40);
@@ -603,32 +563,21 @@
                                 Q{{ $wx2 }},{{ $waterTopY - 5 }} {{ round(($wx1 + $wx2) / 2 + 20) }},{{ $waterTopY }}
                                 Q{{ $wx3 }},{{ $waterTopY + 4 }} {{ $wx4 }},{{ $waterTopY - 2 }}"
                             fill="none" stroke="#bae6fd" stroke-width="1.8" opacity="{{ $waveOpac }}" />
-
-                        {{-- ===== TIANG TANAH SVG ===== --}}
-                        <image href="{{ asset('sungai/tiang_tanah.svg') }}" x="{{ $tiangX }}"
+<image href="{{ asset('sungai/tiang_tanah.svg') }}" x="{{ $tiangX }}"
                             y="{{ $tiangY }}" width="{{ $tiangW }}" height="{{ $tiangH }}"
                             preserveAspectRatio="xMinYMax meet" opacity="{{ $tiangOpac }}" />
-
-                        {{-- ===== PEIL SCALE (DINAMIS, PURE SVG) ===== --}}
-                        @php
-                            // Band warna bahaya (batas nilai bebas, sesuaikan kebutuhan)
-                            // Merah:  30–40  | Kuning: 15–30  | Hijau: 0–15
+@php
                             $bandDefs = [
                                 ['from' => 30, 'to' => 40, 'fill' => '#fca5a5'], // merah
                                 ['from' => 15, 'to' => 30, 'fill' => '#fde68a'], // kuning
                                 ['from' => 0,  'to' => 15, 'fill' => '#bbf7d0'], // hijau
                             ];
                         @endphp
-
-                        {{-- Background peil scale dari file --}}
-                        <image href="{{ asset('sumur/peil.svg') }}"
+<image href="{{ asset('sumur/peil.svg') }}"
                                x="{{ $scaleX }}" y="{{ $scaleY }}"
                                width="{{ $scaleW }}" height="{{ $scaleH }}"
                                preserveAspectRatio="xMidYMid meet" />
-
-                        {{-- Tick marks + angka (label setiap 10, minor setiap 2) --}}
-                        @php
-                            // Hitung step tick agar tidak terlalu padat
+@php
                             $scaleRange  = $scaleMax - $scaleMin;
                             $tickStep    = $scaleRange > 100 ? 10 : ($scaleRange > 20 ? 5 : 2);
                             $majorStep   = $scaleRange > 100 ? 50 : ($scaleRange > 20 ? 10 : 5);
@@ -652,8 +601,7 @@
                                       fill="#78350f" font-weight="600">{{ $vRound }}</text>
                             @endif
                         @endfor
-                        {{-- Label MAX hanya jika tidak numpuk dengan major tick terakhir --}}
-                        @php
+@php
                             $lastMajorV   = floor(($scaleMax - $scaleMin) / $majorStep) * $majorStep + $scaleMin;
                             $lastMajorY   = $scaleBotY - ($lastMajorV - $scaleMin) * $pxPerUnit;
                             $maxPixGap    = $lastMajorY - $scaleTopY; // jarak vertikal SVG unit
@@ -670,25 +618,18 @@
                                   font-family="ui-sans-serif, system-ui, sans-serif"
                                   fill="#78350f" font-weight="600">{{ $scaleMax }}</text>
                         @endif
-
-                        {{-- ===== GARIS INDIKATOR TMA DI PEIL ===== --}}
-                        <line x1="{{ $scaleX - 8 }}" y1="{{ $tmaLineY }}"
+<line x1="{{ $scaleX - 8 }}" y1="{{ $tmaLineY }}"
                             x2="{{ $scaleX + $scaleW + 2 }}" y2="{{ $tmaLineY }}"
                             stroke="{{ $lineClr }}" stroke-width="2"
                             stroke-dasharray="{{ $isOnline ? 'none' : '4 3' }}" />
-                        {{-- Titik penanda --}}
-                        <circle cx="{{ $scaleX - 8 }}" cy="{{ $tmaLineY }}" r="3.5"
+<circle cx="{{ $scaleX - 8 }}" cy="{{ $tmaLineY }}" r="3.5"
                             fill="{{ $lineClr }}" opacity="{{ $isOnline ? '1' : '0.6' }}" />
                     </svg>
 
                 </div>
-
-                {{-- Kanan: Data Pengukuran (vertikal) --}}
-                <div class="col-span-12 md:col-span-3 flex flex-col justify-start gap-2">
+<div class="col-span-12 md:col-span-3 flex flex-col justify-start gap-2">
                     <div class="text-sm font-semibold text-slate-700">Data Pengukuran</div>
-
-                    {{-- Tinggi Muka Air --}}
-                    @php
+@php
                         $tmaAnalisaUrl = $pTma
                             ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pTma->nama_parameter)
                             : route('analisa.index', $lg->id_logger);
@@ -714,9 +655,7 @@
                             </div>
                         </div>
                     </a>
-
-                    {{-- Debit --}}
-                    @php
+@php
                         $debitAnalisaUrl = $pDebit
                             ? route('analisa.index', $lg->id_logger) .
                                 '?parameter=' .
@@ -739,20 +678,16 @@
                                     class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                                     {{ is_numeric($debit) ? number_format((float) $debit, 3) : '-' }}
                                 </span>
-                                <span class="text-xs font-semibold text-slate-400">m³/s</span>
+                                <span class="text-xs font-semibold text-slate-400">mÃ‚Â³/s</span>
                             </div>
                         </div>
                     </a>
                 </div>
             </div>
-
-            {{-- Baris bawah: Logger health cards --}}
-            <div class="border-t border-slate-100 pt-3">
+<div class="border-t border-slate-100 pt-3">
                 <div class="text-sm font-semibold text-slate-700 mb-2">Logger</div>
-                {{-- Override grid ke horizontal 3-kolom di semua ukuran --}}
-                <div class="grid grid-cols-3 gap-2">
-                    {{-- HUMIDITY --}}
-                    <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
+<div class="grid grid-cols-3 gap-2">
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
                         class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-300 px-3 py-2.5">
                         <div class="flex items-center gap-2">
                             <div
@@ -771,9 +706,7 @@
                             </div>
                         </div>
                     </a>
-
-                    {{-- BATTERY --}}
-                    <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
                         class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-green-300 px-3 py-2.5">
                         <div class="flex items-center gap-2">
                             <div
@@ -792,9 +725,7 @@
                             </div>
                         </div>
                     </a>
-
-                    {{-- TEMPERATURE --}}
-                    <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
+<a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
                         class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-orange-300 px-3 py-2.5">
                         <div class="flex items-center gap-2">
                             <div
@@ -808,7 +739,7 @@
                                 <div
                                     class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
                                     {{ $temp ?? '-' }}<span
-                                        class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
+                                        class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°C</span>
                                 </div>
                             </div>
                         </div>

@@ -69,8 +69,7 @@
                     <img src="{{ asset('logo/logo-awlr.svg') }}" alt="Logo" class="w-6 h-6">
                 </div>
                 <div>
-                    {{-- <h1 class="text-xl font-bold text-slate-800" x-text="selectedDeviceName || 'Pilih Pos'"></h1> --}}
-                    @if ($devices->isNotEmpty())
+@if ($devices->isNotEmpty())
                         <select id="loggerSelect" x-model="selectedDeviceId"
                             @change="switchDevice()"
                             class="appearance-none bg-transparent text-lg font-bold text-slate-800 border-none focus:ring-0 p-0 pr-8 cursor-pointer w-full md:w-auto">
@@ -92,8 +91,7 @@
                         :class="dataOnline ? 'text-emerald-600' : 'text-rose-600'">
                         <span class="w-2 h-2 rounded-full"
                             :class="dataOnline ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'"></span>
-                        {{-- {{ optional($firstDevice)->status_logger === 'online' ? 'Koneksi Terhubung' : 'Koneksi Terputus' }} --}}
-                        <span x-text="dataOnline ? 'Koneksi Terhubung' : 'Koneksi Terputus'"></span>
+<span x-text="dataOnline ? 'Koneksi Terhubung' : 'Koneksi Terputus'"></span>
                     </div>
                     <div class="text-xs text-slate-500">Terakhir diperbarui <span x-text="lastUpdate"></span></div>
                 </div>
@@ -128,8 +126,7 @@
                 <!-- Chart Header -->
                 <div class="text-center mb-6">
                     <h2 class="text-lg font-bold text-slate-900">Data Realtime <span x-text="getTabLabel()"></span></h2>
-                    {{-- <p class="text-slate-500 text-sm">{{ \Carbon\Carbon::now()->format('d F Y') }}</p> --}}
-                    <p class="text-slate-500 text-sm" x-text="moment().format('DD MMMM YYYY')"></p>
+<p class="text-slate-500 text-sm" x-text="moment().format('DD MMMM YYYY')"></p>
                 </div>
 
                 <!-- Chart Canvas -->
@@ -157,8 +154,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
-                        {{-- <template x-for="row in dataHistory" :key="row.waktu"> --}}
-                        <template x-for="(row, i) in dataHistory" :key="`${row.waktu}-${i}`">
+<template x-for="(row, i) in dataHistory" :key="`${row.waktu}-${i}`">
 
                             <tr class="hover:bg-slate-50">
                                 <td class="px-6 py-4 text-center text-slate-900" x-text="row.waktu"></td>

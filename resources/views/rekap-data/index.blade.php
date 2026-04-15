@@ -2,16 +2,14 @@
 
 @section('content')
     <div x-data="rekapData()" class="space-y-4">
-
-        {{-- Filter Bar --}}
-        <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 px-6 py-4">
+<div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 px-6 py-4">
             <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
                 <div class="flex-1 min-w-0">
                     <label class="block text-sm font-semibold text-slate-900 mb-2">Rentang Tanggal</label>
                     <div class="relative w-full" id="rkpWrap">
                         <input type="text" id="rkpRangeText"
                             class="w-full h-11 calendar-input text-sm rounded-lg pr-10 border border-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700 text-slate-700"
-                            placeholder="YYYY-MM-DD — YYYY-MM-DD" autocomplete="off" readonly />
+                            placeholder="YYYY-MM-DD â€” YYYY-MM-DD" autocomplete="off" readonly />
                         <button type="button" id="rkpBtn"
                             class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
@@ -20,19 +18,15 @@
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         </button>
-
-                        {{-- Floating Panel --}}
-                        <div id="rkpPanel"
+<div id="rkpPanel"
                             class="fixed w-[calc(100vw-32px)] max-w-[640px] rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-[9999] hidden">
-
-                            {{-- Start / End boxes --}}
-                            <div class="flex items-center gap-3">
+<div class="flex items-center gap-3">
                                 <div class="flex-1">
                                     <div id="rkpStartBox"
                                         class="h-9 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-sm text-slate-700">
                                     </div>
                                 </div>
-                                <div class="w-8 flex items-center justify-center text-slate-400">→</div>
+                                <div class="w-8 flex items-center justify-center text-slate-400">â†’</div>
                                 <div class="flex-1">
                                     <div id="rkpEndBox"
                                         class="h-9 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-sm text-slate-700">
@@ -43,14 +37,11 @@
                             <div class="mt-2 text-center text-xs text-slate-600">
                                 <span id="rkpDays">0 hari</span>
                             </div>
-
-                            {{-- Dual calendar grid --}}
-                            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {{-- Left calendar --}}
-                                <div class="rounded-xl border border-slate-200 p-3">
+<div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="rounded-xl border border-slate-200 p-3">
                                     <div class="flex items-center justify-between">
                                         <button type="button" id="rkpPrev"
-                                            class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">‹</button>
+                                            class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">â€¹</button>
                                         <div class="flex items-center gap-2">
                                             <div class="relative">
                                                 <button type="button" id="rkpMonthBtnL"
@@ -88,9 +79,7 @@
                                     </div>
                                     <div id="rkpGridL" class="mt-1 grid grid-cols-7"></div>
                                 </div>
-
-                                {{-- Right calendar --}}
-                                <div class="rounded-xl border border-slate-200 p-3">
+<div class="rounded-xl border border-slate-200 p-3">
                                     <div class="flex items-center justify-between">
                                         <div class="w-8"></div>
                                         <div class="flex items-center gap-2">
@@ -118,7 +107,7 @@
                                             </div>
                                         </div>
                                         <button type="button" id="rkpNext"
-                                            class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">›</button>
+                                            class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">â€º</button>
                                     </div>
                                     <div class="mt-3 grid grid-cols-7 gap-1 text-xs text-slate-500">
                                         <div class="text-center">Sen</div>
@@ -132,18 +121,14 @@
                                     <div id="rkpGridR" class="mt-1 grid grid-cols-7"></div>
                                 </div>
                             </div>
-
-                            {{-- Panel footer --}}
-                            <div class="mt-4 flex justify-end gap-2">
+<div class="mt-4 flex justify-end gap-2">
                                 <button type="button" id="rkpClear"
                                     class="px-4 py-2 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">Batal</button>
                                 <button type="button" id="rkpApply"
                                     class="px-4 py-2 text-xs rounded-lg bg-[#303481] text-white hover:bg-[#10134B]">Terapkan</button>
                             </div>
                         </div>
-
-                        {{-- Hidden inputs used by Alpine fetchData() --}}
-                        <input type="hidden" id="rkpStartHidden" x-ref="startDate">
+<input type="hidden" id="rkpStartHidden" x-ref="startDate">
                         <input type="hidden" id="rkpEndHidden" x-ref="endDate">
                     </div>
                 </div>
@@ -173,10 +158,7 @@
                 <p class="text-sm text-red-700 font-medium" x-text="errorMessage"></p>
             </div>
         </div>
-
-
-        {{-- Summary Cards --}}
-        <div x-show="dataLoaded" x-cloak class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<div x-show="dataLoaded" x-cloak class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div class="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 ring-1 ring-blue-200 px-5 py-4">
                 <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide">Total Logger</p>
                 <p class="text-2xl font-bold text-blue-900 mt-1" x-text="loggers.length"></p>
@@ -194,19 +176,16 @@
                 <p class="text-2xl font-bold text-orange-900 mt-1" x-text="loggers.filter(l => l.overall_pct < 95).length"></p>
             </div>
         </div>
-
-        {{-- Main Table --}}
-        <div x-show="dataLoaded" x-cloak class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
-            {{-- Legend --}}
-            <div class="px-6 py-3 border-b border-slate-200 flex flex-wrap items-center gap-4 bg-slate-50">
+<div x-show="dataLoaded" x-cloak class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
+<div class="px-6 py-3 border-b border-slate-200 flex flex-wrap items-center gap-4 bg-slate-50">
                 <span class="text-xs font-semibold text-slate-600 uppercase tracking-wide mr-2">Keterangan:</span>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block h-3 w-3 rounded-full bg-emerald-500"></span>
-                    <span class="text-xs text-slate-600">≥ 95% (Baik)</span>
+                    <span class="text-xs text-slate-600">â‰¥ 95% (Baik)</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block h-3 w-3 rounded-full bg-yellow-400"></span>
-                    <span class="text-xs text-slate-600">60–94% (Sedang)</span>
+                    <span class="text-xs text-slate-600">60â€“94% (Sedang)</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block h-3 w-3 rounded-full bg-red-500"></span>
@@ -221,14 +200,10 @@
             <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
                 <table class="w-full text-left text-sm text-slate-600 whitespace-nowrap border-separate border-spacing-0">
                     <thead class="text-xs font-bold text-neutral-950 uppercase">
-                        {{-- Row 1: Month groups (sticky label columns span both rows) --}}
-                        <tr class="bg-neutral-300">
-                            {{-- NO: disembunyikan di mobile --}}
-                            <th class="hidden sm:table-cell sticky left-0 z-30 bg-neutral-300 px-3 py-2 min-w-[2.5rem] text-center" rowspan="2">No</th>
-                            {{-- ID Logger: disembunyikan di mobile --}}
-                            <th class="hidden sm:table-cell sticky sm:left-[2.5rem] z-30 bg-neutral-300 px-4 py-2 min-w-[7rem]" rowspan="2">ID Logger</th>
-                            {{-- Nama Logger: sticky left-0 di mobile, left-[9.5rem] di sm+ --}}
-                            <th class="sticky left-0 sm:left-[9.5rem] z-30 bg-neutral-300 px-4 py-2 min-w-[8rem] sm:min-w-[11rem]" rowspan="2"
+<tr class="bg-neutral-300">
+<th class="hidden sm:table-cell sticky left-0 z-30 bg-neutral-300 px-3 py-2 min-w-[2.5rem] text-center" rowspan="2">No</th>
+<th class="hidden sm:table-cell sticky sm:left-[2.5rem] z-30 bg-neutral-300 px-4 py-2 min-w-[7rem]" rowspan="2">ID Logger</th>
+<th class="sticky left-0 sm:left-[9.5rem] z-30 bg-neutral-300 px-4 py-2 min-w-[8rem] sm:min-w-[11rem]" rowspan="2"
                                 style="box-shadow: 4px 0 6px rgba(0,0,0,0.12)">Nama Logger</th>
                             <template x-for="group in monthGroups" :key="group.label">
                                 <th class="px-4 py-2 text-center border-l-2 border-neutral-400"
@@ -237,8 +212,7 @@
                                 </th>
                             </template>
                         </tr>
-                        {{-- Row 2: Individual day numbers --}}
-                        <tr class="bg-neutral-200">
+<tr class="bg-neutral-200">
                             <template x-for="date in dates" :key="date">
                                 <th class="px-3 py-2 text-center min-w-[5.5rem] border-l border-neutral-300"
                                     x-text="formatDay(date)"></th>
@@ -248,18 +222,14 @@
                     <tbody class="divide-y divide-slate-200 bg-white">
                         <template x-for="(logger, idx) in loggers" :key="logger.id">
                             <tr class="hover:bg-slate-50 transition-colors">
-                                {{-- No: hidden di mobile --}}
-                                <td class="hidden sm:table-cell sticky left-0 z-10 bg-white px-3 py-3 text-center font-medium text-slate-500 min-w-[2.5rem] border-r border-slate-100" x-text="idx + 1"></td>
-                                {{-- ID Logger: hidden di mobile --}}
-                                <td class="hidden sm:table-cell sticky sm:left-[2.5rem] z-10 bg-white px-4 py-3 font-mono text-xs text-slate-800 min-w-[7rem] border-r border-slate-100" x-text="logger.id"></td>
-                                {{-- Nama Logger: left-0 di mobile, left-[9.5rem] di sm+ --}}
-                                <td class="sticky left-0 sm:left-[9.5rem] z-10 bg-white px-3 sm:px-4 py-3 font-semibold text-slate-900 min-w-[8rem] sm:min-w-[11rem] text-sm"
+<td class="hidden sm:table-cell sticky left-0 z-10 bg-white px-3 py-3 text-center font-medium text-slate-500 min-w-[2.5rem] border-r border-slate-100" x-text="idx + 1"></td>
+<td class="hidden sm:table-cell sticky sm:left-[2.5rem] z-10 bg-white px-4 py-3 font-mono text-xs text-slate-800 min-w-[7rem] border-r border-slate-100" x-text="logger.id"></td>
+<td class="sticky left-0 sm:left-[9.5rem] z-10 bg-white px-3 sm:px-4 py-3 font-semibold text-slate-900 min-w-[8rem] sm:min-w-[11rem] text-sm"
                                     style="box-shadow: 4px 0 6px rgba(0,0,0,0.09)" x-text="logger.name"></td>
-                                {{-- Per-day cells --}}
-                                <template x-for="day in logger.days" :key="day.date">
+<template x-for="day in logger.days" :key="day.date">
                                     <td class="px-4 py-3 text-center">
                                         <template x-if="day.expected === 0">
-                                            <span class="text-slate-400 text-xs">—</span>
+                                            <span class="text-slate-400 text-xs">â€”</span>
                                         </template>
                                         <template x-if="day.expected > 0">
                                             <div class="flex flex-col items-center gap-1">
@@ -282,9 +252,7 @@
                                 </template>
                             </tr>
                         </template>
-
-                        {{-- Empty state --}}
-                        <template x-if="loggers.length === 0 && dataLoaded">
+<template x-if="loggers.length === 0 && dataLoaded">
                             <tr>
                                 <td :colspan="5 + dates.length" class="px-6 py-12 text-center text-sm text-slate-500">
                                     Tidak ada data untuk rentang tanggal yang dipilih.
@@ -295,9 +263,7 @@
                 </table>
             </div>
         </div>
-
-        {{-- Empty state (before search) --}}
-        <div x-show="!dataLoaded && !loading" x-cloak class="text-center py-16 px-6">
+<div x-show="!dataLoaded && !loading" x-cloak class="text-center py-16 px-6">
             <div class="flex justify-center mb-6">
                 <div class="h-24 w-24 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 ring-4 ring-blue-200 flex items-center justify-center">
                     <svg class="h-12 w-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -337,7 +303,6 @@
                 },
 
                 async fetchData() {
-                    // Read from hidden inputs set by the custom range picker
                     const startInput = document.getElementById('rkpStartHidden');
                     const endInput   = document.getElementById('rkpEndHidden');
                     const sd = (startInput && startInput.value) || this.filters.start_date;
@@ -401,19 +366,14 @@
                     this.dates        = [];
                     this.loggers      = [];
                     this.errorMessage = '';
-                    // Also reset the picker UI (syncs selStart/selEnd inside the picker)
                     if (typeof window.rkpSetRange === 'function') {
                         window.rkpSetRange(sd, ed);
                     }
                 },
-
-                // e.g. "18" — just the day number for the second header row
                 formatDay(dateStr) {
                     const d = new Date(dateStr + 'T00:00:00');
                     return d.toLocaleDateString('id-ID', { day: '2-digit' });
                 },
-
-                // Compute month groups for colspan header, e.g. [{label:'Jan 2025', count:10}, {label:'Feb 2025', count:20}]
                 get monthGroups() {
                     if (!this.dates.length) return [];
                     const groups = [];
@@ -454,7 +414,6 @@
     </script>
 
     <script>
-    // ── Rekap Data Range Picker ──────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function () {
         (function initRkpRangePicker() {
             const MONTHS_ID  = ['Januari','Februari','Maret','April','Mei','Juni',
@@ -478,8 +437,6 @@
             const gridR     = document.getElementById('rkpGridR');
 
             if (!wrap || !panel || !btn || !rangeText || !gridL || !gridR) return;
-
-            // ── Helpers ──────────────────────────────────────────────────────
             const pad     = n => String(n).padStart(2, '0');
             const keyOf   = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
             const fmtDisp = d => `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
@@ -487,30 +444,18 @@
                 (new Date(b.getFullYear(), b.getMonth(), b.getDate()) -
                  new Date(a.getFullYear(), a.getMonth(), a.getDate())) / 86400000
             ) + 1;
-
-            // ── State ────────────────────────────────────────────────────────
             const now = new Date();
             const ago6 = new Date(now); ago6.setDate(now.getDate() - 6);
-
-            // Applied = what was last Terapkan-ed (persisted)
             let appliedStart = new Date(ago6.getFullYear(), ago6.getMonth(), ago6.getDate());
             let appliedEnd   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-            // Temp = live selection inside the open panel
             let tempStart = new Date(appliedStart);
             let tempEnd   = new Date(appliedEnd);
-
-            // picking=false → next click sets START; picking=true → next click sets END
             let picking = false;
-
-            // Left calendar view (right is always left + 1 month)
             let viewLeft = new Date(tempStart.getFullYear(), tempStart.getMonth(), 1);
 
             function syncRightFromLeft() {
                 return new Date(viewLeft.getFullYear(), viewLeft.getMonth() + 1, 1);
             }
-
-            // ── Position panel ───────────────────────────────────────────────
             function positionPanel() {
                 const wasHidden = panel.classList.contains('hidden');
                 if (wasHidden) {
@@ -537,8 +482,6 @@
                 panel.style.top  = top + 'px';
                 panel.style.left = left + 'px';
             }
-
-            // ── Header labels ────────────────────────────────────────────────
             function setHeaderLabels() {
                 const lY = viewLeft.getFullYear(), lM = viewLeft.getMonth();
                 const rV = syncRightFromLeft();
@@ -547,16 +490,12 @@
                 document.getElementById('rkpMonthLabelR').textContent = MONTHS_ID[rV.getMonth()];
                 document.getElementById('rkpYearLabelR').textContent  = String(rV.getFullYear());
             }
-
-            // ── Top start/end boxes ──────────────────────────────────────────
             function updateTopInfo() {
                 startBox.textContent = fmtDisp(tempStart);
                 endBox.textContent   = fmtDisp(tempEnd);
                 daysLabel.textContent = `${daysDiff(tempStart, tempEnd)} hari`;
-                rangeText.value = `${keyOf(tempStart)} — ${keyOf(tempEnd)}`;
+                rangeText.value = `${keyOf(tempStart)} â€” ${keyOf(tempEnd)}`;
             }
-
-            // ── Render one calendar grid ──────────────────────────────────────
             function isBetween(d, a, b) {
                 const t  = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
                 const ta = new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime();
@@ -571,8 +510,6 @@
                 const offset = (first.getDay() + 6) % 7; // Mon=0
 
                 targetGrid.innerHTML = '';
-
-                // Empty offset cells
                 for (let i = 0; i < offset; i++) {
                     const e = document.createElement('div');
                     e.className = 'h-9';
@@ -585,12 +522,8 @@
                     const isE  = keyOf(cur) === keyOf(tempEnd);
                     const isSE = isS && isE; // single-day (start === end)
                     const inRg = !isSE && isBetween(cur, tempStart, tempEnd);
-
-                    // ── Outer wrapper: full-width grid cell ──────────────────
                     const wrapper = document.createElement('div');
                     wrapper.className = 'relative h-9 flex items-center justify-center cursor-pointer';
-
-                    // ── Strip background (absolute, sits behind the circle) ──
                     if (!isSE && (inRg || isS || isE)) {
                         const strip = document.createElement('div');
                         strip.className = 'absolute inset-y-0 bg-[#E9EAFB] pointer-events-none';
@@ -599,8 +532,6 @@
                         else          strip.style.cssText = 'left:0;right:0';    // full width for in-range
                         wrapper.appendChild(strip);
                     }
-
-                    // ── Inner circle / day number ─────────────────────────────
                     const circle = document.createElement('div');
                     circle.textContent = String(d);
                     if (isS || isE) {
@@ -616,12 +547,10 @@
                         e.stopPropagation();
                         const clicked = new Date(y, m, d);
                         if (!picking) {
-                            // First click → set both start & end to this date
                             tempStart = clicked;
                             tempEnd   = clicked;
                             picking   = true;
                         } else {
-                            // Second click → set end, auto-swap if before start
                             tempEnd = clicked;
                             if (tempEnd.getTime() < tempStart.getTime()) {
                                 const t = tempStart; tempStart = tempEnd; tempEnd = t;
@@ -635,16 +564,12 @@
                     targetGrid.appendChild(wrapper);
                 }
             }
-
-            // ── Full render ──────────────────────────────────────────────────
             function render() {
                 setHeaderLabels();
                 updateTopInfo();
                 renderMonthGrid(gridL, viewLeft);
                 renderMonthGrid(gridR, syncRightFromLeft());
             }
-
-            // ── Open / Close ─────────────────────────────────────────────────
             function openPanel() {
                 panel.classList.remove('hidden');
                 positionPanel();
@@ -656,8 +581,6 @@
                 picking   = false;
                 closeMenus();
             }
-
-            // ── Month/Year dropdowns ─────────────────────────────────────────
             function closeMenus() {
                 ['L','R'].forEach(s => {
                     const mm = document.getElementById('rkpMonthMenu' + s);
@@ -680,7 +603,6 @@
                         if (side === 'L') {
                             viewLeft = new Date(viewLeft.getFullYear(), idx, 1);
                         } else {
-                            // Adjust viewLeft so right shows the chosen month
                             const rV = syncRightFromLeft();
                             const newR = new Date(rV.getFullYear(), idx, 1);
                             viewLeft = new Date(newR.getFullYear(), newR.getMonth() - 1, 1);
@@ -742,8 +664,6 @@
                 if (mMenu) mMenu.addEventListener('click', e => e.stopPropagation());
                 if (yMenu) yMenu.addEventListener('click', e => e.stopPropagation());
             });
-
-            // ── Navigation ───────────────────────────────────────────────────
             if (prevBtn) prevBtn.addEventListener('click', () => {
                 viewLeft = new Date(viewLeft.getFullYear(), viewLeft.getMonth() - 1, 1);
                 render();
@@ -752,8 +672,6 @@
                 viewLeft = new Date(viewLeft.getFullYear(), viewLeft.getMonth() + 1, 1);
                 render();
             });
-
-            // ── Batal (cancel) ────────────────────────────────────────────────
             clearBtn.addEventListener('click', () => {
                 tempStart = new Date(appliedStart);
                 tempEnd   = new Date(appliedEnd);
@@ -761,8 +679,6 @@
                 viewLeft  = new Date(tempStart.getFullYear(), tempStart.getMonth(), 1);
                 closePanel();
             });
-
-            // ── Terapkan (apply) ──────────────────────────────────────────────
             applyBtn.addEventListener('click', () => {
                 if (!tempStart || !tempEnd) return;
                 const diff = daysDiff(tempStart, tempEnd) - 1; // exclusive diff for 31-day cap
@@ -779,9 +695,7 @@
 
                 startHid.value  = sd;
                 endHid.value    = ed;
-                rangeText.value = `${sd} — ${ed}`;
-
-                // Sync to Alpine component
+                rangeText.value = `${sd} â€” ${ed}`;
                 const alpineEl = document.querySelector('[x-data]');
                 if (alpineEl && alpineEl._x_dataStack) {
                     const comp = alpineEl._x_dataStack[0];
@@ -792,8 +706,6 @@
                 }
                 closePanel();
             });
-
-            // ── Open/close triggers ───────────────────────────────────────────
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 panel.classList.contains('hidden') ? openPanel() : closePanel();
@@ -813,8 +725,6 @@
             window.addEventListener('resize', () => {
                 if (!panel.classList.contains('hidden')) positionPanel();
             });
-
-            // ── Expose for Alpine resetFilter() ──────────────────────────────
             window.rkpSetRange = function (sd, ed) {
                 const parseYMD = s => { const p = s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); };
                 appliedStart = sd ? parseYMD(sd) : new Date();
@@ -824,15 +734,13 @@
                 picking   = false;
                 startHid.value  = sd || '';
                 endHid.value    = ed || '';
-                rangeText.value = (sd && ed) ? `${sd} — ${ed}` : '';
+                rangeText.value = (sd && ed) ? `${sd} â€” ${ed}` : '';
                 viewLeft = new Date(tempStart.getFullYear(), tempStart.getMonth(), 1);
                 render();
             };
-
-            // ── Init with default 7-day range ────────────────────────────────
             startHid.value  = keyOf(appliedStart);
             endHid.value    = keyOf(appliedEnd);
-            rangeText.value = `${keyOf(appliedStart)} — ${keyOf(appliedEnd)}`;
+            rangeText.value = `${keyOf(appliedStart)} â€” ${keyOf(appliedEnd)}`;
             render();
             closePanel(); // start hidden
         })();

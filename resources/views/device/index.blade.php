@@ -87,20 +87,19 @@
                                         <template x-for="(param, paramIndex) in (device.params || [])"
                                             :key="param.id_param || paramIndex">
                                             <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium"
-                                                :class="paramColorClass(param.nama_parameter)" {{-- x-text="param.nama_parameter || '-'"></span> --}}
+                                                :class="paramColorClass(param.nama_parameter)" 
                                                 x-text="(param.nama_parameter || '-').replaceAll('_', ' ')"></span>
                                         </template>
                                     </div>
                                 </td>
-                                {{-- Badge Status Perbaikan --}}
-                                <td class="whitespace-nowrap px-6 py-4 text-center">
+<td class="whitespace-nowrap px-6 py-4 text-center">
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
                                         :class="device.status_perbaikan === 'perbaikan'
                                             ? 'bg-orange-100 text-orange-700'
                                             : 'bg-green-100 text-green-700'"
                                     >
-                                        <span x-show="device.status_perbaikan !== 'perbaikan'">✓</span>
-                                        <span x-show="device.status_perbaikan === 'perbaikan'">⚠</span>
+                                        <span x-show="device.status_perbaikan !== 'perbaikan'">Ã¢Å“â€œ</span>
+                                        <span x-show="device.status_perbaikan === 'perbaikan'">Ã¢Å¡Â </span>
                                         <span x-text="device.status_perbaikan === 'perbaikan' ? 'Perbaikan' : 'Normal'"></span>
                                     </span>
                                 </td>
@@ -151,12 +150,9 @@
             </template>
 
             <div class="border-t border-slate-200 bg-white px-4 py-3 sm:px-6">
-                {{-- Pagination would go here if needed --}}
-            </div>
+</div>
         </div>
-
-        {{-- DETAIL DEVICE MODAL --}}
-        <div x-show="showDetailModal" class="fixed inset-0 z-50" aria-labelledby="detail-modal-title"
+<div x-show="showDetailModal" class="fixed inset-0 z-50" aria-labelledby="detail-modal-title"
             role="dialog" aria-modal="true" style="display: none;">
             <div x-show="showDetailModal" x-transition:enter="ease-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
@@ -194,9 +190,7 @@
                     </div>
 
                     <div class="space-y-3 px-3 py-4 sm:space-y-4 sm:px-6 sm:py-5 max-h-[80vh] overflow-y-auto">
-
-                        {{-- Identitas Device --}}
-                        <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+<div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                             <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                 <img src="{{ asset('icons/identitas_icon.svg') }}" class="h-5 w-5">
                                 <p class="text-base font-bold text-slate-900">Identitas Device</p>
@@ -216,9 +210,7 @@
                                 </div>
                             </div>
                         </div>
-
-                        {{-- Lokasi Pos --}}
-                        <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+<div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                             <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                 <img src="{{ asset('icons/lokasi_icon.svg') }}" class="h-5 w-5">
                                 <p class="text-base font-bold text-slate-900">Lokasi Pos</p>
@@ -238,17 +230,13 @@
                                 </div>
                             </div>
                         </div>
-
-                        {{-- Sub Kategori (AWLR only) --}}
-                        <template x-if="isAwlrKategori(detailData.id_katlogger)">
+<template x-if="isAwlrKategori(detailData.id_katlogger)">
                             <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                                 <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                     <img src="{{ asset('icons/sub_kategori_icon.svg') }}" class="h-5 w-5">
                                     <p class="text-base font-bold text-slate-900">Sub Kategori</p>
                                 </div>
-
-                                {{-- JIAT --}}
-                                <template x-if="detailData.sub_kategori === 'JIAT'">
+<template x-if="detailData.sub_kategori === 'JIAT'">
                                     <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-5 sm:gap-6">
                                         <div>
                                             <p class="text-xs uppercase tracking-wide text-slate-400">Sub Kategori</p>
@@ -272,9 +260,7 @@
                                         </div>
                                     </div>
                                 </template>
-
-                                {{-- NON JIAT --}}
-                                <template x-if="detailData.sub_kategori === 'NON JIAT'">
+<template x-if="detailData.sub_kategori === 'NON JIAT'">
                                     <div class="grid grid-cols-3 gap-3 px-4 py-4 sm:gap-6">
                                         <div>
                                             <p class="text-xs uppercase tracking-wide text-slate-400">Sub Kategori</p>
@@ -292,18 +278,14 @@
                                         </div>
                                     </div>
                                 </template>
-
-                                {{-- Fallback jika belum ada sub kategori --}}
-                                <template x-if="detailData.sub_kategori === '-'">
+<template x-if="detailData.sub_kategori === '-'">
                                     <div class="px-4 py-4">
                                         <p class="text-sm text-slate-400">-</p>
                                     </div>
                                 </template>
                             </div>
                         </template>
-
-                        {{-- Detail Parameter --}}
-                        <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+<div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                             <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                 <img src="{{ asset('icons/param_icon.svg') }}" class="h-5 w-5">
                                 <p class="text-base font-bold text-slate-900">Detail Parameter</p>
@@ -341,11 +323,7 @@
                 </div>
             </div>
         </div>
-
-
-        {{-- SETUP DEVICE MODAL --}}
-
-        <div x-show="isAddOpen" x-transition class="fixed inset-0 z-50" aria-labelledby="modal-title"
+<div x-show="isAddOpen" x-transition class="fixed inset-0 z-50" aria-labelledby="modal-title"
             role="dialog" aria-modal="true" style="display: none;">
 
             <div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto" @click="closeAddModal()">
@@ -386,17 +364,7 @@
                                     <input type="text" name="alamat" required
                                         class="mt-1 w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
                                 </div>
-                                {{-- <div>
-                                    <label class="block text-xs font-medium text-gray-700">Pilih Instansi</label>
-                                    <select name="pilih_instansi" required
-                                        class="mt-1 w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
-                                        <option value="">-- Pilih Instansi --</option>
-                                        <template x-for="instansi in instansis" :key="instansi.id">
-                                            <option :value="instansi.id" x-text="instansi.nama"></option>
-                                        </template>
-                                    </select>
-                                </div> --}}
-                            </div>
+</div>
 
                             <!-- Latitude & Longitude -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -606,8 +574,7 @@
                                     </button>
                                 </div>
                                 <div class="px-4 py-3">
-                                    {{-- Column headers: only desktop --}}
-                                    <div class="hidden sm:grid grid-cols-[24px_1.6fr_1fr_0.9fr_52px] gap-3 px-1 pb-2 text-sm font-semibold text-gray-900">
+<div class="hidden sm:grid grid-cols-[24px_1.6fr_1fr_0.9fr_52px] gap-3 px-1 pb-2 text-sm font-semibold text-gray-900">
                                         <span class="text-center text-gray-400">#</span>
                                         <span>Nama Parameter</span>
                                         <span>Kolom Sensor</span>
@@ -617,21 +584,16 @@
 
                                     <div class="space-y-2">
                                         <template x-for="(param, index) in addData.params" :key="index">
-                                            {{-- Mobile: card, Desktop: grid row --}}
-                                            <div class="rounded-lg border border-gray-100 bg-slate-50 p-3
+<div class="rounded-lg border border-gray-100 bg-slate-50 p-3
                                                         sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0
                                                         sm:grid sm:grid-cols-[24px_1.6fr_1fr_0.9fr_52px] sm:gap-3 sm:items-start">
                                                 <input type="hidden" :name="'params[' + index + '][parameter_group_id]'"
                                                     x-model="param.parameter_group_id">
-
-                                                {{-- Nomor urut --}}
-                                                <div class="flex items-center justify-between mb-2 sm:mb-0 sm:justify-center sm:pt-2">
+<div class="flex items-center justify-between mb-2 sm:mb-0 sm:justify-center sm:pt-2">
                                                     <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold sm:w-4 sm:h-4" x-text="index + 1"></span>
                                                     <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-400 sm:hidden">Parameter <span x-text="index + 1"></span></p>
                                                 </div>
-
-                                                {{-- Nama Parameter --}}
-                                                <div class="space-y-1">
+<div class="space-y-1">
                                                     <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Nama Parameter</p>
                                                     <select x-model="param.list_parameter_id"
                                                         @change="applyListParameterToParamRow(param, addSensorOptions)"
@@ -639,8 +601,7 @@
                                                         <option value="">Isi dari List Parameter (opsional)</option>
                                                         <template x-for="lp in listParameterOptions" :key="'add-list-' + lp.id">
                                                             <option :value="String(lp.id)"
-                                                                {{-- x-text="lp.parameter_utama ? `${lp.nama_parameter} (${lp.parameter_utama})` : lp.nama_parameter"> --}}
-                                                                x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} (${(lp.parameter_utama || '').replaceAll('_',' ')})`: (lp.nama_parameter || '').replaceAll('_',' ')">
+x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} (${(lp.parameter_utama || '').replaceAll('_',' ')})`: (lp.nama_parameter || '').replaceAll('_',' ')">
                                                             </option>
                                                         </template>
                                                     </select>
@@ -648,9 +609,7 @@
                                                         x-model="param.nama_parameter" type="text" required
                                                         class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
                                                 </div>
-
-                                                {{-- Kolom Sensor & Satuan: 2-col on mobile, separate cells on desktop --}}
-                                                <div class="mt-2 grid grid-cols-2 gap-2 sm:contents">
+<div class="mt-2 grid grid-cols-2 gap-2 sm:contents">
                                                     <div>
                                                         <p class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Kolom Sensor</p>
                                                         <select :name="'params[' + index + '][kolom_sensor]'"
@@ -669,9 +628,7 @@
                                                             class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
                                                     </div>
                                                 </div>
-
-                                                {{-- Delete --}}
-                                                <div class="mt-2 flex justify-end sm:mt-0 sm:block">
+<div class="mt-2 flex justify-end sm:mt-0 sm:block">
                                                     <button type="button" @click="removeParameter(index)"
                                                         :disabled="addData.params.length === 1"
                                                         class="inline-flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
@@ -710,9 +667,7 @@
                 </div>
             </div>
         </div>
-
-        {{-- EDIT MODAL --}}
-        <div x-show="isOpen" class="fixed inset-0 z-50" aria-labelledby="modal-title" role="dialog"
+<div x-show="isOpen" class="fixed inset-0 z-50" aria-labelledby="modal-title" role="dialog"
             aria-modal="true" style="display: none;">
 
             <div class="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto"
@@ -752,9 +707,7 @@
                         <div class="px-6 py-4 space-y-6 max-h-[70vh] overflow-y-auto">
                             <input type="hidden" name="latitude" x-model="editData.latitude">
                             <input type="hidden" name="longitude" x-model="editData.longitude">
-
-                            {{-- Identitas Device --}}
-                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+<div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-4">Identitas Device</h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div>
@@ -780,9 +733,7 @@
                                     </div>
                                 </div>
                             </div>
-
-                            {{-- Sub Kategori (AWLR only) --}}
-                            <template x-if="isEditAwlr()">
+<template x-if="isEditAwlr()">
                                 <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
                                     <h4 class="text-sm font-semibold text-gray-900 mb-4">Sub Kategori</h4>
                                     <div class="flex items-center gap-8 mb-4">
@@ -909,9 +860,7 @@
                                     </template>
                                 </div>
                             </template>
-
-                            {{-- Peta Lokasi --}}
-                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+<div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-3">Pilih Lokasi di Peta</h4>
                                 <div class="grid grid-cols-2 gap-4 mb-3">
                                     <div>
@@ -943,8 +892,7 @@
                                     </button>
                                 </div>
                                 <div class="px-4 py-3">
-                                    {{-- Column headers: only desktop --}}
-                                    <div class="hidden sm:grid grid-cols-[24px_1.6fr_1fr_0.9fr_52px] gap-3 px-1 pb-2 text-sm font-semibold text-gray-900">
+<div class="hidden sm:grid grid-cols-[24px_1.6fr_1fr_0.9fr_52px] gap-3 px-1 pb-2 text-sm font-semibold text-gray-900">
                                         <span class="text-center text-gray-400">#</span>
                                         <span>Nama Parameter</span>
                                         <span>Kolom Sensor</span>
@@ -955,31 +903,25 @@
                                     <div class="space-y-2">
                                         <template x-for="(param, index) in editData.params"
                                             :key="param.id_param || 'param_' + index">
-                                            {{-- Mobile: card, Desktop: grid row --}}
-                                            <div class="rounded-lg border border-gray-100 bg-slate-50 p-3
+<div class="rounded-lg border border-gray-100 bg-slate-50 p-3
                                                         sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0
                                                         sm:grid sm:grid-cols-[24px_1.6fr_1fr_0.9fr_52px] sm:gap-3 sm:items-start">
                                                 <input type="hidden" :name="'params[' + index + '][id_param]'"
                                                     x-model="param.id_param">
                                                 <input type="hidden" :name="'params[' + index + '][parameter_group_id]'"
                                                     x-model="param.parameter_group_id">
-
-                                                {{-- Nomor urut: badge di mobile (header card), angka kecil di desktop --}}
-                                                <div class="flex items-center justify-between mb-2 sm:mb-0 sm:justify-center sm:pt-2">
+<div class="flex items-center justify-between mb-2 sm:mb-0 sm:justify-center sm:pt-2">
                                                     <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold sm:w-4 sm:h-4" x-text="index + 1"></span>
-                                                    {{-- Label hanya di mobile --}}
-                                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-400 sm:hidden">Parameter <span x-text="index + 1"></span></p>
+<p class="text-[10px] font-semibold uppercase tracking-wide text-gray-400 sm:hidden">Parameter <span x-text="index + 1"></span></p>
                                                 </div>
-
-                                                {{-- Nama Parameter --}}
-                                                <div class="space-y-1">
+<div class="space-y-1">
                                                     <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Nama Parameter</p>
                                                     <select x-model="param.list_parameter_id"
                                                         @change="applyListParameterToParamRow(param, editSensorOptions)"
                                                         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 focus:border-indigo-500 focus:ring-indigo-500">
                                                         <option value="">Isi dari List Parameter (opsional)</option>
                                                         <template x-for="lp in listParameterOptions" :key="'edit-list-' + lp.id">
-                                                            <option :value="String(lp.id)" {{-- x-text="lp.parameter_utama ? `${lp.nama_parameter} (${lp.parameter_utama})` : lp.nama_parameter"> --}}
+                                                            <option :value="String(lp.id)" 
                                                                 x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} (${(lp.parameter_utama || '').replaceAll('_',' ')})`: (lp.nama_parameter || '').replaceAll('_',' ')">
                                                             </option>
                                                         </template>
@@ -988,9 +930,7 @@
                                                         x-model="param.nama_parameter"
                                                         class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
                                                 </div>
-
-                                                {{-- Kolom Sensor & Satuan: 2-col on mobile, separate cells on desktop --}}
-                                                <div class="mt-2 grid grid-cols-2 gap-2 sm:contents">
+<div class="mt-2 grid grid-cols-2 gap-2 sm:contents">
                                                     <div>
                                                         <p class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Kolom Sensor</p>
                                                         <select :name="'params[' + index + '][kolom_sensor]'"
@@ -1010,9 +950,7 @@
                                                             class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
                                                     </div>
                                                 </div>
-
-                                                {{-- Delete --}}
-                                                <div class="mt-2 flex justify-end sm:mt-0 sm:block">
+<div class="mt-2 flex justify-end sm:mt-0 sm:block">
                                                     <button type="button" @click="removeEditParameter(index)"
                                                         :disabled="editData.params.length === 1"
                                                         class="inline-flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
@@ -1034,10 +972,7 @@
                                 </div>
                             </div>
 
-                            {{-- ═══════════════════════════════════════ --}}
-                            {{-- STATUS PERBAIKAN SECTION --}}
-                            {{-- ═══════════════════════════════════════ --}}
-                            <div class="rounded-lg border-2 border-orange-200 bg-orange-50"
+<div class="rounded-lg border-2 border-orange-200 bg-orange-50"
                                 x-data="{
                                     perbaikanLoading: false,
                                     perbaikanError: '',
@@ -1111,30 +1046,26 @@
                                     </div>
                                     <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
                                         :class="statusPerbaikan === 'perbaikan' ? 'bg-orange-500 text-white' : 'bg-green-500 text-white'"
-                                        x-text="statusPerbaikan === 'perbaikan' ? '⚠ Sedang Perbaikan' : '✓ Normal'">
+                                        x-text="statusPerbaikan === 'perbaikan' ? 'Ã¢Å¡Â  Sedang Perbaikan' : 'Ã¢Å“â€œ Normal'">
                                     </span>
                                 </div>
 
                                 <div class="p-4 space-y-4">
                                     <div x-show="perbaikanError" x-cloak class="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700" x-text="perbaikanError"></div>
                                     <div x-show="perbaikanSuccess" x-cloak class="rounded-lg bg-green-50 border border-green-200 px-3 py-2 text-sm text-green-700" x-text="perbaikanSuccess"></div>
-
-                                    {{-- Toggle Buttons --}}
-                                    <div class="flex gap-2">
+<div class="flex gap-2">
                                         <button type="button" @click="toggleNormal()" :disabled="statusPerbaikan === 'normal' || perbaikanLoading"
                                             class="flex-1 py-2.5 rounded-lg text-sm font-semibold border-2 transition-all"
                                             :class="statusPerbaikan === 'normal' ? 'bg-green-600 border-green-600 text-white' : 'bg-white border-green-300 text-green-700 hover:bg-green-50'">
-                                            ✓ Normal
+                                            Ã¢Å“â€œ Normal
                                         </button>
                                         <button type="button" @click="editData.status_perbaikan = 'perbaikan'" :disabled="perbaikanLoading"
                                             class="flex-1 py-2.5 rounded-lg text-sm font-semibold border-2 transition-all"
                                             :class="statusPerbaikan === 'perbaikan' ? 'bg-orange-500 border-orange-500 text-white' : 'bg-white border-orange-300 text-orange-700 hover:bg-orange-50'">
-                                            ⚠ Perbaikan
+                                            Ã¢Å¡Â  Perbaikan
                                         </button>
                                     </div>
-
-                                    {{-- Form perbaikan muncul saat status = perbaikan --}}
-                                    <div x-show="statusPerbaikan === 'perbaikan'" x-cloak
+<div x-show="statusPerbaikan === 'perbaikan'" x-cloak
                                         x-transition:enter="transition ease-out duration-200"
                                         x-transition:enter-start="opacity-0 -translate-y-2"
                                         x-transition:enter-end="opacity-100 translate-y-0"
@@ -1159,13 +1090,11 @@
                                         </div>
                                         <button type="button" @click="submitPerbaikan()" :disabled="perbaikanLoading"
                                             class="w-full rounded-lg bg-orange-500 py-2.5 text-sm font-semibold text-white hover:bg-orange-600 transition-colors disabled:opacity-50">
-                                            <span x-show="!perbaikanLoading">💾 Simpan Catatan Perbaikan</span>
+                                            <span x-show="!perbaikanLoading">Ã°Å¸â€™Â¾ Simpan Catatan Perbaikan</span>
                                             <span x-show="perbaikanLoading" x-cloak>Menyimpan...</span>
                                         </button>
                                     </div>
-
-                                    {{-- Riwayat Perbaikan --}}
-                                    <template x-if="perbaikanHistory.length > 0">
+<template x-if="perbaikanHistory.length > 0">
                                         <div>
                                             <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Riwayat Perbaikan</p>
                                             <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
@@ -1175,9 +1104,9 @@
                                                             <div class="flex-1 min-w-0">
                                                                 <p class="text-sm font-medium text-gray-900 leading-snug" x-text="item.keterangan"></p>
                                                                 <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500">
-                                                                    <span>📅 <span x-text="item.tanggal_perbaikan"></span></span>
-                                                                    <span>👤 <span x-text="item.petugas"></span></span>
-                                                                    <span>🕐 <span x-text="item.created_at"></span></span>
+                                                                    <span>Ã°Å¸â€œâ€¦ <span x-text="item.tanggal_perbaikan"></span></span>
+                                                                    <span>Ã°Å¸â€˜Â¤ <span x-text="item.petugas"></span></span>
+                                                                    <span>Ã°Å¸â€¢Â <span x-text="item.created_at"></span></span>
                                                                 </div>
                                                             </div>
                                                             <span class="flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold"
@@ -1321,15 +1250,11 @@
                     const devices = Array.isArray(this.allDevices) ? this.allDevices : [];
                     const q = (this.searchQuery || '').trim();
                     if (!q) return devices;
-
-                    // Fuzzy on text/description fields
                     const fuse = new Fuse(devices, {
                         threshold: 0.35,
                         keys: ['nama_lokasi', 'alamat']
                     });
                     const fuzzyResults = fuse.search(q).map(r => r.item);
-
-                    // Exact on ID field
                     const ql = q.toLowerCase();
                     const exactResults = devices.filter(d =>
                         d.id_logger && d.id_logger.toLowerCase().includes(ql)
@@ -1370,7 +1295,6 @@
                 },
 
                 async openAddModal() {
-                    // Fetch dropdown data
                     try {
                         const response = await fetch('{{ route('device.create') }}')
                         const data = await response.json()
@@ -1381,8 +1305,6 @@
                     }
 
                     this.isAddOpen = true
-
-                    // Initialize map after modal is shown
                     this.$nextTick(() => {
                         this.initAddDeviceMap()
                     })
@@ -1390,7 +1312,6 @@
 
                 closeAddModal() {
                     this.isAddOpen = false
-                    // Reset form
                     this.addData = {
                         latitude: '',
                         longitude: '',
@@ -1414,8 +1335,6 @@
                             parameter_group_id: ''
                         }]
                     }
-
-                    // Destroy map
                     if (this.addDeviceMap) {
                         this.addDeviceMap.remove()
                         this.addDeviceMap = null
@@ -1426,13 +1345,9 @@
                 initAddDeviceMap() {
                     this.$nextTick(() => {
                         if (!document.getElementById('addDeviceMap')) return
-
-                        // Clean up existing map if any
                         if (this.addDeviceMap) {
                             this.addDeviceMap.remove()
                         }
-
-                        // Default center: Jakarta
                         const defaultLat = this.addData.latitude || -6.200000
                         const defaultLng = this.addData.longitude || 106.816666
                         const defaultZoom = 13
@@ -1452,32 +1367,24 @@
                             iconAnchor:  [17, 56],
                             popupAnchor: [0, -56]
                         });
-
-                        // Create draggable marker if coordinates exist
                         if (this.addData.latitude && this.addData.longitude) {
                             this.addDeviceMarker = L.marker([defaultLat, defaultLng], {
                                 draggable: true,
                                 icon: customMarkerIcon
                             }).addTo(this.addDeviceMap)
                         } else {
-                            // Create marker at default position
                             this.addDeviceMarker = L.marker([defaultLat, defaultLng], {
                                 draggable: true,
                                 icon: customMarkerIcon
                             }).addTo(this.addDeviceMap)
-                            // Set initial coordinates
                             this.addData.latitude = defaultLat.toFixed(6)
                             this.addData.longitude = defaultLng.toFixed(6)
                         }
-
-                        // Map click event - update coordinates and move marker
                         this.addDeviceMap.on('click', (e) => {
                             this.addData.latitude = e.latlng.lat.toFixed(6)
                             this.addData.longitude = e.latlng.lng.toFixed(6)
                             this.addDeviceMarker.setLatLng(e.latlng)
                         })
-
-                        // Marker drag event - update coordinates as marker is dragged
                         this.addDeviceMarker.on('dragend', (e) => {
                             const position = e.target.getLatLng()
                             this.addData.latitude = position.lat.toFixed(6)
@@ -1485,8 +1392,6 @@
                         })
                     })
                 },
-
-                // Update map when coordinates are manually entered
                 updateAddMapFromInputs() {
                     if (!this.addDeviceMap || !this.addDeviceMarker) return
 
@@ -1569,13 +1474,9 @@
                         this.addData.selectedLogger = logger
                         this.addData.id_katlogger = logger.id_katlogger || ''
                         this.addData.sensorCount = logger.sensor_count || 16
-
-                        // Update sensor options based on sensor count
                         this.addSensorOptions = Array.from({
                             length: logger.sensor_count
                         }, (_, i) => 'sensor' + (i + 1))
-
-                        // Reset parameters sensor selection
                         this.addData.params.forEach(param => {
                             param.kolom_sensor = ''
                         })
@@ -1656,7 +1557,6 @@
                 openDetailModal(device) {
                     const jiat = device?.jiat ?? null
                     const hasJiat = !!jiat
-                    // Sama dengan openModal: nonjiat ada → NON JIAT, kedalaman_sumur > 0 → JIAT
                     const isNonJiat = !!device?.nonjiat
                     const isJiat = !isNonJiat && parseFloat(jiat?.kedalaman_sumur ?? 0) > 0
 
@@ -1865,8 +1765,6 @@
                         id_katlogger: device.id_katlogger ?? '',
                         nama_lokasi: device.lokasi?.nama_lokasi ?? '',
                         nama_logger: device.nama_logger ?? '',
-                        // non_jiat: jika ada relasi nonjiat, ATAU kedalaman_sumur <= 0 / kosong
-                        // jiat: hanya jika kedalaman_sumur > 0 (TANPA relasi nonjiat)
                         subKategori: device.nonjiat
                             ? 'non_jiat'
                             : (parseFloat(device.jiat?.kedalaman_sumur ?? 0) > 0 ? 'jiat' : 'non_jiat'),
@@ -1881,26 +1779,16 @@
                         elevasi_max: device.nonjiat?.elevasi_max != null ? parseFloat(device.nonjiat.elevasi_max) : '',
                         elevasi_min: device.nonjiat?.elevasi_min != null ? parseFloat(device.nonjiat.elevasi_min) : '',
                     })
-
-                    // Kosongkan dulu biar Alpine reset DOM
                     this.editData.params = []
-
-                    // Generate sensor options based on sensor_count BEFORE opening modal
                     const sensorCount = parseInt(device.sensor_count ?? 16, 10)
                     const validSensorCount = (Number.isNaN(sensorCount) || sensorCount <= 0) ? 16 :
                         sensorCount
-
-                    // Always generate fresh sensor options based on actual device sensor count
                     const sensorsFromCount = Array.from({
                         length: validSensorCount
                     }, (_, i) => 'sensor' + (i + 1))
-
-                    // Get sensors from existing params to preserve any custom values
                     const sensorsFromParams = (device.params ?? [])
                         .map(p => String(p.kolom_sensor || '').trim())
                         .filter(Boolean)
-
-                    // Merge and sort sensor options
                     const mergedSensors = [...new Set([...sensorsFromCount, ...sensorsFromParams])]
                     this.editSensorOptions = mergedSensors.sort((a, b) => {
                         const aNum = parseInt(a.replace('sensor', ''), 10)
@@ -1908,21 +1796,14 @@
                         if (Number.isNaN(aNum) || Number.isNaN(bNum)) return a.localeCompare(b)
                         return aNum - bNum
                     })
-
-                    // Buka modal dulu
                     this.isOpen = true
-
-                    // Init peta setelah modal terbuka
                     this.$nextTick(() => {
                         this.initEditDeviceMap()
                     })
-
-                    // Tunggu DOM siap, baru inject params
                     this.$nextTick(() => {
                         this.editData.params = (device.params ?? []).map(p => ({
                             id_param: p.id_param,
                             list_parameter_id: '',
-                            // nama_parameter: p.nama_parameter ?? '',
                             nama_parameter: (p.nama_parameter ?? '').toString().replaceAll('_', ' '),
                             kolom_sensor: p.kolom_sensor ?? '',
                             satuan: p.satuan ?? '',
@@ -1978,8 +1859,6 @@
                             .id) ===
                         selectedId)
                     if (!selected) return
-
-                    // param.nama_parameter = selected.nama_parameter || param.nama_parameter || ''
                     const np = (selected.nama_parameter || '').toString()
                     param.nama_parameter = np ? np.replaceAll('_', ' ') : (param.nama_parameter || '')
 

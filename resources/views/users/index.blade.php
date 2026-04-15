@@ -167,8 +167,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Role</label>
-                                    {{-- Desktop/iPad: native select --}}
-                                    <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         x-model="createForm.level_user"
                                         @change="handleRoleChange('create', createForm.level_user)">
                                         <option value="">-- Pilih Role --</option>
@@ -176,8 +175,7 @@
                                             <option :value="r" x-text="r"></option>
                                         </template>
                                     </select>
-                                    {{-- Mobile: custom dropdown --}}
-                                    <div class="sm:hidden relative" x-data="{ openRole: false }">
+<div class="sm:hidden relative" x-data="{ openRole: false }">
                                         <button type="button" @click="openRole = !openRole"
                                             class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                             :class="createForm.level_user ? 'text-gray-900' : 'text-gray-400'">
@@ -207,8 +205,7 @@
                                 <label class="block text-sm font-semibold text-gray-900 mb-2">Instansi</label>
                                 <template x-if="isSuperAdminUser">
                                     <div>
-                                        {{-- Desktop/iPad: native select --}}
-                                        <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                             x-model="createForm.instansi_id"
                                             @change="syncSelectedLoggerAccess('create')">
                                             <option value="">-- Pilih Instansi --</option>
@@ -216,8 +213,7 @@
                                                 <option :value="String(inst.id)" x-text="inst.nama"></option>
                                             </template>
                                         </select>
-                                        {{-- Mobile: custom dropdown --}}
-                                        <div class="sm:hidden relative" x-data="{ openInst: false }">
+<div class="sm:hidden relative" x-data="{ openInst: false }">
                                             <button type="button" @click="openInst = !openInst"
                                                 class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                                 :class="createForm.instansi_id ? 'text-gray-900' : 'text-gray-400'">
@@ -335,8 +331,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-gray-900 mb-2">Role</label>
-                                        {{-- Desktop/iPad: native select --}}
-                                        <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                             x-model="editForm.level_user"
                                             @change="handleRoleChange('edit', editForm.level_user)">
                                             <option value="">-- Pilih Role --</option>
@@ -344,8 +339,7 @@
                                                 <option :value="r" x-text="r"></option>
                                             </template>
                                         </select>
-                                        {{-- Mobile: custom dropdown --}}
-                                        <div class="sm:hidden relative" x-data="{ openRoleE: false }">
+<div class="sm:hidden relative" x-data="{ openRoleE: false }">
                                             <button type="button" @click="openRoleE = !openRoleE"
                                                 class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                                 :class="editForm.level_user ? 'text-gray-900' : 'text-gray-400'">
@@ -372,8 +366,7 @@
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Instansi</label>
                                     <template x-if="isSuperAdminUser">
                                         <div>
-                                            {{-- Desktop/iPad: native select --}}
-                                            <select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+<select class="hidden sm:block w-full rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                                 x-model="editForm.instansi_id"
                                                 @change="syncSelectedLoggerAccess('edit')">
                                                 <option value="">-- Pilih Instansi --</option>
@@ -381,8 +374,7 @@
                                                     <option :value="String(inst.id)" x-text="inst.nama"></option>
                                                 </template>
                                             </select>
-                                            {{-- Mobile: custom dropdown --}}
-                                            <div class="sm:hidden relative" x-data="{ openInstE: false }">
+<div class="sm:hidden relative" x-data="{ openInstE: false }">
                                                 <button type="button" @click="openInstE = !openInstE"
                                                     class="w-full flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2 bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                                     :class="editForm.instansi_id ? 'text-gray-900' : 'text-gray-400'">
@@ -431,9 +423,7 @@
                                             class="text-xs text-slate-500">Logger belum tersedia untuk instansi ini.</div>
                                     </div>
                                 </div>
-
-                                {{-- Status Akun: HANYA tampil untuk Superadmin --}}
-                                <template x-if="isSuperAdminUser">
+<template x-if="isSuperAdminUser">
                                     <div class="border border-slate-200 rounded-lg p-4 bg-slate-50 space-y-3">
                                         <label class="block text-sm font-semibold text-gray-900">Status Akun</label>
                                         <div class="flex gap-2">
@@ -441,23 +431,22 @@
                                                 @click="editForm.status = 'aktif'"
                                                 :class="editForm.status === 'aktif' ? 'bg-green-600 text-white ring-2 ring-green-400' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'"
                                                 class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all">
-                                                ✓ Aktif
+                                                âœ“ Aktif
                                             </button>
                                             <button type="button"
                                                 @click="editForm.status = 'suspend'"
                                                 :class="editForm.status === 'suspend' ? 'bg-yellow-500 text-white ring-2 ring-yellow-300' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'"
                                                 class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all">
-                                                ⏸ Suspend
+                                                â¸ Suspend
                                             </button>
                                             <button type="button"
                                                 @click="editForm.status = 'non-aktif'"
                                                 :class="editForm.status === 'non-aktif' ? 'bg-red-600 text-white ring-2 ring-red-400' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'"
                                                 class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all">
-                                                ✕ Non-Aktif
+                                                âœ• Non-Aktif
                                             </button>
                                         </div>
-                                        {{-- Textarea pesan suspend, hanya muncul jika status = suspend --}}
-                                        <div x-show="editForm.status === 'suspend'" x-cloak>
+<div x-show="editForm.status === 'suspend'" x-cloak>
                                             <label class="block text-xs font-semibold text-yellow-700 mb-1">Pesan untuk User (wajib diisi):</label>
                                             <textarea x-model="editForm.suspend_reason" rows="3"
                                                 placeholder="Contoh: Akun Anda di-suspend karena belum menyelesaikan administrasi bulan ini. Hubungi admin untuk informasi lebih lanjut."
@@ -585,21 +574,15 @@
                 filteredUsers() {
                     const q = (this.searchQuery || '').toLowerCase().trim();
                     if (!q) return this.users;
-
-                    // Fuzzy search on name/text fields
                     const fuse = new Fuse(this.users, {
                         threshold: 0.35,
                         keys: ['nama', 'instansi']
                     });
                     const fuzzyResults = fuse.search(this.searchQuery.trim()).map(r => r.item);
-
-                    // Exact search on code/ID fields
                     const exactResults = this.users.filter(u =>
                         (u.username || '').toLowerCase().includes(q) ||
                         (u.level_user || '').toLowerCase().includes(q)
                     );
-
-                    // Merge & deduplicate
                     const seen = new Set();
                     return [...fuzzyResults, ...exactResults].filter(u => {
                         if (seen.has(u.id)) return false;
@@ -852,7 +835,6 @@
                         this.editForm.logger_access.forEach((id) => formData.append('logger_access[]', id));
                         formData.append('_token', '{{ csrf_token() }}');
                         formData.append('_method', 'PUT');
-                        // Kirim status & suspend_reason (controller akan filter hanya untuk superadmin)
                         formData.append('status', this.editForm.status || 'aktif');
                         if (this.editForm.status === 'suspend') {
                             formData.append('suspend_reason', this.editForm.suspend_reason || '');

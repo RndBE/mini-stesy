@@ -13,14 +13,10 @@
                     : '-';
                 $jamRange = now()->format('H:00') . ' - ' . now()->format('H:59');
                 $tanggalHarian = now()->format('d M Y');
-
-                // Tentukan siang/malam berdasarkan waktu terakhir logger kirim data
                 $loggerWaktu   = $lg->latest_waktu ? \Carbon\Carbon::parse($lg->latest_waktu) : now();
                 $loggerHour    = (int) $loggerWaktu->format('H');
                 $isPagi        = ($loggerHour >= 6 && $loggerHour < 18);
                 $waktuSuffix   = $isPagi ? '' : '_malam';
-
-                // State yang punya varian  / _malam
                 $timeAwareStates = ['tidak_hujan', 'hujan_sangat_ringan', 'hujan_ringan'];
 
                 $iconStatePerJam = preg_match('/^[a-z0-9_]+$/', (string) $stateHujanPerJam)
@@ -29,8 +25,6 @@
                 $iconStateHarian = preg_match('/^[a-z0-9_]+$/', (string) $stateHujanHarian)
                     ? $stateHujanHarian
                     : 'tidak_hujan';
-
-                // Tambahkan suffix /_malam untuk state yang relevan
                 if (in_array($iconStatePerJam, $timeAwareStates)) {
                     $iconStatePerJam .= $waktuSuffix;
                 }

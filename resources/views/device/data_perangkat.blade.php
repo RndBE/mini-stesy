@@ -267,15 +267,13 @@
                                         <label for="create_kategori"
                                             class="block text-xs font-medium text-gray-700">Kategori
                                             Perangkat</label>
-                                        {{-- Desktop/iPad: native select --}}
-                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.id_katlogger">
+<select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.id_katlogger">
                                             <option value="">Pilih Kategori</option>
                                             @foreach ($kategoris as $kategori)
                                                 <option value="{{ $kategori->id_katlogger }}">{{ $kategori->nama_kategori }}</option>
                                             @endforeach
                                         </select>
-                                        {{-- Mobile: custom dropdown --}}
-                                        <div class="sm:hidden mt-1 relative" x-data="{ openCKat: false }">
+<div class="sm:hidden mt-1 relative" x-data="{ openCKat: false }">
                                             <button type="button" @click="openCKat = !openCKat"
                                                 class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                                 :class="formData.id_katlogger ? 'text-gray-900' : 'text-gray-400'">
@@ -300,15 +298,13 @@
                                         <label for="create_instansi"
                                             class="block text-xs font-medium text-gray-700">Instansi
                                         </label>
-                                        {{-- Desktop/iPad: native select --}}
-                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.instansi_id">
+<select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.instansi_id">
                                             <option value="">Pilih Instansi</option>
                                             @foreach ($instansis as $instansi)
                                                 <option value="{{ $instansi->id }}">{{ $instansi->nama }}</option>
                                             @endforeach
                                         </select>
-                                        {{-- Mobile: custom dropdown --}}
-                                        <div class="sm:hidden mt-1 relative" x-data="{ openCInst: false }">
+<div class="sm:hidden mt-1 relative" x-data="{ openCInst: false }">
                                             <button type="button" @click="openCInst = !openCInst"
                                                 class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                                 :class="formData.instansi_id ? 'text-gray-900' : 'text-gray-400'">
@@ -334,14 +330,12 @@
                                     <div>
                                         <label for="create_jumlah_sensor" class="block text-xs font-medium text-gray-700">
                                             Jumlah Sensor</label>
-                                        {{-- Desktop/iPad: native select --}}
-                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.jumlah_sensor">
+<select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.jumlah_sensor">
                                             <option value="">Pilih Sensor</option>
                                             <option value="16">16 Sensor</option>
                                             <option value="19">19 Sensor</option>
                                         </select>
-                                        {{-- Mobile: custom dropdown --}}
-                                        <div class="sm:hidden mt-1 relative" x-data="{ openCSensor: false }">
+<div class="sm:hidden mt-1 relative" x-data="{ openCSensor: false }">
                                             <button type="button" @click="openCSensor = !openCSensor"
                                                 class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                                 :class="formData.jumlah_sensor ? 'text-gray-900' : 'text-gray-400'">
@@ -512,15 +506,13 @@
                                         <label for="edit_kategori"
                                             class="block text-xs font-medium text-gray-700">Kategori
                                             Perangkat</label>
-                                        {{-- Desktop/iPad: native select --}}
-                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.id_katlogger">
+<select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.id_katlogger">
                                             <option value="">Pilih Kategori</option>
                                             @foreach ($kategoris as $kategori)
                                                 <option value="{{ $kategori->id_katlogger }}">{{ $kategori->nama_kategori }}</option>
                                             @endforeach
                                         </select>
-                                        {{-- Mobile: custom dropdown --}}
-                                        <div class="sm:hidden mt-1 relative" x-data="{ openEKat: false }">
+<div class="sm:hidden mt-1 relative" x-data="{ openEKat: false }">
                                             <button type="button" @click="openEKat = !openEKat"
                                                 class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                                 :class="formData.id_katlogger ? 'text-gray-900' : 'text-gray-400'">
@@ -544,15 +536,13 @@
                                     <div>
                                         <label for="edit_instansi"
                                             class="block text-xs font-medium text-gray-700">Instansi</label>
-                                        {{-- Desktop/iPad: native select --}}
-                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.instansi_id">
+<select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.instansi_id">
                                             <option value="">Pilih Instansi</option>
                                             @foreach ($instansis as $instansi)
                                                 <option value="{{ $instansi->id }}">{{ $instansi->nama }}</option>
                                             @endforeach
                                         </select>
-                                        {{-- Mobile: custom dropdown --}}
-                                        <div class="sm:hidden mt-1 relative" x-data="{ openEInst: false }">
+<div class="sm:hidden mt-1 relative" x-data="{ openEInst: false }">
                                             <button type="button" @click="openEInst = !openEInst"
                                                 class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                                 :class="formData.instansi_id ? 'text-gray-900' : 'text-gray-400'">
@@ -578,14 +568,12 @@
                                     <div>
                                         <label for="edit_jumlah_sensor" class="block text-xs font-medium text-gray-700">
                                             Jumlah Sensor</label>
-                                        {{-- Desktop/iPad: native select --}}
-                                        <select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.jumlah_sensor">
+<select class="hidden sm:block mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-2" x-model="formData.jumlah_sensor">
                                             <option value="">Pilih Sensor</option>
                                             <option value="16">16 Sensor</option>
                                             <option value="19">19 Sensor</option>
                                         </select>
-                                        {{-- Mobile: custom dropdown --}}
-                                        <div class="sm:hidden mt-1 relative" x-data="{ openESensor: false }">
+<div class="sm:hidden mt-1 relative" x-data="{ openESensor: false }">
                                             <button type="button" @click="openESensor = !openESensor"
                                                 class="w-full flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 bg-white text-sm text-left focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                                 :class="formData.jumlah_sensor ? 'text-gray-900' : 'text-gray-400'">
@@ -797,15 +785,11 @@
                 filteredDevices() {
                     const q = (this.searchQuery || '').trim();
                     if (!q) return this.allDevices;
-
-                    // Fuzzy on name/text fields
                     const fuse = new Fuse(this.allDevices, {
                         threshold: 0.35,
                         keys: ['nama_logger', 'instansi', 'nama_penjaga']
                     });
                     const fuzzyResults = fuse.search(q).map(r => r.item);
-
-                    // Exact on code/ID fields
                     const ql = q.toLowerCase();
                     const exactResults = this.allDevices.filter(d =>
                         (d.id_logger && d.id_logger.toLowerCase().includes(ql)) ||
@@ -885,7 +869,6 @@
                     this.showCreateModal = false;
                     this._fpCreate.forEach(fp => fp.destroy());
                     this._fpCreate = [];
-                    // Reset input types kembali ke date untuk desktop
                     ['create_tanggal_pemasangan', 'create_masa_garansi', 'create_awal_kontrak'].forEach(id => {
                         const el = document.getElementById(id);
                         if (el && el.type === 'text') { el.type = 'date'; el.readOnly = false; el.removeAttribute('placeholder'); }
@@ -919,7 +902,6 @@
                     this.showEditModal = false;
                     this._fpEdit.forEach(fp => fp.destroy());
                     this._fpEdit = [];
-                    // Reset input types kembali ke date untuk desktop
                     ['tanggal_pemasangan', 'masa_garansi', 'awal_kontrak'].forEach(id => {
                         const el = document.getElementById(id);
                         if (el && el.type === 'text') { el.type = 'date'; el.readOnly = false; el.removeAttribute('placeholder'); }

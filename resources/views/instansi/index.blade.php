@@ -589,15 +589,11 @@
                 filteredInstansi() {
                     const q = (this.searchQuery || '').trim();
                     if (!q) return this.allInstansi;
-
-                    // Fuzzy on text fields
                     const fuse = new Fuse(this.allInstansi, {
                         threshold: 0.35,
                         keys: ['nama', 'alamat']
                     });
                     const fuzzyResults = fuse.search(q).map(r => r.item);
-
-                    // Exact on code fields
                     const ql = q.toLowerCase();
                     const exactResults = this.allInstansi.filter(item =>
                         (item.telp && item.telp.toLowerCase().includes(ql)) ||
@@ -871,8 +867,6 @@
                 }
             }
         }
-
-        // Auto-open create modal if there are validation errors for create
         @if ($errors->any() && old('_method') !== 'PUT')
             document.addEventListener('alpine:init', () => {
                 setTimeout(() => {
@@ -887,8 +881,6 @@
                 }
             });
         @endif
-
-        // Auto-open edit modal if there are validation errors for edit
         @if ($errors->any() && old('_method') === 'PUT')
             document.addEventListener('alpine:init', () => {
                 setTimeout(() => {
