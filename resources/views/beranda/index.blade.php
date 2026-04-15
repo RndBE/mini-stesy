@@ -1,6 +1,10 @@
 @extends('layouts.app')
 @section('content')
     <style>
+        .col-span-12 {
+            grid-column: span 12 / span 12;
+        }
+
         @media (min-width: 768px) {
             .md\:col-span-3 {
                 grid-column: span 3 / span 3;
@@ -41,6 +45,72 @@
 
             .md\:text-left {
                 text-align: left;
+            }
+        }
+
+        @media (min-width: 640px) {
+            .sm\:top-10 {
+                top: 2.5rem;
+            }
+
+            .sm\:mt-24 {
+                margin-top: 6rem;
+            }
+
+            .sm\:h-28 {
+                height: 7rem;
+            }
+
+            .sm\:w-28 {
+                width: 7rem;
+            }
+
+            .sm\:px-3 {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+
+            .sm\:py-2\.5 {
+                padding-top: 0.625rem;
+                padding-bottom: 0.625rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .lg\:h-32 {
+                height: 8rem;
+            }
+
+            .lg\:w-32 {
+                width: 8rem;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .xl\:mt-28 {
+                margin-top: 7rem;
+            }
+        }
+
+        @media (min-width: 1536px) {
+            .\32xl\:top-7 {
+                top: 1.75rem;
+            }
+
+            .\32xl\:h-36 {
+                height: 9rem;
+            }
+
+            .\32xl\:w-36 {
+                width: 9rem;
+            }
+
+            .\32xl\:mt-32 {
+                margin-top: 8rem;
             }
         }
     </style>
