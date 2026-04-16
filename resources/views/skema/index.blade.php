@@ -132,7 +132,7 @@
                     </div>
 <div id="panel-wb-wrap" class="hidden px-4 py-3 border-b border-slate-800/80 bg-slate-900/40">
                         <div class="text-[9px] font-bold text-orange-400 border-b border-orange-900/30 pb-1 mb-2 uppercase tracking-widest flex items-center gap-1.5">
-                            Ã°Å¸â€œÅ  Simulasi Kinerja (Water Balance)
+                            📊  Simulasi Kinerja (Water Balance)
                         </div>
                         <div class="grid grid-cols-2 gap-3 mb-2">
                             <div class="bg-slate-800/70 p-1.5 rounded border border-slate-700/50">
@@ -1640,7 +1640,7 @@
                     btn.disabled = true;
                     btn.className =
                         'w-full py-2.5 rounded-lg font-bold text-sm bg-slate-700 text-slate-400 cursor-not-allowed';
-                    txtEl.textContent = 'Ã¢ÂÂ³ Mengirim perintah...';
+                    txtEl.textContent = '↑ Mengirim perintah...';
                     statusBox.classList.remove('hidden');
                     statusText.textContent = 'Menyambung ke MQTT broker...';
                     statusText.className = 'text-slate-400';
@@ -1663,7 +1663,7 @@
                         const json = await res.json();
 
                         if (!json.success) {
-                            txtEl.textContent = 'Ã¢ÂÅ’ Gagal Dikirim';
+                            txtEl.textContent = '✗ Gagal Dikirim';
                             statusText.textContent = json.message || 'Terjadi kesalahan.';
                             statusText.className = 'text-red-400';
                             setTimeout(resetAwgcButton, 4000);
@@ -1711,7 +1711,7 @@
                         }, 3000);
 
                     } catch (e) {
-                        txtEl.textContent = 'Ã¢ÂÅ’ Error Jaringan';
+                        txtEl.textContent = '✗ Error Jaringan';
                         statusText.textContent = 'Periksa koneksi internet Anda.';
                         statusText.className = 'text-red-400';
                         setTimeout(resetAwgcButton, 4000);

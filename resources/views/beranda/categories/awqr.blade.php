@@ -7,7 +7,7 @@
             'ph_air' => ['label' => 'pH AIR', 'satuan' => '', 'icon' => 'icons/awgr/ph_air.svg'],
             'suhu_air' => ['label' => 'SUHU AIR', 'satuan' => '°C', 'icon' => 'icons/awgr/suhu_air.svg'],
             'orp' => ['label' => 'ORP', 'satuan' => 'mV', 'icon' => 'icons/awgr/orp.svg'],
-            'conductivity' => ['label' => 'CONDUCTIVITY', 'satuan' => 'ÃŽÂ¼S/cm', 'icon' => 'icons/awgr/conductivity.svg'],
+            'conductivity' => ['label' => 'CONDUCTIVITY', 'satuan' => 'µS/cm', 'icon' => 'icons/awgr/conductivity.svg'],
             'salinity' => ['label' => 'SALINITY', 'satuan' => 'PSU', 'icon' => 'icons/awgr/salinity.svg'],
             'tds' => [
                 'label' => 'TOTAL DISSOLVED SOLIDS',

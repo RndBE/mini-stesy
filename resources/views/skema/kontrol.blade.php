@@ -80,14 +80,14 @@
                     <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-center col-span-1">
                         <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-wide">Debit</p>
                         <p class="text-xl font-bold text-emerald-800 leading-none mt-1">{{ number_format($node['debit_m3s'], 2) }}</p>
-                        <p class="text-[10px] text-emerald-400 mt-0.5">mÂ³/dtk</p>
+                        <p class="text-[10px] text-emerald-400 mt-0.5">m³/dtk</p>
                     </div>
                     @endif
                     @if(isset($node['kapasitas_m3s']))
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center col-span-1">
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Kapasitas</p>
                         <p class="text-xl font-bold text-slate-700 leading-none mt-1">{{ number_format($node['kapasitas_m3s'], 2) }}</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">mÂ³/dtk</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">m³/dtk</p>
                     </div>
                     @endif
                 </div>

@@ -16,10 +16,10 @@
                     $afmrTiangW = 265;
                     $afmrTiangH = 260;
                     $afmrScaleH = 185;
-                    $afmrScaleW = round($afmrScaleH * (38 / 174)); // Ã¢â€°Ë†40
+                    $afmrScaleW = round($afmrScaleH * (38 / 174)); // ≈40
                     $afmrScaleX = 457;
                     $afmrScaleY = 76;
-                    $afmrSf          = $afmrScaleH / 174; // Ã¢â€°Ë†1.063
+                    $afmrSf          = $afmrScaleH / 174; // ≈1.063
                     $afmrTopNativeY  = 5.0;   // y native = scaleMax
                     $afmrBotNativeY  = 166.0;  // y native = scaleMin
 

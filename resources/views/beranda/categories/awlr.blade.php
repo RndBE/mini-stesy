@@ -501,10 +501,10 @@
                         $tiangW = 262;
                         $tiangH = 260;
                         $scaleH = 185;
-                        $scaleW = round($scaleH * (38 / 174)); // Ã¢â€°Ë†40
+                        $scaleW = round($scaleH * (38 / 174)); // ≈40
                         $scaleX = 457;
                         $scaleY = 76;
-                        $sf = $scaleH / 174; // Ã¢â€°Ë†1.063
+                        $sf = $scaleH / 174; // ≈1.063
                         $peilTopNativeY = 5.0;   // y native mark MAX
                         $peilBotNativeY = 166.0;  // y native mark MIN
 

@@ -185,7 +185,7 @@
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block h-3 w-3 rounded-full bg-yellow-400"></span>
-                    <span class="text-xs text-slate-600">60â€“94% (Sedang)</span>
+                    <span class="text-xs text-slate-600">60–94% (Sedang)</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block h-3 w-3 rounded-full bg-red-500"></span>
@@ -229,7 +229,7 @@
 <template x-for="day in logger.days" :key="day.date">
                                     <td class="px-4 py-3 text-center">
                                         <template x-if="day.expected === 0">
-                                            <span class="text-slate-400 text-xs">â€”</span>
+                                            <span class="text-slate-400 text-xs">–</span>
                                         </template>
                                         <template x-if="day.expected > 0">
                                             <div class="flex flex-col items-center gap-1">
@@ -494,7 +494,7 @@
                 startBox.textContent = fmtDisp(tempStart);
                 endBox.textContent   = fmtDisp(tempEnd);
                 daysLabel.textContent = `${daysDiff(tempStart, tempEnd)} hari`;
-                rangeText.value = `${keyOf(tempStart)} â€” ${keyOf(tempEnd)}`;
+                rangeText.value = `${keyOf(tempStart)} – ${keyOf(tempEnd)}`;
             }
             function isBetween(d, a, b) {
                 const t  = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
@@ -695,7 +695,7 @@
 
                 startHid.value  = sd;
                 endHid.value    = ed;
-                rangeText.value = `${sd} â€” ${ed}`;
+                rangeText.value = `${sd} – ${ed}`;
                 const alpineEl = document.querySelector('[x-data]');
                 if (alpineEl && alpineEl._x_dataStack) {
                     const comp = alpineEl._x_dataStack[0];
@@ -734,13 +734,13 @@
                 picking   = false;
                 startHid.value  = sd || '';
                 endHid.value    = ed || '';
-                rangeText.value = (sd && ed) ? `${sd} â€” ${ed}` : '';
+                rangeText.value = (sd && ed) ? `${sd} – ${ed}` : '';
                 viewLeft = new Date(tempStart.getFullYear(), tempStart.getMonth(), 1);
                 render();
             };
             startHid.value  = keyOf(appliedStart);
             endHid.value    = keyOf(appliedEnd);
-            rangeText.value = `${keyOf(appliedStart)} â€” ${keyOf(appliedEnd)}`;
+            rangeText.value = `${keyOf(appliedStart)} – ${keyOf(appliedEnd)}`;
             render();
             closePanel(); // start hidden
         })();

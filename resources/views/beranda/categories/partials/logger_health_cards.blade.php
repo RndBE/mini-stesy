@@ -39,7 +39,7 @@
             <div class="leading-tight text-center md:text-left min-w-0 w-full overflow-hidden">
                 <div class="text-[8px] sm:text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
                 <div class="text-sm sm:text-base md:text-xl font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                    {{ $temp ?? '-' }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">Â°C</span>
+                    {{ $temp ?? '-' }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">°C</span>
                 </div>
             </div>
         </div>

@@ -431,7 +431,7 @@
                                                 @click="editForm.status = 'aktif'"
                                                 :class="editForm.status === 'aktif' ? 'bg-green-600 text-white ring-2 ring-green-400' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'"
                                                 class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all">
-                                                âœ“ Aktif
+                                                ✔ Aktif
                                             </button>
                                             <button type="button"
                                                 @click="editForm.status = 'suspend'"

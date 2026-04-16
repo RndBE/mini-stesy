@@ -519,7 +519,7 @@
     <div class="info-panel rounded-lg" id="infoPanel">
         <div class="info-panel-header">
             <div class="info-panel-title">Informasi Logger</div>
-            <button class="info-panel-close" onclick="closeInfoPanel()">Ã—</button>
+            <button class="info-panel-close" onclick="closeInfoPanel()">×</button>
         </div>
         <div class="info-panel-body">
             <div class="info-item mb-2 pb-1">
@@ -564,7 +564,7 @@
         <div class="doc-modal-content" onclick="event.stopPropagation()">
             <div class="doc-modal-header">
                 <div class="doc-modal-title">Dokumentasi</div>
-                <button class="doc-modal-close" onclick="closeDocModal()">Ã—</button>
+                <button class="doc-modal-close" onclick="closeDocModal()">×</button>
             </div>
             <div class="doc-modal-body">
                 @if ($photos->count() > 0)
@@ -622,7 +622,7 @@
         <div class="doc-modal-content" style="max-width: 900px;" onclick="event.stopPropagation()">
             <div class="doc-modal-header">
                 <div class="doc-modal-title">Jumlah Data Masuk 30 Hari Terakhir</div>
-                <button class="doc-modal-close" onclick="closeDataMasukModal()">Ã—</button>
+                <button class="doc-modal-close" onclick="closeDataMasukModal()">×</button>
             </div>
             <div class="doc-modal-body">
                 <div style="height: 400px;">
@@ -750,7 +750,7 @@
                                         </div>
                                         <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300"
                                             :class="pumpRunning ? 'bg-amber-100 text-amber-700 animate-pulse' : pumpState === 'on' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'"
-                                            x-text="pumpRunning ? (pumpTargetState === 'on' ? 'âš™ Starting...' : 'âš™ Stopping...') : pumpState === 'on' ? 'Pump ON' : 'Pump OFF'"></span>
+                                            x-text="pumpRunning ? (pumpTargetState === 'on' ? '⚙ Starting...' : '⚙ Stopping...') : pumpState === 'on' ? 'Pump ON' : 'Pump OFF'"></span>
                                     </div>
 <div class="mt-6 flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-stretch">
 <div class="relative flex w-full flex-col items-center justify-center rounded-xl bg-gradient-to-b from-[#0b132b] to-[#0a2342] p-4 sm:w-1/3 shadow-[inset_0_4px_20px_rgba(0,0,0,0.8)] overflow-hidden">
@@ -1372,13 +1372,13 @@
                                 <div class="z-10">
                                     <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1"
                                         id="rainfallCardLabel">AKUMULASI CURAH HUJAN</div>
-                                    <div class="text-xs text-slate-400 mb-1" id="rainfallCardDate">â€”</div>
+                                    <div class="text-xs text-slate-400 mb-1" id="rainfallCardDate">–</div>
                                     <div class="flex items-baseline gap-1">
                                         <span class="text-3xl font-bold text-slate-800"
                                             id="rainfallCardTotal">0.000</span>
                                         <span class="text-sm font-semibold text-slate-500">mm</span>
                                     </div>
-                                    <div class="mt-1 text-xs font-medium" id="rainfallCardCategory">â€”</div>
+                                    <div class="mt-1 text-xs font-medium" id="rainfallCardCategory">–</div>
                                 </div>
                                 <img id="rainfallCardIcon" src="{{ asset('klasifikasi_hujan/tidak_hujan.png') }}"
                                     onerror="this.onerror=null;this.src='{{ asset('klasifikasi_hujan/tidak_hujan.png') }}';"
@@ -1415,7 +1415,7 @@
                         $phDisplayAwgr = is_numeric($latestPhAwgr) ? number_format((float)$latestPhAwgr, 2) : '-';
                         $phTimeDisplayAwgr = $latestPhTimeAwgr ? date('d-m-Y H:i:s', strtotime($latestPhTimeAwgr)) : '-';
                         $phVal = is_numeric($latestPhAwgr) ? (float)$latestPhAwgr : null;
-                        $phClassLabel = $phVal !== null ? ($phVal >= 6 && $phVal <= 9 ? 'Kelas I â€“ III' : ($phVal >= 5 ? 'Kelas IV' : 'Di Luar Baku Mutu')) : '';
+                        $phClassLabel = $phVal !== null ? ($phVal >= 6 && $phVal <= 9 ? 'Kelas I – III' : ($phVal >= 5 ? 'Kelas IV' : 'Di Luar Baku Mutu')) : '';
                         $phClassColor = $phVal !== null ? ($phVal >= 6 && $phVal <= 9 ? '#3b82f6' : ($phVal >= 5 ? '#ef4444' : '#6b7280')) : '#6b7280';
                     @endphp
 <div id="awqrParamHeader" class="hidden mb-3">
@@ -1427,11 +1427,11 @@
                                             <div class="text-xs font-semibold text-slate-700 uppercase tracking-wide" id="awqrParamLabel">NILAI PARAMETER</div>
                                             <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
                                                 <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 16 16" stroke="currentColor"><rect x="1" y="2" width="14" height="13" rx="2" stroke-width="1.5"/><path d="M1 6h14" stroke-width="1.5"/><path d="M5 1v3M11 1v3" stroke-width="1.5" stroke-linecap="round"/></svg>
-                                                <span id="awqrParamTimeSpan">â€”</span>
+                                                <span id="awqrParamTimeSpan">–</span>
                                             </div>
                                         </div>
                                         <div class="text-right leading-none">
-                                            <span class="text-3xl font-bold text-slate-800" id="awqrParamValue">â€”</span>
+                                            <span class="text-3xl font-bold text-slate-800" id="awqrParamValue">–</span>
                                             <span class="text-xs text-slate-400 ml-1" id="awqrParamUnit"></span>
                                         </div>
                                     </div>

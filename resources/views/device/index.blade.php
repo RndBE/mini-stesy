@@ -1106,7 +1106,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                                 <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500">
                                                                     <span>📅 <span x-text="item.tanggal_perbaikan"></span></span>
                                                                     <span>👤 <span x-text="item.petugas"></span></span>
-                                                                    <span>Ã°Å¸â€¢Â <span x-text="item.created_at"></span></span>
+                                                                    <span>🕒 <span x-text="item.created_at"></span></span>
                                                                 </div>
                                                             </div>
                                                             <span class="flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold"
