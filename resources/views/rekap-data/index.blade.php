@@ -9,7 +9,7 @@
                     <div class="relative w-full" id="rkpWrap">
                         <input type="text" id="rkpRangeText"
                             class="w-full h-11 calendar-input text-sm rounded-lg pr-10 border border-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700 text-slate-700"
-                            placeholder="YYYY-MM-DD â€” YYYY-MM-DD" autocomplete="off" readonly />
+                            placeholder="YYYY-MM-DD - YYYY-MM-DD" autocomplete="off" readonly />
                         <button type="button" id="rkpBtn"
                             class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"

@@ -617,7 +617,7 @@ background: rgba(0, 0, 0, 0.28);
                                 $txtCls  = $isOnline ? 'text-emerald-600' : 'text-rose-600';
                                 $statusLabel = $isOnline ? 'Koneksi Terhubung' : 'Koneksi Terputus';
                                 $fmt = function($v, $dec = 3) {
-                                    if (!is_numeric($v)) return '—';
+                                    if (!is_numeric($v)) return '-';
                                     $s = number_format((float)$v, $dec, '.', ',');
                                     if (str_contains($s, '.')) {
                                         [$int, $dec] = explode('.', $s);
@@ -653,7 +653,7 @@ background: rgba(0, 0, 0, 0.28);
 @if ($kat === 'AWLR' && ($point['sub_kategori'] ?? '') === 'jiat')
                                     <div class="text-center my-2">
                                         <div class="text-xl font-bold text-slate-900">
-                                            {{ is_numeric($point['kedalaman_sumur']) ? $fmt($point['kedalaman_sumur'], 3) . ' m' : '—' }}
+                                            {{ is_numeric($point['kedalaman_sumur']) ? $fmt($point['kedalaman_sumur'], 3) . ' m' : '-' }}
                                         </div>
                                         <div class="text-xs text-slate-500">Kedalaman Air Sumur</div>
                                     </div>
@@ -662,13 +662,13 @@ background: rgba(0, 0, 0, 0.28);
                                     <div class="grid grid-cols-2 gap-x-2 my-2">
                                         <div class="text-center">
                                             <div class="text-lg font-bold text-slate-900">
-                                                {{ is_numeric($point['tma']) ? $fmt($point['tma'], 3) . ' m' : '—' }}
+                                                {{ is_numeric($point['tma']) ? $fmt($point['tma'], 3) . ' m' : '-' }}
                                             </div>
                                             <div class="text-[10px] text-slate-500">Tinggi Muka Air</div>
                                         </div>
                                         <div class="text-center">
                                             <div class="text-lg font-bold text-slate-900">
-                                                {{ is_numeric($point['debit']) ? $fmt($point['debit'], 3) . ' m³/s' : '—' }}
+                                                {{ is_numeric($point['debit']) ? $fmt($point['debit'], 3) . ' m³/s' : '-' }}
                                             </div>
                                             <div class="text-[10px] text-slate-500">Debit</div>
                                         </div>
@@ -686,13 +686,13 @@ background: rgba(0, 0, 0, 0.28);
                                         @foreach ($afmrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ' ' . $u1 : '—' }}
+                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ' ' . $u1 : '-' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
                                             </div>
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '—' }}
+                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '-' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
                                             </div>
@@ -711,13 +711,13 @@ background: rgba(0, 0, 0, 0.28);
                                         @foreach ($arrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : '—' }}
+                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : '-' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
                                             </div>
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '—' }}
+                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '-' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
                                             </div>
@@ -738,14 +738,14 @@ background: rgba(0, 0, 0, 0.28);
                                         @foreach ($awrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : '—' }}
+                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : '-' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
                                             </div>
                                             <div class="text-center py-0.5">
                                                 @if($l2 !== '')
                                                     <div class="text-sm font-bold text-slate-900">
-                                                        {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '—' }}
+                                                        {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '-' }}
                                                     </div>
                                                     <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
                                                 @endif
@@ -766,13 +766,13 @@ background: rgba(0, 0, 0, 0.28);
                                         @foreach ($awqrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ($u1 ? ' '.$u1 : '') : '—' }}
+                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ($u1 ? ' '.$u1 : '') : '-' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
                                             </div>
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v2) ? $fmt($v2, 2) . ($u2 ? ' '.$u2 : '') : '—' }}
+                                                    {{ is_numeric($v2) ? $fmt($v2, 2) . ($u2 ? ' '.$u2 : '') : '-' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
                                             </div>
@@ -790,15 +790,15 @@ background: rgba(0, 0, 0, 0.28);
                                 @endif
 <div class="grid grid-cols-3 text-xs text-slate-600 border-t mt-1">
                                     <div class="flex flex-col items-center py-2">
-                                        <span class="text-blue-500 font-semibold">{{ $point['humidity'] !== null ? $point['humidity'].'%' : '—' }}</span>
+                                        <span class="text-blue-500 font-semibold">{{ $point['humidity'] !== null ? $point['humidity'].'%' : '-' }}</span>
                                         <span>humidity</span>
                                     </div>
                                     <div class="flex flex-col items-center border-l border-r py-2">
-                                        <span class="text-amber-500 font-semibold">{{ $point['battery'] !== null ? $point['battery'].' V' : '—' }}</span>
+                                        <span class="text-amber-500 font-semibold">{{ $point['battery'] !== null ? $point['battery'].' V' : '-' }}</span>
                                         <span>battery</span>
                                     </div>
                                     <div class="flex flex-col items-center py-2">
-                                        <span class="text-rose-500 font-semibold">{{ $point['temp'] !== null ? $point['temp'].' °C' : '—' }}</span>
+                                        <span class="text-rose-500 font-semibold">{{ $point['temp'] !== null ? $point['temp'].' °C' : '-' }}</span>
                                         <span>temp</span>
                                     </div>
                                 </div>
@@ -1289,7 +1289,7 @@ const backdrop = document.getElementById('petaSidebarBackdrop');
             marker.bindPopup(`
                 <div class="popup-header">
                 <div class="popup-title">${p.nama_logger}</div>
-                <div class="popup-close" onclick="document.querySelector('.leaflet-popup-close-button')?.click()">Ãƒâ€”</div>
+                <div class="popup-close" onclick="document.querySelector('.leaflet-popup-close-button')?.click()">X</div>
                 </div>
                 <div class="popup-body">
                 <div class="popup-info-row">
