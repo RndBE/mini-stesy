@@ -98,8 +98,8 @@
                                             ? 'bg-orange-100 text-orange-700'
                                             : 'bg-green-100 text-green-700'"
                                     >
-                                        <span x-show="device.status_perbaikan !== 'perbaikan'">Ã¢Å“â€œ</span>
-                                        <span x-show="device.status_perbaikan === 'perbaikan'">Ã¢Å¡Â </span>
+                                        <span x-show="device.status_perbaikan !== 'perbaikan'">✓</span>
+                                        <span x-show="device.status_perbaikan === 'perbaikan'">⚠</span>
                                         <span x-text="device.status_perbaikan === 'perbaikan' ? 'Perbaikan' : 'Normal'"></span>
                                     </span>
                                 </td>
@@ -1046,7 +1046,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                     </div>
                                     <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
                                         :class="statusPerbaikan === 'perbaikan' ? 'bg-orange-500 text-white' : 'bg-green-500 text-white'"
-                                        x-text="statusPerbaikan === 'perbaikan' ? 'Ã¢Å¡Â  Sedang Perbaikan' : 'Ã¢Å“â€œ Normal'">
+                                        x-text="statusPerbaikan === 'perbaikan' ? '⚠ Sedang Perbaikan' : '✓ Normal'">
                                     </span>
                                 </div>
 
@@ -1057,12 +1057,12 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                         <button type="button" @click="toggleNormal()" :disabled="statusPerbaikan === 'normal' || perbaikanLoading"
                                             class="flex-1 py-2.5 rounded-lg text-sm font-semibold border-2 transition-all"
                                             :class="statusPerbaikan === 'normal' ? 'bg-green-600 border-green-600 text-white' : 'bg-white border-green-300 text-green-700 hover:bg-green-50'">
-                                            Ã¢Å“â€œ Normal
+                                            ✓ Normal
                                         </button>
                                         <button type="button" @click="editData.status_perbaikan = 'perbaikan'" :disabled="perbaikanLoading"
                                             class="flex-1 py-2.5 rounded-lg text-sm font-semibold border-2 transition-all"
                                             :class="statusPerbaikan === 'perbaikan' ? 'bg-orange-500 border-orange-500 text-white' : 'bg-white border-orange-300 text-orange-700 hover:bg-orange-50'">
-                                            Ã¢Å¡Â  Perbaikan
+                                            ⚠ Perbaikan
                                         </button>
                                     </div>
 <div x-show="statusPerbaikan === 'perbaikan'" x-cloak
