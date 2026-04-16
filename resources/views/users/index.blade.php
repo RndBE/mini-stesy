@@ -80,9 +80,26 @@
                                             'bg-green-100 text-green-800': (u.status || 'aktif') === 'aktif',
                                             'bg-yellow-100 text-yellow-800': u.status === 'suspend',
                                             'bg-red-100 text-red-800': u.status === 'non-aktif'
-                                        }"
-                                        x-text="u.status === 'suspend' ? 'Suspend' : (u.status === 'non-aktif' ? 'Non-Aktif' : 'Aktif')"
-                                    ></span>
+                                        }">
+                                        <template x-if="(u.status || 'aktif') === 'aktif'">
+                                            <div class="flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                Aktif
+                                            </div>
+                                        </template>
+                                        <template x-if="u.status === 'suspend'">
+                                            <div class="flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                                                Suspend
+                                            </div>
+                                        </template>
+                                        <template x-if="u.status === 'non-aktif'">
+                                            <div class="flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                Non-Aktif
+                                            </div>
+                                        </template>
+                                    </span>
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
@@ -430,20 +447,29 @@
                                             <button type="button"
                                                 @click="editForm.status = 'aktif'"
                                                 :class="editForm.status === 'aktif' ? 'bg-green-600 text-white ring-2 ring-green-400' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'"
-                                                class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all">
-                                                ✔ Aktif
+                                                class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1.5">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Aktif
                                             </button>
                                             <button type="button"
                                                 @click="editForm.status = 'suspend'"
                                                 :class="editForm.status === 'suspend' ? 'bg-yellow-500 text-white ring-2 ring-yellow-300' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'"
-                                                class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all">
-                                                â¸ Suspend
+                                                class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1.5">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                                </svg>
+                                                Suspend
                                             </button>
                                             <button type="button"
                                                 @click="editForm.status = 'non-aktif'"
                                                 :class="editForm.status === 'non-aktif' ? 'bg-red-600 text-white ring-2 ring-red-400' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'"
-                                                class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all">
-                                                âœ• Non-Aktif
+                                                class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1.5">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Non-Aktif
                                             </button>
                                         </div>
 <div x-show="editForm.status === 'suspend'" x-cloak>
