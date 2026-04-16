@@ -31,37 +31,13 @@ class PetaApiController extends Controller
                 $lat = $l->lokasi?->latitude;
                 $lng = $l->lokasi?->longitude;
 
-                // Tentukan kolom waktu
-                $pTempS16 = $l->params->firstWhere('kolom_sensor', 'temp_s16');
-                $pTempS19 = $l->params->firstWhere('kolom_sensor', 'temp_s19');
-                $timeColumn = $pTempS19 ? 'temp_s19' : ($pTempS16 ? 'temp_s16' : null);
-
-                // Ambil data terbaru
-                $latest = null;
-                if ($l->tabel_main) {
-                    if ($timeColumn) {
-                        $latest = DB::table($l->tabel_main)
-                            ->where('id_logger', $l->id_logger)
-                            ->whereNotNull($timeColumn)
-                            ->orderByDesc($timeColumn)
-                            ->first();
-                    }
-                    if (!$latest) {
-                        $latest = DB::table($l->tabel_main)
-                            ->where('id_logger', $l->id_logger)
-                            ->whereNotNull('waktu')
-                            ->orderByDesc('waktu')
-                            ->first();
-                    }
-                }
+                // Ambil snapshot terbaru, prioritaskan tabel latest agar sinkron dengan waktu/status di UI.
+                $latest = $this->resolveLatestSnapshot($l);
 
                 // Sensor logger health
-                $pHumidity = $l->params->firstWhere('nama_parameter', 'humidity_logger')
-                    ?? $l->params->firstWhere('nama_parameter', 'humidity');
-                $pBattery  = $l->params->firstWhere('nama_parameter', 'battery_logger')
-                    ?? $l->params->firstWhere('nama_parameter', 'battery');
-                $pTemp     = $l->params->firstWhere('nama_parameter', 'temperature_logger')
-                    ?? $l->params->firstWhere('nama_parameter', 'temperature');
+                $pHumidity = $this->findParamByAliases($l->params, ['humidity_logger', 'humidity']);
+                $pBattery  = $this->findParamByAliases($l->params, ['battery_logger', 'battery']);
+                $pTemp     = $this->findParamByAliases($l->params, ['temperature_logger', 'temperature']);
 
                 $humidity = ($latest && $pHumidity?->kolom_sensor) ? ($latest->{$pHumidity->kolom_sensor} ?? null) : null;
                 $battery  = ($latest && $pBattery?->kolom_sensor)  ? ($latest->{$pBattery->kolom_sensor} ?? null)  : null;
@@ -70,7 +46,7 @@ class PetaApiController extends Controller
                 // Status online/offline
                 $waktu16  = optional($l->temp16)->waktu;
                 $waktu19  = optional($l->temp19)->waktu;
-                $lastTime = collect([$waktu16, $waktu19])->filter()->sortDesc()->first();
+                $lastTime = ($latest->waktu ?? null) ?: collect([$waktu16, $waktu19])->filter()->sortDesc()->first();
                 $diffMin  = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
                 $status   = ($diffMin !== null && $diffMin < 60) ? 'online' : 'offline';
 
@@ -158,5 +134,68 @@ class PetaApiController extends Controller
             }
         }
         return null;
+    }
+
+    private function findParamByAliases($params, array $aliases): mixed
+    {
+        $aliases = collect($aliases)
+            ->map(fn($alias) => strtolower(trim((string) $alias)))
+            ->filter()
+            ->values()
+            ->all();
+
+        return $params->first(function ($param) use ($aliases) {
+            $name = strtolower(trim((string) $param->nama_parameter));
+            $utama = strtolower(trim((string) $param->parameter_utama));
+
+            return in_array($name, $aliases, true) || in_array($utama, $aliases, true);
+        });
+    }
+
+    private function resolveLatestSnapshot($logger): mixed
+    {
+        $latestTemp = collect([$logger->temp16, $logger->temp19])
+            ->filter(fn($row) => $row && !empty($row->waktu))
+            ->sortByDesc(fn($row) => (string) $row->waktu)
+            ->first();
+
+        if ($latestTemp) {
+            return $latestTemp;
+        }
+
+        $pTempS16 = $logger->params->firstWhere('kolom_sensor', 'temp_s16');
+        $pTempS19 = $logger->params->firstWhere('kolom_sensor', 'temp_s19');
+        $timeColumn = $pTempS19 ? 'temp_s19' : ($pTempS16 ? 'temp_s16' : null);
+
+        if (!$logger->tabel_main) {
+            return null;
+        }
+
+        if ($timeColumn) {
+            $latest = DB::table($logger->tabel_main)
+                ->where('id_logger', $logger->id_logger)
+                ->whereNotNull($timeColumn)
+                ->orderByDesc($timeColumn)
+                ->first();
+
+            if ($latest) {
+                return $latest;
+            }
+        }
+
+        $latest = DB::table($logger->tabel_main)
+            ->where('id_logger', $logger->id_logger)
+            ->whereNotNull('waktu')
+            ->orderByDesc('waktu')
+            ->first();
+
+        if ($latest) {
+            return $latest;
+        }
+
+        return DB::table($logger->tabel_main)
+            ->where('id_logger', $logger->id_logger)
+            ->orderByDesc('id')
+            ->first();
     }
 }
