@@ -5,7 +5,7 @@
         $sensorMap = [
             'tma' => ['label' => 'TINGGI MUKA AIR', 'satuan' => 'mdpl', 'icon' => 'icons/awgr/elevasi_muka_air.svg'],
             'ph_air' => ['label' => 'pH AIR', 'satuan' => '', 'icon' => 'icons/awgr/ph_air.svg'],
-            'suhu_air' => ['label' => 'SUHU AIR', 'satuan' => 'Ã‚Â°C', 'icon' => 'icons/awgr/suhu_air.svg'],
+            'suhu_air' => ['label' => 'SUHU AIR', 'satuan' => '°C', 'icon' => 'icons/awgr/suhu_air.svg'],
             'orp' => ['label' => 'ORP', 'satuan' => 'mV', 'icon' => 'icons/awgr/orp.svg'],
             'conductivity' => ['label' => 'CONDUCTIVITY', 'satuan' => 'ÃŽÂ¼S/cm', 'icon' => 'icons/awgr/conductivity.svg'],
             'salinity' => ['label' => 'SALINITY', 'satuan' => 'PSU', 'icon' => 'icons/awgr/salinity.svg'],
@@ -66,7 +66,7 @@
 <div class="absolute" style="top:6%;left:8%;width:84%;height:55%;background:#E6E6E6;border-radius:3px;padding:4px 5px;box-sizing:border-box;font-family:ui-monospace,monospace;{{ $muted ? 'opacity:0.6' : '' }}">
                                 <div style="font-size:10px;font-weight:700;text-align:right;color:#333;line-height:1;margin-bottom:3px">pH</div>
                                 <div style="font-size:15px;font-weight:900;color:#111;line-height:1.1">{{ $phDisplay }}</div>
-                                <div style="font-size:10px;font-weight:700;color:#333;line-height:1.3">{{ $suhuDisplay }}<span style="font-size:10px">Ã‚Â°C</span></div>
+                                <div style="font-size:10px;font-weight:700;color:#333;line-height:1.3">{{ $suhuDisplay }}<span style="font-size:10px">°C</span></div>
                             </div>
 <div class="absolute flex flex-col items-center" style="bottom:10%;left:50%;transform:translateX(-50%);gap:5px">
                                 <img src="{{ asset('alat-ukur-air/tombol-alat.svg') }}" style="width:13px;height:13px;display:block" alt="">
@@ -162,7 +162,7 @@
                             <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                                 TEMPERATURE</div>
                             <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°C</span>
+                                {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
                             </div>
                         </div>
                     </a>

@@ -418,7 +418,7 @@
                     const targetPct  = this.targetValue
 
                     this.workflowSteps = [
-                        { key: 'confirm', title: 'Confirm action',            subtitle: `Target: ${targetGate} â†’ ${targetPct}%`,   status: 'done'   },
+                        { key: 'confirm', title: 'Confirm action',            subtitle: `Target: ${targetGate} → ${targetPct}%`,   status: 'done'   },
                         { key: 'mqtt',   title: 'Connecting to MQTT broker',  subtitle: 'Connecting...',                           status: 'active' },
                         { key: 'logger', title: 'Connecting to logger',        subtitle: 'Waiting for device session...',           status: 'pending' },
                         { key: 'ack',    title: 'Sending command & waiting ACK', subtitle: 'Waiting response from logger...',      status: 'pending' },

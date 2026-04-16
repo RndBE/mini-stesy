@@ -115,12 +115,12 @@
                             <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Debit Aktual</span>
                             <div>
                                 <span class="font-black text-xl text-[#0ea5e9] drop-shadow-[0_0_5px_#0ea5e9]" id="panel-debit-val">0</span>
-                                <span class="text-[10px] text-slate-500"> mÃ‚Â³/dtk</span>
+                                <span class="text-[10px] text-slate-500"> m³/dtk</span>
                             </div>
                         </div>
                         <div class="flex justify-between items-baseline mb-1.5">
                             <span class="text-[9px] text-slate-300">Kapasitas Rencana</span>
-                            <span class="text-xs text-slate-300 font-mono"><span id="panel-kapasitas-val">-</span> mÃ‚Â³/dtk</span>
+                            <span class="text-xs text-slate-300 font-mono"><span id="panel-kapasitas-val">-</span> m³/dtk</span>
                         </div>
 <div class="w-full bg-slate-700 rounded-full h-1.5 mb-1">
                             <div id="panel-debit-bar" class="h-1.5 rounded-full bg-emerald-400 transition-all duration-500" style="width:0%"></div>
@@ -137,21 +137,21 @@
                         <div class="grid grid-cols-2 gap-3 mb-2">
                             <div class="bg-slate-800/70 p-1.5 rounded border border-slate-700/50">
                                 <span class="block text-[9px] text-slate-400 mb-0.5">Q Perintah</span>
-                                <span class="font-mono text-sm text-slate-200"><span id="panel-wb-perintah">0</span> <span class="text-[9px] text-slate-500">mÃ‚Â³/s</span></span>
+                                <span class="font-mono text-sm text-slate-200"><span id="panel-wb-perintah">0</span> <span class="text-[9px] text-slate-500">m³/s</span></span>
                             </div>
                             <div class="bg-slate-800/70 p-1.5 rounded border border-emerald-900/30">
                                 <span class="block text-[9px] text-emerald-500/80 mb-0.5">Q Terukur</span>
-                                <span class="font-mono text-sm text-emerald-400"><span id="panel-wb-terukur">0</span> <span class="text-[9px] text-emerald-700">mÃ‚Â³/s</span></span>
+                                <span class="font-mono text-sm text-emerald-400"><span id="panel-wb-terukur">0</span> <span class="text-[9px] text-emerald-700">m³/s</span></span>
                             </div>
                         </div>
                         <div class="flex flex-col gap-1.5 p-2 bg-slate-800/40 rounded border border-slate-800">
                             <div class="flex justify-between items-center">
                                 <span class="text-[10px] text-slate-400">Error Deviasi</span>
-                                <span class="font-mono text-xs font-bold" id="panel-wb-err-parent"><span id="panel-wb-err-val">0</span> mÃ‚Â³/s (<span id="panel-wb-err-pct">0</span>%)</span>
+                                <span class="font-mono text-xs font-bold" id="panel-wb-err-parent"><span id="panel-wb-err-val">0</span> m³/s (<span id="panel-wb-err-pct">0</span>%)</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-[10px] text-slate-400">Selisih Vol. (1 Jam)</span>
-                                <span class="font-mono text-xs font-bold" id="panel-wb-vol-parent"><span id="panel-wb-vol">0</span> mÃ‚Â³</span>
+                                <span class="font-mono text-xs font-bold" id="panel-wb-vol-parent"><span id="panel-wb-vol">0</span> m³</span>
                             </div>
                             <div id="panel-wb-status" class="mt-1.5 px-2 py-1.5 rounded text-[10px] font-bold tracking-wider uppercase text-center border">
                                 STABIL
@@ -170,7 +170,7 @@
                     </div> <!-- Penutup area scroll -->
 <div id="container-btn-control" class="hidden px-4 py-3 bg-slate-800 z-10 border-t border-slate-700/80 flex-shrink-0 shadow-[0_-5px_15px_rgba(0,0,0,0.3)]">
                         <button id="btn-show-control" class="w-full py-2.5 rounded shadow flex items-center justify-center gap-2 font-bold text-xs transition-colors bg-cyan-900/40 hover:bg-cyan-800/60 text-cyan-300 border border-cyan-700/50 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)]">
-                            Ã¢Å¡â„¢Ã¯Â¸Â Buka Kontrol Mesin Pintu
+                            ⚙️ Buka Kontrol Mesin Pintu
                         </button>
                     </div>
                 </div>
@@ -242,15 +242,15 @@
             <span id="api-status-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
             <span id="api-status-text" class="text-[10px] font-semibold text-slate-400">Menghubungkan...</span>
             <span class="text-slate-700">|</span>
-            <span class="text-[10px] text-slate-500">Update:Ã‚Â <span id="api-last-update" class="text-slate-400 font-mono">-</span></span>
+            <span class="text-[10px] text-slate-500">Update: <span id="api-last-update" class="text-slate-400 font-mono">-</span></span>
             <span class="text-slate-700">|</span>
-            <span class="text-[10px] text-slate-500">Aktif:Ã‚Â <span id="api-node-count" class="text-emerald-400 font-mono font-bold">-</span>Ã‚Â node</span>
+            <span class="text-[10px] text-slate-500">Aktif: <span id="api-node-count" class="text-emerald-400 font-mono font-bold">-</span> node</span>
         </div>
 
         <!-- Banner Error Koneksi (muncul dari atas saat API gagal) -->
         <div id="api-error-banner" class="hidden absolute top-0 left-0 right-0 flex items-center justify-center gap-3 py-2 px-4 bg-red-900/95 border-b border-red-700 shadow-lg" style="z-index: 60;">
             <svg class="w-4 h-4 text-red-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
-            <span class="text-sm font-semibold text-red-200">Koneksi ke server terputus Ã¢â‚¬â€ Data sensor tidak dapat diperbarui</span>
+            <span class="text-sm font-semibold text-red-200">Koneksi ke server terputus — Data sensor tidak dapat diperbarui</span>
             <button onclick="document.getElementById('api-error-banner').classList.add('hidden')" class="ml-auto text-red-400 hover:text-white text-lg leading-none">&times;</button>
         </div>
     </div>
@@ -643,15 +643,15 @@
                         if (pct >= 80) {
                             barEl.className = 'h-1.5 rounded-full bg-emerald-400 transition-all duration-500 ease-out';
                             pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-400';
-                            suffix = ' Ã¢â‚¬â€ Normal';
+                            suffix = ' — Normal';
                         } else if (pct >= 50) {
                             barEl.className = 'h-1.5 rounded-full bg-yellow-400 transition-all duration-500 ease-out';
                             pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-yellow-900/60 text-yellow-400';
-                            suffix = ' Ã¢â‚¬â€ Kurang';
+                            suffix = ' — Kurang';
                         } else {
                             barEl.className = 'h-1.5 rounded-full bg-red-500 transition-all duration-500 ease-out';
                             pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-900/60 text-red-400';
-                            suffix = ' Ã¢â‚¬â€ Kritis';
+                            suffix = ' — Kritis';
                         }
                         animateNumber('panel-debit-pct', pct, false, (val) => `${val}%${suffix}`);
                         
@@ -872,15 +872,15 @@
                                         if (pct >= 80) {
                                             if (barEl) barEl.className = 'h-1.5 rounded-full bg-emerald-400 transition-all duration-500 ease-out';
                                             if (pctEl) pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-400';
-                                            suffix = ' Ã¢â‚¬â€ Normal';
+                                            suffix = ' — Normal';
                                         } else if (pct >= 50) {
                                             if (barEl) barEl.className = 'h-1.5 rounded-full bg-yellow-400 transition-all duration-500 ease-out';
                                             if (pctEl) pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-yellow-900/60 text-yellow-400';
-                                            suffix = ' Ã¢â‚¬â€ Kurang';
+                                            suffix = ' — Kurang';
                                         } else {
                                             if (barEl) barEl.className = 'h-1.5 rounded-full bg-red-500 transition-all duration-500 ease-out';
                                             if (pctEl) pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-900/60 text-red-400';
-                                            suffix = ' Ã¢â‚¬â€ Kritis';
+                                            suffix = ' — Kritis';
                                         }
                                         if (pctEl) animateNumber('panel-debit-pct', pct, false, (val) => `${val}%${suffix}`);
                                     }
@@ -1621,7 +1621,7 @@
                     btn.disabled = false;
                     btn.className =
                         'w-full py-2.5 rounded-lg font-bold text-sm transition-all duration-200 bg-[#0ea5e9] hover:bg-[#0284c7] active:scale-95 text-white shadow-lg shadow-cyan-900/50';
-                    document.getElementById('awgc-btn-text').textContent = 'Ã¢Å¡Â¡ Terapkan Posisi Pintu';
+                    document.getElementById('awgc-btn-text').textContent = '⚡ Terapkan Posisi Pintu';
                     document.getElementById('awgc-command-status').classList.add('hidden');
                     if (commandPollInterval) {
                         clearInterval(commandPollInterval);
@@ -1671,7 +1671,7 @@
                         }
 
                         activeCommandId = json.command_id;
-                        txtEl.textContent = 'Ã°Å¸â€œÂ¡ Menunggu Konfirmasi Alat...';
+                        txtEl.textContent = '📡 Menunggu Konfirmasi Alat...';
                         statusText.textContent =
                             `Perintah terkirim (ID: ${activeCommandId}). Menunggu respons...`;
                         statusText.className = 'text-yellow-400';
@@ -1685,7 +1685,7 @@
                                     commandPollInterval = null;
 
                                     if (pJson.status === 'success') {
-                                        txtEl.textContent = 'Ã¢Å“â€¦ Berhasil Dieksekusi';
+                                        txtEl.textContent = '✅ Berhasil Dieksekusi';
                                         btn.className =
                                             'w-full py-2.5 rounded-lg font-bold text-sm bg-emerald-700 text-white cursor-not-allowed';
                                         statusText.textContent = 'Pintu bergerak ke posisi ' +
@@ -1696,7 +1696,7 @@
                                         document.getElementById('awgc-bukaan-bar').style.width =
                                             target + '%';
                                     } else {
-                                        txtEl.textContent = 'Ã¢Å¡Â Ã¯Â¸Â Gagal di Alat';
+                                        txtEl.textContent = '⚠️ Gagal di Alat';
                                         btn.className =
                                             'w-full py-2.5 rounded-lg font-bold text-sm bg-red-900/60 text-red-300 cursor-not-allowed';
                                         statusText.textContent = pJson.pesan_error ||
@@ -1765,12 +1765,12 @@
                                     const txtEl = document.getElementById('awgc-btn-text');
                                     const statusText = document.getElementById('awgc-command-status-text');
                                     if (isSuccess) {
-                                        txtEl.textContent = 'Ã¢Å“â€¦ Berhasil (via WebSocket)';
+                                        txtEl.textContent = '✅ Berhasil (via WebSocket)';
                                         statusText.textContent = 'Pintu bergerak ke posisi ' + payload
                                             .bukaan_persen + '%';
                                         statusText.className = 'text-emerald-400';
                                     } else {
-                                        txtEl.textContent = 'Ã¢Å¡Â Ã¯Â¸Â Gagal (via WebSocket)';
+                                        txtEl.textContent = '⚠️ Gagal (via WebSocket)';
                                         statusText.className = 'text-red-400';
                                     }
                                     setTimeout(resetAwgcButton, 5000);

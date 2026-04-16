@@ -26,7 +26,7 @@
                                         class="h-9 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-sm text-slate-700">
                                     </div>
                                 </div>
-                                <div class="w-8 flex items-center justify-center text-slate-400">â†’</div>
+                                <div class="w-8 flex items-center justify-center text-slate-400">→</div>
                                 <div class="flex-1">
                                     <div id="rkpEndBox"
                                         class="h-9 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-sm text-slate-700">
@@ -41,7 +41,7 @@
 <div class="rounded-xl border border-slate-200 p-3">
                                     <div class="flex items-center justify-between">
                                         <button type="button" id="rkpPrev"
-                                            class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">â€¹</button>
+                                            class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">‹</button>
                                         <div class="flex items-center gap-2">
                                             <div class="relative">
                                                 <button type="button" id="rkpMonthBtnL"
@@ -107,7 +107,7 @@
                                             </div>
                                         </div>
                                         <button type="button" id="rkpNext"
-                                            class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">â€º</button>
+                                            class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">›</button>
                                     </div>
                                     <div class="mt-3 grid grid-cols-7 gap-1 text-xs text-slate-500">
                                         <div class="text-center">Sen</div>

@@ -11,7 +11,7 @@
             ],
             'arah_angin' => [
                 'label' => 'ARAH ANGIN',
-                'satuan' => 'Ã‚Â°',
+                'satuan' => '°',
                 'icon' => 'icons/awr/arah_angin.svg',
                 'terms' => ['wind_direction', 'arah_angin', 'wind direction', 'wind_dir', 'wd'],
             ],
@@ -34,7 +34,7 @@
             ],
             'arah_cahaya' => [
                 'label' => 'ARAH',
-                'satuan' => 'Ã‚Â°',
+                'satuan' => '°',
                 'icon' => 'icons/awr/arah.svg',
                 'terms' => [
                     'arah_cahaya',
@@ -51,7 +51,7 @@
             ],
             'temperatur' => [
                 'label' => 'TEMPERATUR',
-                'satuan' => 'Ã‚Â°C',
+                'satuan' => '°C',
                 'icon' => 'icons/awr/temper.svg',
                 'terms' => [
                     'temperatur',
@@ -201,7 +201,7 @@
                                 </div>
                                 <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
                                     {{ $dispArahAngin }}<span
-                                        class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°</span>
+                                        class="text-[10px] font-bold text-slate-400 ml-0.5">°</span>
                                 </div>
                             </div>
                         </a>
@@ -268,7 +268,7 @@
                                 <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase">ARAH</div>
                                 <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
                                     {{ $dispArahCahaya }}<span
-                                        class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°</span>
+                                        class="text-[10px] font-bold text-slate-400 ml-0.5">°</span>
                                 </div>
                             </div>
                         </a>
@@ -289,7 +289,7 @@
                         <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             TEMPERATUR</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $dispTemperatur }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°C</span>
+                            {{ $dispTemperatur }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
                         </div>
                     </div>
                 </a>
@@ -365,7 +365,7 @@
                         <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             TEMPERATURE</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°C</span>
+                            {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
                         </div>
                     </div>
                 </a>
@@ -478,7 +478,7 @@
                     ctx.textBaseline = 'middle';
                     [0, 45, 90, 135, 180, 225, 270, 315].forEach(function(deg) {
                         var rad = (deg - 90) * Math.PI / 180;
-                        ctx.fillText(deg + 'Ã‚Â°', cx + R * 0.70 * Math.cos(rad), cy + R * 0.70 * Math
+                        ctx.fillText(deg + '°', cx + R * 0.70 * Math.cos(rad), cy + R * 0.70 * Math
                             .sin(rad));
                     });
                 }

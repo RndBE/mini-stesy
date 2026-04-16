@@ -15,7 +15,7 @@
                     <div class="flex items-center gap-2 flex-wrap">
                         <h1 class="text-lg font-bold text-white leading-tight">Pos AWLR Sungai Brantas</h1>
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-400/30 text-blue-100 border border-blue-300/30">
-                            AWLR Ã¢â‚¬â€œ Non JIAT
+                            AWLR – Non JIAT
                         </span>
                     </div>
                     <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-blue-100/80">
@@ -27,7 +27,7 @@
                             </svg>
                             Jl. Ahmad Yani No. 12, Malang
                         </span>
-                        <span class="text-blue-300/50">Ã‚Â·</span>
+                        <span class="text-blue-300/50">·</span>
                         <span class="font-mono text-xs text-blue-200/70">ID: BCN-AWLR-0042</span>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
                 <div class="h-4 w-px bg-white/20 hidden sm:block"></div>
                 <div class="text-xs text-blue-100/70">
                     <span class="text-blue-200/50">Last update</span><br>
-                    <span class="font-semibold text-white/80">10 Mar 2026 Ã‚Â· 10:32:05</span>
+                    <span class="font-semibold text-white/80">10 Mar 2026 · 10:32:05</span>
                 </div>
             </div>
 <div class="flex items-center gap-2 flex-shrink-0">
@@ -110,7 +110,7 @@
                     <div class="flex-1 rounded-sm {{ $loop->index < 4 ? 'bg-blue-400' : 'bg-slate-200' }}" style="height: {{ $h * 2 }}px"></div>
                 @endforeach
             </div>
-            <p class="mt-1 text-[11px] text-slate-400">Kuat Ã‚Â· 4G</p>
+            <p class="mt-1 text-[11px] text-slate-400">Kuat · 4G</p>
         </div>
 <div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
             <div class="flex items-center justify-between mb-2">
@@ -262,9 +262,9 @@
                                 @php
                                     $sensors = [
                                         ['name' => 'TMA (Tinggi Muka Air)', 'col' => 'sensor_1', 'unit' => 'm',   'calib' => '+0.00', 'active' => true],
-                                        ['name' => 'Debit Air',              'col' => 'sensor_2', 'unit' => 'mÃ‚Â³/s','calib' => '+0.00', 'active' => true],
+                                        ['name' => 'Debit Air',              'col' => 'sensor_2', 'unit' => 'm³/s','calib' => '+0.00', 'active' => true],
                                         ['name' => 'Curah Hujan',            'col' => 'sensor_3', 'unit' => 'mm',  'calib' => '-0.05', 'active' => true],
-                                        ['name' => 'Suhu Air',               'col' => 'sensor_4', 'unit' => 'Ã‚Â°C',  'calib' => '+0.00', 'active' => false],
+                                        ['name' => 'Suhu Air',               'col' => 'sensor_4', 'unit' => '°C',  'calib' => '+0.00', 'active' => false],
                                     ];
                                 @endphp
                                 @foreach ($sensors as $i => $sensor)
@@ -330,9 +330,9 @@
                             <div class="space-y-1.5">
                                 <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">QoS Level</label>
                                 <select class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-800 focus:border-[#303481] focus:ring-1 focus:ring-[#303481] outline-none transition">
-                                    <option>0 Ã¢â‚¬â€œ At most once</option>
-                                    <option selected>1 Ã¢â‚¬â€œ At least once</option>
-                                    <option>2 Ã¢â‚¬â€œ Exactly once</option>
+                                    <option>0 – At most once</option>
+                                    <option selected>1 – At least once</option>
+                                    <option>2 – Exactly once</option>
                                 </select>
                             </div>
                         </div>

@@ -164,7 +164,7 @@
                 </button>
             </form>
 
-            <div class="mt-4 px-3 text-[11px] text-slate-400 sidebar-footer">Ã‚Â© Beacon Engineering {{ now()->year }}
+            <div class="mt-4 px-3 text-[11px] text-slate-400 sidebar-footer">© Beacon Engineering {{ now()->year }}
             </div>
         </div>
     </div>

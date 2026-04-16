@@ -1000,7 +1000,7 @@
                                     <div class="flex items-center justify-between gap-2">
                                         <button type="button" id="dpPrev"
                                             class="h-8 w-8 rounded-lg border border-slate-50 hover:bg-slate-50 flex items-center justify-center">
-                                            <span class="text-slate-600">â€¹</span>
+                                            <span class="text-slate-600">‹</span>
                                         </button>
 
                                         <div class="flex items-center gap-2">
@@ -1050,7 +1050,7 @@
 
                                         <button type="button" id="dpNext"
                                             class="h-8 w-8 rounded-lg border border-slate-50 hover:bg-slate-50 flex items-center justify-center">
-                                            <span class="text-slate-600">â€º</span>
+                                            <span class="text-slate-600">›</span>
                                         </button>
                                     </div>
 
@@ -1134,7 +1134,7 @@
                                     <div class="flex items-center justify-between">
                                         <button type="button" id="ypPrev"
                                             class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">
-                                            <span class="text-slate-600">â€¹</span>
+                                            <span class="text-slate-600">‹</span>
                                         </button>
 
                                         <div class="text-xs font-semibold text-slate-700 bg-slate-100 rounded-full px-4 py-1"
@@ -1142,7 +1142,7 @@
 
                                         <button type="button" id="ypNext"
                                             class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">
-                                            <span class="text-slate-600">â€º</span>
+                                            <span class="text-slate-600">›</span>
                                         </button>
                                     </div>
 
@@ -1177,7 +1177,7 @@
                                                 class="h-9 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-sm text-slate-700">
                                             </div>
                                         </div>
-                                        <div class="w-8 flex items-center justify-center text-slate-700">â†’</div>
+                                        <div class="w-8 flex items-center justify-center text-slate-700">→</div>
                                         <div class="flex-1">
                                             <div id="rpEndBox"
                                                 class="h-9 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-sm text-slate-700">
@@ -1193,7 +1193,7 @@
                                         <div class="rounded-xl border border-slate-200 p-3">
                                             <div class="flex items-center justify-between">
                                                 <button type="button" id="rpPrev"
-                                                    class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">â€¹</button>
+                                                    class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">‹</button>
 
                                                 <div class="flex items-center gap-2">
                                                     <div class="relative">
@@ -1232,7 +1232,7 @@
                                                 </div>
 
                                                 <button type="button" id="rpNext"
-                                                    class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">â€º</button>
+                                                    class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">›</button>
                                             </div>
 
                                             <div class="mt-3 grid grid-cols-7 gap-1 text-xs text-slate-500">

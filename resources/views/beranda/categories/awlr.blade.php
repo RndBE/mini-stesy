@@ -678,7 +678,7 @@
                                     class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                                     {{ is_numeric($debit) ? number_format((float) $debit, 3) : '-' }}
                                 </span>
-                                <span class="text-xs font-semibold text-slate-400">mÃ‚Â³/s</span>
+                                <span class="text-xs font-semibold text-slate-400">m³/s</span>
                             </div>
                         </div>
                     </a>
@@ -739,7 +739,7 @@
                                 <div
                                     class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
                                     {{ $temp ?? '-' }}<span
-                                        class="text-[10px] font-bold text-slate-400 ml-0.5">Ã‚Â°C</span>
+                                        class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
                                 </div>
                             </div>
                         </div>

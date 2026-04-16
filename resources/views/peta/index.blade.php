@@ -617,7 +617,7 @@ background: rgba(0, 0, 0, 0.28);
                                 $txtCls  = $isOnline ? 'text-emerald-600' : 'text-rose-600';
                                 $statusLabel = $isOnline ? 'Koneksi Terhubung' : 'Koneksi Terputus';
                                 $fmt = function($v, $dec = 3) {
-                                    if (!is_numeric($v)) return 'Ã¢â‚¬â€';
+                                    if (!is_numeric($v)) return '—';
                                     $s = number_format((float)$v, $dec, '.', ',');
                                     if (str_contains($s, '.')) {
                                         [$int, $dec] = explode('.', $s);
@@ -653,7 +653,7 @@ background: rgba(0, 0, 0, 0.28);
 @if ($kat === 'AWLR' && ($point['sub_kategori'] ?? '') === 'jiat')
                                     <div class="text-center my-2">
                                         <div class="text-xl font-bold text-slate-900">
-                                            {{ is_numeric($point['kedalaman_sumur']) ? $fmt($point['kedalaman_sumur'], 3) . ' m' : 'Ã¢â‚¬â€' }}
+                                            {{ is_numeric($point['kedalaman_sumur']) ? $fmt($point['kedalaman_sumur'], 3) . ' m' : '—' }}
                                         </div>
                                         <div class="text-xs text-slate-500">Kedalaman Air Sumur</div>
                                     </div>
@@ -662,13 +662,13 @@ background: rgba(0, 0, 0, 0.28);
                                     <div class="grid grid-cols-2 gap-x-2 my-2">
                                         <div class="text-center">
                                             <div class="text-lg font-bold text-slate-900">
-                                                {{ is_numeric($point['tma']) ? $fmt($point['tma'], 3) . ' m' : 'Ã¢â‚¬â€' }}
+                                                {{ is_numeric($point['tma']) ? $fmt($point['tma'], 3) . ' m' : '—' }}
                                             </div>
                                             <div class="text-[10px] text-slate-500">Tinggi Muka Air</div>
                                         </div>
                                         <div class="text-center">
                                             <div class="text-lg font-bold text-slate-900">
-                                                {{ is_numeric($point['debit']) ? $fmt($point['debit'], 3) . ' mÃ‚Â³/s' : 'Ã¢â‚¬â€' }}
+                                                {{ is_numeric($point['debit']) ? $fmt($point['debit'], 3) . ' m³/s' : '—' }}
                                             </div>
                                             <div class="text-[10px] text-slate-500">Debit</div>
                                         </div>
@@ -678,7 +678,7 @@ background: rgba(0, 0, 0, 0.28);
                                     <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
                                         @php
                                             $afmrRows = [
-                                                [$point['luas_penampang'],   'mÃ‚Â²',  'Luas Penampang Basah',  $point['debit'],         'mÃ‚Â³/s', 'Debit'],
+                                                [$point['luas_penampang'],   'm²',  'Luas Penampang Basah',  $point['debit'],         'm³/s', 'Debit'],
                                                 [$point['flow_velocity'],    'm/s', 'Flow Velocity',          $point['elevasi_muka_air'], 'm',   'Elevasi Muka Air'],
                                                 [$point['jarak_sensor'],     'm',   'Jarak Sensor',           $point['elevasi_sensor'],   'm',   'Elevasi Sensor'],
                                             ];
@@ -686,13 +686,13 @@ background: rgba(0, 0, 0, 0.28);
                                         @foreach ($afmrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ' ' . $u1 : 'Ã¢â‚¬â€' }}
+                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ' ' . $u1 : '—' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
                                             </div>
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : 'Ã¢â‚¬â€' }}
+                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '—' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
                                             </div>
@@ -703,21 +703,21 @@ background: rgba(0, 0, 0, 0.28);
                                     <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
                                         @php
                                             $arrRows = [
-                                                [$point['kecepatan_angin'], 'Km',  'Kecepatan Angin',  $point['arah_angin'],   'Ã‚Â°',  'Arah Angin'],
-                                                [$point['kecerahan'],      'K Lux','Kecerahan',        $point['arah_cahaya'],  'Ã‚Â°',  'Arah Cahaya'],
+                                                [$point['kecepatan_angin'], 'Km',  'Kecepatan Angin',  $point['arah_angin'],   '°',  'Arah Angin'],
+                                                [$point['kecerahan'],      'K Lux','Kecerahan',        $point['arah_cahaya'],  '°',  'Arah Cahaya'],
                                                 [$point['curah_hujan'],    'mm',  'Curah Hujan 1',     $point['curah_hujan_2'],'mm', 'Curah Hujan 2'],
                                             ];
                                         @endphp
                                         @foreach ($arrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : 'Ã¢â‚¬â€' }}
+                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : '—' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
                                             </div>
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : 'Ã¢â‚¬â€' }}
+                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '—' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
                                             </div>
@@ -728,24 +728,24 @@ background: rgba(0, 0, 0, 0.28);
                                     <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
                                         @php
                                             $awrRows = [
-                                                [$point['kecepatan_angin'],  'Km',   'Kecepatan Angin',   $point['arah_angin'],      'Ã‚Â°',    'Arah Angin'],
-                                                [$point['temperatur_udara'], 'Ã‚Â°C',   'Temperatur Udara',  $point['kelembaban_udara'], '%',    'Kelembaban Udara'],
+                                                [$point['kecepatan_angin'],  'Km',   'Kecepatan Angin',   $point['arah_angin'],      '°',    'Arah Angin'],
+                                                [$point['temperatur_udara'], '°C',   'Temperatur Udara',  $point['kelembaban_udara'], '%',    'Kelembaban Udara'],
                                                 [$point['tekanan_udara'],    'hPa',  'Tekanan Udara',     $point['kecerahan'],        'K Lux','Kecerahan'],
-                                                [$point['arah_cahaya'],      'Ã‚Â°',    'Arah Cahaya',       $point['curah_hujan'],      'mm',   'Curah Hujan 1'],
+                                                [$point['arah_cahaya'],      '°',    'Arah Cahaya',       $point['curah_hujan'],      'mm',   'Curah Hujan 1'],
                                                 [$point['curah_hujan_2'],    'mm',   'Curah Hujan 2',     null,                       '',     ''],
                                             ];
                                         @endphp
                                         @foreach ($awrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : 'Ã¢â‚¬â€' }}
+                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : '—' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
                                             </div>
                                             <div class="text-center py-0.5">
                                                 @if($l2 !== '')
                                                     <div class="text-sm font-bold text-slate-900">
-                                                        {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : 'Ã¢â‚¬â€' }}
+                                                        {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '—' }}
                                                     </div>
                                                     <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
                                                 @endif
@@ -758,21 +758,21 @@ background: rgba(0, 0, 0, 0.28);
                                         @php
                                             $awqrRows = [
                                                 [$point['tma'],          'mdpl', 'Tinggi Muka Air',  $point['ph_air'],     '',    'pH Air'],
-                                                [$point['suhu_air'],     'Ã‚Â°C',   'Suhu Air',          $point['orp'],        'mV',  'ORP'],
-                                                [$point['conductivity'], 'Ã‚ÂµS/cm','Conductivity',      $point['salinity'],   'PSU', 'Salinity'],
-                                                [$point['tds'],          'Ã‚Â°',    'Total Dissolved Solids', $point['turbidity'], 'NTU', 'Turbidity'],
+                                                [$point['suhu_air'],     '°C',   'Suhu Air',          $point['orp'],        'mV',  'ORP'],
+                                                [$point['conductivity'], 'µS/cm','Conductivity',      $point['salinity'],   'PSU', 'Salinity'],
+                                                [$point['tds'],          '°',    'Total Dissolved Solids', $point['turbidity'], 'NTU', 'Turbidity'],
                                             ];
                                         @endphp
                                         @foreach ($awqrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ($u1 ? ' '.$u1 : '') : 'Ã¢â‚¬â€' }}
+                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ($u1 ? ' '.$u1 : '') : '—' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
                                             </div>
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v2) ? $fmt($v2, 2) . ($u2 ? ' '.$u2 : '') : 'Ã¢â‚¬â€' }}
+                                                    {{ is_numeric($v2) ? $fmt($v2, 2) . ($u2 ? ' '.$u2 : '') : '—' }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
                                             </div>
@@ -790,15 +790,15 @@ background: rgba(0, 0, 0, 0.28);
                                 @endif
 <div class="grid grid-cols-3 text-xs text-slate-600 border-t mt-1">
                                     <div class="flex flex-col items-center py-2">
-                                        <span class="text-blue-500 font-semibold">{{ $point['humidity'] !== null ? $point['humidity'].'%' : 'Ã¢â‚¬â€' }}</span>
+                                        <span class="text-blue-500 font-semibold">{{ $point['humidity'] !== null ? $point['humidity'].'%' : '—' }}</span>
                                         <span>humidity</span>
                                     </div>
                                     <div class="flex flex-col items-center border-l border-r py-2">
-                                        <span class="text-amber-500 font-semibold">{{ $point['battery'] !== null ? $point['battery'].' V' : 'Ã¢â‚¬â€' }}</span>
+                                        <span class="text-amber-500 font-semibold">{{ $point['battery'] !== null ? $point['battery'].' V' : '—' }}</span>
                                         <span>battery</span>
                                     </div>
                                     <div class="flex flex-col items-center py-2">
-                                        <span class="text-rose-500 font-semibold">{{ $point['temp'] !== null ? $point['temp'].' Ã‚Â°C' : 'Ã¢â‚¬â€' }}</span>
+                                        <span class="text-rose-500 font-semibold">{{ $point['temp'] !== null ? $point['temp'].' °C' : '—' }}</span>
                                         <span>temp</span>
                                     </div>
                                 </div>

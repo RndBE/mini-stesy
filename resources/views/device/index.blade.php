@@ -1090,7 +1090,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                         </div>
                                         <button type="button" @click="submitPerbaikan()" :disabled="perbaikanLoading"
                                             class="w-full rounded-lg bg-orange-500 py-2.5 text-sm font-semibold text-white hover:bg-orange-600 transition-colors disabled:opacity-50">
-                                            <span x-show="!perbaikanLoading">Ã°Å¸â€™Â¾ Simpan Catatan Perbaikan</span>
+                                            <span x-show="!perbaikanLoading">💾 Simpan Catatan Perbaikan</span>
                                             <span x-show="perbaikanLoading" x-cloak>Menyimpan...</span>
                                         </button>
                                     </div>
@@ -1104,8 +1104,8 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                             <div class="flex-1 min-w-0">
                                                                 <p class="text-sm font-medium text-gray-900 leading-snug" x-text="item.keterangan"></p>
                                                                 <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500">
-                                                                    <span>Ã°Å¸â€œâ€¦ <span x-text="item.tanggal_perbaikan"></span></span>
-                                                                    <span>Ã°Å¸â€˜Â¤ <span x-text="item.petugas"></span></span>
+                                                                    <span>📅 <span x-text="item.tanggal_perbaikan"></span></span>
+                                                                    <span>👤 <span x-text="item.petugas"></span></span>
                                                                     <span>Ã°Å¸â€¢Â <span x-text="item.created_at"></span></span>
                                                                 </div>
                                                             </div>
