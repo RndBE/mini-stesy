@@ -19,6 +19,7 @@ use App\Models\Perbaikan;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 class DeviceController extends Controller
 {

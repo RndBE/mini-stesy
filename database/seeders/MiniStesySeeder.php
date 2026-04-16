@@ -222,7 +222,7 @@ class MiniStesySeeder extends Seeder
                     'module' => 'Pengaturan Device',
                     'action_type' => 'UPDATE',
                     'activity' => 'Perubahan konfigurasi logger',
-                    'target' => 'ID Logger 10001',
+                    'target' => 'ID Logger 10366',
                     'status' => 'SUCCESS',
                     'ip_address' => '127.0.0.1',
                     'user_agent' => 'Seeder Script',
@@ -521,7 +521,7 @@ class MiniStesySeeder extends Seeder
         }
 
         DB::table('t_logger')->insert([
-            ['id' => 1, 'id_logger' => '10001', 'instansi_id' => $instansiBeaconId,  'nama_logger' => 'AWLR Seturan',     'tabel_main' => 't_s19_01', 'jeda_notif' => 1, 'idlokasi' => 1, 'id_katlogger' => 1, 'sensor_count' => 19],
+            ['id' => 1, 'id_logger' => '10366', 'instansi_id' => $instansiBeaconId,  'nama_logger' => 'AWLR Seturan',     'tabel_main' => 't_s19_01', 'jeda_notif' => 1, 'idlokasi' => 1, 'id_katlogger' => 1, 'sensor_count' => 19],
             ['id' => 2, 'id_logger' => '10002', 'instansi_id' => $instansiBeaconId,  'nama_logger' => 'ARR Pogung',       'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 2, 'id_katlogger' => 2, 'sensor_count' => 16],
             ['id' => 3, 'id_logger' => '10003', 'instansi_id' => $instansiBeaconId,  'nama_logger' => 'AWLR Sinduadi',    'tabel_main' => 't_s16_01', 'jeda_notif' => 1, 'idlokasi' => 3, 'id_katlogger' => 1, 'sensor_count' => 16],
             ['id' => 4, 'id_logger' => '10004', 'instansi_id' => $instansiContohId,  'nama_logger' => 'ARR Bantar',       'tabel_main' => 't_s19_01', 'jeda_notif' => 1, 'idlokasi' => 4, 'id_katlogger' => 2, 'sensor_count' => 19],
@@ -553,12 +553,12 @@ class MiniStesySeeder extends Seeder
         ]);
 
         DB::table('parameter_sensor')->insert([
-            // ── AWLR 10001 ──────────────────────────────────────────────────────
-            ['id_param' =>  1, 'logger_id' => '10001', 'nama_parameter' => 'TMA',                'kolom_sensor' => 'sensor14', 'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'water',              'debit_awlr' => '-', 'parameter_utama' => 'tma'],
-            ['id_param' =>  5, 'logger_id' => '10001', 'nama_parameter' => 'humidity_logger',    'kolom_sensor' => 'sensor5',  'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
-            ['id_param' =>  6, 'logger_id' => '10001', 'nama_parameter' => 'battery_logger',     'kolom_sensor' => 'sensor4',  'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80','debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
-            ['id_param' =>  7, 'logger_id' => '10001', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor10', 'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
-            ['id_param' =>  8, 'logger_id' => '10001', 'nama_parameter' => 'muka_air_tanah',     'kolom_sensor' => 'sensor1',  'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'waves',              'debit_awlr' => '-', 'parameter_utama' => 'muka_air_tanah'],
+            // ── AWLR 10366 ──────────────────────────────────────────────────────
+            ['id_param' =>  1, 'logger_id' => '10366', 'nama_parameter' => 'TMA',                'kolom_sensor' => 'sensor14', 'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'water',              'debit_awlr' => '-', 'parameter_utama' => 'tma'],
+            ['id_param' =>  5, 'logger_id' => '10366', 'nama_parameter' => 'humidity_logger',    'kolom_sensor' => 'sensor5',  'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
+            ['id_param' =>  6, 'logger_id' => '10366', 'nama_parameter' => 'battery_logger',     'kolom_sensor' => 'sensor4',  'satuan' => 'volt', 'tipe_graf' => 'line', 'icon_app' => 'battery_charging_80','debit_awlr' => '-', 'parameter_utama' => 'battery_logger'],
+            ['id_param' =>  7, 'logger_id' => '10366', 'nama_parameter' => 'temperature_logger', 'kolom_sensor' => 'sensor10', 'satuan' => '°C',   'tipe_graf' => 'line', 'icon_app' => 'thermometer',        'debit_awlr' => '-', 'parameter_utama' => 'temperature_logger'],
+            ['id_param' =>  8, 'logger_id' => '10366', 'nama_parameter' => 'muka_air_tanah',     'kolom_sensor' => 'sensor1',  'satuan' => 'm',    'tipe_graf' => 'line', 'icon_app' => 'waves',              'debit_awlr' => '-', 'parameter_utama' => 'muka_air_tanah'],
             // ── ARR 10002 ───────────────────────────────────────────────────────
             ['id_param' =>  2, 'logger_id' => '10002', 'nama_parameter' => 'Curah Hujan',        'kolom_sensor' => 'sensor8',  'satuan' => 'mm',   'tipe_graf' => 'bar',  'icon_app' => 'rain',               'debit_awlr' => '-', 'parameter_utama' => 'hujan'],
             ['id_param' => 13, 'logger_id' => '10002', 'nama_parameter' => 'humidity_logger',    'kolom_sensor' => 'sensor3',  'satuan' => '%',    'tipe_graf' => 'line', 'icon_app' => 'water_percent',      'debit_awlr' => '-', 'parameter_utama' => 'humidity_logger'],
@@ -653,10 +653,10 @@ class MiniStesySeeder extends Seeder
         DB::table('t_informasi')->insert([
             [
                 'id_inf' => 1,
-                'logger_id' => '10001',
+                'logger_id' => '10366',
                 'seri_logger' => 'Beacon Logger V1',
                 'sensor' => 'Ultrasonic',
-                'serial_number' => 'SN-10001',
+                'serial_number' => 'SN-10366',
                 'elevasi' => '100',
                 'nosell' => '-',
                 'nama_pic' => 'PIC 1',
@@ -742,7 +742,7 @@ class MiniStesySeeder extends Seeder
         ]);
 
         DB::table('jiat_data')->insert([
-            ['id' => 1, 'id_logger' => '10001', 'kedalaman_sumur' => 5.5, 'kedalaman_pompa' => 2.0, 'kedalaman_sensor' => 1.2, 'has_pump' => true],
+            ['id' => 1, 'id_logger' => '10366', 'kedalaman_sumur' => 5.5, 'kedalaman_pompa' => 2.0, 'kedalaman_sensor' => 1.2, 'has_pump' => true],
             ['id' => 2, 'id_logger' => '10002', 'kedalaman_sumur' => 4.2, 'kedalaman_pompa' => 1.7, 'kedalaman_sensor' => 1.0, 'has_pump' => true],
             ['id' => 3, 'id_logger' => '10003', 'kedalaman_sumur' => 6.1, 'kedalaman_pompa' => 2.4, 'kedalaman_sensor' => 1.4, 'has_pump' => true],
             ['id' => 4, 'id_logger' => '10004', 'kedalaman_sumur' => 3.9, 'kedalaman_pompa' => 1.5, 'kedalaman_sensor' => 0.9, 'has_pump' => true],
@@ -762,7 +762,7 @@ class MiniStesySeeder extends Seeder
         }
 
         DB::table('foto_pos')->insert([
-            ['id' => 1, 'id_logger' => '10001', 'url_foto' => 'pos/10001.png', 'foto_utama' => 1],
+            ['id' => 1, 'id_logger' => '10366', 'url_foto' => 'pos/10366.png', 'foto_utama' => 1],
             ['id' => 2, 'id_logger' => '10002', 'url_foto' => 'pos/10002.png', 'foto_utama' => 1],
             ['id' => 3, 'id_logger' => '10003', 'url_foto' => 'pos/10003.png', 'foto_utama' => 1],
             ['id' => 4, 'id_logger' => '10004', 'url_foto' => 'pos/10004.png', 'foto_utama' => 1],
@@ -773,33 +773,33 @@ class MiniStesySeeder extends Seeder
         ]);
 
         DB::table('tingkat_siaga_awlr')->insert([
-            ['id' => 1, 'id_logger' => '10001', 'id_status' => 1, 'nama' => 'Normal', 'nilai' => 100.0, 'status' => 1, 'warna' => 'hijau'],
+            ['id' => 1, 'id_logger' => '10366', 'id_status' => 1, 'nama' => 'Normal', 'nilai' => 100.0, 'status' => 1, 'warna' => 'hijau'],
             ['id' => 2, 'id_logger' => '10003', 'id_status' => 1, 'nama' => 'Normal', 'nilai' => 105.0, 'status' => 1, 'warna' => 'hijau'],
-            ['id' => 3, 'id_logger' => '10001', 'id_status' => 2, 'nama' => 'Siaga', 'nilai' => 140.0, 'status' => 1, 'warna' => 'kuning'],
+            ['id' => 3, 'id_logger' => '10366', 'id_status' => 2, 'nama' => 'Siaga', 'nilai' => 140.0, 'status' => 1, 'warna' => 'kuning'],
             ['id' => 4, 'id_logger' => '10003', 'id_status' => 2, 'nama' => 'Siaga', 'nilai' => 145.0, 'status' => 1, 'warna' => 'kuning'],
         ]);
 
         DB::table('notifikasi')->insert([
-            ['id' => 1, 'id_logger' => '10001', 'id_tingkat_siaga' => 1, 'tma' => 95.5, 'datetime' => '2025-01-10 10:00:00'],
+            ['id' => 1, 'id_logger' => '10366', 'id_tingkat_siaga' => 1, 'tma' => 95.5, 'datetime' => '2025-01-10 10:00:00'],
             ['id' => 2, 'id_logger' => '10003', 'id_tingkat_siaga' => 2, 'tma' => 101.2, 'datetime' => '2025-01-10 10:05:00'],
-            ['id' => 3, 'id_logger' => '10001', 'id_tingkat_siaga' => 3, 'tma' => 142.3, 'datetime' => '2025-01-11 08:00:00'],
+            ['id' => 3, 'id_logger' => '10366', 'id_tingkat_siaga' => 3, 'tma' => 142.3, 'datetime' => '2025-01-11 08:00:00'],
             ['id' => 4, 'id_logger' => '10003', 'id_tingkat_siaga' => 4, 'tma' => 146.1, 'datetime' => '2025-01-11 08:10:00'],
         ]);
 
         DB::table('rumus_debit')->insert([
-            ['id' => 1, 'id_logger' => '10001', 'rumus' => 'Q = a*(H^b)'],
+            ['id' => 1, 'id_logger' => '10366', 'rumus' => 'Q = a*(H^b)'],
         ]);
 
         DB::table('set_sinkronisasi')->insert([
-            ['id' => 1, 'idlogger' => '10001', 'tanggal' => '2025-01-01'],
+            ['id' => 1, 'idlogger' => '10366', 'tanggal' => '2025-01-01'],
         ]);
 
         DB::table('t_perbaikan')->insert([
-            ['id_perbaikan' => 1, 'id_logger' => '10001', 'data_terakhir' => 'OK', 'tabel' => 't_awlr'],
+            ['id_perbaikan' => 1, 'id_logger' => '10366', 'data_terakhir' => 'OK', 'tabel' => 't_awlr'],
         ]);
 
         DB::table('t_riwayat')->insert([
-            ['id_riwayat' => 1, 'id_logger' => '10001', 'tanggal' => '2025-01-05', 'kendala' => 'Tidak ada', 'perbaikan' => 'Tidak ada', 'gambar' => '-', 'file' => '-'],
+            ['id_riwayat' => 1, 'id_logger' => '10366', 'tanggal' => '2025-01-05', 'kendala' => 'Tidak ada', 'perbaikan' => 'Tidak ada', 'gambar' => '-', 'file' => '-'],
         ]);
         DB::table('ts_table_pool')->insert([
             ['table_name' => 't_s16_01', 'sensor_count' => 16, 'max_logger' => 5, 'is_active' => 1, 'created_at' => now()],
@@ -807,7 +807,7 @@ class MiniStesySeeder extends Seeder
         ]);
 
         DB::table('logger_storage_map')->insert([
-            ['id_logger' => '10001', 'table_name' => 't_s19_01', 'sensor_count' => 19, 'active' => 1, 'created_at' => now()],
+            ['id_logger' => '10366', 'table_name' => 't_s19_01', 'sensor_count' => 19, 'active' => 1, 'created_at' => now()],
             ['id_logger' => '10002', 'table_name' => 't_s16_01', 'sensor_count' => 16, 'active' => 1, 'created_at' => now()],
             ['id_logger' => '10003', 'table_name' => 't_s16_01', 'sensor_count' => 16, 'active' => 1, 'created_at' => now()],
             ['id_logger' => '10004', 'table_name' => 't_s19_01', 'sensor_count' => 19, 'active' => 1, 'created_at' => now()],
@@ -865,7 +865,7 @@ class MiniStesySeeder extends Seeder
 
         $s19 = [
             [
-                'id_logger' => '10001',
+                'id_logger' => '10366',
                 'waktu' => $now,
                 'sensor1' => 1.1,
                 'sensor2' => 2.1,
@@ -914,7 +914,7 @@ class MiniStesySeeder extends Seeder
         DB::table('t_s19_01')->insert($s19);
 
         $temp16 = DB::table('temp_s16_latest')->whereIn('id_logger', ['10002', '10003'])->get()->toArray();
-        $temp19 = DB::table('temp_s19_latest')->whereIn('id_logger', ['10001', '10004'])->get()->toArray();
+        $temp19 = DB::table('temp_s19_latest')->whereIn('id_logger', ['10366', '10004'])->get()->toArray();
 
         if (count($temp16) === 0) {
             DB::table('temp_s16_latest')->insert([
@@ -966,7 +966,7 @@ class MiniStesySeeder extends Seeder
         if (count($temp19) === 0) {
             DB::table('temp_s19_latest')->insert([
                 [
-                    'id_logger' => '10001',
+                    'id_logger' => '10366',
                     'waktu' => $now,
                     'sensor1' => 1.1,
                     'sensor2' => 2.1,
@@ -1020,7 +1020,7 @@ class MiniStesySeeder extends Seeder
         $end = Carbon::create(2026, 3, 6, 16, 0, 0);
 
         if (Schema::hasTable('t_s19_01')) {
-            DB::table('t_s19_01')->where('id_logger', '10001')->whereBetween('waktu', [$start, $end])->delete();
+            DB::table('t_s19_01')->where('id_logger', '10366')->whereBetween('waktu', [$start, $end])->delete();
             DB::table('t_s19_01')->where('id_logger', '10004')->whereBetween('waktu', [$start, $end])->delete();
             DB::table('t_s19_01')->where('id_logger', '10006')->whereBetween('waktu', [$start, $end])->delete(); // AWR
         }
@@ -1051,7 +1051,7 @@ class MiniStesySeeder extends Seeder
             $badDays[$days[$i]] = $rates[$i % count($rates)];
         }
 
-        $this->seedS19Logger10001($start, $end, $badDays);
+        $this->seedS19Logger10366($start, $end, $badDays);
         $this->seedS16Logger10003($start, $end, $badDays);
         $this->seedS16Logger10002($start, $end, $badDays);
         $this->seedS19Logger10004($start, $end, $badDays);
@@ -1061,7 +1061,7 @@ class MiniStesySeeder extends Seeder
         $this->seedS16Logger10008($start, $end, $badDays); // AWLR Non-JIAT
     }
 
-    private function seedS19Logger10001(Carbon $start, Carbon $end, array $badDays): void
+    private function seedS19Logger10366(Carbon $start, Carbon $end, array $badDays): void
     {
         $intervalMinutes = 1;
         $bulk = [];
@@ -1075,7 +1075,7 @@ class MiniStesySeeder extends Seeder
                 $time = $current->format('Y-m-d H:i:s');
 
                 $bulk[] = [
-                    'id_logger' => '10001',
+                    'id_logger' => '10366',
                     'waktu' => $time,
                     'sensor1' => mt_rand(90, 110) / 10,
                     'sensor2' => mt_rand(90, 110) / 10,

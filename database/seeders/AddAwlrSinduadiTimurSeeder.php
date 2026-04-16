@@ -14,7 +14,7 @@ class AddAwlrSinduadiTimurSeeder extends Seeder
             return;
         }
 
-        $seedLoggerId = '10009';
+        $seedLoggerId = '10367';
         $seedTimestamp = '2026-01-09 06:00:00';
 
         $sourceLogger = DB::table('t_logger')->where('id_logger', '10003')->first();
@@ -147,7 +147,7 @@ class AddAwlrSinduadiTimurSeeder extends Seeder
             'logger_id' => $seedLoggerId,
             'seri_logger' => 'Beacon Logger V2',
             'sensor' => 'Pressure',
-            'serial_number' => 'SN-10009',
+            'serial_number' => 'SN-10367',
             'elevasi' => '103',
             'nosell' => '-',
             'nama_pic' => 'PIC 9',
