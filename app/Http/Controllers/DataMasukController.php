@@ -164,7 +164,12 @@ class DataMasukController extends Controller
         $id = $request->input('id_alat')
             ?? $request->input('id_logger')
             ?? $request->input('code_logger');
+
+        // ── Bangun waktu: bisa dari 'waktu' (format lama) atau 'hari'+'jam' (format baru) ──
         $waktu = $request->input('waktu');
+        if (!$waktu && $request->has('hari') && $request->has('jam')) {
+            $waktu = $request->input('hari') . ' ' . $request->input('jam');
+        }
 
         if (!$id || !$waktu) {
             return response()->json(['success' => false, 'message' => 'id_alat dan waktu wajib'], 400);
@@ -198,9 +203,20 @@ class DataMasukController extends Controller
         ];
 
         $maxSensor = str_contains($tableMain, '19') ? 19 : 16;
+
+        // ── Parsing sensor: dukung format nested {"nama":...,"nilai":...,"satuan":...}
+        //    maupun format flat (nilai langsung)
         for ($i = 1; $i <= $maxSensor; $i++) {
             $k = 'sensor' . $i;
-            $row[$k] = $request->input($k);
+            $raw = $request->input($k);
+
+            if (is_array($raw)) {
+                // Format baru: ambil 'nilai', jika array kosong atau tidak ada 'nilai' → null
+                $row[$k] = array_key_exists('nilai', $raw) ? $raw['nilai'] : null;
+            } else {
+                // Format lama: nilai langsung (string/number/null)
+                $row[$k] = $raw;
+            }
         }
 
         // Merge dengan snapshot terkini agar kolom NOT NULL tidak kosong
