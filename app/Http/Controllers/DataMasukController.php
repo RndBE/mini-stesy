@@ -159,7 +159,7 @@ class DataMasukController extends Controller
         }
     }
 
-    public function add_awlr2(Request $request)
+    public function datamasuk(Request $request)
     {
         $id = $request->input('id_alat')
             ?? $request->input('id_logger')

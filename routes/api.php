@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\AnalisaApiController;
 use App\Http\Controllers\Api\BerandaApiController;
 
 // ─── Existing routes ───────────────────────────────────────────────────────────
-Route::post('/datamasuk/add_awlr2', [DataMasukController::class, 'add_awlr2']);
+Route::post('/datamasuk', [DataMasukController::class, 'datamasuk']);
 Route::get('/ping-awlr', fn() => 'pong');
 
 // ─── Mobile API v1 ─────────────────────────────────────────────────────────────
