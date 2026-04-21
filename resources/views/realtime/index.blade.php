@@ -201,12 +201,14 @@
                     _pahoWaitTimer: null,
 
                     mqtt: {
-                        broker: String(mqttCfg.broker || '72.60.78.159'),
-                        port: Number(mqttCfg.port || 8383),
+                        // Pakai domain sendiri sebagai WSS proxy via Nginx
+                        broker: String(mqttCfg.broker || window.location.hostname),
+                        port: Number(mqttCfg.port || (window.location.protocol === 'https:' ? 443 : 80)),
                         path: String(mqttCfg.path || '/mqtt'),
                         user: String(mqttCfg.user || 'beacon'),
                         pass: String(mqttCfg.pass || 'be_jogja'),
-                        useSSL: Boolean(mqttCfg.useSSL || false),
+                        // Otomatis WSS jika HTTPS
+                        useSSL: window.location.protocol === 'https:',
                         client: null,
                         connected: false,
                         connecting: false,
