@@ -90,7 +90,7 @@
                         @enderror
                     </div>
 
-                    <div class="flex items-center justify-between text-sm">
+                    <!-- <div class="flex items-center justify-between text-sm">
                         <label for="remember_me" class="inline-flex items-center gap-2 text-slate-600">
                             <input id="remember_me" type="checkbox"
                                 class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
@@ -103,7 +103,7 @@
                                 Lupa kata sandi?
                             </a>
                         @endif
-                    </div>
+                    </div> -->
 
                     <button type="submit"
                         class="mt-2 w-full rounded-xl bg-indigo-700 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-300">
