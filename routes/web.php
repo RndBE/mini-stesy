@@ -82,7 +82,7 @@ Route::middleware(['auth'])->group(function () {
 // Endpoint konfirmasi dari firmware alat AWGC (tanpa auth, diamankan via token di payload)
 Route::post('/api/awgc/confirm/{commandId}', [AwgcCommandController::class, 'confirm'])->name('awgc.command.confirm');
 
-Route::middleware(['auth'])->get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
+Route::middleware(['auth', 'permission:view_audit_log'])->get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 // Route::middleware(['auth'])->post('/audit-log/client-export', [AuditLogController::class, 'clientExport'])->name('audit-log.client-export');
 
 // Device Routes

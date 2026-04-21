@@ -146,11 +146,13 @@
                     <span class="sidebar-text truncate">Unduh Aplikasi</span>
                 </a>
 
+                @permission('view_audit_log')
                 <a href="{{ route('audit-log.index') }}"
                     class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('audit-log.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                     <img src="{{ asset('icons/log_audit_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('audit-log.*') ? 'brightness-0 invert' : '' }}" alt="Log Audit">
                     <span class="sidebar-text truncate">Log Audit</span>
                 </a>
+                @endpermission
             </div>
         </nav>
 
