@@ -282,16 +282,29 @@ class DataMasukController extends Controller
         try {
             $clientId = 'bemqtt-' . $id . '-' . \Illuminate\Support\Str::random(6);
             $mqtt = new \Bluerhinos\phpMQTT($mqttHost, $mqttPort, $clientId);
-            // $mqtt = new phpMQTT($mqttHost, $mqttPort, $clientId, $mqttCa);
+            $mqtt->keepalive = 5; // keepalive 5 detik
 
+            // Set socket timeout 5 detik agar tidak hanging jika port diblokir firewall
+            if (isset($mqtt->socket) && is_resource($mqtt->socket)) {
+                stream_set_timeout($mqtt->socket, 5);
+            }
 
-            if ($mqtt->connect(true, null, $mqttUser, $mqttPass)) {
+            // Bungkus connect() dalam alarm/set_time_limit agar maksimal 5 detik
+            $connected = false;
+            $prevTimeout = ini_get('default_socket_timeout');
+            ini_set('default_socket_timeout', 5);
+
+            $connected = @$mqtt->connect(true, null, $mqttUser, $mqttPass);
+
+            ini_set('default_socket_timeout', $prevTimeout);
+
+            if ($connected) {
                 $mqtt->publish((string) $id, json_encode($payload), 0, false);
                 $mqtt->close();
                 $mqttOk = true;
             } else {
                 $mqttOk = false;
-                $mqttErr = 'connect timeout';
+                $mqttErr = 'connect timeout / connection refused';
             }
         } catch (\Throwable $e) {
             $mqttOk = false;
