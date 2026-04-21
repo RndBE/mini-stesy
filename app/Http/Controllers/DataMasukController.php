@@ -270,7 +270,7 @@ class DataMasukController extends Controller
             }
         }
 
-        $mqttHost = env('MQTT_HOST', '72.60.78.159');
+        $mqttHost = env('MQTT_HOST', '103.82.241.100');
         $mqttPort = (int) env('MQTT_PORT', 1883);
         $mqttUser = env('MQTT_USER', 'beacon');
         $mqttPass = env('MQTT_PASS', 'be_jogja');
