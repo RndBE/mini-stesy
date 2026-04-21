@@ -2,13 +2,6 @@
 
 @section('content')
     <div class="space-y-3">
-        <!-- Page Header -->
-        <div class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-900">Unduh Aplikasi</h1>
-                <p class="text-sm text-slate-500">Download aplikasi mobile untuk Android dan iOS</p>
-            </div>
-        </div>
 
         <div class="w-full md:w-1/2">
             <div class="space-y-2">
