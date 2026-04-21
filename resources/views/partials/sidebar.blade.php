@@ -13,7 +13,7 @@
                 @permission('view_beranda')
                     <a href="{{ route('beranda') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('beranda') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <img src="{{ asset('icons/beranda_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('beranda') ? 'brightness-0 invert' : '' }}" alt="Beranda">
+                        <img src="{{ asset(request()->routeIs('beranda') ? 'icons/beranda_fill.svg' : 'icons/beranda_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('beranda') ? 'brightness-0 invert' : '' }}" alt="Beranda">
                         <span class="sidebar-text truncate">Beranda</span>
                     </a>
                 @endpermission
@@ -21,13 +21,13 @@
                 @permission('view_peta_lokasi')
                     <a href="{{ route('peta.lokasi') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('peta.lokasi') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <img src="{{ asset('icons/peta_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('peta.lokasi') ? 'brightness-0 invert' : '' }}" alt="Peta Lokasi">
+                        <img src="{{ asset(request()->routeIs('peta.lokasi') ? 'icons/peta_fill.svg' : 'icons/peta_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('peta.lokasi') ? 'brightness-0 invert' : '' }}" alt="Peta Lokasi">
                         <span class="sidebar-text truncate">Peta Lokasi</span>
                     </a>
 
                     <a href="{{ route('rekap-data.index') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('rekap-data.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <img src="{{ asset('icons/data_perangkat_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('rekap-data.*') ? 'brightness-0 invert' : '' }}" alt="Rekap Data">
+                        <img src="{{ asset(request()->routeIs('rekap-data.*') ? 'icons/data_perangkat_fill.svg' : 'icons/data_perangkat_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('rekap-data.*') ? 'brightness-0 invert' : '' }}" alt="Rekap Data">
                         <span class="sidebar-text truncate">Rekap Data</span>
                     </a>
                 @endpermission
@@ -35,13 +35,13 @@
                 @permission('view_realtime')
                     <a href="{{ route('realtime.index') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('realtime.index') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <img src="{{ asset('icons/realtime_monitoring_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('realtime.index') ? 'brightness-0 invert' : '' }}" alt="Realtime">
+                        <img src="{{ asset(request()->routeIs('realtime.index') ? 'icons/realtime_monitoring_fill.svg' : 'icons/realtime_monitoring_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('realtime.index') ? 'brightness-0 invert' : '' }}" alt="Realtime">
                         <span class="sidebar-text truncate">Realtime Monitoring</span>
                     </a>
 
                     <a href="{{ route('tingkat-siaga-awlr.index') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('tingkat-siaga-awlr.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <img src="{{ asset('icons/pengaturan_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('tingkat-siaga-awlr.*') ? 'brightness-0 invert' : '' }}" alt="Tingkat Siaga">
+                        <img src="{{ asset(request()->routeIs('tingkat-siaga-awlr.*') ? 'icons/pengaturan_fill.svg' : 'icons/pengaturan_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('tingkat-siaga-awlr.*') ? 'brightness-0 invert' : '' }}" alt="Tingkat Siaga">
                         <span class="sidebar-text truncate">Tingkat Siaga AWLR</span>
                     </a>
                 @endpermission
@@ -49,7 +49,7 @@
                 @permission('view_data_perangkat')
                     <a href="{{ route('device.data') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('device.data') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <img src="{{ asset('icons/data_perangkat_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('device.data') ? 'brightness-0 invert' : '' }}" alt="Data Perangkat">
+                        <img src="{{ asset(request()->routeIs('device.data') ? 'icons/data_perangkat_fill.svg' : 'icons/data_perangkat_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('device.data') ? 'brightness-0 invert' : '' }}" alt="Data Perangkat">
                         <span class="sidebar-text truncate">Data Perangkat</span>
                     </a>
                 @endpermission
@@ -57,7 +57,7 @@
                 @permission('view_device')
                     <a href="{{ route('device.index') }}"
                         class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('device.index') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                        <img src="{{ asset('icons/pengaturan_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('device.index') ? 'brightness-0 invert' : '' }}" alt="Pengaturan Device">
+                        <img src="{{ asset(request()->routeIs('device.index') ? 'icons/pengaturan_fill.svg' : 'icons/pengaturan_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('device.index') ? 'brightness-0 invert' : '' }}" alt="Pengaturan Device">
                         <span class="sidebar-text truncate">Pengaturan Device</span>
                     </a>
                 @endpermission
@@ -94,7 +94,7 @@
                                 <a href="{{ route('instansi.index') }}"
                                     class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('instansi.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     @if(request()->routeIs('instansi.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
-                                    <img src="{{ asset('icons/instansi_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('instansi.*') ? 'brightness-0 invert' : '' }}" alt="Instansi">
+                                    <img src="{{ asset(request()->routeIs('instansi.*') ? 'icons/instansi_fill.svg' : 'icons/instansi_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('instansi.*') ? 'brightness-0 invert' : '' }}" alt="Instansi">
                                     <span class="sidebar-text truncate">Instansi</span>
                                 </a>
                             @endif
@@ -103,19 +103,19 @@
                                 <a href="{{ route('kategori.index') }}"
                                     class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('kategori.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     @if(request()->routeIs('kategori.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
-                                    <img src="{{ asset('icons/kategori_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('kategori.*') ? 'brightness-0 invert' : '' }}" alt="Kategori Logger">
+                                    <img src="{{ asset(request()->routeIs('kategori.*') ? 'icons/kategori_fill.svg' : 'icons/kategori_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('kategori.*') ? 'brightness-0 invert' : '' }}" alt="Kategori Logger">
                                     <span class="sidebar-text truncate">Kategori Logger</span>
                                 </a>
                                 <a href="{{ route('list-parameter.index') }}"
                                     class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('list-parameter.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     @if(request()->routeIs('list-parameter.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
-                                    <img src="{{ asset('icons/list_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('list-parameter.*') ? 'brightness-0 invert' : '' }}" alt="List Parameter">
+                                    <img src="{{ asset(request()->routeIs('list-parameter.*') ? 'icons/list_line_fill.svg' : 'icons/list_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('list-parameter.*') ? 'brightness-0 invert' : '' }}" alt="List Parameter">
                                     <span class="sidebar-text truncate">List Parameter</span>
                                 </a>
                                 <a href="{{ route('template-kategori-parameter.index') }}"
                                     class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('template-kategori-parameter.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     @if(request()->routeIs('template-kategori-parameter.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
-                                    <img src="{{ asset('icons/template_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('template-kategori-parameter.*') ? 'brightness-0 invert' : '' }}" alt="Template Parameter">
+                                    <img src="{{ asset(request()->routeIs('template-kategori-parameter.*') ? 'icons/template_fill.svg' : 'icons/template_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('template-kategori-parameter.*') ? 'brightness-0 invert' : '' }}" alt="Template Parameter">
                                     <span class="sidebar-text truncate">Template Parameter</span>
                                 </a>
                             @endpermission
@@ -124,13 +124,13 @@
                                 <a href="{{ route('roles.index') }}"
                                     class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('roles.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     @if(request()->routeIs('roles.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
-                                    <img src="{{ asset('icons/rbac_role_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('roles.*') ? 'brightness-0 invert' : '' }}" alt="RBAC Role">
+                                    <img src="{{ asset(request()->routeIs('roles.*') ? 'icons/rbac_role_fill.svg' : 'icons/rbac_role_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('roles.*') ? 'brightness-0 invert' : '' }}" alt="RBAC Role">
                                     <span class="sidebar-text truncate">RBAC Role</span>
                                 </a>
                                 <a href="{{ route('permissions.index') }}"
                                     class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     @if(request()->routeIs('permissions.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
-                                    <img src="{{ asset('icons/rbac_permission_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('permissions.*') ? 'brightness-0 invert' : '' }}" alt="RBAC Permission">
+                                    <img src="{{ asset(request()->routeIs('permissions.*') ? 'icons/rbac_permission_fill.svg' : 'icons/rbac_permission_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('permissions.*') ? 'brightness-0 invert' : '' }}" alt="RBAC Permission">
                                     <span class="sidebar-text truncate">RBAC Permission</span>
                                 </a>
                             @endpermission
@@ -139,7 +139,7 @@
                                 <a href="{{ route('users.index') }}"
                                     class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('users.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
                                     @if(request()->routeIs('users.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
-                                    <img src="{{ asset('icons/user_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('users.*') ? 'brightness-0 invert' : '' }}" alt="User">
+                                    <img src="{{ asset(request()->routeIs('users.*') ? 'icons/user_fill.svg' : 'icons/user_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('users.*') ? 'brightness-0 invert' : '' }}" alt="User">
                                     <span class="sidebar-text truncate">User</span>
                                 </a>
                             @endpermission
@@ -149,14 +149,14 @@
 
                 <a href="{{ route('download.index') }}"
                     class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('download.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                    <img src="{{ asset('icons/unduh_aplikasi_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('download.*') ? 'brightness-0 invert' : '' }}" alt="Unduh Aplikasi">
+                    <img src="{{ asset(request()->routeIs('download.*') ? 'icons/unduh_aplikasi_fill.svg' : 'icons/unduh_aplikasi_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('download.*') ? 'brightness-0 invert' : '' }}" alt="Unduh Aplikasi">
                     <span class="sidebar-text truncate">Unduh Aplikasi</span>
                 </a>
 
                 @permission('view_audit_log')
                 <a href="{{ route('audit-log.index') }}"
                     class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('audit-log.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
-                    <img src="{{ asset('icons/log_audit_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('audit-log.*') ? 'brightness-0 invert' : '' }}" alt="Log Audit">
+                    <img src="{{ asset(request()->routeIs('audit-log.*') ? 'icons/log_audit_fill.svg' : 'icons/log_audit_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('audit-log.*') ? 'brightness-0 invert' : '' }}" alt="Log Audit">
                     <span class="sidebar-text truncate">Log Audit</span>
                 </a>
                 @endpermission
