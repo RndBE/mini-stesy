@@ -185,11 +185,11 @@
                 <span class="text-xs font-semibold text-slate-600 uppercase tracking-wide mr-2">Keterangan:</span>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block h-3 w-3 rounded-full bg-emerald-500"></span>
-                    <span class="text-xs text-slate-600">â‰¥ 95% (Baik)</span>
+                    <span class="text-xs text-slate-600">> 95% (Baik)</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block h-3 w-3 rounded-full bg-yellow-400"></span>
-                    <span class="text-xs text-slate-600">60–94% (Sedang)</span>
+                    <span class="text-xs text-slate-600">60% - 94% (Sedang)</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="inline-block h-3 w-3 rounded-full bg-red-500"></span>
@@ -303,7 +303,7 @@
                 get overallAvg() {
                     if (!this.loggers.length) return 0;
                     const sum = this.loggers.reduce((a, l) => a + l.overall_pct, 0);
-                    return Math.round(sum / this.loggers.length * 10) / 10;
+                    return Math.round(sum / this.loggers.length);
                 },
 
                 async fetchData() {

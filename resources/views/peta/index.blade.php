@@ -831,8 +831,9 @@ background: rgba(0, 0, 0, 0.28);
                     <h3 class="font-semibold text-sm mb-4">FILTER PETA</h3>
                     @php
                         $arrThresholds = $thresholds['ARR'] ?? collect();
+                        $arrTotal = collect($points)->where('kategori', 'ARR')->count();
                     @endphp
-                    @if ($arrThresholds->isNotEmpty())
+                    @if ($arrThresholds->isNotEmpty() && $arrTotal > 0)
                         <div class="border rounded-xl p-4 mb-4">
                             <label class="flex items-center gap-2 font-semibold mb-3">
                                 <input type="checkbox" id="filterARR" checked class="accent-indigo-600">
@@ -847,12 +848,14 @@ background: rgba(0, 0, 0, 0.28);
                                             ->where('arr_state', $threshold->state_key)
                                             ->count();
                                     @endphp
+                                    @if($count > 0)
                                     <label class="flex items-center gap-2">
                                         <input type="checkbox" id="filterARR_{{ $threshold->state_key }}" checked>
                                         <img src="{{ asset('icons/arr/' . $threshold->state_key . '.svg') }}"
                                             class="h-7 w-7 inline-block" alt="{{ $threshold->state_label }}">
                                         {{ $threshold->state_label }} ({{ $count }})
                                     </label>
+                                    @endif
                                 @endforeach
                             </div>
                         </div>
@@ -862,6 +865,7 @@ background: rgba(0, 0, 0, 0.28);
                         $awlrOffline   = collect($points)->where('kategori', 'AWLR')->where('status', 'offline')->count();
                         $awlrPerbaikan = collect($points)->where('kategori', 'AWLR')->where('status', 'perbaikan')->count();
                     @endphp
+                    @if($awlrOnline + $awlrOffline + $awlrPerbaikan > 0)
                     <div class="border rounded-xl p-4 mb-4">
                         <label class="flex items-center gap-2 font-semibold mb-3">
                             <input type="checkbox" id="filterAWLR" checked class="accent-indigo-600">
@@ -869,16 +873,20 @@ background: rgba(0, 0, 0, 0.28);
                             AWLR (Automatic Water Level Recorder)
                         </label>
                         <div class="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm">
+                            @if($awlrOnline > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWLR_online" checked>
                                 <img src="{{ asset('icons/awlr/online.svg') }}" class="h-7 w-7 inline-block">
                                 Koneksi Terhubung ({{ $awlrOnline }})
                             </label>
+                            @endif
+                            @if($awlrOffline > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWLR_offline" checked>
                                 <img src="{{ asset('icons/awlr/offline.svg') }}" class="h-7 w-7 inline-block">
                                 Koneksi Terputus ({{ $awlrOffline }})
                             </label>
+                            @endif
                             @if($awlrPerbaikan > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWLR_perbaikan" checked>
@@ -888,6 +896,7 @@ background: rgba(0, 0, 0, 0.28);
                             @endif
                         </div>
                     </div>
+                    @endif
                     @php
                         $afmrOnline    = collect($points)->where('kategori', 'AFMR')->where('status', 'online')->count();
                         $afmrOffline   = collect($points)->where('kategori', 'AFMR')->where('status', 'offline')->count();
@@ -901,16 +910,20 @@ background: rgba(0, 0, 0, 0.28);
                             AFMR (Automatic Flow Measurement Recorder)
                         </label>
                         <div class="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm">
+                            @if($afmrOnline > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAFMR_online" checked>
                                 <img src="{{ asset('icons/afmr/online.svg') }}" class="h-7 w-7 inline-block">
                                 Koneksi Terhubung ({{ $afmrOnline }})
                             </label>
+                            @endif
+                            @if($afmrOffline > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAFMR_offline" checked>
                                 <img src="{{ asset('icons/afmr/offline.svg') }}" class="h-7 w-7 inline-block">
                                 Koneksi Terputus ({{ $afmrOffline }})
                             </label>
+                            @endif
                             @if($afmrPerbaikan > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAFMR_perbaikan" checked>
@@ -934,16 +947,20 @@ background: rgba(0, 0, 0, 0.28);
                             AWQR (Automatic Water Quality Recorder)
                         </label>
                         <div class="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm">
+                            @if($awqrOnline > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWQR_online" checked>
                                 <img src="{{ asset('icons/awgr/awlr_map_pins_on.svg') }}" class="h-7 w-7 inline-block">
                                 Koneksi Terhubung ({{ $awqrOnline }})
                             </label>
+                            @endif
+                            @if($awqrOffline > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWQR_offline" checked>
                                 <img src="{{ asset('icons/awgr/awlr_map_pins_off.svg') }}" class="h-7 w-7 inline-block">
                                 Koneksi Terputus ({{ $awqrOffline }})
                             </label>
+                            @endif
                             @if($awqrPerbaikan > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWQR_perbaikan" checked>
@@ -955,6 +972,7 @@ background: rgba(0, 0, 0, 0.28);
                     </div>
                     @endif
                     @php
+                        $awrTotal         = collect($points)->where('kategori', 'AWR')->count();
                         $awrOnline        = collect($points)->where('kategori', 'AWR')->where('status', 'online')->count();
                         $awrOffline       = collect($points)->where('kategori', 'AWR')->where('status', 'offline')->count();
                         $awrSangatRingan  = collect($points)->where('kategori', 'AWR')->where('arr_state', 'awr_sangat_ringan')->count();
@@ -969,6 +987,7 @@ background: rgba(0, 0, 0, 0.28);
                         })->count();
 
                     @endphp
+                    @if($awrTotal > 0)
                     <div class="border rounded-xl p-4">
                         <label class="flex items-center gap-2 font-semibold mb-3">
                             <input type="checkbox" id="filterAWR" checked class="accent-indigo-600">
@@ -976,48 +995,65 @@ background: rgba(0, 0, 0, 0.28);
                             AWR (Automatic Weather Recorder)
                         </label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                            @if($awrOnline > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWR_online" checked>
                                 <img src="{{ asset('icons/awr/online.svg') }}" class="h-7 w-7 inline-block">
                                 Terhubung ({{ $awrOnline }})
                             </label>
+                            @endif
+                            @if($awrSangatRingan > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWR_awr_sangat_ringan" checked>
                                 <img src="{{ asset('icons/awr/sangat_ringan.svg') }}" class="h-7 w-7 inline-block">
                                 Sangat Ringan ({{ $awrSangatRingan }})
                             </label>
+                            @endif
+                            @if($awrRingan > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWR_awr_ringan" checked>
                                 <img src="{{ asset('icons/awr/ringan.svg') }}" class="h-7 w-7 inline-block">
                                 Ringan ({{ $awrRingan }})
                             </label>
+                            @endif
+                            @if($awrSedang > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWR_awr_sedang" checked>
                                 <img src="{{ asset('icons/awr/sedang.svg') }}" class="h-7 w-7 inline-block">
                                 Sedang ({{ $awrSedang }})
                             </label>
+                            @endif
+                            @if($awrLebat > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWR_awr_lebat" checked>
                                 <img src="{{ asset('icons/awr/lebat.svg') }}" class="h-7 w-7 inline-block">
                                 Lebat ({{ $awrLebat }})
                             </label>
+                            @endif
+                            @if($awrSangatLebat > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWR_awr_sangat_lebat" checked>
                                 <img src="{{ asset('icons/awr/sangat_lebat.svg') }}" class="h-7 w-7 inline-block">
                                 Sangat Lebat ({{ $awrSangatLebat }})
                             </label>
+                            @endif
+                            @if($awrPerbaikan > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWR_perbaikan" checked>
                                 <img src="{{ asset('icons/awr/perbaikan.svg') }}" class="h-7 w-7 inline-block">
                                 Perbaikan ({{ $awrPerbaikan }})
                             </label>
+                            @endif
+                            @if($awrKoneksiPutus > 0)
                             <label class="flex items-center gap-2">
                                 <input type="checkbox" id="filterAWR_koneksi_terputus" checked>
                                 <img src="{{ asset('icons/awr/offline.svg') }}" class="h-7 w-7 inline-block">
                                 Koneksi Terputus ({{ $awrKoneksiPutus }})
                             </label>
+                            @endif
                         </div>
                     </div>
+                    @endif
                 </div>
                 <div class="modal-section">
                     <div class="section-title">JENIS PETA</div>

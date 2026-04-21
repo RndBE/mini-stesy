@@ -76,12 +76,14 @@ class RekapDataController extends Controller
                 // Future days not counted
                 if ($dayCarbon->startOfDay()->gt($now->copy()->startOfDay())) {
                     $expected = 0;
+                } elseif ($dayCarbon->isSameDay($now)) {
+                    $expected = (int) $now->copy()->startOfDay()->diffInMinutes($now);
                 } else {
                     $expected = 1440;
                 }
 
                 $count       = (int) ($counts[$date] ?? 0);
-                $pct         = $expected > 0 ? round(min(100, ($count / $expected) * 100), 1) : 0;
+                $pct         = $expected > 0 ? (int) round(min(100, ($count / $expected) * 100)) : 0;
                 $totalCount  += $count;
                 $totalExpect += $expected;
 
@@ -94,7 +96,7 @@ class RekapDataController extends Controller
             }
 
             $overallPct = $totalExpect > 0
-                ? round(min(100, ($totalCount / $totalExpect) * 100), 1)
+                ? (int) round(min(100, ($totalCount / $totalExpect) * 100))
                 : 0;
 
             $loggersData[] = [
