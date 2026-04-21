@@ -59,7 +59,7 @@
     @php
         $firstDevice = $devices->first();
     @endphp
-    <div x-data="realtimeHandler()" x-init="initData()" class="space-y-6">
+    <div x-data="realtimeHandler()" x-init="initData()" class="space-y-3">
 
         <!-- Header -->
         <div
