@@ -89,10 +89,11 @@
                             </svg>
                         </button>
 
-                        <div x-show="open" x-collapse x-cloak class="space-y-2 px-2 pb-2 pt-2">
+                        <div x-show="open" x-collapse x-cloak class="relative space-y-1 pb-3 pt-1 pl-3 pr-2 ml-[22px] border-l-[2px] border-slate-200">
                             @if (auth()->check() && (auth()->user()->hasPermission('manage_instansi') || auth()->user()->isInstansiAdmin()))
                                 <a href="{{ route('instansi.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('instansi.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('instansi.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    @if(request()->routeIs('instansi.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
                                     <img src="{{ asset('icons/instansi_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('instansi.*') ? 'brightness-0 invert' : '' }}" alt="Instansi">
                                     <span class="sidebar-text truncate">Instansi</span>
                                 </a>
@@ -100,17 +101,20 @@
 
                             @permission('manage_instansi')
                                 <a href="{{ route('kategori.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('kategori.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('kategori.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    @if(request()->routeIs('kategori.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
                                     <img src="{{ asset('icons/kategori_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('kategori.*') ? 'brightness-0 invert' : '' }}" alt="Kategori Logger">
                                     <span class="sidebar-text truncate">Kategori Logger</span>
                                 </a>
                                 <a href="{{ route('list-parameter.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('list-parameter.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('list-parameter.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    @if(request()->routeIs('list-parameter.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
                                     <img src="{{ asset('icons/list_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('list-parameter.*') ? 'brightness-0 invert' : '' }}" alt="List Parameter">
                                     <span class="sidebar-text truncate">List Parameter</span>
                                 </a>
                                 <a href="{{ route('template-kategori-parameter.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('template-kategori-parameter.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('template-kategori-parameter.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    @if(request()->routeIs('template-kategori-parameter.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
                                     <img src="{{ asset('icons/template_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('template-kategori-parameter.*') ? 'brightness-0 invert' : '' }}" alt="Template Parameter">
                                     <span class="sidebar-text truncate">Template Parameter</span>
                                 </a>
@@ -118,12 +122,14 @@
 
                             @permission('manage_rbac')
                                 <a href="{{ route('roles.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('roles.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('roles.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    @if(request()->routeIs('roles.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
                                     <img src="{{ asset('icons/rbac_role_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('roles.*') ? 'brightness-0 invert' : '' }}" alt="RBAC Role">
                                     <span class="sidebar-text truncate">RBAC Role</span>
                                 </a>
                                 <a href="{{ route('permissions.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    @if(request()->routeIs('permissions.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
                                     <img src="{{ asset('icons/rbac_permission_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('permissions.*') ? 'brightness-0 invert' : '' }}" alt="RBAC Permission">
                                     <span class="sidebar-text truncate">RBAC Permission</span>
                                 </a>
@@ -131,7 +137,8 @@
 
                             @permission('manage_user')
                                 <a href="{{ route('users.index') }}"
-                                    class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('users.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold {{ request()->routeIs('users.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-white' }}">
+                                    @if(request()->routeIs('users.*')) <div class="absolute -left-[14px] top-1.5 bottom-1.5 w-[3px] bg-[#303481] rounded-r-md"></div> @endif
                                     <img src="{{ asset('icons/user_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('users.*') ? 'brightness-0 invert' : '' }}" alt="User">
                                     <span class="sidebar-text truncate">User</span>
                                 </a>
