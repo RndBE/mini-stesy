@@ -206,7 +206,8 @@
                         path: String(mqttCfg.path || '/mqtt'),
                         user: String(mqttCfg.user || 'beacon'),
                         pass: String(mqttCfg.pass || 'be_jogja'),
-                        useSSL: Boolean(mqttCfg.useSSL || false),
+                        // Otomatis pakai WSS jika website dibuka via HTTPS (fix mixed content)
+                        useSSL: Boolean(mqttCfg.useSSL) || window.location.protocol === 'https:',
                         client: null,
                         connected: false,
                         connecting: false,
