@@ -14,10 +14,11 @@ class DataMasukController extends Controller
 {
     public function index()
     {
-        $loggers = t_Logger::query()
-            ->forUser(auth()->user())
-            ->orderBy('nama_logger')
-            ->get();
+        $query = t_Logger::query();
+        if (auth()->check()) {
+            $query->forUser(auth()->user());
+        }
+        $loggers = $query->orderBy('nama_logger')->get();
 
         return view('data-masuk.index', ['title' => 'Data Masuk'], compact('loggers'));
     }
@@ -54,10 +55,11 @@ class DataMasukController extends Controller
             }
 
             $sensorCount = null;
-            $loggerRow = t_Logger::query()
-                ->forUser(auth()->user())
-                ->where('id_logger', $logger_id)
-                ->first();
+            $queryLoggerRow = t_Logger::query()->where('id_logger', $logger_id);
+            if (auth()->check()) {
+                $queryLoggerRow->forUser(auth()->user());
+            }
+            $loggerRow = $queryLoggerRow->first();
 
             if (!$loggerRow) {
                 return response()->json([

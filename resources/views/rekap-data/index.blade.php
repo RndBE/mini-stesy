@@ -151,10 +151,10 @@
                         class="flex-1 sm:flex-none h-11 px-4 rounded-lg border-2 border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 active:scale-95">
                         Reset
                     </button>
-                    <button type="button" @click="window.location.href='{{ route('data-masuk.index') }}'"
+                    <!-- <button type="button" @click="window.location.href='{{ route('data-masuk.index') }}'"
                         class="flex-1 sm:flex-none h-11 px-4 rounded-lg border-2 border-indigo-600 text-indigo-700 font-semibold hover:bg-indigo-50 transition-all duration-200 active:scale-95 whitespace-nowrap">
                         Data per Logger
-                    </button>
+                    </button> -->
                 </div>
             </div>
 

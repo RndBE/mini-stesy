@@ -20,11 +20,13 @@
         }
     </style>
     <div class="min-h-screen flex">
-        @include('partials.sidebar')
-        <div id="sidebarBackdrop" class="fixed inset-0 z-30 hidden bg-black/50 lg:hidden"></div>
+        @auth
+            @include('partials.sidebar')
+            <div id="sidebarBackdrop" class="fixed inset-0 z-30 hidden bg-black/50 lg:hidden"></div>
+        @endauth
 
         <div id="mainContent" class="flex min-h-screen w-full flex-col transition-all duration-300"
-            style="margin-left: 16rem; width: calc(100% - 16rem);">
+            style="{{ auth()->check() ? 'margin-left: 16rem; width: calc(100% - 16rem);' : 'margin-left: 0; width: 100%;' }}">
             @include('partials.topbar')
 @php
                 $contentPaddingClass = request()->routeIs('peta.*') || request()->routeIs('skema-irigasi.*') ? '' : 'p-4';

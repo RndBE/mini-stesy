@@ -53,10 +53,9 @@ Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
     Route::get('/analisa/export/{id_logger}', [AnalisaController::class, 'exportExcel'])->name('analisa.export');
 });
 
-Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
-    Route::get('/data-masuk', [DataMasukController::class, 'index'])->name('data-masuk.index');
-    Route::get('/api/data-masuk', [DataMasukController::class, 'getData'])->name('data-masuk.api');
-});
+// Rute data-masuk dibuka untuk publik (tanpa login)
+Route::get('/data-masuk', [DataMasukController::class, 'index'])->name('data-masuk.index');
+Route::get('/api/data-masuk', [DataMasukController::class, 'getData'])->name('data-masuk.api');
 
 Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
     Route::get('/rekap-data', [RekapDataController::class, 'index'])->name('rekap-data.index');

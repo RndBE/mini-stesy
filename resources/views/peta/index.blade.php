@@ -1530,6 +1530,32 @@ const backdrop = document.getElementById('petaSidebarBackdrop');
             }
             setTimeout(() => map.invalidateSize(), 0);
         }
+
+        // Sinkronisasi otomatis Checkbox Induk (Kategori) dan Anak (Status/Kondisi)
+        ['ARR', 'AWLR', 'AWR', 'AWQR', 'AFMR'].forEach(cat => {
+            const parent = document.getElementById('filter' + cat);
+            if (!parent) return;
+
+            const children = document.querySelectorAll('input[type="checkbox"][id^="filter' + cat + '_"]');
+            
+            // Top-down: Induk di-klik -> ubah semua anak
+            parent.addEventListener('change', function() {
+                const isChecked = this.checked;
+                children.forEach(child => { 
+                    child.checked = isChecked; 
+                });
+            });
+
+            // Bottom-up: Anak di-klik -> sinkronisasi status induk
+            children.forEach(child => {
+                child.addEventListener('change', function() {
+                    // Beri centang induk jika ada SATU elemen anak saja yang masih di-centang
+                    const anyChecked = Array.from(children).some(c => c.checked);
+                    parent.checked = anyChecked;
+                });
+            });
+        });
+
         [
             'filterARR',
             'filterAWLR',

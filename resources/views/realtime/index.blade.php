@@ -534,7 +534,14 @@
                                                 'Sensor '),
                                             unit: p.satuan || '',
                                             column: p.kolom_sensor
-                                        }));
+                                        }))
+                                        .sort((a, b) => {
+                                            const matchA = String(a.column || '').match(/\d+/);
+                                            const matchB = String(b.column || '').match(/\d+/);
+                                            const numA = matchA ? parseInt(matchA[0], 10) : 9999;
+                                            const numB = matchB ? parseInt(matchB[0], 10) : 9999;
+                                            return numA - numB;
+                                        });
                                 } else {
                                     this.tabs = this.buildFallbackTabs(this.rawData[0] || incomingRows[0] || null);
                                 }
