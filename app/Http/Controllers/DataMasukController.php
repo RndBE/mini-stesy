@@ -270,45 +270,32 @@ class DataMasukController extends Controller
             }
         }
 
-        $mqttHost = env('MQTT_HOST', '103.82.241.100');
+        $mqttHost = env('MQTT_HOST', '72.60.78.159');
         $mqttPort = (int) env('MQTT_PORT', 1883);
         $mqttUser = env('MQTT_USER', 'beacon');
         $mqttPass = env('MQTT_PASS', 'be_jogja');
-
-        // Cek apakah MQTT diaktifkan via .env (default: nonaktif jika host = 127.0.0.1 atau MQTT_ENABLED = false)
-        $mqttEnabled = env('MQTT_ENABLED', true) && $mqttHost !== '127.0.0.1';
+        // $mqttCa = env('MQTT_CA', '/etc/ssl/certs/ca-bundle.crt');
 
         $mqttOk = null;
         $mqttErr = null;
 
-        if ($mqttEnabled) {
-            try {
-                $clientId = 'bemqtt-' . $id . '-' . \Illuminate\Support\Str::random(6);
-                $mqtt = new \Bluerhinos\phpMQTT($mqttHost, $mqttPort, $clientId);
-                $mqtt->keepalive = 5;
+        try {
+            $clientId = 'bemqtt-' . $id . '-' . \Illuminate\Support\Str::random(6);
+            $mqtt = new \Bluerhinos\phpMQTT($mqttHost, $mqttPort, $clientId);
+            // $mqtt = new phpMQTT($mqttHost, $mqttPort, $clientId, $mqttCa);
 
-                $prevTimeout = ini_get('default_socket_timeout');
-                ini_set('default_socket_timeout', 5);
 
-                $connected = @$mqtt->connect(true, null, $mqttUser, $mqttPass);
-
-                ini_set('default_socket_timeout', $prevTimeout);
-
-                if ($connected) {
-                    $mqtt->publish((string) $id, json_encode($payload), 0, false);
-                    $mqtt->close();
-                    $mqttOk = true;
-                } else {
-                    $mqttOk = false;
-                    $mqttErr = 'connect timeout / connection refused';
-                }
-            } catch (\Throwable $e) {
+            if ($mqtt->connect(true, null, $mqttUser, $mqttPass)) {
+                $mqtt->publish((string) $id, json_encode($payload), 0, false);
+                $mqtt->close();
+                $mqttOk = true;
+            } else {
                 $mqttOk = false;
-                $mqttErr = $e->getMessage();
+                $mqttErr = 'connect timeout';
             }
-        } else {
-            $mqttOk = null;
-            $mqttErr = 'MQTT dinonaktifkan (MQTT_HOST=127.0.0.1 atau MQTT_ENABLED=false)';
+        } catch (\Throwable $e) {
+            $mqttOk = false;
+            $mqttErr = $e->getMessage();
         }
 
         return response()->json([
