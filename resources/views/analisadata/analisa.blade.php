@@ -1710,9 +1710,9 @@
                 { label: '', data: [], hidden: true },
                 { label: '', data: [], hidden: true }
             ] : [
-                { label: 'Rerata',   data: [], borderColor: '#1e40af', backgroundColor: 'rgba(30,64,175,0.1)',  tension: 0.4, cubicInterpolationMode: 'monotone', fill: true,  borderWidth: 3, pointRadius: 2 },
-                { label: 'Minimum',  data: [], borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.1)', tension: 0.4, cubicInterpolationMode: 'monotone', fill: false, borderWidth: 2, borderDash: [5,5], pointRadius: 0 },
-                { label: 'Maksimum', data: [], borderColor: '#4338ca', backgroundColor: 'rgba(67,56,202,0.1)', tension: 0.4, cubicInterpolationMode: 'monotone', fill: true,  borderWidth: 2, borderDash: [5,5], pointRadius: 0 }
+                { label: 'Rerata',   data: [], borderColor: '#1e40af', backgroundColor: 'rgba(30,64,175,0.1)',  tension: 0.4, cubicInterpolationMode: 'monotone', fill: false, borderWidth: 3, pointRadius: 2 },
+                { label: 'Minimum',  data: [], borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.1)', tension: 0.4, cubicInterpolationMode: 'monotone', fill: 0,     borderWidth: 2, borderDash: [5,5], pointRadius: 0 },
+                { label: 'Maksimum', data: [], borderColor: '#4338ca', backgroundColor: 'rgba(67,56,202,0.1)', tension: 0.4, cubicInterpolationMode: 'monotone', fill: 0,     borderWidth: 2, borderDash: [5,5], pointRadius: 0 }
             ];
 
             chart = new Chart(ctx, {

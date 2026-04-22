@@ -280,15 +280,15 @@ class AnalisaController extends Controller
                     $min = $hourData->min($column);
                     $max = $hourData->max($column);
 
-                    $values[] = round($avg, 2);
-                    $minValues[] = round($min, 2);
-                    $maxValues[] = round($max, 2);
+                    $values[] = round($avg, 4);
+                    $minValues[] = round($min, 4);
+                    $maxValues[] = round($max, 4);
 
                     $tableData[] = [
                         'waktu'   => $hour,
-                        'rerata'  => round($avg, 2),
-                        'minimum' => round($min, 2),
-                        'maksimum' => round($max, 2),
+                        'rerata'  => round($avg, 4),
+                        'minimum' => round($min, 4),
+                        'maksimum' => round($max, 4),
                     ];
                 } else {
                     $values[] = null;
@@ -321,15 +321,15 @@ class AnalisaController extends Controller
                     $min = $dayData->min($column);
                     $max = $dayData->max($column);
 
-                    $values[] = round($avg, 2);
-                    $minValues[] = round($min, 2);
-                    $maxValues[] = round($max, 2);
+                    $values[] = round($avg, 4);
+                    $minValues[] = round($min, 4);
+                    $maxValues[] = round($max, 4);
 
                     $tableData[] = [
                         'waktu'   => "Tanggal $i",
-                        'rerata'  => round($avg, 2),
-                        'minimum' => round($min, 2),
-                        'maksimum' => round($max, 2),
+                        'rerata'  => round($avg, 4),
+                        'minimum' => round($min, 4),
+                        'maksimum' => round($max, 4),
                     ];
                 } else {
                     $values[] = null;
@@ -361,15 +361,15 @@ class AnalisaController extends Controller
                     $min = $dateData->min($column);
                     $max = $dateData->max($column);
 
-                    $values[] = round($avg, 2);
-                    $minValues[] = round($min, 2);
-                    $maxValues[] = round($max, 2);
+                    $values[] = round($avg, 4);
+                    $minValues[] = round($min, 4);
+                    $maxValues[] = round($max, 4);
 
                     $tableData[] = [
                         'waktu'   => date('d M Y', strtotime($dateKey)),
-                        'rerata'  => round($avg, 2),
-                        'minimum' => round($min, 2),
-                        'maksimum' => round($max, 2),
+                        'rerata'  => round($avg, 4),
+                        'minimum' => round($min, 4),
+                        'maksimum' => round($max, 4),
                     ];
                 } else {
                     $values[] = null;
@@ -403,15 +403,15 @@ class AnalisaController extends Controller
                     $min = $monthData->min($column);
                     $max = $monthData->max($column);
 
-                    $values[] = round($avg, 2);
-                    $minValues[] = round($min, 2);
-                    $maxValues[] = round($max, 2);
+                    $values[] = round($avg, 4);
+                    $minValues[] = round($min, 4);
+                    $maxValues[] = round($max, 4);
 
                     $tableData[] = [
                         'waktu'   => $mName,
-                        'rerata'  => round($avg, 2),
-                        'minimum' => round($min, 2),
-                        'maksimum' => round($max, 2),
+                        'rerata'  => round($avg, 4),
+                        'minimum' => round($min, 4),
+                        'maksimum' => round($max, 4),
                     ];
                 } else {
                     $values[] = null;
@@ -440,9 +440,9 @@ class AnalisaController extends Controller
             'minData'      => $minValues,
             'maxData'      => $maxValues,
             'tableData'    => $tableData,
-            'rerata'       => $numericValues->avg() ? round($numericValues->avg(), 2) : 0,
-            'minimum'      => $numericValues->min() ? round($numericValues->min(), 2) : 0,
-            'maksimum'     => $numericValues->max() ? round($numericValues->max(), 2) : 0,
+            'rerata'       => $numericValues->avg() ? round($numericValues->avg(), 4) : 0,
+            'minimum'      => $numericValues->min() ? round($numericValues->min(), 4) : 0,
+            'maksimum'     => $numericValues->max() ? round($numericValues->max(), 4) : 0,
             'tipe_graf'    => $param->tipe_graf ?? 'line',
             'akumulasi'    => $akumulasi,
             'klasifikasi'  => $klasifikasi,
