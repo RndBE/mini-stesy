@@ -345,7 +345,7 @@ class DeviceController extends Controller
             if (!str_contains($v, '_')) {
                 $v = str_replace(' ', '_', $v);
             }
-            return strtolower($v);
+            return $v;
         };
 
         if ($request->has('params') && is_array($request->params)) {
