@@ -137,9 +137,16 @@ class DataMasukController extends Controller
             })->toArray();
 
             // Calculate completeness: actual records / expected records per day (1440 minutes)
-            $expectedRecords = 1440; // 24 hours * 60 minutes per day
+            if ($tanggalParsed->isSameDay($now)) {
+                $expectedRecords = max(1, $tanggalAwal->diffInMinutes($now)); // Minutes passed since start of day
+            } else {
+                $expectedRecords = 1440; // 24 hours * 60 minutes per day
+            }
             $actualRecords = count($data);
             $completeness = round(($actualRecords / $expectedRecords) * 100, 2);
+            if ($completeness > 100) {
+                $completeness = 100;
+            }
 
             return response()->json([
                 'success' => true,
