@@ -280,15 +280,15 @@ class AnalisaController extends Controller
                     $min = $hourData->min($column);
                     $max = $hourData->max($column);
 
-                    $values[] = round($avg, 4);
-                    $minValues[] = round($min, 4);
-                    $maxValues[] = round($max, 4);
+                    $values[] = round($avg, 3);
+                    $minValues[] = round($min, 3);
+                    $maxValues[] = round($max, 3);
 
                     $tableData[] = [
                         'waktu'   => $hour,
-                        'rerata'  => round($avg, 4),
-                        'minimum' => round($min, 4),
-                        'maksimum' => round($max, 4),
+                        'rerata'  => round($avg, 3),
+                        'minimum' => round($min, 3),
+                        'maksimum' => round($max, 3),
                     ];
                 } else {
                     $values[] = null;
