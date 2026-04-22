@@ -1748,7 +1748,8 @@
                             border: { display: false }
                         },
                         y: {
-                            beginAtZero: true,
+                            beginAtZero: isBar,
+                            grace: isBar ? '0%' : '15%',
                             min: isBar ? 0 : undefined,
                             grid: { color: 'rgba(148,163,184,0.15)', lineWidth: 1 },
                             ticks: {
