@@ -289,12 +289,20 @@ class DataMasukController extends Controller
         $mqttErr = null;
 
         try {
+            $mqttTimeout = 5; // seconds
             $clientId = 'bemqtt-' . $id . '-' . \Illuminate\Support\Str::random(6);
             $mqtt = new \Bluerhinos\phpMQTT($mqttHost, $mqttPort, $clientId);
             // $mqtt = new phpMQTT($mqttHost, $mqttPort, $clientId, $mqttCa);
 
+            // Set default socket timeout agar connect() tidak hang tanpa batas
+            $oldTimeout = ini_get('default_socket_timeout');
+            ini_set('default_socket_timeout', $mqttTimeout);
 
             if ($mqtt->connect(true, null, $mqttUser, $mqttPass)) {
+                // Set stream timeout pada socket yang sudah terkoneksi
+                if (isset($mqtt->socket) && is_resource($mqtt->socket)) {
+                    stream_set_timeout($mqtt->socket, $mqttTimeout);
+                }
                 $mqtt->publish("tes", json_encode($payload), 0, false);
                 $mqtt->close();
                 $mqttOk = true;
@@ -302,9 +310,16 @@ class DataMasukController extends Controller
                 $mqttOk = false;
                 $mqttErr = 'connect timeout';
             }
+
+            // Kembalikan default_socket_timeout ke nilai semula
+            ini_set('default_socket_timeout', $oldTimeout);
         } catch (\Throwable $e) {
             $mqttOk = false;
             $mqttErr = $e->getMessage();
+            // Pastikan timeout dikembalikan meskipun ada error
+            if (isset($oldTimeout)) {
+                ini_set('default_socket_timeout', $oldTimeout);
+            }
         }
 
         return response()->json([
