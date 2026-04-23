@@ -6,7 +6,6 @@ use App\Models\t_Logger;
 use App\Models\Parameter_sensor;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Bluerhinos\phpMQTT;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -279,113 +278,45 @@ class DataMasukController extends Controller
             }
         }
 
-        $mqttHost = env('MQTT_HOST', 'mqtt.beacontelemetry.com');
-        $mqttPort = (int) env('MQTT_PORT', 8883);
-        $mqttUser = env('MQTT_USER', 'userlog');
-        $mqttPass = env('MQTT_PASS', 'b34c0n');
-        $mqttCa  = env('MQTT_CA', '/etc/ssl/certs/ca-bundle.crt');
-
         $mqttOk = null;
         $mqttErr = null;
+        $mqttDebug = [];
 
-        // ── MQTT publish dengan timeout ketat (3 detik) ──────────────────────
-        // phpMQTT library hardcode timeout 60 detik di stream_socket_client
-        // dan method read() bisa hang tanpa batas. Kita bypass library
-        // dan pakai raw socket langsung agar timeout bisa dikontrol.
+        // ── MQTT publish via php-mqtt/laravel-client ──────────────────────────
+        // Konfigurasi TLS, sertifikat CA, auth, dan timeout ada di config/mqtt-client.php
+        // dan .env. Library ini menangani TLS handshake + timeout dengan benar.
         try {
-            $mqttTimeout = 3; // detik — cukup untuk connect + publish
-            $clientId = 'bemqtt-' . $id . '-' . \Illuminate\Support\Str::random(6);
-            $topic = 'tes';
-            $mqttPayload = json_encode($payload);
+            // Log config yang dipakai untuk debugging
+            $mqttDebug = [
+                'host'            => config('mqtt-client.connections.default.host'),
+                'port'            => config('mqtt-client.connections.default.port'),
+                'protocol'        => config('mqtt-client.connections.default.protocol'),
+                'tls_enabled'     => config('mqtt-client.connections.default.connection_settings.tls.enabled'),
+                'ca_file'         => config('mqtt-client.connections.default.connection_settings.tls.ca_file'),
+                'ca_file_exists'  => file_exists((string) config('mqtt-client.connections.default.connection_settings.tls.ca_file', '')),
+                'verify_peer'     => config('mqtt-client.connections.default.connection_settings.tls.verify_peer'),
+                'verify_peer_name'=> config('mqtt-client.connections.default.connection_settings.tls.verify_peer_name'),
+                'auth_username'   => config('mqtt-client.connections.default.connection_settings.auth.username') ? '***set***' : '***empty***',
+                'connect_timeout' => config('mqtt-client.connections.default.connection_settings.connect_timeout'),
+                'socket_timeout'  => config('mqtt-client.connections.default.connection_settings.socket_timeout'),
+            ];
 
-            // 1. Buka koneksi TCP/TLS dengan timeout ketat
-            $protocol = $mqttPort === 8883 ? 'tls' : 'tcp';
-            $errno = 0;
-            $errstr = '';
-
-            // Buat SSL context dengan CA certificate untuk TLS
-            $contextOpts = [];
-            if ($protocol === 'tls' && $mqttCa && file_exists($mqttCa)) {
-                $contextOpts['ssl'] = [
-                    'verify_peer'       => true,
-                    'verify_peer_name'  => true,
-                    'cafile'            => $mqttCa,
-                    'allow_self_signed' => false,
-                ];
-            } elseif ($protocol === 'tls') {
-                // Kalau file CA tidak ada, tetap coba tanpa verify (fallback)
-                $contextOpts['ssl'] = [
-                    'verify_peer'       => false,
-                    'verify_peer_name'  => false,
-                    'allow_self_signed' => true,
-                ];
-            }
-            $context = stream_context_create($contextOpts);
-
-            $socket = @stream_socket_client(
-                "{$protocol}://{$mqttHost}:{$mqttPort}",
-                $errno,
-                $errstr,
-                $mqttTimeout,                // ← timeout connect (3 detik, bukan 60)
-                STREAM_CLIENT_CONNECT,
-                $context                     // ← SSL context dengan sertifikat CA
+            \PhpMqtt\Client\Facades\MQTT::publish(
+                (string) $id,                // topic = id_logger
+                json_encode($payload),       // payload JSON
+                0,                           // QoS 0 = fire and forget
             );
-
-            if (!$socket) {
-                throw new \RuntimeException("MQTT connect failed: [{$errno}] {$errstr}");
-            }
-
-            // Set read/write timeout pada socket yang sudah terbuka
-            stream_set_timeout($socket, $mqttTimeout);
-            stream_set_blocking($socket, true);
-
-            // 2. Bangun CONNECT packet (MQTT 3.1.1)
-            $connectPayload = '';
-            $connectPayload .= pack('n', 4) . 'MQTT';      // Protocol Name
-            $connectPayload .= chr(0x04);                    // Protocol Level (4 = 3.1.1)
-            $connectFlags = 0x02;                            // Clean Session
-            if ($mqttUser) $connectFlags |= 0x80;            // Username flag
-            if ($mqttPass) $connectFlags |= 0x40;            // Password flag
-            $connectPayload .= chr($connectFlags);
-            $connectPayload .= pack('n', 10);                // Keep Alive (10s)
-            $connectPayload .= pack('n', strlen($clientId)) . $clientId;
-            if ($mqttUser) $connectPayload .= pack('n', strlen($mqttUser)) . $mqttUser;
-            if ($mqttPass) $connectPayload .= pack('n', strlen($mqttPass)) . $mqttPass;
-
-            // Fixed header: type=CONNECT (0x10) + remaining length
-            $remainLen = strlen($connectPayload);
-            $fixedHeader = chr(0x10) . chr($remainLen);
-            fwrite($socket, $fixedHeader . $connectPayload);
-
-            // 3. Baca CONNACK (4 bytes: fixed header 2 + variable header 2)
-            $connack = fread($socket, 4);
-            if ($connack === false || strlen($connack) < 4) {
-                fclose($socket);
-                throw new \RuntimeException('MQTT CONNACK timeout — broker tidak merespon');
-            }
-            $connackReturnCode = ord($connack[3]);
-            if ($connackReturnCode !== 0) {
-                fclose($socket);
-                throw new \RuntimeException("MQTT CONNACK error code: {$connackReturnCode}");
-            }
-
-            // 4. Bangun PUBLISH packet (QoS 0 — fire and forget, tidak perlu ACK)
-            $publishPayload = pack('n', strlen($topic)) . $topic . $mqttPayload;
-            $publishLen = strlen($publishPayload);
-            $publishHeader = chr(0x30) . chr($publishLen);
-            fwrite($socket, $publishHeader . $publishPayload);
-
-            // 5. DISCONNECT + tutup socket
-            fwrite($socket, chr(0xe0) . chr(0x00));
-            fclose($socket);
-
             $mqttOk = true;
         } catch (\Throwable $e) {
             $mqttOk = false;
             $mqttErr = $e->getMessage();
-            if (isset($socket) && is_resource($socket)) {
-                @fclose($socket);
-            }
+            $mqttDebug['exception_class'] = get_class($e);
+            $mqttDebug['exception_file']  = $e->getFile() . ':' . $e->getLine();
+            $mqttDebug['trace_short']     = array_slice(
+                array_map(fn($f) => ($f['file'] ?? '?') . ':' . ($f['line'] ?? '?') . ' ' . ($f['class'] ?? '') . ($f['type'] ?? '') . ($f['function'] ?? ''),
+                    $e->getTrace()),
+                0, 5  // top 5 frames saja
+            );
         }
 
         return response()->json([
@@ -401,6 +332,7 @@ class DataMasukController extends Controller
                 'ok' => $mqttOk,
                 'error' => $mqttErr,
                 'topic' => (string) $id,
+                'debug' => $mqttDebug,
             ],
         ]);
     }

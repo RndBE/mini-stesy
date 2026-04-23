@@ -239,27 +239,15 @@ class AwgcCommandController extends Controller
     }
 
     /**
-     * Publish perintah ke MQTT broker menggunakan library phpMQTT.
+     * Publish perintah ke MQTT broker menggunakan php-mqtt/laravel-client.
      */
     private function publishToMqtt(string $idLogger, array $payload): bool
     {
         try {
-            $mqtt = new \phpMQTT(
-                env('MQTT_HOST', '72.60.78.159'),
-                (int) env('MQTT_PORT', 1883),
-                'laravel-awgc-' . uniqid()
-            );
-
-            if (!$mqtt->connect(true, null, env('MQTT_USER'), env('MQTT_PASS'))) {
-                Log::error('MQTT connect gagal saat kirim perintah AWGC');
-                return false;
-            }
-
             $topic   = "stesy/awgc/{$idLogger}/command";
             $message = json_encode($payload);
 
-            $mqtt->publish($topic, $message, 1); // QoS 1 = at least once
-            $mqtt->close();
+            \PhpMqtt\Client\Facades\MQTT::publish($topic, $message, 0);
 
             Log::info("AWGC command published to {$topic}: {$message}");
             return true;
