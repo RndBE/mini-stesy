@@ -283,7 +283,7 @@ class DataMasukController extends Controller
         $mqttPort = (int) env('MQTT_PORT', 8883);
         $mqttUser = env('MQTT_USER', 'userlog');
         $mqttPass = env('MQTT_PASS', 'b34c0n');
-        // $mqttCa = env('MQTT_CA', '/etc/ssl/certs/ca-bundle.crt');
+        $mqttCa  = env('MQTT_CA', '/etc/ssl/certs/ca-bundle.crt');
 
         $mqttOk = null;
         $mqttErr = null;
@@ -302,12 +302,33 @@ class DataMasukController extends Controller
             $protocol = $mqttPort === 8883 ? 'tls' : 'tcp';
             $errno = 0;
             $errstr = '';
+
+            // Buat SSL context dengan CA certificate untuk TLS
+            $contextOpts = [];
+            if ($protocol === 'tls' && $mqttCa && file_exists($mqttCa)) {
+                $contextOpts['ssl'] = [
+                    'verify_peer'       => true,
+                    'verify_peer_name'  => true,
+                    'cafile'            => $mqttCa,
+                    'allow_self_signed' => false,
+                ];
+            } elseif ($protocol === 'tls') {
+                // Kalau file CA tidak ada, tetap coba tanpa verify (fallback)
+                $contextOpts['ssl'] = [
+                    'verify_peer'       => false,
+                    'verify_peer_name'  => false,
+                    'allow_self_signed' => true,
+                ];
+            }
+            $context = stream_context_create($contextOpts);
+
             $socket = @stream_socket_client(
                 "{$protocol}://{$mqttHost}:{$mqttPort}",
                 $errno,
                 $errstr,
                 $mqttTimeout,                // ← timeout connect (3 detik, bukan 60)
-                STREAM_CLIENT_CONNECT
+                STREAM_CLIENT_CONNECT,
+                $context                     // ← SSL context dengan sertifikat CA
             );
 
             if (!$socket) {
