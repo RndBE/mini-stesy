@@ -58,9 +58,6 @@ class RekapDataController extends Controller
             $sensorCount = $this->resolveSensorCount($logger);
             $tableMain   = $this->resolveMainTable($logger->tabel_main ?? null, $sensorCount);
 
-            // Detect actual sending interval from recent data
-            $intervalMinutes = $this->detectIntervalMinutes($tableMain, $logger->id_logger);
-
             // Get counts grouped by date in one query.
             // COUNT DISTINCT per-minute to deduplicate double-sends within the same minute.
             $counts = DB::table($tableMain)
@@ -77,18 +74,22 @@ class RekapDataController extends Controller
 
             foreach ($dates as $date) {
                 $dayCarbon = Carbon::parse($date, config('app.timezone'));
-                // Future days not counted
+                $count     = (int) ($counts[$date] ?? 0);
+
+                // Future days: tidak dihitung (tampil "–")
                 if ($dayCarbon->startOfDay()->gt($now->copy()->startOfDay())) {
                     $expected = 0;
+                    $pct      = 0;
                 } elseif ($dayCarbon->isSameDay($now)) {
-                    $minutesElapsed = (int) $now->copy()->startOfDay()->diffInMinutes($now);
-                    $expected = (int) ceil($minutesElapsed / $intervalMinutes);
+                    // Hari ini: expected = menit yang sudah berlalu sejak tengah malam
+                    $expected = max(1, (int) $now->copy()->startOfDay()->diffInMinutes($now));
+                    $pct      = (int) round(min(100, ($count / $expected) * 100));
                 } else {
-                    $expected = (int) ceil(1440 / $intervalMinutes);
+                    // Hari lampau: expected = 1440 menit (1 hari penuh)
+                    $expected = 1440;
+                    $pct      = (int) round(min(100, ($count / $expected) * 100));
                 }
 
-                $count       = (int) ($counts[$date] ?? 0);
-                $pct         = $expected > 0 ? (int) round(min(100, ($count / $expected) * 100)) : 0;
                 $totalCount  += $count;
                 $totalExpect += $expected;
 
