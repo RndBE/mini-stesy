@@ -761,6 +761,20 @@ class MiniStesySeeder extends Seeder
             ]);
         }
 
+        // AFMR Non-Contact data untuk AFMR Kranggan (10005)
+        if (Schema::hasTable('afmr_noncontact_data')) {
+            DB::table('afmr_noncontact_data')->insert([
+                [
+                    'id_logger'           => '10005',
+                    'tinggi_sensor'       => 6.00,   // tinggi sensor dari dasar sungai (m)
+                    'jarak_sensor_ke_air' => 3.50,   // jarak sensor ke permukaan air (m)
+                    'elevasi_max'         => 6.00,   // batas skala atas (m)
+                    'elevasi_min'         => 0.00,   // batas skala bawah (m)
+                    'catatan'             => 'Sensor radar non-contact, konfigurasi awal',
+                ],
+            ]);
+        }
+
         DB::table('foto_pos')->insert([
             ['id' => 1, 'id_logger' => '10366', 'url_foto' => 'pos/10366.png', 'foto_utama' => 1],
             ['id' => 2, 'id_logger' => '10002', 'url_foto' => 'pos/10002.png', 'foto_utama' => 1],

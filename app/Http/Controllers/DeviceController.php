@@ -10,6 +10,8 @@ use App\Models\Instansi;
 use App\Models\t_Lokasi;
 use App\Models\Jiat_data;
 use App\Models\NonJiatData;
+use App\Models\AfmrContactData;
+use App\Models\AfmrNonContactData;
 use App\Models\Parameter;
 use App\Models\ParameterGroup;
 use App\Models\ListParameter;
@@ -30,7 +32,7 @@ class DeviceController extends Controller
     {
         $devices = t_Logger::query()
             ->forUser(auth()->user())
-            ->with(['lokasi', 'params', 'jiat', 'nonjiat', 'perbaikan'])
+            ->with(['lokasi', 'params', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'perbaikan'])
             ->orderBy('id_logger')
             ->get()
             ->map(function ($d) {
@@ -45,6 +47,8 @@ class DeviceController extends Controller
                     'lokasi'             => $d->lokasi,
                     'jiat'               => $d->jiat,
                     'nonjiat'            => $d->nonjiat,
+                    'afmr_contact'       => $d->afmrContact,
+                    'afmr_noncontact'    => $d->afmrNonContact,
                     'params'             => $d->params->map(function ($p) {
                         return [
                             'id_param'           => $p->id_param,
@@ -116,6 +120,7 @@ class DeviceController extends Controller
             'templateMap' => $templateMap,
             'listParameters' => $listParameters,
             'awlrCategoryIds' => $this->awlrCategoryIds(),
+            'afmrCategoryIds' => $this->afmrCategoryIds(),
         ]);
     }
 
@@ -157,7 +162,7 @@ class DeviceController extends Controller
             // 'pilih_instansi'    => 'required|exists:instansi,id',
             'latitude'          => 'required|numeric',
             'longitude'         => 'required|numeric',
-            'sub_kategori'      => 'nullable|in:jiat,non_jiat',
+            'sub_kategori'      => 'nullable|in:jiat,non_jiat,contact,non_contact',
             'has_pump'          => 'nullable|boolean',
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
@@ -240,6 +245,34 @@ class DeviceController extends Controller
                     }
                 }
 
+                // 3b. AFMR data: contact atau non-contact
+                if ($this->isAfmrCategoryId($logger->id_katlogger)) {
+                    $subKategori = $validated['sub_kategori'] ?? 'non_contact';
+
+                    if ($subKategori === 'contact') {
+                        AfmrContactData::updateOrCreate(
+                            ['id_logger' => $logger->id_logger],
+                            [
+                                'lebar_sungai'    => isset($validated['lebar_sungai']) ? (float) $validated['lebar_sungai'] : null,
+                                'kedalaman_rata'  => isset($validated['kedalaman_rata']) ? (float) $validated['kedalaman_rata'] : null,
+                                'koefisien_debit' => isset($validated['koefisien_debit']) ? (float) $validated['koefisien_debit'] : null,
+                                'catatan'         => $validated['catatan_afmr'] ?? null,
+                            ]
+                        );
+                    } else {
+                        AfmrNonContactData::updateOrCreate(
+                            ['id_logger' => $logger->id_logger],
+                            [
+                                'tinggi_sensor'       => isset($validated['tinggi_sensor']) ? (float) $validated['tinggi_sensor'] : null,
+                                'jarak_sensor_ke_air' => isset($validated['jarak_sensor_ke_air']) ? (float) $validated['jarak_sensor_ke_air'] : null,
+                                'elevasi_max'         => isset($validated['elevasi_max']) ? (float) $validated['elevasi_max'] : null,
+                                'elevasi_min'         => isset($validated['elevasi_min']) ? (float) $validated['elevasi_min'] : null,
+                                'catatan'             => $validated['catatan_afmr'] ?? null,
+                            ]
+                        );
+                    }
+                }
+
                 // 4. Create parameters
                 foreach ($validated['params'] as $param) {
                     $parameterGroupId = $param['parameter_group_id']
@@ -271,7 +304,7 @@ class DeviceController extends Controller
             'nama_lokasi'       => 'required|string|max:255',
             'latitude'          => 'nullable|numeric',
             'longitude'         => 'nullable|numeric',
-            'sub_kategori'      => 'nullable|in:jiat,non_jiat',
+            'sub_kategori'      => 'nullable|in:jiat,non_jiat,contact,non_contact',
             'has_pump'          => 'nullable|boolean',
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
@@ -333,6 +366,34 @@ class DeviceController extends Controller
                         'tinggi_sensor'       => (float) ($request->tinggi_sensor ?? 0),
                         'elevasi_max'         => $request->elevasi_max !== null ? (float) $request->elevasi_max : null,
                         'elevasi_min'         => $request->elevasi_min !== null ? (float) $request->elevasi_min : null,
+                    ]
+                );
+            }
+        }
+
+        // AFMR: contact atau non-contact
+        if ($this->isAfmrCategoryId($logger->id_katlogger)) {
+            $subKategori = $request->input('sub_kategori', 'non_contact');
+
+            if ($subKategori === 'contact') {
+                AfmrContactData::updateOrCreate(
+                    ['id_logger' => $logger->id_logger],
+                    [
+                        'lebar_sungai'    => $request->lebar_sungai !== null ? (float) $request->lebar_sungai : null,
+                        'kedalaman_rata'  => $request->kedalaman_rata !== null ? (float) $request->kedalaman_rata : null,
+                        'koefisien_debit' => $request->koefisien_debit !== null ? (float) $request->koefisien_debit : null,
+                        'catatan'         => $request->catatan_afmr ?? null,
+                    ]
+                );
+            } else {
+                AfmrNonContactData::updateOrCreate(
+                    ['id_logger' => $logger->id_logger],
+                    [
+                        'tinggi_sensor'       => $request->tinggi_sensor !== null ? (float) $request->tinggi_sensor : null,
+                        'jarak_sensor_ke_air' => $request->jarak_sensor_ke_air !== null ? (float) $request->jarak_sensor_ke_air : null,
+                        'elevasi_max'         => $request->elevasi_max !== null ? (float) $request->elevasi_max : null,
+                        'elevasi_min'         => $request->elevasi_min !== null ? (float) $request->elevasi_min : null,
+                        'catatan'             => $request->catatan_afmr ?? null,
                     ]
                 );
             }
@@ -799,6 +860,31 @@ class DeviceController extends Controller
         if ($cache === null) {
             $cache = Kategori_logger::query()
                 ->whereRaw('UPPER(nama_kategori) = ?', ['AWLR'])
+                ->pluck('id_katlogger')
+                ->map(fn($id) => (int) $id)
+                ->values()
+                ->all();
+        }
+
+        return $cache;
+    }
+
+    private function isAfmrCategoryId($idKatlogger): bool
+    {
+        if ($idKatlogger === null || $idKatlogger === '') {
+            return false;
+        }
+
+        return in_array((int) $idKatlogger, $this->afmrCategoryIds(), true);
+    }
+
+    private function afmrCategoryIds(): array
+    {
+        static $cache = null;
+
+        if ($cache === null) {
+            $cache = Kategori_logger::query()
+                ->whereRaw('UPPER(nama_kategori) = ?', ['AFMR'])
                 ->pluck('id_katlogger')
                 ->map(fn($id) => (int) $id)
                 ->values()

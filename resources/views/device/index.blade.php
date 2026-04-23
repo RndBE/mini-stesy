@@ -860,6 +860,30 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                     </template>
                                 </div>
                             </template>
+
+                            {{-- ── AFMR: Contact / Non-Contact ─────────────────────────── --}}
+                            <template x-if="isEditAfmr()">
+                                <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                    <h4 class="text-sm font-semibold text-gray-900 mb-4">Sub Kategori AFMR</h4>
+                                    <div class="flex items-center gap-8 mb-4">
+                                        <label class="inline-flex items-center gap-2 text-sm text-gray-800">
+                                            <input type="radio" name="sub_kategori" value="contact"
+                                                x-model="editData.subKategori"
+                                                class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
+                                            Contact
+                                        </label>
+                                        <label class="inline-flex items-center gap-2 text-sm text-gray-800">
+                                            <input type="radio" name="sub_kategori" value="non_contact"
+                                                x-model="editData.subKategori"
+                                                class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
+                                            Non-Contact
+                                        </label>
+                                    </div>
+
+
+                                </div>
+                            </template>
+
 <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-3">Pilih Lokasi di Peta</h4>
                                 <div class="grid grid-cols-2 gap-4 mb-3">
@@ -1162,6 +1186,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                 templateMap: @json($templateMap ?? []),
                 listParameterOptions: @json($listParameters ?? []),
                 awlrCategoryIds: @json($awlrCategoryIds ?? []),
+                afmrCategoryIds: @json($afmrCategoryIds ?? []),
                 addDeviceMap: null,
                 addDeviceMarker: null,
                 editDeviceMap: null,
@@ -1198,6 +1223,10 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     tinggi_sensor: '',
                     elevasi_max: '',
                     elevasi_min: '',
+                    // AFMR Contact
+                    lebar_sungai: '',
+                    kedalaman_rata: '',
+                    koefisien_debit: '',
                     params: []
                 },
                 addData: {
@@ -1509,12 +1538,22 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     return (this.awlrCategoryIds || []).map(id => Number(id)).includes(parsedId)
                 },
 
+                isAfmrKategori(kategoriId) {
+                    const parsedId = Number(kategoriId)
+                    if (Number.isNaN(parsedId) || !parsedId) return false
+                    return (this.afmrCategoryIds || []).map(id => Number(id)).includes(parsedId)
+                },
+
                 isAddAwlr() {
                     return this.isAwlrKategori(this.addData.id_katlogger)
                 },
 
                 isEditAwlr() {
                     return this.isAwlrKategori(this.editData.id_katlogger)
+                },
+
+                isEditAfmr() {
+                    return this.isAfmrKategori(this.editData.id_katlogger)
                 },
 
                 canControlPump(device) {
@@ -1774,10 +1813,20 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         kedalaman_sumur: device.jiat?.kedalaman_sumur ?? '',
                         kedalaman_sensor: device.jiat?.kedalaman_sensor ?? '',
                         kedalaman_pompa: device.jiat?.kedalaman_pompa ?? '',
-                        jarak_sensor_ke_air: device.nonjiat?.jarak_sensor_ke_air != null ? parseFloat(device.nonjiat.jarak_sensor_ke_air) : '',
-                        tinggi_sensor: device.nonjiat?.tinggi_sensor != null ? parseFloat(device.nonjiat.tinggi_sensor) : '',
-                        elevasi_max: device.nonjiat?.elevasi_max != null ? parseFloat(device.nonjiat.elevasi_max) : '',
-                        elevasi_min: device.nonjiat?.elevasi_min != null ? parseFloat(device.nonjiat.elevasi_min) : '',
+                        jarak_sensor_ke_air: device.nonjiat?.jarak_sensor_ke_air != null ? parseFloat(device.nonjiat.jarak_sensor_ke_air) : (device.afmr_noncontact?.jarak_sensor_ke_air != null ? parseFloat(device.afmr_noncontact.jarak_sensor_ke_air) : ''),
+                        tinggi_sensor: device.nonjiat?.tinggi_sensor != null ? parseFloat(device.nonjiat.tinggi_sensor) : (device.afmr_noncontact?.tinggi_sensor != null ? parseFloat(device.afmr_noncontact.tinggi_sensor) : ''),
+                        elevasi_max: device.nonjiat?.elevasi_max != null ? parseFloat(device.nonjiat.elevasi_max) : (device.afmr_noncontact?.elevasi_max != null ? parseFloat(device.afmr_noncontact.elevasi_max) : ''),
+                        elevasi_min: device.nonjiat?.elevasi_min != null ? parseFloat(device.nonjiat.elevasi_min) : (device.afmr_noncontact?.elevasi_min != null ? parseFloat(device.afmr_noncontact.elevasi_min) : ''),
+                        // AFMR sub_kategori detection
+                        subKategori: device.nonjiat
+                            ? 'non_jiat'
+                            : (parseFloat(device.jiat?.kedalaman_sumur ?? 0) > 0 ? 'jiat'
+                            : (device.afmr_contact ? 'contact'
+                            : (device.afmr_noncontact ? 'non_contact' : 'non_contact'))),
+                        // AFMR Contact fields
+                        lebar_sungai: device.afmr_contact?.lebar_sungai != null ? parseFloat(device.afmr_contact.lebar_sungai) : '',
+                        kedalaman_rata: device.afmr_contact?.kedalaman_rata != null ? parseFloat(device.afmr_contact.kedalaman_rata) : '',
+                        koefisien_debit: device.afmr_contact?.koefisien_debit != null ? parseFloat(device.afmr_contact.koefisien_debit) : '',
                     })
                     this.editData.params = []
                     const sensorCount = parseInt(device.sensor_count ?? 16, 10)

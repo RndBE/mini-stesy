@@ -294,6 +294,8 @@
                             $muted = !$isOnline;
                             $iconClass = $muted ? 'grayscale opacity-40' : '';
 
+                            $subKategoriAfmr = $lg->afmrContact ? 'contact' : 'non_contact';
+
                             $kategoriKey = strtoupper((string) ($lg->kategori?->nama_kategori ?? $kategoriName));
                             $kategoriView = match ($kategoriKey) {
                                 'AWLR' => 'beranda.categories.awlr',
@@ -336,6 +338,7 @@
                             'muted'           => $muted,
                             'iconClass'       => $iconClass,
                             'subKategoriAwlr' => $subKategoriAwlr ?? 'non_jiat',
+                            'subKategoriAfmr' => $subKategoriAfmr ?? 'non_contact',
                             'pTma'            => $pTma ?? null,
                             'pDebit'          => $pDebit ?? null,
                             'tma'             => $tma ?? null,
