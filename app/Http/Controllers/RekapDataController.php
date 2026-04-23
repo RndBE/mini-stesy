@@ -58,9 +58,13 @@ class RekapDataController extends Controller
             $sensorCount = $this->resolveSensorCount($logger);
             $tableMain   = $this->resolveMainTable($logger->tabel_main ?? null, $sensorCount);
 
-            // Get counts grouped by date in one query
+            // Detect actual sending interval from recent data
+            $intervalMinutes = $this->detectIntervalMinutes($tableMain, $logger->id_logger);
+
+            // Get counts grouped by date in one query.
+            // COUNT DISTINCT per-minute to deduplicate double-sends within the same minute.
             $counts = DB::table($tableMain)
-                ->selectRaw('DATE(waktu) as tgl, COUNT(*) as cnt')
+                ->selectRaw("DATE(waktu) as tgl, COUNT(DISTINCT DATE_FORMAT(waktu, '%Y-%m-%d %H:%i')) as cnt")
                 ->where('id_logger', $logger->id_logger)
                 ->whereBetween('waktu', [$start, $end])
                 ->groupByRaw('DATE(waktu)')
@@ -77,9 +81,10 @@ class RekapDataController extends Controller
                 if ($dayCarbon->startOfDay()->gt($now->copy()->startOfDay())) {
                     $expected = 0;
                 } elseif ($dayCarbon->isSameDay($now)) {
-                    $expected = (int) $now->copy()->startOfDay()->diffInMinutes($now);
+                    $minutesElapsed = (int) $now->copy()->startOfDay()->diffInMinutes($now);
+                    $expected = (int) ceil($minutesElapsed / $intervalMinutes);
                 } else {
-                    $expected = 1440;
+                    $expected = (int) ceil(1440 / $intervalMinutes);
                 }
 
                 $count       = (int) ($counts[$date] ?? 0);
@@ -122,6 +127,41 @@ class RekapDataController extends Controller
     // ---------------------------------------------------------------
     // Helpers (mirrors DataMasukController)
     // ---------------------------------------------------------------
+
+    /**
+     * Detect the logger's sending interval in minutes by inspecting
+     * the time gap between its most recent consecutive records.
+     * Falls back to 1 minute if data is insufficient.
+     */
+    private function detectIntervalMinutes(string $tableMain, string $loggerId): int
+    {
+        try {
+            $times = DB::table($tableMain)
+                ->where('id_logger', $loggerId)
+                ->orderBy('waktu', 'desc')
+                ->limit(10)
+                ->pluck('waktu');
+
+            if ($times->count() < 2) return 1;
+
+            $intervals = [];
+            for ($i = 0; $i < min($times->count() - 1, 5); $i++) {
+                $diff = (int) abs(
+                    Carbon::parse($times[$i])->diffInSeconds(Carbon::parse($times[$i + 1]))
+                );
+                if ($diff > 0) $intervals[] = $diff;
+            }
+
+            if (empty($intervals)) return 1;
+
+            // Use median to avoid outliers, convert seconds → minutes
+            sort($intervals);
+            $median = $intervals[(int) floor(count($intervals) / 2)];
+            return max(1, (int) round($median / 60));
+        } catch (\Throwable $e) {
+            return 1;
+        }
+    }
 
     private function resolveSensorCount($logger): int
     {
