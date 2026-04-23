@@ -58,10 +58,9 @@ class RekapDataController extends Controller
             $sensorCount = $this->resolveSensorCount($logger);
             $tableMain   = $this->resolveMainTable($logger->tabel_main ?? null, $sensorCount);
 
-            // Get counts grouped by date in one query.
-            // COUNT DISTINCT per-minute to deduplicate double-sends within the same minute.
+            // Get counts grouped by date in one query
             $counts = DB::table($tableMain)
-                ->selectRaw("DATE(waktu) as tgl, COUNT(DISTINCT DATE_FORMAT(waktu, '%Y-%m-%d %H:%i')) as cnt")
+                ->selectRaw('DATE(waktu) as tgl, COUNT(*) as cnt')
                 ->where('id_logger', $logger->id_logger)
                 ->whereBetween('waktu', [$start, $end])
                 ->groupByRaw('DATE(waktu)')
@@ -74,23 +73,20 @@ class RekapDataController extends Controller
 
             foreach ($dates as $date) {
                 $dayCarbon = Carbon::parse($date, config('app.timezone'));
-                $count     = (int) ($counts[$date] ?? 0);
-
-                // Future days: tidak dihitung (tampil "–")
+                // Future days not counted
                 if ($dayCarbon->startOfDay()->gt($now->copy()->startOfDay())) {
                     $expected = 0;
-                    $pct      = 0;
                 } elseif ($dayCarbon->isSameDay($now)) {
-                    // Hari ini: expected = menit yang sudah berlalu sejak tengah malam
-                    $expected = max(1, (int) $now->copy()->startOfDay()->diffInMinutes($now));
-                    $pct      = (int) round(min(100, ($count / $expected) * 100));
+                    $expected = (int) $now->copy()->startOfDay()->diffInMinutes($now);
                 } else {
-                    // Hari lampau: expected = 1440 menit (1 hari penuh)
                     $expected = 1440;
-                    $pct      = (int) round(min(100, ($count / $expected) * 100));
                 }
 
-                $totalCount  += $count;
+                $rawCount    = (int) ($counts[$date] ?? 0);
+                // Cap tampilan count agar tidak melebihi expected (misal 1471 → 1440)
+                $count       = $expected > 0 ? min($rawCount, $expected) : $rawCount;
+                $pct         = $expected > 0 ? (int) round(($count / $expected) * 100) : 0;
+                $totalCount  += $rawCount;
                 $totalExpect += $expected;
 
                 $days[] = [
@@ -128,41 +124,6 @@ class RekapDataController extends Controller
     // ---------------------------------------------------------------
     // Helpers (mirrors DataMasukController)
     // ---------------------------------------------------------------
-
-    /**
-     * Detect the logger's sending interval in minutes by inspecting
-     * the time gap between its most recent consecutive records.
-     * Falls back to 1 minute if data is insufficient.
-     */
-    private function detectIntervalMinutes(string $tableMain, string $loggerId): int
-    {
-        try {
-            $times = DB::table($tableMain)
-                ->where('id_logger', $loggerId)
-                ->orderBy('waktu', 'desc')
-                ->limit(10)
-                ->pluck('waktu');
-
-            if ($times->count() < 2) return 1;
-
-            $intervals = [];
-            for ($i = 0; $i < min($times->count() - 1, 5); $i++) {
-                $diff = (int) abs(
-                    Carbon::parse($times[$i])->diffInSeconds(Carbon::parse($times[$i + 1]))
-                );
-                if ($diff > 0) $intervals[] = $diff;
-            }
-
-            if (empty($intervals)) return 1;
-
-            // Use median to avoid outliers, convert seconds → minutes
-            sort($intervals);
-            $median = $intervals[(int) floor(count($intervals) / 2)];
-            return max(1, (int) round($median / 60));
-        } catch (\Throwable $e) {
-            return 1;
-        }
-    }
 
     private function resolveSensorCount($logger): int
     {
