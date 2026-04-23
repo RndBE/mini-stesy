@@ -653,9 +653,9 @@ background: rgba(0, 0, 0, 0.28);
 @if ($kat === 'AWLR' && ($point['sub_kategori'] ?? '') === 'jiat')
                                     <div class="text-center my-2">
                                         <div class="text-xl font-bold text-slate-900">
-                                            {{ is_numeric($point['kedalaman_sumur']) ? $fmt($point['kedalaman_sumur'], 3) . ' m' : '-' }}
+                                            {{ is_numeric($point['muka_air_tanah']) ? $fmt($point['muka_air_tanah'], 3) . ' m' : '-' }}
                                         </div>
-                                        <div class="text-xs text-slate-500">Kedalaman Air Sumur</div>
+                                        <div class="text-xs text-slate-500">Muka Air Tanah</div>
                                     </div>
 
 @elseif ($kat === 'AWLR')

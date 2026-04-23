@@ -79,6 +79,8 @@ class PetaController extends Controller
                     'status'   => $status,
                     'last_time' => $lastTime,
                     'kedalaman_sumur' => $l->jiat?->kedalaman_sumur,
+                    'muka_air_tanah'  => $this->sensorVal($l->params, $latest, ['muka_air_tanah', 'muka_air', 'water_table', 'mat']),
+
 
                     // ── AWLR Non-JIAT ──────────────────────────────────────────────
                     'sub_kategori' => $l->nonjiat ? 'non_jiat' : ($l->jiat && (float)($l->jiat->kedalaman_sumur ?? 0) > 0 ? 'jiat' : 'non_jiat'),
