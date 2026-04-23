@@ -279,10 +279,10 @@ class DataMasukController extends Controller
             }
         }
 
-        $mqttHost = env('MQTT_HOST', '72.60.78.159');
-        $mqttPort = (int) env('MQTT_PORT', 1883);
-        $mqttUser = env('MQTT_USER', 'beacon');
-        $mqttPass = env('MQTT_PASS', 'be_jogja');
+        $mqttHost = env('MQTT_HOST', '103.82.241.100');
+        $mqttPort = (int) env('MQTT_PORT', 8383);
+        $mqttUser = env('MQTT_USER', 'userlog');
+        $mqttPass = env('MQTT_PASS', 'b34c0n');
         // $mqttCa = env('MQTT_CA', '/etc/ssl/certs/ca-bundle.crt');
 
         $mqttOk = null;
