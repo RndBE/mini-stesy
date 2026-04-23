@@ -295,7 +295,7 @@ class DataMasukController extends Controller
 
 
             if ($mqtt->connect(true, null, $mqttUser, $mqttPass)) {
-                $mqtt->publish((string) $id, json_encode($payload), 0, false);
+                $mqtt->publish("tes", json_encode($payload), 0, false);
                 $mqtt->close();
                 $mqttOk = true;
             } else {
