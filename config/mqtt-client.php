@@ -99,7 +99,7 @@ return [
                 // Auto-reconnect dimatikan agar tidak hang
                 'auto_reconnect' => [
                     'enabled' => false,
-                    'max_reconnect_attempts' => 0,
+                    'max_reconnect_attempts' => 1,
                     'delay_between_reconnect_attempts' => 0,
                 ],
 
