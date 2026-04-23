@@ -288,37 +288,82 @@ class DataMasukController extends Controller
         $mqttOk = null;
         $mqttErr = null;
 
+        // ── MQTT publish dengan timeout ketat (3 detik) ──────────────────────
+        // phpMQTT library hardcode timeout 60 detik di stream_socket_client
+        // dan method read() bisa hang tanpa batas. Kita bypass library
+        // dan pakai raw socket langsung agar timeout bisa dikontrol.
         try {
-            $mqttTimeout = 5; // seconds
+            $mqttTimeout = 3; // detik — cukup untuk connect + publish
             $clientId = 'bemqtt-' . $id . '-' . \Illuminate\Support\Str::random(6);
-            $mqtt = new \Bluerhinos\phpMQTT($mqttHost, $mqttPort, $clientId);
-            // $mqtt = new phpMQTT($mqttHost, $mqttPort, $clientId, $mqttCa);
+            $topic = 'tes';
+            $mqttPayload = json_encode($payload);
 
-            // Set default socket timeout agar connect() tidak hang tanpa batas
-            $oldTimeout = ini_get('default_socket_timeout');
-            ini_set('default_socket_timeout', $mqttTimeout);
+            // 1. Buka koneksi TCP/TLS dengan timeout ketat
+            $protocol = $mqttPort === 8883 ? 'tls' : 'tcp';
+            $errno = 0;
+            $errstr = '';
+            $socket = @stream_socket_client(
+                "{$protocol}://{$mqttHost}:{$mqttPort}",
+                $errno,
+                $errstr,
+                $mqttTimeout,                // ← timeout connect (3 detik, bukan 60)
+                STREAM_CLIENT_CONNECT
+            );
 
-            if ($mqtt->connect(true, null, $mqttUser, $mqttPass)) {
-                // Set stream timeout pada socket yang sudah terkoneksi
-                if (isset($mqtt->socket) && is_resource($mqtt->socket)) {
-                    stream_set_timeout($mqtt->socket, $mqttTimeout);
-                }
-                $mqtt->publish("tes", json_encode($payload), 0, false);
-                $mqtt->close();
-                $mqttOk = true;
-            } else {
-                $mqttOk = false;
-                $mqttErr = 'connect timeout';
+            if (!$socket) {
+                throw new \RuntimeException("MQTT connect failed: [{$errno}] {$errstr}");
             }
 
-            // Kembalikan default_socket_timeout ke nilai semula
-            ini_set('default_socket_timeout', $oldTimeout);
+            // Set read/write timeout pada socket yang sudah terbuka
+            stream_set_timeout($socket, $mqttTimeout);
+            stream_set_blocking($socket, true);
+
+            // 2. Bangun CONNECT packet (MQTT 3.1.1)
+            $connectPayload = '';
+            $connectPayload .= pack('n', 4) . 'MQTT';      // Protocol Name
+            $connectPayload .= chr(0x04);                    // Protocol Level (4 = 3.1.1)
+            $connectFlags = 0x02;                            // Clean Session
+            if ($mqttUser) $connectFlags |= 0x80;            // Username flag
+            if ($mqttPass) $connectFlags |= 0x40;            // Password flag
+            $connectPayload .= chr($connectFlags);
+            $connectPayload .= pack('n', 10);                // Keep Alive (10s)
+            $connectPayload .= pack('n', strlen($clientId)) . $clientId;
+            if ($mqttUser) $connectPayload .= pack('n', strlen($mqttUser)) . $mqttUser;
+            if ($mqttPass) $connectPayload .= pack('n', strlen($mqttPass)) . $mqttPass;
+
+            // Fixed header: type=CONNECT (0x10) + remaining length
+            $remainLen = strlen($connectPayload);
+            $fixedHeader = chr(0x10) . chr($remainLen);
+            fwrite($socket, $fixedHeader . $connectPayload);
+
+            // 3. Baca CONNACK (4 bytes: fixed header 2 + variable header 2)
+            $connack = fread($socket, 4);
+            if ($connack === false || strlen($connack) < 4) {
+                fclose($socket);
+                throw new \RuntimeException('MQTT CONNACK timeout — broker tidak merespon');
+            }
+            $connackReturnCode = ord($connack[3]);
+            if ($connackReturnCode !== 0) {
+                fclose($socket);
+                throw new \RuntimeException("MQTT CONNACK error code: {$connackReturnCode}");
+            }
+
+            // 4. Bangun PUBLISH packet (QoS 0 — fire and forget, tidak perlu ACK)
+            $publishPayload = pack('n', strlen($topic)) . $topic . $mqttPayload;
+            $publishLen = strlen($publishPayload);
+            $publishHeader = chr(0x30) . chr($publishLen);
+            fwrite($socket, $publishHeader . $publishPayload);
+
+            // 5. DISCONNECT + tutup socket
+            fwrite($socket, chr(0xe0) . chr(0x00));
+            fclose($socket);
+
+            $mqttOk = true;
         } catch (\Throwable $e) {
             $mqttOk = false;
             $mqttErr = $e->getMessage();
-            // Pastikan timeout dikembalikan meskipun ada error
-            if (isset($oldTimeout)) {
-                ini_set('default_socket_timeout', $oldTimeout);
+            if (isset($socket) && is_resource($socket)) {
+                @fclose($socket);
             }
         }
 
