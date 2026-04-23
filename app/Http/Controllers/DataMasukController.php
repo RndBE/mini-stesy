@@ -293,7 +293,7 @@ class DataMasukController extends Controller
                 'protocol'        => config('mqtt-client.connections.default.protocol'),
                 'tls_enabled'     => config('mqtt-client.connections.default.connection_settings.tls.enabled'),
                 'ca_file'         => config('mqtt-client.connections.default.connection_settings.tls.ca_file'),
-                'ca_file_exists'  => file_exists((string) config('mqtt-client.connections.default.connection_settings.tls.ca_file', '')),
+                'ca_file_exists'  => (function() { try { return @file_exists((string) config('mqtt-client.connections.default.connection_settings.tls.ca_file', '')); } catch (\Throwable $e) { return 'check_failed: ' . $e->getMessage(); } })(),
                 'verify_peer'     => config('mqtt-client.connections.default.connection_settings.tls.verify_peer'),
                 'verify_peer_name'=> config('mqtt-client.connections.default.connection_settings.tls.verify_peer_name'),
                 'auth_username'   => config('mqtt-client.connections.default.connection_settings.auth.username') ? '***set***' : '***empty***',
