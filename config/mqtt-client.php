@@ -28,6 +28,10 @@ return [
     | an individual connection from the application itself, but all connections
     | defined here can be accessed via name conveniently.
     |
+    | Mode:
+    |   Server (TLS)  : MQTT_PORT=8883  MQTT_TLS_ENABLED=true  (butuh CA cert)
+    |   Lokal (no TLS): MQTT_PORT=1883  MQTT_TLS_ENABLED=false (tanpa sertifikat)
+    |
     */
 
     'connections' => [
@@ -61,6 +65,7 @@ return [
             'connection_settings' => [
 
                 // The TLS settings used for the connection.
+                // Set MQTT_TLS_ENABLED=false di .env untuk koneksi non-TLS (port 1883).
                 'tls' => [
                     'enabled' => env('MQTT_TLS_ENABLED', true),
                     'allow_self_signed_certificate' => env('MQTT_TLS_ALLOW_SELF_SIGNED_CERT', false),

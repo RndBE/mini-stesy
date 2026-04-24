@@ -3474,8 +3474,6 @@
 
                 openPumpModal() {
                     this.showPumpModal = true
-                    // Auto-fetch current pump status saat modal dibuka
-                    this.fetchPumpStatus()
                 },
 
                 closePumpModal() {
@@ -3508,29 +3506,6 @@
                     this.pumpSteps = this.pumpSteps.map(s => s.key === key ? {...s, status, subtitle: subtitle ?? s.subtitle} : s)
                 },
 
-                async fetchPumpStatus() {
-                    try {
-                        const res = await fetch('{{ route("pump.command") }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
-                                'Accept': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                id_logger: '{{ $logger->id_logger }}',
-                                action: 'get',
-                            }),
-                        })
-                        const data = await res.json()
-                        if (data.success && data.pump) {
-                            this.pumpState = data.pump.state === 1 ? 'on' : 'off'
-                        }
-                    } catch (e) {
-                        console.warn('Gagal ambil status pompa:', e)
-                    }
-                },
-
                 async runPumpAction(target) {
                     this.resetPump()
                     this.pumpTargetState = target
@@ -3541,19 +3516,18 @@
                     this.pumpSteps = [
                         { key: 'confirm', title: 'Send command', subtitle: `Sent command: ${cmd}`, status: 'done' },
                         { key: 'mqtt',   title: 'Connecting to MQTT broker', subtitle: 'Menghubungkan ke broker...', status: 'active' },
-                        { key: 'logger', title: 'Menunggu respon dari logger', subtitle: 'Menunggu balasan...', status: 'pending' },
-                        { key: 'ack',    title: 'Receiving acknowledgment', subtitle: 'Menunggu status eksekusi...', status: 'pending' },
+                        { key: 'logger', title: 'Mengirim perintah ke logger', subtitle: 'Mengirim perintah...', status: 'pending' },
                     ]
 
                     try {
-                        // Step 2: Kirim ke API (connect MQTT + publish + subscribe wait)
                         this.mark('mqtt', 'active', 'Menghubungkan ke MQTT broker...')
 
-                        const res = await fetch('{{ route("pump.command") }}', {
+                        // Langsung set logger ke active karena API akan konek + publish + tunggu respon sekaligus
+                        const fetchPromise = fetch('{{ route("pump.command") }}', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 'Accept': 'application/json',
                             },
                             body: JSON.stringify({
@@ -3562,24 +3536,24 @@
                             }),
                         })
 
+                        // Setelah ~1 detik, anggap MQTT sudah konek, pindah ke step logger
+                        await new Promise(r => setTimeout(r, 1000))
+                        this.mark('mqtt', 'done', 'MQTT connected')
+                        this.mark('logger', 'active', 'Menunggu respon dari logger...')
+
+                        const res = await fetchPromise
                         const data = await res.json()
 
                         if (!res.ok) {
-                            // Tentukan step mana yang gagal berdasarkan response
                             const failStep = data.step || 'mqtt_connect'
 
                             if (failStep === 'mqtt_connect') {
+                                // Gagal konek ke MQTT — revert mqtt step
                                 this.mark('mqtt', 'error', data.message || 'Gagal terhubung ke broker')
-                            } else if (failStep === 'timeout') {
-                                this.mark('mqtt', 'done', 'MQTT connected')
-                                this.mark('logger', 'done', 'Command terkirim')
-                                this.mark('ack', 'error', data.message || 'Logger tidak merespons (timeout)')
-                            } else if (failStep === 'logger_error') {
-                                this.mark('mqtt', 'done', 'MQTT connected')
-                                this.mark('logger', 'done', 'Respon diterima')
-                                this.mark('ack', 'error', data.message || 'Logger merespons dengan error')
+                                this.mark('logger', 'pending', 'Mengirim perintah...')
                             } else {
-                                this.mark('mqtt', 'error', data.message || 'Terjadi kesalahan')
+                                // timeout atau logger_error — mqtt sudah ok, logger yang gagal
+                                this.mark('logger', 'error', data.message || 'Logger tidak merespons')
                             }
 
                             this.pumpError = data.message || 'Gagal mengirim perintah'
@@ -3587,16 +3561,8 @@
                             return
                         }
 
-                        // Sukses — animate steps ke done
-                        this.mark('mqtt', 'done', 'MQTT connected')
-                        this.mark('logger', 'active', 'Respon diterima dari logger...')
-
-                        await new Promise(r => setTimeout(r, 400))
-                        this.mark('logger', 'done', 'Respon diterima')
-                        this.mark('ack', 'active', 'Validasi eksekusi...')
-
-                        await new Promise(r => setTimeout(r, 400))
-                        this.mark('ack', 'done', data.pump?.msg || 'Acknowledgment received')
+                        // Sukses — logger merespons
+                        this.mark('logger', 'done', data.pump?.msg || 'Respon diterima dari logger')
 
                         this.pumpRunning = false
                         this.pumpState = target
