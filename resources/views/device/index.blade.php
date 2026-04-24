@@ -1637,6 +1637,9 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
 
                     this.resetPumpWorkflow()
                     this.showPumpModal = true
+
+                    // Auto-fetch current pump status
+                    this.fetchPumpStatus(device?.id_logger)
                 },
 
                 closePumpModal() {
@@ -1661,6 +1664,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         visible: false,
                         running: false,
                         success: false,
+                        error: null,
                         steps: []
                     }
                 },
@@ -1712,6 +1716,10 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         return 'border-emerald-200 bg-emerald-50/40 shadow-[0_0_0_1px_rgba(16,185,129,0.05)]'
                     }
 
+                    if (status === 'error') {
+                        return 'border-red-200 bg-red-50/70'
+                    }
+
                     return 'border-slate-200 bg-white/70 opacity-80'
                 },
 
@@ -1722,6 +1730,10 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
 
                     if (status === 'active') {
                         return 'bg-emerald-100/80'
+                    }
+
+                    if (status === 'error') {
+                        return 'bg-red-100'
                     }
 
                     return 'bg-slate-100'
@@ -1750,7 +1762,31 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     })
                 },
 
-                runPumpAction(targetState) {
+                async fetchPumpStatus(idLogger) {
+                    if (!idLogger) return
+                    try {
+                        const res = await fetch('{{ route("pump.command") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                id_logger: idLogger,
+                                action: 'get',
+                            }),
+                        })
+                        const data = await res.json()
+                        if (data.success && data.pump) {
+                            this.setPumpPreviewState(data.pump.state === 1 ? 'on' : 'off')
+                        }
+                    } catch (e) {
+                        console.warn('Gagal ambil status pompa:', e)
+                    }
+                },
+
+                async runPumpAction(targetState) {
                     const nextState = targetState === 'on' ? 'on' : 'off'
                     const commandName = nextState === 'on' ? 'turn_on_pump' : 'turn_off_pump'
 
@@ -1761,29 +1797,74 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         visible: true,
                         running: true,
                         success: false,
+                        error: null,
                         steps: this.buildPumpWorkflowSteps(commandName)
                     }
 
-                    this.pumpWorkflowTimers.push(window.setTimeout(() => {
-                        this.markPumpStep('mqtt', 'done', 'MQTT connected')
-                        this.markPumpStep('logger', 'active', 'Connecting...')
-                    }, 1100))
+                    try {
+                        this.markPumpStep('mqtt', 'active', 'Menghubungkan ke MQTT broker...')
 
-                    this.pumpWorkflowTimers.push(window.setTimeout(() => {
+                        const res = await fetch('{{ route("pump.command") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                id_logger: this.pumpControlData.id_logger,
+                                action: nextState,
+                            }),
+                        })
+
+                        const data = await res.json()
+
+                        if (!res.ok) {
+                            const failStep = data.step || 'mqtt_connect'
+
+                            if (failStep === 'mqtt_connect') {
+                                this.markPumpStep('mqtt', 'error', data.message || 'Gagal terhubung ke broker')
+                            } else if (failStep === 'timeout') {
+                                this.markPumpStep('mqtt', 'done', 'MQTT connected')
+                                this.markPumpStep('logger', 'done', 'Command terkirim')
+                                this.markPumpStep('ack', 'error', data.message || 'Logger tidak merespons (timeout)')
+                            } else if (failStep === 'logger_error') {
+                                this.markPumpStep('mqtt', 'done', 'MQTT connected')
+                                this.markPumpStep('logger', 'done', 'Respon diterima')
+                                this.markPumpStep('ack', 'error', data.message || 'Logger merespons dengan error')
+                            } else {
+                                this.markPumpStep('mqtt', 'error', data.message || 'Terjadi kesalahan')
+                            }
+
+                            this.pumpWorkflow.error = data.message || 'Gagal mengirim perintah'
+                            this.pumpWorkflow.running = false
+                            return
+                        }
+
+                        // Sukses — animate steps
+                        this.markPumpStep('mqtt', 'done', 'MQTT connected')
+                        this.markPumpStep('logger', 'active', 'Respon diterima dari logger...')
+
+                        await new Promise(r => setTimeout(r, 400))
                         this.markPumpStep('logger', 'done', 'Logger connected')
                         this.markPumpStep('ack', 'active', 'Receiving acknowledgment...')
-                    }, 2400))
 
-                    this.pumpWorkflowTimers.push(window.setTimeout(() => {
-                        this.markPumpStep('ack', 'done', 'Acknowledgment received')
+                        await new Promise(r => setTimeout(r, 400))
+                        this.markPumpStep('ack', 'done', data.pump?.msg || 'Acknowledgment received')
                         this.pumpWorkflow.running = false
                         this.pumpWorkflow.success = true
                         this.setPumpPreviewState(nextState)
-                    }, 3900))
 
-                    this.pumpWorkflowTimers.push(window.setTimeout(() => {
-                        this.pumpWorkflow.visible = false
-                    }, 6100))
+                        this.pumpWorkflowTimers.push(window.setTimeout(() => {
+                            this.pumpWorkflow.visible = false
+                        }, 3000))
+
+                    } catch (e) {
+                        console.error('Pump command error:', e)
+                        this.markPumpStep('mqtt', 'error', 'Network error: ' + (e.message || 'Tidak dapat terhubung'))
+                        this.pumpWorkflow.error = 'Gagal menghubungi server'
+                        this.pumpWorkflow.running = false
+                    }
                 },
 
                 openModal(device) {

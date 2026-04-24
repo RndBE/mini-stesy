@@ -23,6 +23,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\SettingLoggerController;
 use App\Http\Controllers\SkemaIrigasiController;
 use App\Http\Controllers\Api\AwgcCommandController;
+use App\Http\Controllers\Api\PumpCommandController;
 use Illuminate\Support\Facades\Http;
 
 // Route::get('/', function () {
@@ -80,6 +81,9 @@ Route::middleware(['auth'])->group(function () {
 
 // Endpoint konfirmasi dari firmware alat AWGC (tanpa auth, diamankan via token di payload)
 Route::post('/api/awgc/confirm/{commandId}', [AwgcCommandController::class, 'confirm'])->name('awgc.command.confirm');
+
+// Perintah kontrol pompa AWLR JIAT via MQTT
+Route::middleware(['auth'])->post('/api/pump/command', [PumpCommandController::class, 'command'])->name('pump.command');
 
 Route::middleware(['auth', 'permission:view_audit_log'])->get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 // Route::middleware(['auth'])->post('/audit-log/client-export', [AuditLogController::class, 'clientExport'])->name('audit-log.client-export');

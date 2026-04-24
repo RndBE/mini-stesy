@@ -897,10 +897,10 @@
                                         <div class="space-y-2">
                                             <template x-for="(step, index) in pumpSteps" :key="step.key">
                                                 <div class="rounded-xl border p-3 transition"
-                                                    :class="step.status === 'done' ? 'border-emerald-200 bg-emerald-50/70' : step.status === 'active' ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-white/70 opacity-80'">
+                                                    :class="step.status === 'done' ? 'border-emerald-200 bg-emerald-50/70' : step.status === 'active' ? 'border-emerald-200 bg-emerald-50/40' : step.status === 'error' ? 'border-red-200 bg-red-50/70' : 'border-slate-200 bg-white/70 opacity-80'">
                                                     <div class="flex items-center gap-2.5">
                                                         <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl"
-                                                            :class="step.status === 'done' ? 'bg-emerald-100' : step.status === 'active' ? 'bg-emerald-100/80' : 'bg-slate-100'">
+                                                            :class="step.status === 'done' ? 'bg-emerald-100' : step.status === 'active' ? 'bg-emerald-100/80' : step.status === 'error' ? 'bg-red-100' : 'bg-slate-100'">
                                                             <template x-if="step.status === 'done'">
                                                                 <svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
                                                                     <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 010 1.42l-7.2 7.2a1 1 0 01-1.415 0l-3-3a1 1 0 111.414-1.42l2.293 2.295 6.493-6.495a1 1 0 011.415 0z" clip-rule="evenodd" />
@@ -909,13 +909,18 @@
                                                             <template x-if="step.status === 'active'">
                                                                 <span class="inline-block h-4 w-4 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></span>
                                                             </template>
+                                                            <template x-if="step.status === 'error'">
+                                                                <svg class="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </template>
                                                             <template x-if="step.status === 'pending'">
                                                                 <span class="h-2 w-2 rounded-full bg-slate-300"></span>
                                                             </template>
                                                         </div>
                                                         <div class="min-w-0 flex-1">
-                                                            <p class="text-sm font-semibold" :class="step.status === 'pending' ? 'text-slate-500' : 'text-slate-900'" x-text="step.title"></p>
-                                                            <p class="mt-0.5 text-xs" :class="step.status === 'pending' ? 'text-slate-400' : 'text-slate-500'" x-text="step.subtitle"></p>
+                                                            <p class="text-sm font-semibold" :class="step.status === 'pending' ? 'text-slate-500' : step.status === 'error' ? 'text-red-700' : 'text-slate-900'" x-text="step.title"></p>
+                                                            <p class="mt-0.5 text-xs" :class="step.status === 'pending' ? 'text-slate-400' : step.status === 'error' ? 'text-red-500' : 'text-slate-500'" x-text="step.subtitle"></p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -3465,9 +3470,12 @@
                 pumpWorkflowVisible: false,
                 pumpSteps: [],
                 pumpTimers: [],
+                pumpError: null,
 
                 openPumpModal() {
                     this.showPumpModal = true
+                    // Auto-fetch current pump status saat modal dibuka
+                    this.fetchPumpStatus()
                 },
 
                 closePumpModal() {
@@ -3476,6 +3484,7 @@
                     this.pumpTimers = []
                     this.pumpWorkflowVisible = false
                     this.pumpSteps = []
+                    this.pumpError = null
                     this.showPumpModal = false
                 },
 
@@ -3492,39 +3501,114 @@
                     this.pumpRunning = false
                     this.pumpWorkflowVisible = false
                     this.pumpSteps = []
+                    this.pumpError = null
                 },
 
-                runPumpAction(target) {
+                mark(key, status, subtitle) {
+                    this.pumpSteps = this.pumpSteps.map(s => s.key === key ? {...s, status, subtitle: subtitle ?? s.subtitle} : s)
+                },
+
+                async fetchPumpStatus() {
+                    try {
+                        const res = await fetch('{{ route("pump.command") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                id_logger: '{{ $logger->id_logger }}',
+                                action: 'get',
+                            }),
+                        })
+                        const data = await res.json()
+                        if (data.success && data.pump) {
+                            this.pumpState = data.pump.state === 1 ? 'on' : 'off'
+                        }
+                    } catch (e) {
+                        console.warn('Gagal ambil status pompa:', e)
+                    }
+                },
+
+                async runPumpAction(target) {
                     this.resetPump()
                     this.pumpTargetState = target
                     this.pumpRunning = true
                     this.pumpWorkflowVisible = true
+
                     const cmd = target === 'on' ? 'turn_on_pump' : 'turn_off_pump'
                     this.pumpSteps = [
                         { key: 'confirm', title: 'Send command', subtitle: `Sent command: ${cmd}`, status: 'done' },
-                        { key: 'mqtt',   title: 'Connecting to logger', subtitle: 'Mencoba terhubung...', status: 'active' },
-                        { key: 'logger', title: 'Menunggu respon dari logger', subtitle: 'Akan memproses perintah...', status: 'pending' },
+                        { key: 'mqtt',   title: 'Connecting to MQTT broker', subtitle: 'Menghubungkan ke broker...', status: 'active' },
+                        { key: 'logger', title: 'Menunggu respon dari logger', subtitle: 'Menunggu balasan...', status: 'pending' },
                         { key: 'ack',    title: 'Receiving acknowledgment', subtitle: 'Menunggu status eksekusi...', status: 'pending' },
                     ]
 
-                    const mark = (key, status, subtitle) => {
-                        this.pumpSteps = this.pumpSteps.map(s => s.key === key ? {...s, status, subtitle: subtitle ?? s.subtitle} : s)
-                    }
-                    this.pumpTimers.push(setTimeout(() => { 
-                        mark('mqtt', 'done', 'Connected to logger') 
-                        mark('logger', 'active', 'Menunggu respon...') 
-                    }, 1100))
-                    this.pumpTimers.push(setTimeout(() => { 
-                        mark('logger', 'done', 'Respon diterima') 
-                        mark('ack', 'active', 'Validasi eksekusi...') 
-                    }, 2400))
-                    this.pumpTimers.push(setTimeout(() => {
-                        mark('ack', 'done', 'Acknowledgment received')
+                    try {
+                        // Step 2: Kirim ke API (connect MQTT + publish + subscribe wait)
+                        this.mark('mqtt', 'active', 'Menghubungkan ke MQTT broker...')
+
+                        const res = await fetch('{{ route("pump.command") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                id_logger: '{{ $logger->id_logger }}',
+                                action: target === 'on' ? 'on' : 'off',
+                            }),
+                        })
+
+                        const data = await res.json()
+
+                        if (!res.ok) {
+                            // Tentukan step mana yang gagal berdasarkan response
+                            const failStep = data.step || 'mqtt_connect'
+
+                            if (failStep === 'mqtt_connect') {
+                                this.mark('mqtt', 'error', data.message || 'Gagal terhubung ke broker')
+                            } else if (failStep === 'timeout') {
+                                this.mark('mqtt', 'done', 'MQTT connected')
+                                this.mark('logger', 'done', 'Command terkirim')
+                                this.mark('ack', 'error', data.message || 'Logger tidak merespons (timeout)')
+                            } else if (failStep === 'logger_error') {
+                                this.mark('mqtt', 'done', 'MQTT connected')
+                                this.mark('logger', 'done', 'Respon diterima')
+                                this.mark('ack', 'error', data.message || 'Logger merespons dengan error')
+                            } else {
+                                this.mark('mqtt', 'error', data.message || 'Terjadi kesalahan')
+                            }
+
+                            this.pumpError = data.message || 'Gagal mengirim perintah'
+                            this.pumpRunning = false
+                            return
+                        }
+
+                        // Sukses — animate steps ke done
+                        this.mark('mqtt', 'done', 'MQTT connected')
+                        this.mark('logger', 'active', 'Respon diterima dari logger...')
+
+                        await new Promise(r => setTimeout(r, 400))
+                        this.mark('logger', 'done', 'Respon diterima')
+                        this.mark('ack', 'active', 'Validasi eksekusi...')
+
+                        await new Promise(r => setTimeout(r, 400))
+                        this.mark('ack', 'done', data.pump?.msg || 'Acknowledgment received')
+
                         this.pumpRunning = false
                         this.pumpState = target
-                    }, 3900))
-                    
-                    this.pumpTimers.push(setTimeout(() => { this.pumpWorkflowVisible = false }, 6100))
+
+                        this.pumpTimers.push(setTimeout(() => { this.pumpWorkflowVisible = false }, 3000))
+
+                    } catch (e) {
+                        console.error('Pump command error:', e)
+                        this.mark('mqtt', 'error', 'Network error: ' + (e.message || 'Tidak dapat terhubung'))
+                        this.pumpError = 'Gagal menghubungi server'
+                        this.pumpRunning = false
+                    }
                 }
             }
         }
