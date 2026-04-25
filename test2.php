@@ -1,0 +1,1 @@
+<?php require 'vendor/autoload.php'; $app = require_once 'bootstrap/app.php'; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); $pc = app(App\Http\Controllers\PetaController::class); $res = $pc->index(); print_r($res->getData()['points']->where('id_logger', '10367')->first());
