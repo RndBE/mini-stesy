@@ -186,29 +186,37 @@
                             $statusText = $isOnline ? 'Koneksi Terhubung' : 'Koneksi Terputus';
                             $sdText = $isSdOk ? 'OK' : 'Bermasalah';
 
-                            $pHumidity =
-                                $lg->params->firstWhere('parameter_utama', 'humidity_logger') ??
-                                $lg->params->firstWhere('nama_parameter', 'humidity_logger');
-                            $pBattery =
-                                $lg->params->firstWhere('parameter_utama', 'battery_logger') ??
-                                $lg->params->firstWhere('nama_parameter', 'battery_logger');
-                            $pTemp =
-                                $lg->params->firstWhere('parameter_utama', 'temperature_logger') ??
-                                $lg->params->firstWhere('nama_parameter', 'temperature_logger');
-                            $pMukaAir =
-                                $lg->params->firstWhere('parameter_utama', 'muka_air_tanah') ??
-                                $lg->params->firstWhere('nama_parameter', 'muka_air_tanah');
-                            $pRain =
-                                $lg->params->firstWhere('parameter_utama', 'hujan') ??
-                                ($lg->params->firstWhere('nama_parameter', 'Curah Hujan') ??
-                                    $lg->params->first(function ($param) {
-                                        $name = strtolower(trim((string) $param->nama_parameter));
-                                        $utama = strtolower(trim((string) $param->parameter_utama));
-                                        return str_contains($name, 'hujan') ||
-                                            str_contains($name, 'rain') ||
-                                            str_contains($utama, 'hujan') ||
-                                            str_contains($utama, 'rain');
-                                    }));
+                            $pHumidity = $lg->params->first(function ($p) {
+                                $u = strtolower(trim((string) $p->parameter_utama));
+                                $n = strtolower(trim((string) $p->nama_parameter));
+                                return $u === 'humidity_logger' || $n === 'humidity_logger'
+                                    || str_contains($n, 'humidity') || str_contains($u, 'humidity');
+                            });
+                            $pBattery = $lg->params->first(function ($p) {
+                                $u = strtolower(trim((string) $p->parameter_utama));
+                                $n = strtolower(trim((string) $p->nama_parameter));
+                                return $u === 'battery_logger' || $n === 'battery_logger'
+                                    || str_contains($n, 'battery') || str_contains($u, 'battery');
+                            });
+                            $pTemp = $lg->params->first(function ($p) {
+                                $u = strtolower(trim((string) $p->parameter_utama));
+                                $n = strtolower(trim((string) $p->nama_parameter));
+                                return $u === 'temperature_logger' || $n === 'temperature_logger'
+                                    || str_contains($n, 'temperature') || str_contains($u, 'temperature');
+                            });
+                            $pMukaAir = $lg->params->first(function ($p) {
+                                $u = strtolower(trim((string) $p->parameter_utama));
+                                $n = strtolower(trim((string) $p->nama_parameter));
+                                return $u === 'muka_air_tanah' || $n === 'muka_air_tanah'
+                                    || str_contains($n, 'muka') || str_contains($u, 'muka');
+                            });
+                            $pRain = $lg->params->first(function ($param) {
+                                $name = strtolower(trim((string) $param->nama_parameter));
+                                $utama = strtolower(trim((string) $param->parameter_utama));
+                                return $utama === 'hujan' || $name === 'curah hujan'
+                                    || str_contains($name, 'hujan') || str_contains($name, 'rain')
+                                    || str_contains($utama, 'hujan') || str_contains($utama, 'rain');
+                            });
 
                             $humidity =
                                 $latest && $pHumidity && $pHumidity->kolom_sensor
