@@ -239,7 +239,7 @@
                                             <div class="flex flex-col items-center gap-1">
                                                 <span class="text-sm font-bold"
                                                     :class="pctTextClass(day.pct)"
-                                                    x-text="day.pct + '%'">
+                                                    x-text="parseFloat(day.pct).toFixed(1) + '%'">
                                                 </span>
                                                 <div class="w-full h-1.5 rounded-full bg-slate-200 overflow-hidden">
                                                     <div class="h-full rounded-full transition-all duration-500"
@@ -301,9 +301,9 @@
                 loggers: [],
 
                 get overallAvg() {
-                    if (!this.loggers.length) return 0;
+                    if (!this.loggers.length) return '0.0';
                     const sum = this.loggers.reduce((a, l) => a + l.overall_pct, 0);
-                    return Math.round(sum / this.loggers.length);
+                    return (sum / this.loggers.length).toFixed(1);
                 },
 
                 async fetchData() {
