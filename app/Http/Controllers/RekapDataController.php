@@ -85,7 +85,7 @@ class RekapDataController extends Controller
                 $rawCount    = (int) ($counts[$date] ?? 0);
                 // Cap tampilan count agar tidak melebihi expected (misal 1471 → 1440)
                 $count       = $expected > 0 ? min($rawCount, $expected) : $rawCount;
-                $pct         = $expected > 0 ? (int) round(($count / $expected) * 100) : 0;
+                $pct         = $expected > 0 ? round(($count / $expected) * 100, 1) : 0;
                 $totalCount  += $rawCount;
                 $totalExpect += $expected;
 
@@ -98,7 +98,7 @@ class RekapDataController extends Controller
             }
 
             $overallPct = $totalExpect > 0
-                ? (int) round(min(100, ($totalCount / $totalExpect) * 100))
+                ? round(min(100, ($totalCount / $totalExpect) * 100), 1)
                 : 0;
 
             $loggersData[] = [
