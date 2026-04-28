@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div x-data="rekapData()" class="space-y-4">
+    <div x-data="{...rekapData(), ...csvUpload()}" class="space-y-4">
 <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 px-6 py-4">
             <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
                 <div class="flex-1 min-w-0">
@@ -151,6 +151,14 @@
                         class="flex-1 sm:flex-none h-11 px-4 rounded-lg border-2 border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 active:scale-95">
                         Reset
                     </button>
+                    <button type="button" @click="openUploadModal()"
+                        class="flex-1 sm:flex-none h-11 px-4 rounded-lg border-2 border-emerald-600 text-emerald-700 font-semibold hover:bg-emerald-50 hover:border-emerald-700 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                        </svg>
+                        Upload CSV
+                    </button>
                     <!-- <button type="button" @click="window.location.href='{{ route('data-masuk.index') }}'"
                         class="flex-1 sm:flex-none h-11 px-4 rounded-lg border-2 border-indigo-600 text-indigo-700 font-semibold hover:bg-indigo-50 transition-all duration-200 active:scale-95 whitespace-nowrap">
                         Data per Logger
@@ -278,6 +286,135 @@
             </div>
             <h3 class="text-xl font-bold text-slate-900 mb-2">Rekap Data Kelengkapan</h3>
             <p class="text-slate-500 max-w-md mx-auto">Pilih rentang tanggal, kemudian klik <strong>Cari</strong> untuk menampilkan rekap kelengkapan data seluruh logger.</p>
+        </div>
+
+        {{-- ===== MODAL UPLOAD CSV (di dalam main x-data agar share state) ===== --}}
+        <div x-show="uploadOpen" x-cloak
+            class="fixed inset-0 z-[99990] flex items-center justify-center p-4"
+            @keydown.escape.window="closeUploadModal()">
+            {{-- Backdrop --}}
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="closeUploadModal()"></div>
+            {{-- Panel --}}
+            <div class="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
+                {{-- Header --}}
+                <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+                    <div class="flex items-center gap-3">
+                        <div class="h-9 w-9 rounded-xl bg-emerald-100 flex items-center justify-center">
+                            <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Upload Data CSV</h3>
+                            <p class="text-xs text-slate-500">Tambah data yang hilang dari file CSV</p>
+                        </div>
+                    </div>
+                    <button @click="closeUploadModal()" class="h-8 w-8 rounded-lg hover:bg-slate-200 flex items-center justify-center text-slate-500">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                {{-- Body --}}
+                <div class="px-6 py-5 space-y-4">
+                    {{-- Logger Dropdown --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Pilih Logger</label>
+                        <select x-model="uploadLoggerId"
+                            class="w-full h-10 rounded-lg border border-slate-300 px-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-500 bg-white">
+                            <option value="">-- Pilih Logger --</option>
+                            @foreach(\App\Models\t_Logger::query()->forUser(auth()->user())->orderBy('nama_logger')->get() as $lgr)
+                                <option value="{{ $lgr->id_logger }}">{{ $lgr->nama_logger ?? $lgr->id_logger }} &mdash; {{ $lgr->id_logger }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    {{-- File Picker (multiple) --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">File CSV <span class="font-normal text-slate-400">(bisa lebih dari satu)</span></label>
+                        <div class="relative border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors"
+                            :class="uploadFiles.length ? 'border-emerald-400 bg-emerald-50' : 'border-slate-300 hover:border-slate-400 bg-slate-50'"
+                            @click="$refs.csvInput.click()">
+                            <input type="file" accept=".csv,text/csv" multiple x-ref="csvInput" class="hidden"
+                                @change="uploadFiles = Array.from($event.target.files)">
+                            <template x-if="!uploadFiles.length">
+                                <div>
+                                    <svg class="mx-auto h-8 w-8 text-slate-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    <p class="text-sm text-slate-500">Klik untuk pilih file <span class="font-semibold text-slate-700">.csv</span></p>
+                                    <p class="text-xs text-slate-400 mt-0.5">Bisa pilih lebih dari satu &bull; Maks. 10 MB per file</p>
+                                </div>
+                            </template>
+                            <template x-if="uploadFiles.length">
+                                <div class="space-y-1 text-left">
+                                    <template x-for="(f, i) in uploadFiles" :key="i">
+                                        <div class="flex items-center gap-2 bg-white rounded-lg px-3 py-1.5 ring-1 ring-emerald-200">
+                                            <svg class="h-4 w-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            <span class="text-xs font-medium text-slate-700 flex-1 truncate" x-text="f.name"></span>
+                                            <span class="text-xs text-slate-400" x-text="(f.size/1024).toFixed(1)+' KB'"></span>
+                                            {{-- status per file --}}
+                                            <span x-show="fileStatuses[i] === 'uploading'" class="text-xs text-blue-500 animate-pulse">↑</span>
+                                            <span x-show="fileStatuses[i] === 'done'" class="text-xs text-emerald-600 font-bold">✓</span>
+                                            <span x-show="fileStatuses[i] === 'error'" class="text-xs text-red-500 font-bold">✗</span>
+                                        </div>
+                                    </template>
+                                    <button type="button" @click.stop="uploadFiles = []; fileStatuses = []; $refs.csvInput.value = ''"
+                                        class="mt-1 text-xs text-red-500 hover:text-red-700 underline">Hapus semua file</button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                    {{-- Catatan format --}}
+                    <div class="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3">
+                        <p class="text-xs font-semibold text-blue-700 mb-1">Format CSV yang diharapkan:</p>
+                        <p class="text-xs text-blue-600 font-mono">id_alat, tanggal, jam, [kolom 1], [kolom 2], ..., [kolom 16]</p>
+                        <p class="text-xs text-blue-500 mt-1">Kolom setelah <span class="font-semibold">jam</span> akan dimasukkan secara urut → sensor1, sensor2, ..., sensor16. Nama kolom bebas.</p>
+                    </div>
+                    {{-- Hasil upload (akumulasi semua file) --}}
+                    <div x-show="uploadResults.length" x-cloak class="space-y-2 max-h-48 overflow-y-auto">
+                        <template x-for="(res, i) in uploadResults" :key="i">
+                            <div class="rounded-lg border px-3 py-2 text-xs"
+                                :class="res.success ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'">
+                                <p class="font-semibold truncate" :class="res.success ? 'text-emerald-800' : 'text-red-700'" x-text="res.filename"></p>
+                                <template x-if="res.success">
+                                    <p class="text-slate-600 mt-0.5">
+                                        <span class="font-bold text-emerald-700" x-text="res.inserted"></span> ditambahkan &bull;
+                                        <span x-text="res.skipped"></span> dilewati
+                                    </p>
+                                </template>
+                                <template x-if="!res.success">
+                                    <p class="text-red-600 mt-0.5" x-text="res.message"></p>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                    {{-- Upload error global --}}
+                    <div x-show="uploadError" x-cloak class="rounded-lg bg-red-50 border border-red-200 px-4 py-3">
+                        <p class="text-xs font-semibold text-red-700" x-text="uploadError"></p>
+                    </div>
+                </div>
+                {{-- Footer --}}
+                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
+                    <button type="button" @click="closeUploadModal()"
+                        class="h-10 px-5 rounded-lg border-2 border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-100 transition-all">
+                        Tutup
+                    </button>
+                    <button type="button" @click="doUpload()"
+                        :disabled="uploading || !uploadLoggerId || !uploadFiles.length"
+                        class="h-10 px-6 rounded-lg bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                        <svg x-show="uploading" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span x-show="!uploading" x-text="uploadFiles.length > 1 ? 'Upload ' + uploadFiles.length + ' File' : 'Upload'"></span>
+                        <span x-show="uploading" x-cloak x-text="'Mengupload ' + (uploadCurrentIdx+1) + '/' + uploadFiles.length + '...'"></span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -412,6 +549,102 @@
                     if (pct >= 95) return 'text-emerald-700';
                     if (pct >= 60) return 'text-yellow-600';
                     return 'text-red-600';
+                },
+            };
+        }
+    </script>
+
+    <script>
+        function csvUpload() {
+            return {
+                uploadOpen:       false,
+                uploading:        false,
+                uploadLoggerId:   '',
+                uploadFiles:      [],   // array of File objects
+                fileStatuses:     [],   // 'uploading' | 'done' | 'error' per index
+                uploadResults:    [],   // hasil per file
+                uploadError:      '',
+                uploadCurrentIdx: 0,
+
+                openUploadModal() {
+                    this.uploadResults    = [];
+                    this.fileStatuses     = [];
+                    this.uploadError      = '';
+                    this.uploadFiles      = [];
+                    this.uploadCurrentIdx = 0;
+                    this.uploadOpen       = true;
+                },
+
+                closeUploadModal() {
+                    this.uploadOpen = false;
+                },
+
+                async doUpload() {
+                    if (!this.uploadLoggerId || !this.uploadFiles.length) return;
+
+                    this.uploading     = true;
+                    this.uploadResults = [];
+                    this.fileStatuses  = this.uploadFiles.map(() => null);
+                    this.uploadError   = '';
+
+                    const token = '{{ csrf_token() }}';
+                    let anyInserted = false;
+
+                    for (let i = 0; i < this.uploadFiles.length; i++) {
+                        this.uploadCurrentIdx = i;
+                        this.fileStatuses[i]  = 'uploading';
+                        this.fileStatuses      = [...this.fileStatuses]; // trigger reactivity
+
+                        const file = this.uploadFiles[i];
+                        const form = new FormData();
+                        form.append('logger_id', this.uploadLoggerId);
+                        form.append('csv_file',  file);
+
+                        try {
+                            const resp = await fetch('{{ route("rekap-data.upload-csv") }}', {
+                                method:  'POST',
+                                headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
+                                body:    form,
+                            });
+                            const data = await resp.json();
+
+                            if (resp.ok && data.success) {
+                                this.fileStatuses[i] = 'done';
+                                this.uploadResults.push({
+                                    success:  true,
+                                    filename: file.name,
+                                    inserted: data.inserted,
+                                    skipped:  data.skipped,
+                                    errors:   data.errors,
+                                });
+                                if (data.inserted > 0) anyInserted = true;
+                            } else {
+                                this.fileStatuses[i] = 'error';
+                                this.uploadResults.push({
+                                    success:  false,
+                                    filename: file.name,
+                                    message:  data.message || 'Upload gagal.',
+                                });
+                            }
+                        } catch (err) {
+                            this.fileStatuses[i] = 'error';
+                            this.uploadResults.push({
+                                success:  false,
+                                filename: file.name,
+                                message:  'Gagal menghubungi server.',
+                            });
+                        }
+
+                        this.fileStatuses = [...this.fileStatuses];
+                        this.uploadResults = [...this.uploadResults];
+                    }
+
+                    // Refresh rekap jika ada data baru
+                    if (anyInserted && typeof this.fetchData === 'function' && this.dataLoaded) {
+                        await this.fetchData();
+                    }
+
+                    this.uploading = false;
                 },
             };
         }
