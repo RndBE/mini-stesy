@@ -73,6 +73,9 @@ class PetaApiController extends Controller
                     'informasi'   => $l->informasi ? [
                         'seri_logger'   => $l->informasi->seri_logger,
                         'serial_number' => $l->informasi->serial_number,
+                        'awal_kontrak'  => $l->informasi->awal_kontrak,
+                        'garansi'       => $l->informasi->garansi,
+                        'imei'          => $l->informasi->imei,
                         'nama_pic'      => $l->informasi->nama_pic,
                         'no_pic'        => $l->informasi->no_pic,
                     ] : null,
