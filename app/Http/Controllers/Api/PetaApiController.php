@@ -74,13 +74,27 @@ class PetaApiController extends Controller
                         'temp'     => is_numeric($temp) ? round($temp, 1) : null,
                     ],
                     'sensor_data' => [
-                        'tma'            => $this->sensorVal($l->params, $latest, ['tma', 'muka_air', 'tinggi_muka']),
-                        'debit'          => $this->sensorVal($l->params, $latest, ['debit']),
-                        'curah_hujan'    => $this->sensorVal($l->params, $latest, ['hujan', 'rain', 'curah']),
+                        'tma'              => $this->sensorVal($l->params, $latest, ['tma', 'muka_air', 'tinggi_muka']),
+                        'debit'            => $this->sensorVal($l->params, $latest, ['debit']),
+                        'curah_hujan'      => $this->sensorVal($l->params, $latest, ['hujan', 'rain', 'curah']),
                         'elevasi_muka_air' => $this->sensorVal($l->params, $latest, ['elevasi_muka']),
-                        'flow_velocity'  => $this->sensorVal($l->params, $latest, ['flow_velocity', 'velocity']),
-                        'jarak_sensor'   => $this->sensorVal($l->params, $latest, ['jarak_sensor']),
+                        'flow_velocity'    => $this->sensorVal($l->params, $latest, ['flow_velocity', 'velocity']),
+                        'jarak_sensor'     => $this->sensorVal($l->params, $latest, ['jarak_sensor']),
+                        'muka_air_tanah'   => $this->sensorVal($l->params, $latest, ['muka_air_tanah', 'air_tanah']),
                     ],
+                    'sub_kategori' => $l->jiat ? 'jiat' : ($l->nonjiat ? 'non_jiat' : null),
+                    'jiat_data' => $l->jiat ? [
+                        'kedalaman_sumur'  => is_numeric($l->jiat->kedalaman_sumur)  ? (float) $l->jiat->kedalaman_sumur  : null,
+                        'kedalaman_sensor' => is_numeric($l->jiat->kedalaman_sensor) ? (float) $l->jiat->kedalaman_sensor : null,
+                        'kedalaman_pompa'  => is_numeric($l->jiat->kedalaman_pompa)  ? (float) $l->jiat->kedalaman_pompa  : null,
+                        'has_pump'         => (bool) ($l->jiat->has_pump ?? false),
+                    ] : null,
+                    'nonjiat_data' => $l->nonjiat ? [
+                        'elevasi_min'          => is_numeric($l->nonjiat->elevasi_min)          ? (float) $l->nonjiat->elevasi_min          : null,
+                        'elevasi_max'          => is_numeric($l->nonjiat->elevasi_max)          ? (float) $l->nonjiat->elevasi_max          : null,
+                        'tinggi_sensor'        => is_numeric($l->nonjiat->tinggi_sensor)        ? (float) $l->nonjiat->tinggi_sensor        : null,
+                        'jarak_sensor_ke_air'  => is_numeric($l->nonjiat->jarak_sensor_ke_air)  ? (float) $l->nonjiat->jarak_sensor_ke_air  : null,
+                    ] : null,
                 ];
             })
             ->filter(fn($p) => $p['lat'] !== null && $p['lng'] !== null)
