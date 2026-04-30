@@ -173,10 +173,14 @@ class DataMasukController extends Controller
             ?? $request->input('id_logger')
             ?? $request->input('code_logger');
 
-        // ── Bangun waktu: bisa dari 'waktu' (format lama) atau 'hari'+'jam' (format baru) ──
+        // ── Bangun waktu: bisa dari 'waktu' (format lama) atau 'hari'+'jam'/'tanggal'+'jam' (format baru) ──
         $waktu = $request->input('waktu');
-        if (!$waktu && $request->has('hari') && $request->has('jam')) {
-            $waktu = $request->input('hari') . ' ' . $request->input('jam');
+        if (!$waktu) {
+            if ($request->has('hari') && $request->has('jam')) {
+                $waktu = $request->input('hari') . ' ' . $request->input('jam');
+            } elseif ($request->has('tanggal') && $request->has('jam')) {
+                $waktu = $request->input('tanggal') . ' ' . $request->input('jam');
+            }
         }
 
         if (!$id || !$waktu) {
