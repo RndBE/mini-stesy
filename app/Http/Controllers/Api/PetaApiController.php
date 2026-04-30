@@ -24,7 +24,7 @@ class PetaApiController extends Controller
 
         $points = t_Logger::query()
             ->forUser($request->user())
-            ->with(['lokasi', 'params', 'temp16', 'temp19', 'jiat', 'nonjiat', 'kategori'])
+            ->with(['lokasi', 'params', 'temp16', 'temp19', 'jiat', 'nonjiat', 'kategori', 'informasi'])
             ->whereNotNull('idlokasi')
             ->get()
             ->map(function ($l) use ($thresholds) {
@@ -68,6 +68,14 @@ class PetaApiController extends Controller
                     'arr_state'   => $arrState,
                     'status'      => $status,
                     'last_time'   => $lastTime,
+                    'no_seluler'  => $l->no_seluler,
+                    'sensor_count' => $l->sensor_count ?? $l->params->count(),
+                    'informasi'   => $l->informasi ? [
+                        'seri_logger'   => $l->informasi->seri_logger,
+                        'serial_number' => $l->informasi->serial_number,
+                        'nama_pic'      => $l->informasi->nama_pic,
+                        'no_pic'        => $l->informasi->no_pic,
+                    ] : null,
                     'logger_health' => [
                         'humidity' => is_numeric($humidity) ? round($humidity, 1) : null,
                         'battery'  => is_numeric($battery) ? round($battery, 2) : null,
