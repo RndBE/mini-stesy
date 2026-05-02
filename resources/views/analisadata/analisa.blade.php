@@ -681,7 +681,7 @@
                 <span class="hidden sm:inline">Informasi</span>
             </button>
 
-            @if($logger->jiat?->has_pump)
+            @if($logger->jiat?->has_pump && strtolower($logger->kategori->nama_kategori ?? '') === 'awlr')
 <div x-data="pumpControlApp()">
                 <button @click="openPumpModal()"
                     class="bg-amber-50 border border-amber-200 items-center rounded-lg flex px-3 sm:px-4 text-amber-700 py-2 sm:py-3 hover:bg-amber-100 text-sm transition-colors">
