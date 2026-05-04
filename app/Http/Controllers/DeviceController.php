@@ -211,28 +211,19 @@ class DeviceController extends Controller
                 // 3. JIAT data hanya dipakai untuk kategori AWLR
                 if ($this->isAwlrCategoryId($logger->id_katlogger)) {
                     $subKategori = $validated['sub_kategori'] ?? 'non_jiat';
-                    $kedalamanSumur = $subKategori === 'jiat'
-                        ? (float) ($validated['kedalaman_sumur'] ?? 0)
-                        : 0.0;
-                    $hasPump = $subKategori === 'jiat'
-                        ? (bool) ($validated['has_pump'] ?? false)
-                        : false;
 
-                    $kedalamanSensor = (float) ($validated['kedalaman_sensor'] ?? 0);
-                    $kedalamanPompa = (float) ($validated['kedalaman_pompa'] ?? 0);
-
-                    Jiat_data::updateOrCreate(
-                        ['id_logger' => $logger->id_logger],
-                        [
-                            'kedalaman_sumur'  => $kedalamanSumur,
-                            'kedalaman_sensor' => $kedalamanSensor,
-                            'kedalaman_pompa'  => $kedalamanPompa,
-                            'has_pump'         => $hasPump,
-                        ]
-                    );
-
-                    // Non JIAT: simpan ke nonjiat_data
-                    if ($subKategori === 'non_jiat') {
+                    if ($subKategori === 'jiat') {
+                        Jiat_data::updateOrCreate(
+                            ['id_logger' => $logger->id_logger],
+                            [
+                                'kedalaman_sumur'  => (float) ($validated['kedalaman_sumur'] ?? 0),
+                                'kedalaman_sensor' => (float) ($validated['kedalaman_sensor'] ?? 0),
+                                'kedalaman_pompa'  => (float) ($validated['kedalaman_pompa'] ?? 0),
+                                'has_pump'         => (bool) ($validated['has_pump'] ?? false),
+                            ]
+                        );
+                        NonJiatData::where('id_logger', $logger->id_logger)->delete();
+                    } elseif ($subKategori === 'non_jiat') {
                         NonJiatData::updateOrCreate(
                             ['id_logger' => $logger->id_logger],
                             [
@@ -242,6 +233,7 @@ class DeviceController extends Controller
                                 'elevasi_min'         => isset($validated['elevasi_min']) ? (float) $validated['elevasi_min'] : null,
                             ]
                         );
+                        Jiat_data::where('id_logger', $logger->id_logger)->delete();
                     }
                 }
 
@@ -259,6 +251,7 @@ class DeviceController extends Controller
                                 'catatan'         => $validated['catatan_afmr'] ?? null,
                             ]
                         );
+                        AfmrNonContactData::where('id_logger', $logger->id_logger)->delete();
                     } else {
                         AfmrNonContactData::updateOrCreate(
                             ['id_logger' => $logger->id_logger],
@@ -270,6 +263,7 @@ class DeviceController extends Controller
                                 'catatan'             => $validated['catatan_afmr'] ?? null,
                             ]
                         );
+                        AfmrContactData::where('id_logger', $logger->id_logger)->delete();
                     }
                 }
 
@@ -337,28 +331,19 @@ class DeviceController extends Controller
 
         if ($this->isAwlrCategoryId($logger->id_katlogger)) {
             $subKategori = $request->input('sub_kategori', 'non_jiat');
-            $kedalamanSumur = $subKategori === 'jiat'
-                ? (float) ($request->kedalaman_sumur ?? 0)
-                : 0.0;
-            $hasPump = $subKategori === 'jiat'
-                ? (bool) $request->boolean('has_pump')
-                : false;
 
-            $kedalamanSensor = (float) ($request->kedalaman_sensor ?? 0);
-            $kedalamanPompa = (float) ($request->kedalaman_pompa ?? 0);
-
-            Jiat_data::updateOrCreate(
-                ['id_logger' => $logger->id_logger],
-                [
-                    'kedalaman_sumur'  => $kedalamanSumur,
-                    'kedalaman_sensor' => $kedalamanSensor,
-                    'kedalaman_pompa'  => $kedalamanPompa,
-                    'has_pump'         => $hasPump,
-                ]
-            );
-
-            // Non JIAT: simpan ke nonjiat_data
-            if ($subKategori === 'non_jiat') {
+            if ($subKategori === 'jiat') {
+                Jiat_data::updateOrCreate(
+                    ['id_logger' => $logger->id_logger],
+                    [
+                        'kedalaman_sumur'  => (float) ($request->kedalaman_sumur ?? 0),
+                        'kedalaman_sensor' => (float) ($request->kedalaman_sensor ?? 0),
+                        'kedalaman_pompa'  => (float) ($request->kedalaman_pompa ?? 0),
+                        'has_pump'         => (bool) $request->boolean('has_pump'),
+                    ]
+                );
+                NonJiatData::where('id_logger', $logger->id_logger)->delete();
+            } elseif ($subKategori === 'non_jiat') {
                 NonJiatData::updateOrCreate(
                     ['id_logger' => $logger->id_logger],
                     [
@@ -368,6 +353,7 @@ class DeviceController extends Controller
                         'elevasi_min'         => $request->elevasi_min !== null ? (float) $request->elevasi_min : null,
                     ]
                 );
+                Jiat_data::where('id_logger', $logger->id_logger)->delete();
             }
         }
 
@@ -385,6 +371,7 @@ class DeviceController extends Controller
                         'catatan'         => $request->catatan_afmr ?? null,
                     ]
                 );
+                AfmrNonContactData::where('id_logger', $logger->id_logger)->delete();
             } else {
                 AfmrNonContactData::updateOrCreate(
                     ['id_logger' => $logger->id_logger],
@@ -396,6 +383,7 @@ class DeviceController extends Controller
                         'catatan'             => $request->catatan_afmr ?? null,
                     ]
                 );
+                AfmrContactData::where('id_logger', $logger->id_logger)->delete();
             }
         }
 
