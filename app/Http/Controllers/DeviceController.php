@@ -18,9 +18,11 @@ use App\Models\ListParameter;
 use App\Models\TemplateKategoriParameter;
 use App\Models\List_das;
 use App\Models\Perbaikan;
+use App\Models\Foto_pos;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Schema\Blueprint;
 
 class DeviceController extends Controller
@@ -32,7 +34,7 @@ class DeviceController extends Controller
     {
         $devices = t_Logger::query()
             ->forUser(auth()->user())
-            ->with(['lokasi', 'params', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'perbaikan'])
+            ->with(['lokasi', 'params', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'perbaikan', 'fotos'])
             ->orderBy('id_logger')
             ->get()
             ->map(function ($d) {
@@ -49,6 +51,13 @@ class DeviceController extends Controller
                     'nonjiat'            => $d->nonjiat,
                     'afmr_contact'       => $d->afmrContact,
                     'afmr_noncontact'    => $d->afmrNonContact,
+                    'fotos'              => $d->fotos->map(function ($f) {
+                        return [
+                            'id' => $f->id,
+                            'url_foto' => asset('storage/' . $f->url_foto),
+                            'foto_utama' => (bool)$f->foto_utama,
+                        ];
+                    })->values(),
                     'params'             => $d->params->map(function ($p) {
                         return [
                             'id_param'           => $p->id_param,
@@ -880,5 +889,80 @@ class DeviceController extends Controller
         }
 
         return $cache;
+    }
+    public function storeFoto(Request $request, $id)
+    {
+        $request->validate([
+            'foto' => 'required|image|mimes:jpeg,png,jpg|max:5120', // max 5MB
+        ]);
+
+        $logger = t_Logger::query()
+            ->forUser(auth()->user())
+            ->where('id_logger', $id)
+            ->firstOrFail();
+
+        $path = $request->file('foto')->store('foto_pos', 'public');
+
+        $isFirst = $logger->fotos()->count() === 0;
+
+        $foto = Foto_pos::create([
+            'id_logger' => $logger->id_logger,
+            'url_foto' => $path,
+            'foto_utama' => $isFirst ? 1 : 0
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto berhasil diupload',
+            'data' => [
+                'id' => $foto->id,
+                'url_foto' => asset('storage/' . $foto->url_foto),
+                'foto_utama' => (bool)$foto->foto_utama,
+            ]
+        ]);
+    }
+
+    public function destroyFoto($idFoto)
+    {
+        $foto = Foto_pos::findOrFail($idFoto);
+        
+        $logger = t_Logger::query()
+            ->forUser(auth()->user())
+            ->where('id_logger', $foto->id_logger)
+            ->firstOrFail();
+
+        if (Storage::disk('public')->exists($foto->url_foto)) {
+            Storage::disk('public')->delete($foto->url_foto);
+        }
+
+        $foto->delete();
+
+        // If the deleted photo was main, set the first available as main
+        if ($foto->foto_utama) {
+            $nextFoto = Foto_pos::where('id_logger', $logger->id_logger)->first();
+            if ($nextFoto) {
+                $nextFoto->update(['foto_utama' => 1]);
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Foto berhasil dihapus']);
+    }
+
+    public function setUtamaFoto(Request $request, $idFoto)
+    {
+        $foto = Foto_pos::findOrFail($idFoto);
+        
+        $logger = t_Logger::query()
+            ->forUser(auth()->user())
+            ->where('id_logger', $foto->id_logger)
+            ->firstOrFail();
+
+        // Reset all
+        Foto_pos::where('id_logger', $logger->id_logger)->update(['foto_utama' => 0]);
+
+        // Set main
+        $foto->update(['foto_utama' => 1]);
+
+        return response()->json(['success' => true, 'message' => 'Foto utama berhasil diatur']);
     }
 }

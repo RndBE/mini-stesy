@@ -906,6 +906,126 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                 <p class="text-xs text-gray-500 mt-2">Klik peta atau geser marker untuk mengisi koordinat secara otomatis.</p>
                             </div>
 
+                            <div class="rounded-lg border-2 border-indigo-200 bg-indigo-50"
+                                x-data="{
+                                    uploading: false,
+                                    fotoError: '',
+                                    fotoSuccess: '',
+                                    get fotos() { return editData.fotos || []; },
+                                    async uploadFoto(e) {
+                                        const file = e.target.files[0];
+                                        if (!file) return;
+                                        const formData = new FormData();
+                                        formData.append('foto', file);
+                                        this.uploading = true;
+                                        this.fotoError = '';
+                                        try {
+                                            const res = await fetch(`/pengaturan-device/${editData.id_logger}/foto`, {
+                                                method: 'POST',
+                                                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                                                body: formData,
+                                            });
+                                            const d = await res.json();
+                                            if (d.success) {
+                                                if (!editData.fotos) editData.fotos = [];
+                                                editData.fotos.push(d.data);
+                                                const dev = allDevices.find(x => x.id_logger === editData.id_logger);
+                                                if (dev) {
+                                                    if (!dev.fotos) dev.fotos = [];
+                                                    dev.fotos.push(d.data);
+                                                }
+                                                this.fotoSuccess = 'Foto berhasil diupload!';
+                                                setTimeout(() => this.fotoSuccess = '', 3000);
+                                            } else {
+                                                this.fotoError = d.message || 'Gagal mengupload foto.';
+                                                if (d.errors) this.fotoError = Object.values(d.errors).flat()[0];
+                                            }
+                                        } catch(e) { this.fotoError = 'Gagal menghubungi server.'; }
+                                        finally { 
+                                            this.uploading = false; 
+                                            e.target.value = null;
+                                        }
+                                    },
+                                    async deleteFoto(idFoto) {
+                                        if(!confirm('Yakin ingin menghapus foto ini?')) return;
+                                        try {
+                                            const res = await fetch(`/pengaturan-device/foto/${idFoto}`, {
+                                                method: 'DELETE',
+                                                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                                            });
+                                            const d = await res.json();
+                                            if (d.success) {
+                                                editData.fotos = editData.fotos.filter(f => f.id !== idFoto);
+                                                const dev = allDevices.find(x => x.id_logger === editData.id_logger);
+                                                if (dev) dev.fotos = editData.fotos;
+                                            }
+                                        } catch(e) {}
+                                    },
+                                    async setUtama(idFoto) {
+                                        try {
+                                            const res = await fetch(`/pengaturan-device/foto/${idFoto}/utama`, {
+                                                method: 'PUT',
+                                                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                                            });
+                                            const d = await res.json();
+                                            if (d.success) {
+                                                editData.fotos = editData.fotos.map(f => {
+                                                    f.foto_utama = f.id === idFoto;
+                                                    return f;
+                                                });
+                                                const dev = allDevices.find(x => x.id_logger === editData.id_logger);
+                                                if (dev) dev.fotos = editData.fotos;
+                                            }
+                                        } catch(e) {}
+                                    }
+                                }">
+                                <div class="flex items-center justify-between border-b border-indigo-200 px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <h4 class="text-sm font-semibold text-gray-900">Dokumentasi Pos</h4>
+                                    </div>
+                                    <div class="relative">
+                                        <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" @change="uploadFoto($event)" :disabled="uploading">
+                                        <button type="button" class="inline-flex items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-700 disabled:opacity-50" :disabled="uploading">
+                                            <span x-show="!uploading">+ Upload Foto</span>
+                                            <span x-show="uploading">Mengunggah...</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <div x-show="fotoError" x-cloak class="mb-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700" x-text="fotoError"></div>
+                                    <div x-show="fotoSuccess" x-cloak class="mb-3 rounded-lg bg-green-50 border border-green-200 px-3 py-2 text-sm text-green-700" x-text="fotoSuccess"></div>
+                                    
+                                    <template x-if="fotos.length === 0">
+                                        <p class="text-center text-xs text-gray-500 py-4">Belum ada dokumentasi untuk pos ini.</p>
+                                    </template>
+                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                        <template x-for="f in fotos" :key="f.id">
+                                            <div class="relative rounded-lg overflow-hidden border border-gray-200 group aspect-square bg-gray-100">
+                                                <img :src="f.url_foto" class="w-full h-full object-cover">
+                                                
+                                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                                                    <div class="flex justify-end">
+                                                        <button type="button" @click.prevent="deleteFoto(f.id)" class="bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600">
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                        </button>
+                                                    </div>
+                                                    <div class="flex justify-center">
+                                                        <button x-show="!f.foto_utama" type="button" @click.prevent="setUtama(f.id)" class="bg-white/90 text-slate-800 text-[10px] font-bold px-2 py-1 rounded shadow hover:bg-white">Jadikan Utama</button>
+                                                    </div>
+                                                </div>
+                                                <div x-show="f.foto_utama" class="absolute bottom-2 left-2 bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded shadow">
+                                                    Utama
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="bg-slate-50 rounded-lg border border-slate-100">
                                 <div class="border-b border-slate-200 px-4 py-3 flex items-center justify-between gap-3">
                                     <h4 class="text-sm font-semibold text-gray-900">Daftar Parameter</h4>
@@ -1227,7 +1347,8 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     lebar_sungai: '',
                     kedalaman_rata: '',
                     koefisien_debit: '',
-                    params: []
+                    params: [],
+                    fotos: []
                 },
                 addData: {
                     latitude: '',
@@ -1866,6 +1987,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         lebar_sungai: device.afmr_contact?.lebar_sungai != null ? parseFloat(device.afmr_contact.lebar_sungai) : '',
                         kedalaman_rata: device.afmr_contact?.kedalaman_rata != null ? parseFloat(device.afmr_contact.kedalaman_rata) : '',
                         koefisien_debit: device.afmr_contact?.koefisien_debit != null ? parseFloat(device.afmr_contact.koefisien_debit) : '',
+                        fotos: device.fotos ? [...device.fotos] : [],
                     })
                     this.editData.params = []
                     const sensorCount = parseInt(device.sensor_count ?? 16, 10)

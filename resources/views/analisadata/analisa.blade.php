@@ -573,7 +573,7 @@
                         $firstPhotoUrl =
                             str_starts_with($firstPhotoRaw, 'http://') || str_starts_with($firstPhotoRaw, 'https://')
                                 ? $firstPhotoRaw
-                                : asset(ltrim($firstPhotoRaw, '/'));
+                                : asset('storage/' . ltrim($firstPhotoRaw, '/'));
                     @endphp
                     <div class="photo-gallery">
                         <div class="photo-main">
@@ -601,7 +601,7 @@
                                     $photoUrl =
                                         str_starts_with($photoRaw, 'http://') || str_starts_with($photoRaw, 'https://')
                                             ? $photoRaw
-                                            : asset(ltrim($photoRaw, '/'));
+                                            : asset('storage/' . ltrim($photoRaw, '/'));
                                 @endphp
                                 <button type="button" class="photo-thumb {{ $loop->first ? 'active' : '' }}"
                                     data-src="{{ $photoUrl }}" onclick="setDocPhoto({{ $loop->index }})">

@@ -95,6 +95,9 @@ Route::middleware(['auth', 'permission:view_device'])->get('/pengaturan-device',
 Route::middleware(['auth', 'permission:manage_device'])->get('/pengaturan-device/create', [DeviceController::class, 'create'])->name('device.create');
 Route::middleware(['auth', 'permission:manage_device'])->post('/pengaturan-device', [DeviceController::class, 'store'])->name('device.store');
 Route::middleware(['auth', 'permission:manage_device'])->put('/pengaturan-device/{id}', [DeviceController::class, 'update'])->name('device.update');
+Route::middleware(['auth', 'permission:manage_device'])->post('/pengaturan-device/{id}/foto', [DeviceController::class, 'storeFoto'])->name('device.foto.store');
+Route::middleware(['auth', 'permission:manage_device'])->delete('/pengaturan-device/foto/{idFoto}', [DeviceController::class, 'destroyFoto'])->name('device.foto.destroy');
+Route::middleware(['auth', 'permission:manage_device'])->put('/pengaturan-device/foto/{idFoto}/utama', [DeviceController::class, 'setUtamaFoto'])->name('device.foto.utama');
 
 // Perbaikan Logger Routes (semua user yang login bisa mengubah status perbaikan)
 Route::middleware(['auth', 'permission:view_device'])->post('/pengaturan-device/{id}/perbaikan', [DeviceController::class, 'storePerbaikan'])->name('device.perbaikan.store');
