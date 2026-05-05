@@ -103,7 +103,7 @@ class PetaApiController extends Controller
                           'curah_hujan_per_jam' => $this->sensorVal($l->params, $latest, ['curah_hujan_per_jam', 'hujan_jam', 'rain_hour']),
                           'curah_hujan_harian'  => $this->sensorVal($l->params, $latest, ['curah_hujan_harian', 'hujan_hari', 'rain_day']),
                           'luas_penampang_basah' => $this->sensorVal($l->params, $latest, ['luas_penampang', 'penampang_basah', 'luas']),
-                          'elevasi_sensor'   => $this->sensorVal($l->params, $latest, ['elevasi_sensor']),
+                          'elevasi_sensor'   => $this->sensorVal($l->params, $latest, ['elevasi_sensor','tinggi_sensor']),
                           'orp'              => $this->sensorVal($l->params, $latest, ['orp']),
                           'ph_air'           => $this->sensorVal($l->params, $latest, ['ph', 'ph_air']),
                           'suhu_air'         => $this->sensorVal($l->params, $latest, ['suhu_air', 'water_temp']),
