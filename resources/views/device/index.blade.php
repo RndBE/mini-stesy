@@ -989,7 +989,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                     </div>
                                     <div class="relative">
                                         <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" @change="uploadFoto($event)" :disabled="uploading">
-                                        <button type="button" class="inline-flex items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-700 disabled:opacity-50" :disabled="uploading">
+                                        <button type="button" class="inline-flex items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-700 disabled:opacity-50 cursor-pointer" :disabled="uploading">
                                             <span x-show="!uploading">+ Upload Foto</span>
                                             <span x-show="uploading">Mengunggah...</span>
                                         </button>
@@ -1004,13 +1004,13 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                     </template>
                                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                         <template x-for="f in fotos" :key="f.id">
-                                            <div class="relative rounded-lg overflow-hidden border border-gray-200 group aspect-square bg-gray-100">
+                                            <div class="relative rounded-lg overflow-hidden border border-gray-200 group bg-gray-100" style="aspect-ratio: 1/1;">
                                                 <img :src="f.url_foto" class="w-full h-full object-cover">
                                                 
-                                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2" style="background-color: rgba(0,0,0,0.4);">
                                                     <div class="flex justify-end">
-                                                        <button type="button" @click.prevent="deleteFoto(f.id)" class="bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600">
-                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                        <button type="button" @click.prevent="deleteFoto(f.id)" class="bg-red-500 text-white rounded-full hover:bg-red-600" style="padding: 6px;">
+                                                            <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                                         </button>
                                                     </div>
                                                     <div class="flex justify-center">
