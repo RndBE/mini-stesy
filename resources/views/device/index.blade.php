@@ -987,9 +987,9 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                         </svg>
                                         <h4 class="text-sm font-semibold text-gray-900">Dokumentasi Pos</h4>
                                     </div>
-                                    <div class="relative">
-                                        <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" @change="uploadFoto($event)" :disabled="uploading">
-                                        <button type="button" class="inline-flex items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-700 disabled:opacity-50 cursor-pointer" :disabled="uploading">
+                                    <div class="relative inline-block">
+                                        <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" @change="uploadFoto($event)" :disabled="uploading">
+                                        <button type="button" class="relative z-0 inline-flex items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-700 disabled:opacity-50 cursor-pointer" :disabled="uploading">
                                             <span x-show="!uploading">+ Upload Foto</span>
                                             <span x-show="uploading">Mengunggah...</span>
                                         </button>
@@ -1004,20 +1004,20 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                     </template>
                                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                         <template x-for="f in fotos" :key="f.id">
-                                            <div class="relative rounded-lg overflow-hidden border border-gray-200 group bg-gray-100" style="aspect-ratio: 1/1;">
+                                            <div class="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-100" style="aspect-ratio: 1/1;">
                                                 <img :src="f.url_foto" class="w-full h-full object-cover">
                                                 
-                                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2" style="background-color: rgba(0,0,0,0.4);">
+                                                <div class="absolute inset-0 flex flex-col justify-between p-2" style="background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.5) 100%);">
                                                     <div class="flex justify-end">
-                                                        <button type="button" @click.prevent="deleteFoto(f.id)" class="bg-red-500 text-white rounded-full hover:bg-red-600" style="padding: 6px;">
+                                                        <button type="button" @click.prevent="deleteFoto(f.id)" class="bg-red-500 text-white rounded-full hover:bg-red-600 shadow-sm" style="padding: 6px;" title="Hapus Foto">
                                                             <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                                         </button>
                                                     </div>
-                                                    <div class="flex justify-center">
-                                                        <button x-show="!f.foto_utama" type="button" @click.prevent="setUtama(f.id)" class="bg-white/90 text-slate-800 text-[10px] font-bold px-2 py-1 rounded shadow hover:bg-white">Jadikan Utama</button>
+                                                    <div class="flex justify-center pb-1">
+                                                        <button x-show="!f.foto_utama" type="button" @click.prevent="setUtama(f.id)" class="bg-white/90 text-slate-800 text-[10px] font-bold px-2 py-1 rounded shadow hover:bg-white transition-colors">Jadikan Utama</button>
                                                     </div>
                                                 </div>
-                                                <div x-show="f.foto_utama" class="absolute bottom-2 left-2 bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded shadow">
+                                                <div x-show="f.foto_utama" class="absolute bottom-2 left-2 bg-indigo-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow">
                                                     Utama
                                                 </div>
                                             </div>
