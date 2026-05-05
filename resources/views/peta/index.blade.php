@@ -906,7 +906,7 @@ background: rgba(0, 0, 0, 0.28);
                     <div class="border rounded-xl p-4 mb-4">
                         <label class="flex items-center gap-2 font-semibold mb-3">
                             <input type="checkbox" id="filterAFMR" checked class="accent-indigo-600">
-                            <img src="{{ asset('icons/afmr/online.svg') }}" class="h-5 w-5 mr-2 inline-block">
+                            <img src="{{ asset('icons/afmr/ikon_afmr.svg') }}" class="h-5 w-5 mr-2 inline-block">
                             AFMR (Automatic Flow Measurement Recorder)
                         </label>
                         <div class="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm">
@@ -943,7 +943,7 @@ background: rgba(0, 0, 0, 0.28);
                     <div class="border rounded-xl p-4 mb-4">
                         <label class="flex items-center gap-2 font-semibold mb-3">
                             <input type="checkbox" id="filterAWQR" checked class="accent-indigo-600">
-                            <img src="{{ asset('icons/awgr/ph_air.svg') }}" class="h-5 w-5 mr-2 inline-block">
+                            <img src="{{ asset('icons/awgr/ikon_awqr.svg') }}" class="h-5 w-5 mr-2 inline-block">
                             AWQR (Automatic Water Quality Recorder)
                         </label>
                         <div class="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm">
