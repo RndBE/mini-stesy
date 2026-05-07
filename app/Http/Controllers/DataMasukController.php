@@ -459,9 +459,10 @@ class DataMasukController extends Controller
             if (!$lastState) {
                 $shouldNotify = true;
             } else {
-                // Notifikasi dikirim jika statusnya BERUBAH atau sudah lebih dari 1 jam dari notif terakhir
+                // Notifikasi dikirim jika statusnya BERUBAH atau sudah melewati jeda_notif logger
                 $lastTime = \Carbon\Carbon::parse($lastState->last_notified_at);
-                if ($lastState->last_state !== $stateKritis || now()->diffInHours($lastTime) >= 1) {
+                $jedaNotifMenit = max(1, (int) ($logger->jeda_notif ?? 60));
+                if ($lastState->last_state !== $stateKritis || now()->diffInMinutes($lastTime) >= $jedaNotifMenit) {
                     $shouldNotify = true;
                 }
             }
