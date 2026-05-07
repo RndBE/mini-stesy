@@ -139,6 +139,7 @@ class PetaApiController extends Controller
                           'tds'              => $this->sensorVal($l->params, $latest, ['tds', 'total_dissolved_solids', 'dissolved_solids']),
                     ],
                     'sub_kategori' => $l->jiat ? 'jiat' : ($l->nonjiat ? 'non_jiat' : null),
+                    'parameters_list' => $this->buildParametersList($l, $latest),
                     'jiat_data' => $l->jiat ? [
                         'kedalaman_sumur'  => is_numeric($l->jiat->kedalaman_sumur)  ? (float) $l->jiat->kedalaman_sumur  : null,
                         'kedalaman_sensor' => is_numeric($l->jiat->kedalaman_sensor) ? (float) $l->jiat->kedalaman_sensor : null,
@@ -161,6 +162,36 @@ class PetaApiController extends Controller
             'data'    => $points,
             'meta'    => ['total' => $points->count(), 'generated_at' => now()->toIso8601String()],
         ]);
+    }
+
+    private function buildParametersList($logger, $latest): array
+    {
+        $healthKeys = ['humidity_logger', 'battery_logger', 'temperature_logger'];
+
+        return $logger->params->map(function ($p) use ($latest, $healthKeys) {
+            $paramUtama = strtolower(trim((string) ($p->parameter_utama ?? '')));
+            $namaParam  = strtolower(trim((string) ($p->nama_parameter ?? '')));
+
+            if (in_array($paramUtama, $healthKeys)) return null;
+
+            $col   = $p->kolom_sensor;
+            $nilai = null;
+            if ($col && $latest) {
+                $v = $latest->{$col} ?? null;
+                $nilai = is_numeric($v) ? round((float) $v, 3) : null;
+            }
+
+            return [
+                'nama'            => $p->nama_parameter,
+                'satuan'          => $p->satuan ?? null,
+                'nilai'           => $nilai,
+                'key'             => $col ?? $paramUtama,
+                'parameter_utama' => $paramUtama,
+            ];
+        })
+        ->filter(fn ($p) => $p !== null && $p['nilai'] !== null)
+        ->values()
+        ->toArray();
     }
 
     private function getStateFromThreshold($logger, string $status, $latest, $thresholdCollection): string
