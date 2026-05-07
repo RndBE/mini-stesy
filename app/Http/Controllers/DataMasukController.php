@@ -476,11 +476,23 @@ class DataMasukController extends Controller
                     ]
                 );
 
+                $namaKategori = '';
+                if (isset($logger->id_katlogger)) {
+                    if ($logger->id_katlogger == 1) $namaKategori = 'AWLR';
+                    elseif ($logger->id_katlogger == 2) $namaKategori = 'ARR';
+                    elseif ($logger->id_katlogger == 3) $namaKategori = 'AFMR';
+                    elseif ($logger->id_katlogger == 4) $namaKategori = 'AWR';
+                    elseif ($logger->id_katlogger == 5) $namaKategori = 'AWQR';
+                }
+                if (empty($namaKategori)) {
+                    $namaKategori = strtoupper($kategori ?? 'LOGGER');
+                }
+
                 $fcm = new \App\Services\FcmService();
-                $title = "Peringatan " . strtoupper($logger->kategori) . " - " . $nama_logger;
+                $title = "Peringatan " . $namaKategori . " - " . $nama_logger;
                 $fcm->broadcastNotification($title, $bodyMsg, [
                     'id_logger' => $id_logger,
-                    'kategori' => $kategori,
+                    'kategori' => $namaKategori,
                     'state' => $stateKritis,
                     'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
                 ]);
