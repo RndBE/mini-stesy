@@ -387,8 +387,8 @@ class DataMasukController extends Controller
         $stateKritis = null;
         $bodyMsg = '';
 
-        // Deteksi AWLR Siaga
-        if (str_contains($kategori, 'awlr')) {
+        // Deteksi AWLR Siaga (id_katlogger = 1)
+        if (str_contains($kategori, 'awlr') || (isset($logger->id_katlogger) && $logger->id_katlogger == 1)) {
             // Ambil parameter Tinggi Muka Air
             $pTma = \Illuminate\Support\Facades\DB::table('parameter_sensor')
                 ->where('logger_id', $id_logger)
@@ -419,8 +419,8 @@ class DataMasukController extends Controller
                 }
             }
         } 
-        // Deteksi ARR Intensitas Hujan
-        elseif (str_contains($kategori, 'arr')) {
+        // Deteksi ARR Intensitas Hujan (id_katlogger = 2)
+        elseif (str_contains($kategori, 'arr') || (isset($logger->id_katlogger) && $logger->id_katlogger == 2)) {
             $pRain = \Illuminate\Support\Facades\DB::table('parameter_sensor')
                 ->where('logger_id', $id_logger)
                 ->where(function($q) {
