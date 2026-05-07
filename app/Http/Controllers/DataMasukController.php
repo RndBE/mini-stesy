@@ -264,6 +264,14 @@ class DataMasukController extends Controller
             $merged
         );
 
+        // --- CEK DAN KIRIM NOTIFIKASI FCM ---
+        try {
+            $this->checkAndSendNotification($logger, $merged);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('FCM Notification Check Error: ' . $e->getMessage());
+        }
+        // ------------------------------------
+
         $payload = $row;
         $payload['code_logger'] = $id;
 
@@ -368,5 +376,120 @@ class DataMasukController extends Controller
         }
 
         return $sensorCount >= 19 ? 't_s16_01' : 't_s19_01';
+    }
+
+    private function checkAndSendNotification($logger, array $merged)
+    {
+        $kategori = strtolower($logger->kategori ?? '');
+        $id_logger = $logger->id_logger;
+        $nama_logger = $logger->nama_logger ?? $id_logger;
+        
+        $stateKritis = null;
+        $bodyMsg = '';
+
+        // Deteksi AWLR Siaga
+        if (str_contains($kategori, 'awlr')) {
+            // Ambil parameter Tinggi Muka Air
+            $pTma = \Illuminate\Support\Facades\DB::table('parameter_sensor')
+                ->where('logger_id', $id_logger)
+                ->where(function($q) {
+                    $q->where('nama_parameter', 'like', '%tma%')
+                      ->orWhere('nama_parameter', 'like', '%muka air%')
+                      ->orWhere('parameter_utama', 'like', '%tma%');
+                })->first();
+
+            if ($pTma && isset($merged[$pTma->kolom_sensor])) {
+                $tma = (float) $merged[$pTma->kolom_sensor];
+                
+                // Cek dengan tabel tingkat_siaga_awlr
+                $siagaLevels = \Illuminate\Support\Facades\DB::table('tingkat_siaga_awlr')->get();
+                foreach ($siagaLevels as $siaga) {
+                    if ($siaga->min_value === null && $siaga->max_value === null) continue;
+                    $matchMin = $siaga->min_value === null || $tma >= $siaga->min_value;
+                    $matchMax = $siaga->max_value === null || $tma < $siaga->max_value;
+                    
+                    if ($matchMin && $matchMax) {
+                        $s = strtolower($siaga->tingkat_siaga);
+                        if (str_contains($s, 'siaga 1') || str_contains($s, 'siaga 2') || str_contains($s, 'siaga 3')) {
+                            $stateKritis = $siaga->tingkat_siaga;
+                            $bodyMsg = "Tinggi Muka Air mencapai {$tma}m ({$siaga->tingkat_siaga}).";
+                        }
+                        break;
+                    }
+                }
+            }
+        } 
+        // Deteksi ARR Intensitas Hujan
+        elseif (str_contains($kategori, 'arr')) {
+            $pRain = \Illuminate\Support\Facades\DB::table('parameter_sensor')
+                ->where('logger_id', $id_logger)
+                ->where(function($q) {
+                    $q->where('nama_parameter', 'like', '%hujan%')
+                      ->orWhere('parameter_utama', 'like', '%hujan%');
+                })->first();
+
+            if ($pRain && isset($merged[$pRain->kolom_sensor])) {
+                $rain = (float) $merged[$pRain->kolom_sensor];
+                
+                $thresholds = \Illuminate\Support\Facades\DB::table('klasifikasi_threshold')->orderBy('sort_order')->get();
+                foreach ($thresholds as $t) {
+                    if ($t->min_value === null && $t->max_value === null) continue;
+                    $matchMin = $t->min_value === null || $rain >= $t->min_value;
+                    $matchMax = $t->max_value === null || $rain < $t->max_value;
+                    
+                    if ($matchMin && $matchMax) {
+                        $s = strtolower($t->state_key);
+                        if (str_contains($s, 'lebat') || str_contains($s, 'sangat_lebat') || str_contains($s, 'sedang') || str_contains($s, 'sangat lebat')) {
+                            $stateKritis = str_replace('_', ' ', ucwords($t->state_key));
+                            $bodyMsg = "Intensitas hujan mencapai {$rain}mm/jam ({$stateKritis}).";
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Jika ada status kritis, kita cek logger_notification_states
+        if ($stateKritis) {
+            $lastState = \Illuminate\Support\Facades\DB::table('logger_notification_states')
+                ->where('id_logger', $id_logger)->first();
+
+            $shouldNotify = false;
+            
+            if (!$lastState) {
+                $shouldNotify = true;
+            } else {
+                // Notifikasi dikirim jika statusnya BERUBAH atau sudah lebih dari 1 jam dari notif terakhir
+                $lastTime = \Carbon\Carbon::parse($lastState->last_notified_at);
+                if ($lastState->last_state !== $stateKritis || now()->diffInHours($lastTime) >= 1) {
+                    $shouldNotify = true;
+                }
+            }
+
+            if ($shouldNotify) {
+                \Illuminate\Support\Facades\DB::table('logger_notification_states')->updateOrInsert(
+                    ['id_logger' => $id_logger],
+                    [
+                        'last_state' => $stateKritis,
+                        'last_notified_at' => now(),
+                        'updated_at' => now()
+                    ]
+                );
+
+                $fcm = new \App\Services\FcmService();
+                $title = "Peringatan " . strtoupper($logger->kategori) . " - " . $nama_logger;
+                $fcm->broadcastNotification($title, $bodyMsg, [
+                    'id_logger' => $id_logger,
+                    'kategori' => $kategori,
+                    'state' => $stateKritis,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
+                ]);
+            }
+        } else {
+            // Jika normal, hapus state atau ubah ke normal agar jika siaga lagi bisa dinotif ulang
+            \Illuminate\Support\Facades\DB::table('logger_notification_states')
+                ->where('id_logger', $id_logger)
+                ->update(['last_state' => 'Normal']);
+        }
     }
 }

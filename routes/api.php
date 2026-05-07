@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\RealtimeApiController;
 use App\Http\Controllers\Api\DataPerangkatApiController;
 use App\Http\Controllers\Api\AnalisaApiController;
 use App\Http\Controllers\Api\BerandaApiController;
+use App\Http\Controllers\Api\FcmApiController;
 
 // ─── Existing routes ───────────────────────────────────────────────────────────
 Route::post('/datamasuk', [DataMasukController::class, 'datamasuk']);
@@ -28,6 +29,9 @@ Route::prefix('v1/mobile')->group(function () {
         // Auth
         Route::post('/auth/logout', [AuthApiController::class, 'logout']);
         Route::get('/auth/me',      [AuthApiController::class, 'me']);
+        
+        // FCM Token
+        Route::post('/fcm/register', [FcmApiController::class, 'register']);
 
         // Beranda
         Route::get('/beranda/info', [BerandaApiController::class, 'info']);
