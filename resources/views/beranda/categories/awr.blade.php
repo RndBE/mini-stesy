@@ -82,24 +82,16 @@
         foreach ($awrSensorMap as $key => $meta) {
             $terms = $meta['terms'];
             $param = $lg->params->first(function ($p) use ($terms, $loggerInternalKeys) {
-                $namePar = strtolower(trim($p->nama_parameter));
-                $kolom = strtolower(trim($p->kolom_sensor ?? ''));
                 $utama = strtolower(trim($p->parameter_utama ?? ''));
                 foreach ($loggerInternalKeys as $internalKey) {
-                    if (str_contains($namePar, $internalKey) || str_contains($utama, $internalKey)) {
+                    if (str_contains($utama, $internalKey)) {
                         return false;
                     }
                 }
 
                 foreach ($terms as $term) {
-                    if (
-                        $namePar === $term ||
-                        $kolom === $term ||
-                        $utama === $term ||
-                        str_contains($namePar, $term) ||
-                        str_contains($kolom, $term) ||
-                        str_contains($utama, $term)
-                    ) {
+                    $term = strtolower(str_replace(' ', '_', trim($term)));
+                    if ($utama === $term) {
                         return true;
                     }
                 }
@@ -110,7 +102,7 @@
             $awrValues[$key] = [
                 'label' => $meta['label'],
                 'satuan' => $meta['satuan'],
-                'icon' => $meta['icon'],
+                'icon' => $paramIconPath($param, $meta['icon']),
                 'param' => $param,
                 'value' => is_numeric($rawVal) ? (float) $rawVal : null,
             ];
@@ -168,6 +160,7 @@
 
     <div class="px-4 py-3 space-y-3">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+@if (($awrValues['kecepatan_angin']['param'] ?? null) || ($awrValues['arah_angin']['param'] ?? null))
 <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
                 <div class="text-sm font-semibold text-slate-700 mb-3">Angin</div>
                 <div class="flex flex-col items-center gap-4">
@@ -179,9 +172,10 @@
                         </canvas>
                     </div>
 <div class="grid grid-cols-2 gap-3 w-full">
+                        @if ($awrValues['kecepatan_angin']['param'])
                         <a href="{{ $awrRoute('kecepatan_angin') }}"
                             class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 hover:shadow-md hover:border-blue-300 transition-all {{ $muted ? 'grayscale opacity-70' : '' }}">
-                            <img src="{{ asset('icons/awr/kecepatan_angin.svg') }}" onerror="this.style.display='none'"
+                            <img src="{{ asset($awrValues['kecepatan_angin']['icon']) }}" onerror="this.style.display='none'"
                                 class="h-8 w-8 flex-shrink-0 object-contain" alt="Kecepatan Angin">
                             <div class="leading-tight min-w-0">
                                 <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase">KECEPATAN
@@ -192,9 +186,11 @@
                                 </div>
                             </div>
                         </a>
+                        @endif
+                        @if ($awrValues['arah_angin']['param'])
                         <a href="{{ $awrRoute('arah_angin') }}"
                             class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 hover:shadow-md hover:border-blue-300 transition-all {{ $muted ? 'grayscale opacity-70' : '' }}">
-                            <img src="{{ asset('icons/awr/arah_angin.svg') }}" onerror="this.style.display='none'"
+                            <img src="{{ asset($awrValues['arah_angin']['icon']) }}" onerror="this.style.display='none'"
                                 class="h-8 w-8 flex-shrink-0 object-contain" alt="Arah Angin">
                             <div class="leading-tight min-w-0">
                                 <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase">ARAH ANGIN
@@ -205,10 +201,13 @@
                                 </div>
                             </div>
                         </a>
+                        @endif
                     </div>
                 </div>
             </div>
+@endif
 <div class="flex flex-col gap-4">
+@if ($pRain)
 <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white flex-1">
                     <div class="text-sm font-semibold text-slate-700 mb-3">Hujan</div>
                     <div class="grid grid-cols-2 gap-3">
@@ -244,12 +243,15 @@
                         </div>
                     </div>
                 </div>
+@endif
+@if (($awrValues['kecerahan']['param'] ?? null) || ($awrValues['arah_cahaya']['param'] ?? null))
 <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
                     <div class="text-sm font-semibold text-slate-700 mb-3">Cahaya</div>
                     <div class="grid grid-cols-2 gap-3">
+                        @if ($awrValues['kecerahan']['param'])
                         <a href="{{ $awrRoute('kecerahan') }}"
                             class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 hover:shadow-md hover:border-yellow-300 transition-all {{ $muted ? 'grayscale opacity-70' : '' }}">
-                            <img src="{{ asset('icons/awr/kecerahan.svg') }}" onerror="this.style.display='none'"
+                            <img src="{{ asset($awrValues['kecerahan']['icon']) }}" onerror="this.style.display='none'"
                                 class="h-9 w-9 flex-shrink-0 object-contain" alt="Kecerahan">
                             <div class="leading-tight min-w-0">
                                 <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase">KECERAHAN
@@ -260,9 +262,11 @@
                                 </div>
                             </div>
                         </a>
+                        @endif
+                        @if ($awrValues['arah_cahaya']['param'])
                         <a href="{{ $awrRoute('arah_cahaya') }}"
                             class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 hover:shadow-md hover:border-yellow-300 transition-all {{ $muted ? 'grayscale opacity-70' : '' }}">
-                            <img src="{{ asset('icons/awr/arah.svg') }}" onerror="this.style.display='none'"
+                            <img src="{{ asset($awrValues['arah_cahaya']['icon']) }}" onerror="this.style.display='none'"
                                 class="h-9 w-9 flex-shrink-0 object-contain" alt="Arah Cahaya">
                             <div class="leading-tight min-w-0">
                                 <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase">ARAH</div>
@@ -272,17 +276,21 @@
                                 </div>
                             </div>
                         </a>
+                        @endif
                     </div>
                 </div>
+@endif
 
             </div>
         </div>
+@if (($awrValues['temperatur']['param'] ?? null) || ($awrValues['tekanan_udara']['param'] ?? null) || ($awrValues['kelembaban']['param'] ?? null))
 <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
             <div class="text-sm font-semibold text-slate-700 mb-3">Udara</div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                @if ($awrValues['temperatur']['param'])
                 <a href="{{ $awrRoute('temperatur') }}"
                     class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 hover:shadow-md hover:border-orange-300 transition-all {{ $muted ? 'grayscale opacity-70' : '' }}">
-                    <img src="{{ asset('icons/beranda/' . ($isOnline ? 'temper_online.svg' : 'temper_offline.svg')) }}"
+                    <img src="{{ asset($awrValues['temperatur']['icon']) }}"
                         onerror="this.style.display='none'" class="h-9 w-9 flex-shrink-0 object-contain"
                         alt="Temperatur">
                     <div class="leading-tight min-w-0">
@@ -293,9 +301,11 @@
                         </div>
                     </div>
                 </a>
+                @endif
+                @if ($awrValues['tekanan_udara']['param'])
                 <a href="{{ $awrRoute('tekanan_udara') }}"
                     class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 hover:shadow-md hover:border-blue-300 transition-all {{ $muted ? 'grayscale opacity-70' : '' }}">
-                    <img src="{{ asset('icons/awr/tekanan_udara.svg') }}" onerror="this.style.display='none'"
+                    <img src="{{ asset($awrValues['tekanan_udara']['icon']) }}" onerror="this.style.display='none'"
                         class="h-9 w-9 flex-shrink-0 object-contain" alt="Tekanan Udara">
                     <div class="leading-tight min-w-0">
                         <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">TEKANAN
@@ -305,9 +315,11 @@
                         </div>
                     </div>
                 </a>
+                @endif
+                @if ($awrValues['kelembaban']['param'])
                 <a href="{{ $awrRoute('kelembaban') }}"
                     class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 hover:shadow-md hover:border-cyan-300 transition-all {{ $muted ? 'grayscale opacity-70' : '' }}">
-                    <img src="{{ asset('icons/beranda/' . ($isOnline ? 'humidity_online.svg' : 'humidity_offline.svg')) }}"
+                    <img src="{{ asset($awrValues['kelembaban']['icon']) }}"
                         onerror="this.style.display='none'" class="h-9 w-9 flex-shrink-0 object-contain"
                         alt="Kelembaban">
                     <div class="leading-tight min-w-0">
@@ -318,17 +330,21 @@
                         </div>
                     </div>
                 </a>
+                @endif
             </div>
         </div>
+@endif
 
+        @if ($pHumidity || $pBattery || $pTemp)
         <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
             <div class="text-sm font-semibold text-slate-700 mb-3">Logger</div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+@if ($pHumidity)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
                     class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 shadow-sm transition-all hover:shadow-md hover:border-blue-300">
                     <div
                         class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
-                        <img src="{{ asset('icons/beranda/' . ($isOnline ? 'humidity_online.svg' : 'humidity_offline.svg')) }}"
+                        <img src="{{ asset($paramIconPath($pHumidity, 'icons/beranda/' . ($isOnline ? 'humidity_online.svg' : 'humidity_offline.svg'))) }}"
                             alt="Humidity" class="h-full w-full object-cover {{ $iconClass }}">
                     </div>
                     <div class="leading-tight min-w-0">
@@ -339,11 +355,13 @@
                         </div>
                     </div>
                 </a>
+@endif
+@if ($pBattery)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
                     class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 shadow-sm transition-all hover:shadow-md hover:border-green-300">
                     <div
                         class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
-                        <img src="{{ asset('icons/beranda/' . ($isOnline ? 'battery_online.svg' : 'battery_offline.svg')) }}"
+                        <img src="{{ asset($paramIconPath($pBattery, 'icons/beranda/' . ($isOnline ? 'battery_online.svg' : 'battery_offline.svg'))) }}"
                             alt="Battery" class="h-full w-full object-cover {{ $iconClass }}">
                     </div>
                     <div class="leading-tight min-w-0">
@@ -354,11 +372,13 @@
                         </div>
                     </div>
                 </a>
+@endif
+@if ($pTemp)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
                     class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 shadow-sm transition-all hover:shadow-md hover:border-orange-300">
                     <div
                         class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
-                        <img src="{{ asset('icons/beranda/' . ($isOnline ? 'temper_online.svg' : 'temper_offline.svg')) }}"
+                        <img src="{{ asset($paramIconPath($pTemp, 'icons/beranda/' . ($isOnline ? 'temper_online.svg' : 'temper_offline.svg'))) }}"
                             alt="Temperature" class="h-full w-full object-cover {{ $iconClass }}">
                     </div>
                     <div class="leading-tight min-w-0">
@@ -369,8 +389,10 @@
                         </div>
                     </div>
                 </a>
+@endif
             </div>
         </div>
+        @endif
 
     </div>
 </div>

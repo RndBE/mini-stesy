@@ -65,6 +65,8 @@ class DeviceController extends Controller
                             'kolom_sensor'       => $p->kolom_sensor,
                             'satuan'             => $p->satuan,
                             'parameter_group_id' => $p->parameter_group_id,
+                            'parameter_utama'    => $p->parameter_utama,
+                            'icon_app'           => $p->icon_app,
                         ];
                     })->values(),
                     'sensor_count'       => $d->sensor_count ?? (str_contains($d->tabel_main, '19') ? 19 : 16),
@@ -97,6 +99,8 @@ class DeviceController extends Controller
                         return [
                             'list_parameter_id' => $row->list_parameter_id,
                             'nama_parameter' => $list?->nama_parameter,
+                            'parameter_utama' => $list?->parameter_utama,
+                            'icon_app' => $list?->icon_app,
                             'kolom_sensor_default' => $row->kolom_sensor_default ?: ($list?->default_kolom_sensor ?? null),
                             'satuan' => $row->satuan_override ?: ($list?->default_satuan ?? null),
                             'parameter_group_id' => $row->parameter_group_id ?: ($list?->default_parameter_group_id ?? null),
@@ -118,6 +122,7 @@ class DeviceController extends Controller
                     'parameter_utama',
                     'default_satuan',
                     'default_kolom_sensor',
+                    'icon_app',
                     'default_parameter_group_id',
                 ])
                 ->toArray();
@@ -186,6 +191,8 @@ class DeviceController extends Controller
             'params.*.kolom_sensor'   => 'required|string|max:50',
             'params.*.satuan'         => 'required|string|max:50',
             'params.*.parameter_group_id' => 'nullable|integer|exists:parameter_groups,id',
+            'params.*.parameter_utama' => 'nullable|string|max:50',
+            'params.*.icon_app' => 'nullable|string|max:255',
         ]);
 
         // dd($validated);
@@ -278,8 +285,12 @@ class DeviceController extends Controller
 
                 // 4. Create parameters
                 foreach ($validated['params'] as $param) {
+                    $parameterUtama = $this->resolveParameterUtama(
+                        $param['parameter_utama'] ?? null,
+                        $param['nama_parameter'] ?? null
+                    );
                     $parameterGroupId = $param['parameter_group_id']
-                        ?? $this->inferParameterGroupId($param['nama_parameter'] ?? null, null);
+                        ?? $this->inferParameterGroupId($param['nama_parameter'] ?? null, $parameterUtama);
 
                     Parameter::create([
                         'logger_id'       => $logger->id_logger,
@@ -287,6 +298,8 @@ class DeviceController extends Controller
                         'kolom_sensor'    => $param['kolom_sensor'],
                         'satuan'          => $param['satuan'],
                         'parameter_group_id' => $parameterGroupId,
+                        'parameter_utama' => $parameterUtama,
+                        'icon_app' => $this->normalizeIconPath($param['icon_app'] ?? null),
                     ]);
                 }
             });
@@ -322,6 +335,8 @@ class DeviceController extends Controller
             'params.*.kolom_sensor'     => 'required_with:params|string|max:50',
             'params.*.satuan'           => 'required_with:params|string|max:50',
             'params.*.parameter_group_id'  => 'nullable|integer|exists:parameter_groups,id',
+            'params.*.parameter_utama'  => 'nullable|string|max:50',
+            'params.*.icon_app'  => 'nullable|string|max:255',
         ]);
 
         $logger = t_Logger::query()
@@ -396,14 +411,10 @@ class DeviceController extends Controller
             }
         }
 
-        $normalize = function ($v) {
+        $normalizeParamName = function ($v) {
             $v = trim((string) $v);
             $v = preg_replace('/\s+/', ' ', $v);
-            if ($v === '') return '';
-            if (!str_contains($v, '_')) {
-                $v = str_replace(' ', '_', $v);
-            }
-            return $v;
+            return $v ?: '';
         };
 
         if ($request->has('params') && is_array($request->params)) {
@@ -412,16 +423,22 @@ class DeviceController extends Controller
             foreach ($request->params as $data) {
                 $paramId = $data['id_param'] ?? null;
 
-                $namaParam = $normalize($data['nama_parameter'] ?? '');
+                $namaParam = $normalizeParamName($data['nama_parameter'] ?? '');
                 $kolomSensor = trim((string) ($data['kolom_sensor'] ?? ''));
                 $satuan = trim((string) ($data['satuan'] ?? ''));
+                $parameterUtama = $this->resolveParameterUtama(
+                    $data['parameter_utama'] ?? null,
+                    $namaParam ?: null
+                );
 
                 $payload = [
                     'nama_parameter' => $namaParam,
                     'satuan'         => $satuan,
                     'kolom_sensor'   => $kolomSensor,
                     'parameter_group_id' => $data['parameter_group_id']
-                        ?? $this->inferParameterGroupId($namaParam ?: null, null),
+                        ?? $this->inferParameterGroupId($namaParam ?: null, $parameterUtama),
+                    'parameter_utama' => $parameterUtama,
+                    'icon_app' => $this->normalizeIconPath($data['icon_app'] ?? null),
                 ];
 
                 if ($paramId) {
@@ -825,6 +842,35 @@ class DeviceController extends Controller
         }
 
         return $groups['SUMUR'] ?? null;
+    }
+
+    private function resolveParameterUtama(?string $parameterUtama, ?string $namaParameter): ?string
+    {
+        return $this->normalizeParameterKey($parameterUtama);
+    }
+
+    private function normalizeParameterKey(?string $value): ?string
+    {
+        $value = trim((string) $value);
+
+        if ($value === '') {
+            return null;
+        }
+
+        $value = preg_replace('/\s+/', '_', $value);
+        $value = preg_replace('/_+/', '_', $value);
+
+        return substr(strtolower($value), 0, 50);
+    }
+
+    private function normalizeIconPath(?string $value): ?string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        return ltrim($value, '/');
     }
 
     private function parameterGroupMap(): array

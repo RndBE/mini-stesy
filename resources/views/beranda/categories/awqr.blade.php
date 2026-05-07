@@ -27,10 +27,10 @@
         foreach ($sensorMap as $key => $meta) {
             $terms = $sensorAliases[$key] ?? [$key];
             $param = $lg->params->first(function ($p) use ($terms) {
-                $namePar = strtolower(trim($p->nama_parameter));
-                $kolom   = strtolower(trim($p->kolom_sensor ?? ''));
+                $utama = strtolower(trim($p->parameter_utama ?? ''));
                 foreach ($terms as $term) {
-                    if ($namePar === $term || $kolom === $term) {
+                    $term = strtolower(str_replace(' ', '_', trim($term)));
+                    if ($utama === $term) {
                         return true;
                     }
                 }
@@ -41,7 +41,7 @@
             $sensorValues[$key] = [
                 'label'  => $meta['label'],
                 'satuan' => $meta['satuan'],
-                'icon'   => $meta['icon'],
+                'icon'   => $paramIconPath($param, $meta['icon']),
                 'param'  => $param,
                 'value'  => is_numeric($rawVal) ? $rawVal : null,
             ];
@@ -80,12 +80,14 @@
 
         </div>
 <div class="flex-1 min-w-0 space-y-4">
+@if (collect($sensorValues)->contains(fn($sensor) => $sensor['param']))
 <div>
                 <div class="text-md font-semibold text-slate-700 mb-3">Data Pengukuran</div>
                 <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     @foreach (['tma', 'ph_air', 'suhu_air', 'orp', 'conductivity', 'salinity', 'tds', 'turbidity', 'tinggi_sensor'] as $sKey)
                         @php
                             $s = $sensorValues[$sKey];
+                            if (!$s['param']) continue;
                             $dispV = is_numeric($s['value']) ? $s['value'] : '-';
                             $href = $s['param']
                                 ? route('analisa.index', $lg->id_logger) .
@@ -116,14 +118,17 @@
                     @endforeach
                 </div>
             </div>
+@endif
+@if ($pHumidity || $pBattery || $pTemp)
 <div>
                 <div class="text-md font-semibold text-slate-700 mb-3">Logger</div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+@if ($pHumidity)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
                         class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 shadow-sm transition-all hover:shadow-md hover:border-blue-300">
                         <div
                             class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
-                            <img src="{{ asset('icons/beranda/' . ($isOnline ? 'humidity_online.svg' : 'humidity_offline.svg')) }}"
+                            <img src="{{ asset($paramIconPath($pHumidity, 'icons/beranda/' . ($isOnline ? 'humidity_online.svg' : 'humidity_offline.svg'))) }}"
                                 alt="Humidity" class="h-full w-full object-cover {{ $iconClass }}">
                         </div>
                         <div class="leading-tight min-w-0">
@@ -135,11 +140,13 @@
                             </div>
                         </div>
                     </a>
+@endif
+@if ($pBattery)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
                         class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 shadow-sm transition-all hover:shadow-md hover:border-green-300">
                         <div
                             class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
-                            <img src="{{ asset('icons/beranda/' . ($isOnline ? 'battery_online.svg' : 'battery_offline.svg')) }}"
+                            <img src="{{ asset($paramIconPath($pBattery, 'icons/beranda/' . ($isOnline ? 'battery_online.svg' : 'battery_offline.svg'))) }}"
                                 alt="Battery" class="h-full w-full object-cover {{ $iconClass }}">
                         </div>
                         <div class="leading-tight min-w-0">
@@ -151,11 +158,13 @@
                             </div>
                         </div>
                     </a>
+@endif
+@if ($pTemp)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
                         class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 shadow-sm transition-all hover:shadow-md hover:border-orange-300">
                         <div
                             class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
-                            <img src="{{ asset('icons/beranda/' . ($isOnline ? 'temper_online.svg' : 'temper_offline.svg')) }}"
+                            <img src="{{ asset($paramIconPath($pTemp, 'icons/beranda/' . ($isOnline ? 'temper_online.svg' : 'temper_offline.svg'))) }}"
                                 alt="Temperature" class="h-full w-full object-cover {{ $iconClass }}">
                         </div>
                         <div class="leading-tight min-w-0">
@@ -166,8 +175,10 @@
                             </div>
                         </div>
                     </a>
+@endif
                 </div>
             </div>
+@endif
         </div>
     </div>
 </div>

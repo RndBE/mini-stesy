@@ -32,16 +32,18 @@
         
         <!-- Data Cards -->
         <div class="md:col-span-7 space-y-5">
+            @if ($pLuas || $pFlowVelocity || $pElevMukaAir || $pElevSensor || $pJarakSensor || $pRain)
             <div>
                 <div class="text-sm font-bold text-slate-800 mb-3">Data Pengukuran</div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     
+                    @if ($pLuas)
                     @php
                         $luasUrl = $pLuas ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pLuas->nama_parameter) : route('analisa.index', $lg->id_logger);
                     @endphp
                     <a href="{{ $luasUrl }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-sky-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
-                            <img src="{{ asset('icons/afmr/luas_penampang_air.svg') }}" alt="Luas" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset($paramIconPath($pLuas, 'icons/afmr/luas_penampang_air.svg')) }}" alt="Luas" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Luas Penampang Basah</div>
@@ -51,13 +53,15 @@
                             </div>
                         </div>
                     </a>
+                    @endif
 
+                    @if ($pFlowVelocity)
                     @php
                         $flowVelocityUrl = $pFlowVelocity ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pFlowVelocity->nama_parameter) : route('analisa.index', $lg->id_logger);
                     @endphp
                     <a href="{{ $flowVelocityUrl }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-indigo-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
-                            <img src="{{ asset('icons/afmr/flow_velocity.svg') }}" alt="Flow Velocity" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset($paramIconPath($pFlowVelocity, 'icons/afmr/flow_velocity.svg')) }}" alt="Flow Velocity" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Flow Velocity</div>
@@ -67,13 +71,15 @@
                             </div>
                         </div>
                     </a>
+                    @endif
 
+                    @if ($pElevMukaAir)
                     @php
                         $elevMukaAirUrl = $pElevMukaAir ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pElevMukaAir->nama_parameter) : route('analisa.index', $lg->id_logger);
                     @endphp
                     <a href="{{ $elevMukaAirUrl }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-sky-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
-                            <img src="{{ asset('icons/awlr/elevasi_muka_air.svg') }}" alt="Elevasi Muka Air" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset($paramIconPath($pElevMukaAir, 'icons/awlr/elevasi_muka_air.svg')) }}" alt="Elevasi Muka Air" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Elevasi Muka Air</div>
@@ -83,13 +89,15 @@
                             </div>
                         </div>
                     </a>
+                    @endif
 
+                    @if ($pElevSensor)
                     @php
                         $elevSensorUrl = $pElevSensor ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pElevSensor->nama_parameter) : route('analisa.index', $lg->id_logger);
                     @endphp
                     <a href="{{ $elevSensorUrl }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-amber-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
-                            <img src="{{ asset('icons/afmr/tinggi_sensor.svg') }}" alt="Elevasi Sensor" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset($paramIconPath($pElevSensor, 'icons/afmr/tinggi_sensor.svg')) }}" alt="Elevasi Sensor" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Elevasi Sensor</div>
@@ -99,13 +107,15 @@
                             </div>
                         </div>
                     </a>
+                    @endif
 
+                    @if ($pJarakSensor)
                     @php
                         $jarakSensorUrl = $pJarakSensor ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pJarakSensor->nama_parameter) : route('analisa.index', $lg->id_logger);
                     @endphp
                     <a href="{{ $jarakSensorUrl }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-rose-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
-                            <img src="{{ asset('icons/afmr/jarak_sensor.svg') }}" alt="Jarak Sensor" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset($paramIconPath($pJarakSensor, 'icons/afmr/jarak_sensor.svg')) }}" alt="Jarak Sensor" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Jarak Sensor</div>
@@ -115,13 +125,15 @@
                             </div>
                         </div>
                     </a>
+                    @endif
 
+                    @if ($pRain)
                     @php
                         $curahHujanUrl = $pRain ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pRain->nama_parameter) : route('analisa.index', $lg->id_logger);
                     @endphp
                     <a href="{{ $curahHujanUrl }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-blue-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
-                            <img src="{{ asset('icons/afmr/curah_hujan.svg') }}" alt="Precipitation" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset($paramIconPath($pRain, 'icons/afmr/curah_hujan.svg')) }}" alt="Precipitation" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Precipitation Intensity</div>
@@ -131,44 +143,54 @@
                             </div>
                         </div>
                     </a>
+                    @endif
 
                 </div>
             </div>
+            @endif
 
+            @if ($pHumidity || $pBattery || $pTemp)
             <div>
                 <div class="text-sm font-bold text-slate-800 mb-3">Data Logger</div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    @if ($pHumidity)
                     <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-blue-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-slate-100 bg-slate-50">
-                            <img src="{{ asset('icons/beranda/humidity_online.svg') }}" alt="Humidity" class="h-5 w-5 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset($paramIconPath($pHumidity, 'icons/beranda/humidity_online.svg')) }}" alt="Humidity" class="h-5 w-5 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[8px] font-bold uppercase tracking-widest text-slate-500">Humidity</div>
                             <div class="text-base font-extrabold text-slate-900">{{ $humidity ?? '-' }}<span class="text-[9px] font-bold text-slate-500 ml-1">%</span></div>
                         </div>
                     </a>
+                    @endif
                     
+                    @if ($pBattery)
                     <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-green-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-slate-100 bg-slate-50">
-                            <img src="{{ asset('icons/beranda/battery_online.svg') }}" alt="Battery" class="h-5 w-5 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset($paramIconPath($pBattery, 'icons/beranda/battery_online.svg')) }}" alt="Battery" class="h-5 w-5 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[8px] font-bold uppercase tracking-widest text-slate-500">Battery</div>
                             <div class="text-base font-extrabold text-slate-900">{{ $battery ?? '-' }}<span class="text-[9px] font-bold text-slate-500 ml-1">Volt</span></div>
                         </div>
                     </a>
+                    @endif
 
+                    @if ($pTemp)
                     <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-orange-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-slate-100 bg-slate-50">
-                            <img src="{{ asset('icons/beranda/temper_online.svg') }}" alt="Temperature" class="h-5 w-5 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset($paramIconPath($pTemp, 'icons/beranda/temper_online.svg')) }}" alt="Temperature" class="h-5 w-5 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[8px] font-bold uppercase tracking-widest text-slate-500">Temperature</div>
                             <div class="text-base font-extrabold text-slate-900">{{ $temp ?? '-' }}<span class="text-[9px] font-bold text-slate-500 ml-1">°C</span></div>
                         </div>
                     </a>
+                    @endif
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </div>
@@ -293,8 +315,10 @@
                 </svg>
 
             </div>
+@if ($pLuas || $pAfmrDebit || $pFlowVelocity)
 <div class="col-span-12 md:col-span-3 flex flex-col justify-start gap-2">
                 <div class="text-sm font-semibold text-slate-700">Data Pengukuran</div>
+@if ($pLuas)
 @php
                     $luasUrl = $pLuas
                         ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pLuas->nama_parameter)
@@ -304,7 +328,7 @@
                     class="flex items-center gap-2 rounded-xl border px-2.5 py-1.5 bg-white shadow-sm transition-all hover:shadow-md hover:border-sky-300
                         {{ $isOnline ? 'border-slate-200' : 'border-slate-200 grayscale opacity-70' }}">
                     <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 overflow-hidden">
-                        <img src="{{ asset('icons/afmr/luas_penampang_air.svg') }}" alt="Luas" class="h-full w-full object-cover"
+                        <img src="{{ asset($paramIconPath($pLuas, 'icons/afmr/luas_penampang_air.svg')) }}" alt="Luas" class="h-full w-full object-cover"
                             onerror="this.style.display='none'">
                     </div>
                     <div>
@@ -317,6 +341,8 @@
                         </div>
                     </div>
                 </a>
+@endif
+@if ($pAfmrDebit)
 @php
                     $afmrDebitUrl = $pAfmrDebit
                         ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pAfmrDebit->nama_parameter)
@@ -326,7 +352,7 @@
                     class="flex items-center gap-2 rounded-xl border px-2.5 py-1.5 bg-white shadow-sm transition-all hover:shadow-md hover:border-sky-300
                         {{ $isOnline ? 'border-slate-200' : 'border-slate-200 grayscale opacity-70' }}">
                     <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 overflow-hidden">
-                        <img src="{{ asset('icons/awlr/debit.svg') }}" alt="Debit" class="h-full w-full object-cover"
+                        <img src="{{ asset($paramIconPath($pAfmrDebit, 'icons/awlr/debit.svg')) }}" alt="Debit" class="h-full w-full object-cover"
                             onerror="this.style.display='none'">
                     </div>
                     <div>
@@ -339,6 +365,8 @@
                         </div>
                     </div>
                 </a>
+@endif
+@if ($pFlowVelocity)
 @php
                     $flowVelocityUrl = $pFlowVelocity
                         ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pFlowVelocity->nama_parameter)
@@ -348,7 +376,7 @@
                     class="flex items-center gap-2 rounded-xl border px-2.5 py-1.5 bg-white shadow-sm transition-all hover:shadow-md hover:border-indigo-300
                         {{ $isOnline ? 'border-slate-200' : 'border-slate-200 grayscale opacity-70' }}">
                     <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 overflow-hidden">
-                        <img src="{{ asset('icons/afmr/flow_velocity.svg') }}" alt="Flow Velocity" class="h-full w-full object-cover"
+                        <img src="{{ asset($paramIconPath($pFlowVelocity, 'icons/afmr/flow_velocity.svg')) }}" alt="Flow Velocity" class="h-full w-full object-cover"
                             onerror="this.style.display='none'">
                     </div>
                     <div>
@@ -366,9 +394,13 @@
                         </div>
                     </div>
                 </a>
+@endif
             </div>
+@endif
         </div>
+@if ($pElevMukaAir || $pElevSensor || $pJarakSensor)
 <div class="grid grid-cols-3 gap-3">
+@if ($pElevMukaAir)
 @php
                 $elevMukaAirUrl = $pElevMukaAir
                     ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pElevMukaAir->nama_parameter)
@@ -378,7 +410,7 @@
                 class="flex items-center gap-2.5 rounded-xl border px-3 py-2.5 bg-white shadow-sm transition-all hover:shadow-md hover:border-sky-300
                     {{ $isOnline ? 'border-slate-200' : 'border-slate-200 grayscale opacity-70' }}">
                 <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 overflow-hidden">
-                    <img src="{{ asset('icons/awlr/elevasi_muka_air.svg') }}"
+                    <img src="{{ asset($paramIconPath($pElevMukaAir, 'icons/awlr/elevasi_muka_air.svg')) }}"
                         alt="Elevasi Muka Air" class="h-full w-full object-cover"
                         onerror="this.style.display='none'">
                 </div>
@@ -392,6 +424,8 @@
                     </div>
                 </div>
             </a>
+@endif
+@if ($pElevSensor)
 @php
                 $elevSensorUrl = $pElevSensor
                     ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pElevSensor->nama_parameter)
@@ -401,7 +435,7 @@
                 class="flex items-center gap-2.5 rounded-xl border px-3 py-2.5 bg-white shadow-sm transition-all hover:shadow-md hover:border-amber-300
                     {{ $isOnline ? 'border-slate-200' : 'border-slate-200 grayscale opacity-70' }}">
                 <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 overflow-hidden">
-                    <img src="{{ asset('icons/afmr/tinggi_sensor.svg') }}"
+                    <img src="{{ asset($paramIconPath($pElevSensor, 'icons/afmr/tinggi_sensor.svg')) }}"
                         alt="Elevasi Sensor" class="h-full w-full object-cover"
                         onerror="this.style.display='none'">
                 </div>
@@ -415,6 +449,8 @@
                     </div>
                 </div>
             </a>
+@endif
+@if ($pJarakSensor)
 @php
                 $jarakSensorUrl = $pJarakSensor
                     ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pJarakSensor->nama_parameter)
@@ -424,7 +460,7 @@
                 class="flex items-center gap-2.5 rounded-xl border px-3 py-2.5 bg-white shadow-sm transition-all hover:shadow-md hover:border-rose-300
                     {{ $isOnline ? 'border-slate-200' : 'border-slate-200 grayscale opacity-70' }}">
                 <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 overflow-hidden">
-                    <img src="{{ asset('icons/afmr/jarak_sensor.svg') }}"
+                    <img src="{{ asset($paramIconPath($pJarakSensor, 'icons/afmr/jarak_sensor.svg')) }}"
                         alt="Jarak Sensor" class="h-full w-full object-cover"
                         onerror="this.style.display='none'">
                 </div>
@@ -438,15 +474,19 @@
                     </div>
                 </div>
             </a>
+@endif
         </div>
+@endif
+@if ($pHumidity || $pBattery || $pTemp)
 <div class="border-t border-slate-100 pt-3">
             <div class="text-sm font-semibold text-slate-700 mb-2">Logger</div>
             <div class="grid grid-cols-3 gap-2">
+@if ($pHumidity)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
                     class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-300 px-3 py-2.5">
                     <div class="flex items-center gap-2">
                         <div class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
-                            <img src="{{ asset('icons/beranda/' . ($isOnline ? 'humidity_online.svg' : 'humidity_offline.svg')) }}"
+                            <img src="{{ asset($paramIconPath($pHumidity, 'icons/beranda/' . ($isOnline ? 'humidity_online.svg' : 'humidity_offline.svg'))) }}"
                                 alt="Humidity" class="h-full w-full object-cover {{ $iconClass }}">
                         </div>
                         <div class="leading-tight min-w-0">
@@ -457,11 +497,13 @@
                         </div>
                     </div>
                 </a>
+@endif
+@if ($pBattery)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
                     class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-green-300 px-3 py-2.5">
                     <div class="flex items-center gap-2">
                         <div class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
-                            <img src="{{ asset('icons/beranda/' . ($isOnline ? 'battery_online.svg' : 'battery_offline.svg')) }}"
+                            <img src="{{ asset($paramIconPath($pBattery, 'icons/beranda/' . ($isOnline ? 'battery_online.svg' : 'battery_offline.svg'))) }}"
                                 alt="Battery" class="h-full w-full object-cover {{ $iconClass }}">
                         </div>
                         <div class="leading-tight min-w-0">
@@ -472,11 +514,13 @@
                         </div>
                     </div>
                 </a>
+@endif
+@if ($pTemp)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
                     class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-orange-300 px-3 py-2.5">
                     <div class="flex items-center gap-2">
                         <div class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
-                            <img src="{{ asset('icons/beranda/' . ($isOnline ? 'temper_online.svg' : 'temper_offline.svg')) }}"
+                            <img src="{{ asset($paramIconPath($pTemp, 'icons/beranda/' . ($isOnline ? 'temper_online.svg' : 'temper_offline.svg'))) }}"
                                 alt="Temperature" class="h-full w-full object-cover {{ $iconClass }}">
                         </div>
                         <div class="leading-tight min-w-0">
@@ -487,8 +531,10 @@
                         </div>
                     </div>
                 </a>
+@endif
             </div>
         </div>
+@endif
     </div>
 @endif
 </div>

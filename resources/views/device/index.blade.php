@@ -589,6 +589,10 @@
                                                         sm:grid sm:grid-cols-[24px_1.6fr_1fr_0.9fr_52px] sm:gap-3 sm:items-start">
                                                 <input type="hidden" :name="'params[' + index + '][parameter_group_id]'"
                                                     x-model="param.parameter_group_id">
+                                                <input type="hidden" :name="'params[' + index + '][parameter_utama]'"
+                                                    x-model="param.parameter_utama">
+                                                <input type="hidden" :name="'params[' + index + '][icon_app]'"
+                                                    x-model="param.icon_app">
 <div class="flex items-center justify-between mb-2 sm:mb-0 sm:justify-center sm:pt-2">
                                                     <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold sm:w-4 sm:h-4" x-text="index + 1"></span>
                                                     <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-400 sm:hidden">Parameter <span x-text="index + 1"></span></p>
@@ -1054,6 +1058,10 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                     x-model="param.id_param">
                                                 <input type="hidden" :name="'params[' + index + '][parameter_group_id]'"
                                                     x-model="param.parameter_group_id">
+                                                <input type="hidden" :name="'params[' + index + '][parameter_utama]'"
+                                                    x-model="param.parameter_utama">
+                                                <input type="hidden" :name="'params[' + index + '][icon_app]'"
+                                                    x-model="param.icon_app">
 <div class="flex items-center justify-between mb-2 sm:mb-0 sm:justify-center sm:pt-2">
                                                     <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold sm:w-4 sm:h-4" x-text="index + 1"></span>
 <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-400 sm:hidden">Parameter <span x-text="index + 1"></span></p>
@@ -1370,7 +1378,9 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         nama_parameter: '',
                         kolom_sensor: '',
                         satuan: '',
-                        parameter_group_id: ''
+                        parameter_group_id: '',
+                        parameter_utama: '',
+                        icon_app: ''
                     }]
                 },
                 formdata: {
@@ -1482,7 +1492,9 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                             nama_parameter: '',
                             kolom_sensor: '',
                             satuan: '',
-                            parameter_group_id: ''
+                            parameter_group_id: '',
+                            parameter_utama: '',
+                            icon_app: ''
                         }]
                     }
                     if (this.addDeviceMap) {
@@ -1687,7 +1699,9 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         nama_parameter: '',
                         kolom_sensor: '',
                         satuan: '',
-                        parameter_group_id: ''
+                        parameter_group_id: '',
+                        parameter_utama: '',
+                        icon_app: ''
                     })
                 },
 
@@ -1704,7 +1718,9 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         nama_parameter: '',
                         kolom_sensor: '',
                         satuan: '',
-                        parameter_group_id: ''
+                        parameter_group_id: '',
+                        parameter_utama: '',
+                        icon_app: ''
                     })
                 },
 
@@ -2013,11 +2029,14 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     this.$nextTick(() => {
                         this.editData.params = (device.params ?? []).map(p => ({
                             id_param: p.id_param,
-                            list_parameter_id: '',
-                            nama_parameter: (p.nama_parameter ?? '').toString().replaceAll('_', ' '),
+                            list_parameter_id: this.listParameterIdForParam(p),
+                            nama_parameter: (this.listParameterOptionForParam(p)?.nama_parameter ?? p
+                                .nama_parameter ?? '').toString().replaceAll('_', ' '),
                             kolom_sensor: p.kolom_sensor ?? '',
                             satuan: p.satuan ?? '',
-                            parameter_group_id: p.parameter_group_id ?? ''
+                            parameter_group_id: p.parameter_group_id ?? '',
+                            parameter_utama: p.parameter_utama ?? '',
+                            icon_app: (this.listParameterOptionForParam(p)?.icon_app ?? p.icon_app ?? '')
                         }))
 
                         if (!this.editData.params.length) {
@@ -2059,11 +2078,35 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     return options.includes(value) ? value : ''
                 },
 
+                normalizeParameterKey(value) {
+                    value = String(value || '').trim()
+                    if (!value) return ''
+                    return value.replace(/\s+/g, '_').replace(/_+/g, '_').toLowerCase()
+                },
+
+                listParameterIdForParam(param) {
+                    const selected = this.listParameterOptionForParam(param)
+                    return selected ? String(selected.id) : ''
+                },
+
+                listParameterOptionForParam(param) {
+                    const base = this.normalizeParameterKey(param?.parameter_utama)
+                    if (!base) return null
+
+                    return (this.listParameterOptions || []).find((item) => {
+                        return this.normalizeParameterKey(item.parameter_utama || item.nama_parameter) === base
+                    }) || null
+                },
+
                 applyListParameterToParamRow(param, sensorOptions = []) {
                     if (!param) return
 
                     const selectedId = String(param.list_parameter_id || '').trim()
-                    if (!selectedId) return
+                    if (!selectedId) {
+                        param.parameter_utama = ''
+                        param.icon_app = ''
+                        return
+                    }
 
                     const selected = (this.listParameterOptions || []).find((item) => String(item
                             .id) ===
@@ -2073,7 +2116,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     param.nama_parameter = np ? np.replaceAll('_', ' ') : (param.nama_parameter || '')
 
                     const pu = (selected.parameter_utama || '').toString()
-                    if (pu) param.parameter_utama = pu.replaceAll('_', ' ')
+                    param.parameter_utama = pu || ''
 
                     if (selected.default_satuan) {
                         param.satuan = selected.default_satuan
@@ -2086,6 +2129,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     }
 
                     param.parameter_group_id = selected.default_parameter_group_id || ''
+                    param.icon_app = selected.icon_app || ''
                 },
 
                 applyTemplateToAdd() {
@@ -2096,6 +2140,8 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         list_parameter_id: row.list_parameter_id ? String(row
                             .list_parameter_id) : '',
                         nama_parameter: row.nama_parameter || '',
+                        parameter_utama: row.parameter_utama || '',
+                        icon_app: row.icon_app || '',
                         kolom_sensor: this.normalizeSensorOption(row.kolom_sensor_default,
                             this.addSensorOptions),
                         satuan: row.satuan || '',
@@ -2107,7 +2153,9 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         nama_parameter: '',
                         kolom_sensor: '',
                         satuan: '',
-                        parameter_group_id: ''
+                        parameter_group_id: '',
+                        parameter_utama: '',
+                        icon_app: ''
                     }]
                 },
 
@@ -2120,6 +2168,8 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         list_parameter_id: row.list_parameter_id ? String(row
                             .list_parameter_id) : '',
                         nama_parameter: row.nama_parameter || '',
+                        parameter_utama: row.parameter_utama || '',
+                        icon_app: row.icon_app || '',
                         kolom_sensor: this.normalizeSensorOption(row.kolom_sensor_default,
                             this.editSensorOptions),
                         satuan: row.satuan || '',
@@ -2132,7 +2182,9 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         nama_parameter: '',
                         kolom_sensor: '',
                         satuan: '',
-                        parameter_group_id: ''
+                        parameter_group_id: '',
+                        parameter_utama: '',
+                        icon_app: ''
                     }]
                 }
             }))

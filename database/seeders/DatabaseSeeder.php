@@ -11,5 +11,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(\Database\Seeders\MiniStesySeeder::class);
         $this->call(\Database\Seeders\AddAwlrSinduadiTimurSeeder::class);
+        $this->call(\Database\Seeders\ListParameterSeeder::class);
     }
 }

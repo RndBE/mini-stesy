@@ -186,37 +186,47 @@
                             $statusText = $isOnline ? 'Koneksi Terhubung' : 'Koneksi Terputus';
                             $sdText = $isSdOk ? 'OK' : 'Bermasalah';
 
-                            $pHumidity = $lg->params->first(function ($p) {
-                                $u = strtolower(trim((string) $p->parameter_utama));
-                                $n = strtolower(trim((string) $p->nama_parameter));
-                                return $u === 'humidity_logger' || $n === 'humidity_logger'
-                                    || str_contains($n, 'humidity') || str_contains($u, 'humidity');
-                            });
-                            $pBattery = $lg->params->first(function ($p) {
-                                $u = strtolower(trim((string) $p->parameter_utama));
-                                $n = strtolower(trim((string) $p->nama_parameter));
-                                return $u === 'battery_logger' || $n === 'battery_logger'
-                                    || str_contains($n, 'battery') || str_contains($u, 'battery');
-                            });
-                            $pTemp = $lg->params->first(function ($p) {
-                                $u = strtolower(trim((string) $p->parameter_utama));
-                                $n = strtolower(trim((string) $p->nama_parameter));
-                                return $u === 'temperature_logger' || $n === 'temperature_logger'
-                                    || str_contains($n, 'temperature') || str_contains($u, 'temperature');
-                            });
-                            $pMukaAir = $lg->params->first(function ($p) {
-                                $u = strtolower(trim((string) $p->parameter_utama));
-                                $n = strtolower(trim((string) $p->nama_parameter));
-                                return $u === 'muka_air_tanah' || $n === 'muka_air_tanah'
-                                    || str_contains($n, 'muka') || str_contains($u, 'muka');
-                            });
-                            $pRain = $lg->params->first(function ($param) {
-                                $name = strtolower(trim((string) $param->nama_parameter));
-                                $utama = strtolower(trim((string) $param->parameter_utama));
-                                return $utama === 'hujan' || $name === 'curah hujan'
-                                    || str_contains($name, 'hujan') || str_contains($name, 'rain')
-                                    || str_contains($utama, 'hujan') || str_contains($utama, 'rain');
-                            });
+                            $normalizeParamKey = function ($value) {
+                                $value = trim((string) $value);
+                                if ($value === '') return '';
+                                $value = preg_replace('/\s+/', '_', $value);
+                                $value = preg_replace('/_+/', '_', $value);
+                                return strtolower($value);
+                            };
+                            $findParamByBase = function (array $baseKeys) use ($lg, $normalizeParamKey) {
+                                $baseKeys = collect($baseKeys)
+                                    ->map(fn($key) => $normalizeParamKey($key))
+                                    ->filter()
+                                    ->values()
+                                    ->all();
+
+                                return $lg->params->first(function ($param) use ($baseKeys, $normalizeParamKey) {
+                                    $utama = $normalizeParamKey($param->parameter_utama);
+                                    return in_array($utama, $baseKeys, true);
+                                });
+                            };
+                            $paramIconPath = function ($param, string $fallback) use ($isOnline) {
+                                $icon = trim((string) ($param->icon_app ?? ''));
+                                if ($icon === '' || !str_contains($icon, '/')) {
+                                    return $fallback;
+                                }
+
+                                $icon = ltrim($icon, '/');
+                                if (!$isOnline) {
+                                    $offlineIcon = preg_replace('/_online(\.[a-z0-9]+)$/i', '_offline$1', $icon);
+                                    if ($offlineIcon !== $icon) {
+                                        return $offlineIcon;
+                                    }
+                                }
+
+                                return $icon;
+                            };
+
+                            $pHumidity = $findParamByBase(['humidity_logger']);
+                            $pBattery = $findParamByBase(['battery_logger']);
+                            $pTemp = $findParamByBase(['temperature_logger']);
+                            $pMukaAir = $findParamByBase(['muka_air_tanah']);
+                            $pRain = $findParamByBase(['hujan', 'curah_hujan']);
 
                             $humidity =
                                 $latest && $pHumidity && $pHumidity->kolom_sensor
@@ -246,52 +256,24 @@
                             $subKategoriAwlr = (is_numeric($lg->jiat?->kedalaman_sumur) && (float)$lg->jiat->kedalaman_sumur > 0)
                                 ? 'jiat'
                                 : 'non_jiat';
-                            $pTma = $lg->params->first(function ($param) {
-                                $n = strtolower(trim((string) $param->nama_parameter));
-                                $u = strtolower(trim((string) $param->parameter_utama));
-                                return str_contains($n, 'muka') || str_contains($n, 'tma')
-                                    || str_contains($u, 'muka') || str_contains($u, 'tma');
-                            });
-                            $pDebit = $lg->params->first(function ($param) {
-                                $n = strtolower(trim((string) $param->nama_parameter));
-                                $u = strtolower(trim((string) $param->parameter_utama));
-                                return str_contains($n, 'debit') || str_contains($u, 'debit');
-                            });
+                            $pTma = $findParamByBase(['tma', 'muka_air_tanah']);
+                            $pDebit = $findParamByBase(['debit']);
                             $tma   = $latest && $pTma   && $pTma->kolom_sensor   ? $latest->{$pTma->kolom_sensor}   ?? null : null;
                             $debit = $latest && $pDebit && $pDebit->kolom_sensor ? $latest->{$pDebit->kolom_sensor} ?? null : null;
-                            $pElevMukaAir = $lg->params->first(function ($param) {
-                                $n = strtolower(trim((string) $param->nama_parameter));
-                                $u = strtolower(trim((string) $param->parameter_utama));
-                                return str_contains($n, 'elevasi') || str_contains($n, 'elev')
-                                    || str_contains($u, 'elevasi') || str_contains($u, 'elev');
-                            });
-                            $pElevSensor = $lg->params->first(function ($param) {
-                                $n = strtolower(trim((string) $param->nama_parameter));
-                                $u = strtolower(trim((string) $param->parameter_utama));
-                                return (str_contains($n, 'sensor') && str_contains($n, 'elev'))
-                                    || (str_contains($u, 'sensor') && str_contains($u, 'elev'));
-                            });
-                            $pJarakSensor = $lg->params->first(function ($param) {
-                                $n = strtolower(trim((string) $param->nama_parameter));
-                                $u = strtolower(trim((string) $param->parameter_utama));
-                                return str_contains($n, 'jarak') || str_contains($u, 'jarak');
-                            });
-                            $pLuas = $lg->params->first(function ($param) {
-                                $n = strtolower(trim((string) $param->nama_parameter));
-                                $u = strtolower(trim((string) $param->parameter_utama));
-                                return str_contains($n, 'luas') || str_contains($u, 'luas');
-                            });
-                            $pAfmrDebit = $lg->params->first(function ($param) {
-                                $n = strtolower(trim((string) $param->nama_parameter));
-                                $u = strtolower(trim((string) $param->parameter_utama));
-                                return str_contains($n, 'debit') || str_contains($u, 'debit');
-                            });
-                            $pFlowVelocity = $lg->params->first(function ($param) {
-                                $n = strtolower(trim((string) $param->nama_parameter));
-                                $u = strtolower(trim((string) $param->parameter_utama));
-                                return str_contains($n, 'velocity') || str_contains($n, 'kecepatan')
-                                    || str_contains($u, 'velocity') || str_contains($u, 'kecepatan');
-                            });
+                            $pElevMukaAir = $findParamByBase(
+                                ['elevasi_muka_air', 'elev_muka_air']
+                            );
+                            $pElevSensor = $findParamByBase(
+                                ['elevasi_sensor', 'tinggi_sensor']
+                            );
+                            $pJarakSensor = $findParamByBase(['jarak_sensor', 'jarak_sensor_ke_air']);
+                            $pLuas = $findParamByBase(
+                                ['luas_penampang', 'luas_penampang_basah', 'luas_penampang_air']
+                            );
+                            $pAfmrDebit = $findParamByBase(['debit']);
+                            $pFlowVelocity = $findParamByBase(
+                                ['flow_velocity', 'kecepatan_aliran']
+                            );
                             $elevMukaAir  = $latest && $pElevMukaAir  && $pElevMukaAir->kolom_sensor  ? $latest->{$pElevMukaAir->kolom_sensor}  ?? null : null;
                             $elevSensor   = $latest && $pElevSensor   && $pElevSensor->kolom_sensor   ? $latest->{$pElevSensor->kolom_sensor}   ?? null : null;
                             $jarakSensor  = $latest && $pJarakSensor  && $pJarakSensor->kolom_sensor  ? $latest->{$pJarakSensor->kolom_sensor}  ?? null : null;

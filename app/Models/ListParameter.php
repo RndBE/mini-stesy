@@ -13,6 +13,7 @@ class ListParameter extends Model
         'parameter_utama',
         'default_satuan',
         'default_kolom_sensor',
+        'icon_app',
         'default_parameter_group_id',
         'is_active',
     ];

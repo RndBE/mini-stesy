@@ -476,10 +476,12 @@
                 </div>
             </div>
 
+            @if ($pHumidity || $pBattery || $pTemp)
             <div class="col-span-12 md:col-span-4 space-y-3">
                 <div class="text-md font-semibold text-slate-700">Parameter Logger</div>
                 @include('beranda.categories.partials.logger_health_cards')
             </div>
+            @endif
         </div>
     @else
 <div class="p-5 space-y-4">
@@ -627,8 +629,10 @@
                     </svg>
 
                 </div>
+@if ($pTma || $pDebit)
 <div class="col-span-12 md:col-span-3 flex flex-col justify-start gap-2">
                     <div class="text-sm font-semibold text-slate-700">Data Pengukuran</div>
+@if ($pTma)
 @php
                         $tmaAnalisaUrl = $pTma
                             ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($pTma->nama_parameter)
@@ -639,7 +643,7 @@
                             {{ $isOnline ? 'border-slate-200' : 'border-slate-200 grayscale opacity-70' }}">
                         <div
                             class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 overflow-hidden">
-                            <img src="{{ asset('icons/awlr/' . ($isOnline ? 'elevasi_muka_air.svg' : 'elevasi_muka_air.svg')) }}"
+                            <img src="{{ asset($paramIconPath($pTma, 'icons/awlr/elevasi_muka_air.svg')) }}"
                                 alt="TMA" class="h-full w-full object-cover"
                                 onerror="this.style.display='none';this.parentElement.innerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' class=\'h-5 w-5 text-sky-500\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10\'/></svg>'">
                         </div>
@@ -655,6 +659,8 @@
                             </div>
                         </div>
                     </a>
+@endif
+@if ($pDebit)
 @php
                         $debitAnalisaUrl = $pDebit
                             ? route('analisa.index', $lg->id_logger) .
@@ -667,7 +673,7 @@
                             {{ $isOnline ? 'border-slate-200' : 'border-slate-200 grayscale opacity-70' }}">
                         <div
                             class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 overflow-hidden">
-                            <img src="{{ asset('icons/awlr/' . ($isOnline ? 'debit.svg' : 'debit.svg')) }}"
+                            <img src="{{ asset($paramIconPath($pDebit, 'icons/awlr/debit.svg')) }}"
                                 alt="Debit" class="h-full w-full object-cover"
                                 onerror="this.style.display='none';this.parentElement.innerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' class=\'h-5 w-5 text-indigo-500\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M13 10V3L4 14h7v7l9-11h-7z\'/></svg>'">
                         </div>
@@ -682,17 +688,21 @@
                             </div>
                         </div>
                     </a>
+@endif
                 </div>
+@endif
             </div>
+@if ($pHumidity || $pBattery || $pTemp)
 <div class="border-t border-slate-100 pt-3">
                 <div class="text-sm font-semibold text-slate-700 mb-2">Logger</div>
 <div class="grid grid-cols-3 gap-2">
+@if ($pHumidity)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
                         class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-300 px-3 py-2.5">
                         <div class="flex items-center gap-2">
                             <div
                                 class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
-                                <img src="{{ asset('icons/beranda/' . ($isOnline ? 'humidity_online.svg' : 'humidity_offline.svg')) }}"
+                                <img src="{{ asset($paramIconPath($pHumidity, 'icons/beranda/' . ($isOnline ? 'humidity_online.svg' : 'humidity_offline.svg'))) }}"
                                     alt="Humidity" class="h-full w-full object-cover {{ $iconClass }}">
                             </div>
                             <div class="leading-tight min-w-0">
@@ -706,12 +716,14 @@
                             </div>
                         </div>
                     </a>
+@endif
+@if ($pBattery)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pBattery ? '?parameter=' . urlencode($pBattery->nama_parameter) : '' }}"
                         class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-green-300 px-3 py-2.5">
                         <div class="flex items-center gap-2">
                             <div
                                 class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
-                                <img src="{{ asset('icons/beranda/' . ($isOnline ? 'battery_online.svg' : 'battery_offline.svg')) }}"
+                                <img src="{{ asset($paramIconPath($pBattery, 'icons/beranda/' . ($isOnline ? 'battery_online.svg' : 'battery_offline.svg'))) }}"
                                     alt="Battery" class="h-full w-full object-cover {{ $iconClass }}">
                             </div>
                             <div class="leading-tight min-w-0">
@@ -725,12 +737,14 @@
                             </div>
                         </div>
                     </a>
+@endif
+@if ($pTemp)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pTemp ? '?parameter=' . urlencode($pTemp->nama_parameter) : '' }}"
                         class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-orange-300 px-3 py-2.5">
                         <div class="flex items-center gap-2">
                             <div
                                 class="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 overflow-hidden">
-                                <img src="{{ asset('icons/beranda/' . ($isOnline ? 'temper_online.svg' : 'temper_offline.svg')) }}"
+                                <img src="{{ asset($paramIconPath($pTemp, 'icons/beranda/' . ($isOnline ? 'temper_online.svg' : 'temper_offline.svg'))) }}"
                                     alt="Temperature" class="h-full w-full object-cover {{ $iconClass }}">
                             </div>
                             <div class="leading-tight min-w-0">
@@ -744,8 +758,10 @@
                             </div>
                         </div>
                     </a>
+@endif
                 </div>
             </div>
+@endif
 
         </div>
     @endif

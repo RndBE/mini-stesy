@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@php
+    $sensorOptions = collect(range(1, 19))->map(fn($number) => 'sensor' . $number)->values();
+@endphp
+
 @section('content')
     <div x-data="listParameterCrud()" class="space-y-3">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 mt-3">
@@ -30,6 +34,7 @@
                             <th class="px-4 py-3">Parameter Utama</th>
                             <th class="px-4 py-3">Default Satuan</th>
                             <th class="px-4 py-3">Default Kolom Sensor</th>
+                            <th class="px-4 py-3">Icon</th>
                             <th class="px-4 py-3">Default Group</th>
                             <th class="px-4 py-3">Status</th>
                             <th class="px-4 py-3 text-center">Aksi</th>
@@ -44,6 +49,7 @@
                                     'parameter_utama' => $item->parameter_utama,
                                     'default_satuan' => $item->default_satuan,
                                     'default_kolom_sensor' => $item->default_kolom_sensor,
+                                    'icon_app' => $item->icon_app,
                                     'default_parameter_group_id' => $item->default_parameter_group_id,
                                     'is_active' => (bool) $item->is_active,
                                 ];
@@ -55,6 +61,20 @@
                                 <td class="px-4 py-3">{{ str_replace('_', ' ', $item->parameter_utama) }}</td>
                                 <td class="px-4 py-3">{{ $item->default_satuan ?? '-' }}</td>
                                 <td class="px-4 py-3">{{ $item->default_kolom_sensor ?? '-' }}</td>
+                                <td class="px-4 py-3">
+                                    @if ($item->icon_app)
+                                        <span class="inline-flex items-center gap-2">
+                                            <span
+                                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
+                                                <img src="{{ asset($item->icon_app) }}" alt=""
+                                                    class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                                            </span>
+                                            <span class="max-w-[180px] truncate text-xs text-slate-500">{{ $item->icon_app }}</span>
+                                        </span>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
                                 <td class="px-4 py-3">{{ $item->parameterGroup?->nama_group ?? '-' }}</td>
                                 <td class="px-4 py-3">
                                     <span
@@ -86,7 +106,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-4 py-8 text-center text-sm text-slate-500">Belum ada list
+                                <td colspan="9" class="px-4 py-8 text-center text-sm text-slate-500">Belum ada list
                                     parameter.</td>
                             </tr>
                         @endforelse
@@ -161,12 +181,55 @@
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Default Kolom
                                         Sensor</label>
-                                    <input type="text" name="default_kolom_sensor"
-                                        value="{{ old('form_mode') === 'create' ? old('default_kolom_sensor') : '' }}"
-                                        placeholder="contoh: sensor1"
-                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <div class="relative">
+                                        <select name="default_kolom_sensor"
+                                            class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 pr-10 text-sm font-semibold text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                            <option value="">- Pilih Sensor -</option>
+                                            @foreach ($sensorOptions as $sensor)
+                                                <option value="{{ $sensor }}" @selected(old('form_mode') === 'create' && old('default_kolom_sensor') === $sensor)>
+                                                    {{ 'Sensor ' . str_pad((string) substr($sensor, 6), 2, '0', STR_PAD_LEFT) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
                                     @if (old('form_mode') === 'create')
                                         @error('default_kolom_sensor')
+                                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    @endif
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-900 mb-2">Icon</label>
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-slate-50">
+                                            <img x-show="createIconPath" :src="assetUrl(createIconPath)" alt=""
+                                                class="h-7 w-7 object-contain" onerror="this.style.display='none'">
+                                        </div>
+                                        <div class="relative min-w-0 flex-1">
+                                            <select name="icon_app" x-model="createIconPath"
+                                                class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 pr-10 text-sm font-semibold text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                                <option value="">- Pilih Icon -</option>
+                                                @foreach ($iconOptions as $path => $label)
+                                                    <option value="{{ $path }}" @selected(old('form_mode') === 'create' && old('icon_app') === $path)>
+                                                        {{ $label }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    @if (old('form_mode') === 'create')
+                                        @error('icon_app')
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                         @enderror
                                     @endif
@@ -294,11 +357,52 @@
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Default Kolom
                                         Sensor</label>
-                                    <input type="text" name="default_kolom_sensor"
-                                        x-model="editData.default_kolom_sensor" placeholder="contoh: sensor1"
-                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <div class="relative">
+                                        <select name="default_kolom_sensor" x-model="editData.default_kolom_sensor"
+                                            class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 pr-10 text-sm font-semibold text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                            <option value="">- Pilih Sensor -</option>
+                                            <template x-for="sensor in sensorOptions" :key="'edit-sensor-' + sensor">
+                                                <option :value="sensor"
+                                                    x-text="'Sensor ' + String(sensor).replace('sensor', '').padStart(2, '0')"></option>
+                                            </template>
+                                        </select>
+                                        <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
                                     @if (old('form_mode') === 'edit')
                                         @error('default_kolom_sensor')
+                                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    @endif
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-900 mb-2">Icon</label>
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-slate-50">
+                                            <img x-show="editData.icon_app" :src="assetUrl(editData.icon_app)" alt=""
+                                                class="h-7 w-7 object-contain" onerror="this.style.display='none'">
+                                        </div>
+                                        <div class="relative min-w-0 flex-1">
+                                            <select name="icon_app" x-model="editData.icon_app"
+                                                class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 pr-10 text-sm font-semibold text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                                <option value="">- Pilih Icon -</option>
+                                                <template x-for="(label, path) in iconOptions" :key="'icon-' + path">
+                                                    <option :value="path" x-text="label"></option>
+                                                </template>
+                                            </select>
+                                            <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    @if (old('form_mode') === 'edit')
+                                        @error('icon_app')
                                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                         @enderror
                                     @endif
@@ -431,7 +535,10 @@
             return {
                 baseUrl: @json(url('list-parameter')),
                 groups: @json($groups),
+                sensorOptions: @json($sensorOptions),
+                iconOptions: @json($iconOptions),
                 createGroupId: @json((string) old('default_parameter_group_id', '')),
+                createIconPath: @json(old('form_mode') === 'create' ? old('icon_app', '') : ''),
                 showCreateModal: hasErrors && oldFormMode === 'create',
                 showEditModal: hasErrors && oldFormMode === 'edit',
                 showDeleteModal: false,
@@ -441,6 +548,7 @@
                     parameter_utama: @json(old('form_mode') === 'edit' ? old('parameter_utama') : ''),
                     default_satuan: @json(old('form_mode') === 'edit' ? old('default_satuan') : ''),
                     default_kolom_sensor: @json(old('form_mode') === 'edit' ? old('default_kolom_sensor') : ''),
+                    icon_app: @json(old('form_mode') === 'edit' ? old('icon_app') : ''),
                     default_parameter_group_id: @json(old('form_mode') === 'edit' ? (string) old('default_parameter_group_id', '') : ''),
                     is_active: @json(old('form_mode') === 'edit' ? (bool) old('is_active') : false),
                 },
@@ -454,6 +562,10 @@
                 closeCreateModal() {
                     this.showCreateModal = false;
                 },
+                assetUrl(path) {
+                    const cleanPath = String(path || '').replace(/^\/+/, '');
+                    return cleanPath ? `{{ asset('') }}${cleanPath}` : '';
+                },
                 openEditModal(row) {
                     this.editData = {
                         id: row.id,
@@ -461,6 +573,7 @@
                         parameter_utama: (row.parameter_utama ?? '').replaceAll('_', ' '),
                         default_satuan: row.default_satuan ?? '',
                         default_kolom_sensor: row.default_kolom_sensor ?? '',
+                        icon_app: row.icon_app ?? '',
                         default_parameter_group_id: row.default_parameter_group_id ? String(row
                             .default_parameter_group_id) : '',
                         is_active: !!row.is_active,

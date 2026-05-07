@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $sensorOptions = collect(range(1, 19))->map(fn($number) => 'sensor' . $number);
+    @endphp
+
     <div class="max-w-3xl space-y-6">
         <div>
             <h1 class="text-2xl font-bold text-slate-900">Edit List Parameter</h1>
@@ -42,11 +46,45 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700">Default Kolom Sensor</label>
-                        <input type="text" name="default_kolom_sensor"
-                            value="{{ old('default_kolom_sensor', $item->default_kolom_sensor) }}"
-                            placeholder="contoh: sensor1"
-                            class="mt-1 w-full rounded-md border-slate-300 p-2 text-sm shadow-sm">
+                        <div class="relative mt-1">
+                            <select name="default_kolom_sensor"
+                                class="h-10 w-full appearance-none rounded-md border border-slate-300 bg-white px-3 pr-10 text-sm font-medium text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                <option value="">- Pilih Sensor -</option>
+                                @foreach ($sensorOptions as $sensor)
+                                    <option value="{{ $sensor }}" @selected(old('default_kolom_sensor', $item->default_kolom_sensor) === $sensor)>
+                                        {{ 'Sensor ' . str_pad((string) substr($sensor, 6), 2, '0', STR_PAD_LEFT) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
                         @error('default_kolom_sensor')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Icon</label>
+                        <div class="relative mt-1">
+                            <select name="icon_app"
+                                class="h-10 w-full appearance-none rounded-md border border-slate-300 bg-white px-3 pr-10 text-sm font-medium text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                <option value="">- Pilih Icon -</option>
+                                @foreach ($iconOptions as $path => $label)
+                                    <option value="{{ $path }}" @selected(old('icon_app', $item->icon_app) === $path)>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                        @error('icon_app')
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

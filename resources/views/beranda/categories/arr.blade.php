@@ -2,6 +2,7 @@
     @include('beranda.categories.partials.logger_header')
 
     <div class="grid grid-cols-12 gap-4 p-5 md:grid-cols-12">
+        @if ($pRain)
         <div class="col-span-12 md:col-span-8 space-y-3 md:border-r md:border-slate-200 md:pr-4 ">
             <div class="text-md font-semibold text-slate-700">Data Curah Hujan</div>
             @php
@@ -78,10 +79,13 @@
                 </div>
             </div>
         </div>
+        @endif
 
+        @if ($pHumidity || $pBattery || $pTemp)
         <div class="col-span-12 md:col-span-4 space-y-3">
             <div class="text-md font-semibold text-slate-700">Parameter Logger</div>
             @include('beranda.categories.partials.logger_health_cards')
         </div>
+        @endif
     </div>
 </div>
