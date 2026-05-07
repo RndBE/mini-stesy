@@ -16,7 +16,7 @@ class FcmApiController extends Controller
             'device_name' => 'nullable|string'
         ]);
 
-        $userId = $request->user()->id;
+        $userId = $request->user()->id_user;
 
         DB::table('fcm_tokens')->updateOrInsert(
             ['fcm_token' => $request->fcm_token],
