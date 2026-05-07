@@ -468,6 +468,12 @@ class DataMasukController extends Controller
             }
 
             if ($shouldNotify) {
+                \Illuminate\Support\Facades\Log::info('FCM notification triggered', [
+                    'id_logger' => $id_logger,
+                    'state' => $stateKritis,
+                    'jeda_notif' => $logger->jeda_notif ?? null,
+                ]);
+
                 \Illuminate\Support\Facades\DB::table('logger_notification_states')->updateOrInsert(
                     ['id_logger' => $id_logger],
                     [
@@ -496,6 +502,14 @@ class DataMasukController extends Controller
                     'kategori' => $namaKategori,
                     'state' => $stateKritis,
                     'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
+                ]);
+            } else {
+                \Illuminate\Support\Facades\Log::info('FCM notification skipped by throttle', [
+                    'id_logger' => $id_logger,
+                    'state' => $stateKritis,
+                    'jeda_notif' => $logger->jeda_notif ?? null,
+                    'last_state' => $lastState->last_state ?? null,
+                    'last_notified_at' => $lastState->last_notified_at ?? null,
                 ]);
             }
         } else {

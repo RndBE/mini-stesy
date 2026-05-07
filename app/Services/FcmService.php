@@ -105,14 +105,29 @@ class FcmService
         $tokens = DB::table('fcm_tokens')->pluck('fcm_token')->unique();
         
         if ($tokens->isEmpty()) {
+            Log::warning('FCM broadcast skipped: no registered tokens');
             return;
         }
+
+        $sent = 0;
+        $failed = 0;
 
         // Ideally, this should be chunked if there are thousands of tokens.
         foreach ($tokens as $token) {
             // Note: In a real production system with many users, 
             // you'd use a Job/Queue here to send asynchronously.
-            $this->sendNotification($token, $title, $body, $data);
+            if ($this->sendNotification($token, $title, $body, $data)) {
+                $sent++;
+            } else {
+                $failed++;
+            }
         }
+
+        Log::info('FCM broadcast finished', [
+            'title' => $title,
+            'tokens' => $tokens->count(),
+            'sent' => $sent,
+            'failed' => $failed,
+        ]);
     }
 }
