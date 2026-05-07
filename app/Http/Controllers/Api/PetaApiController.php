@@ -58,6 +58,32 @@ class PetaApiController extends Controller
                     $arrState = $this->getStateFromThreshold($l, $status, $latest, $thresholds[$kategori]);
                 }
 
+                $curahHujanHarian = null;
+                $curahHujanPerJam = null;
+                $pRain = $l->params->first(function ($param) {
+                    $name  = strtolower(trim((string) $param->nama_parameter));
+                    $utama = strtolower(trim((string) $param->parameter_utama));
+                    return str_contains($name, 'hujan') || str_contains($name, 'rain') || str_contains($utama, 'hujan') || str_contains($utama, 'rain');
+                });
+
+                if ($pRain && $pRain->kolom_sensor && $l->tabel_main) {
+                    try {
+                        $tableName = $l->tabel_main;
+                        $rainCol = $pRain->kolom_sensor;
+                        $curahHujanHarian = DB::table($tableName)
+                            ->where('id_logger', $l->id_logger)
+                            ->whereBetween('waktu', [now()->copy()->startOfDay(), now()->copy()->endOfDay()])
+                            ->sum($rainCol);
+                        $curahHujanPerJam = DB::table($tableName)
+                            ->where('id_logger', $l->id_logger)
+                            ->whereBetween('waktu', [now()->copy()->startOfHour(), now()->copy()->endOfHour()])
+                            ->sum($rainCol);
+                    } catch (\Exception $e) {}
+                }
+
+                if ($curahHujanHarian === null) $curahHujanHarian = $this->sensorVal($l->params, $latest, ['curah_hujan_harian', 'hujan_hari', 'rain_day']);
+                if ($curahHujanPerJam === null) $curahHujanPerJam = $this->sensorVal($l->params, $latest, ['curah_hujan_per_jam', 'hujan_jam', 'rain_hour']);
+
                 return [
                     'id_logger'   => $l->id_logger,
                     'nama_logger' => $l->nama_logger,
@@ -100,8 +126,8 @@ class PetaApiController extends Controller
                           'temperature'      => $this->sensorVal($l->params, $latest, ['temperature', 'suhu', 'temp']),
                           'tekanan_udara'    => $this->sensorVal($l->params, $latest, ['tekanan_udara', 'pressure', 'tekanan']),
                           'humidity'         => $this->sensorVal($l->params, $latest, ['humidity', 'kelembaban']),
-                          'curah_hujan_per_jam' => $this->sensorVal($l->params, $latest, ['curah_hujan_per_jam', 'hujan_jam', 'rain_hour']),
-                          'curah_hujan_harian'  => $this->sensorVal($l->params, $latest, ['curah_hujan_harian', 'hujan_hari', 'rain_day']),
+                          'curah_hujan_per_jam' => $curahHujanPerJam !== null ? round((float) $curahHujanPerJam, 3) : null,
+                          'curah_hujan_harian'  => $curahHujanHarian !== null ? round((float) $curahHujanHarian, 3) : null,
                           'luas_penampang_basah' => $this->sensorVal($l->params, $latest, ['luas_penampang', 'penampang_basah', 'luas']),
                           'elevasi_sensor'   => $this->sensorVal($l->params, $latest, ['elevasi_sensor','tinggi_sensor']),
                           'orp'              => $this->sensorVal($l->params, $latest, ['orp']),
