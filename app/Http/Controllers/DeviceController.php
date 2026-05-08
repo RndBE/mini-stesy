@@ -189,7 +189,7 @@ class DeviceController extends Controller
             'params'            => 'required|array|min:1',
             'params.*.nama_parameter' => 'required|string|max:255',
             'params.*.kolom_sensor'   => 'required|string|max:50',
-            'params.*.satuan'         => 'required|string|max:50',
+            'params.*.satuan'         => 'nullable|string|max:50',
             'params.*.parameter_group_id' => 'nullable|integer|exists:parameter_groups,id',
             'params.*.parameter_utama' => 'nullable|string|max:50',
             'params.*.icon_app' => 'nullable|string|max:255',
@@ -296,7 +296,7 @@ class DeviceController extends Controller
                         'logger_id'       => $logger->id_logger,
                         'nama_parameter'  => $param['nama_parameter'],
                         'kolom_sensor'    => $param['kolom_sensor'],
-                        'satuan'          => $param['satuan'],
+                        'satuan'          => trim((string) ($param['satuan'] ?? '')),
                         'parameter_group_id' => $parameterGroupId,
                         'parameter_utama' => $parameterUtama,
                         'icon_app' => $this->normalizeIconPath($param['icon_app'] ?? null),
@@ -333,10 +333,15 @@ class DeviceController extends Controller
             'params.*.id_param'         => 'nullable',
             'params.*.nama_parameter'   => 'required_with:params|string|max:255',
             'params.*.kolom_sensor'     => 'required_with:params|string|max:50',
-            'params.*.satuan'           => 'required_with:params|string|max:50',
+            'params.*.satuan'           => 'nullable|string|max:50',
             'params.*.parameter_group_id'  => 'nullable|integer|exists:parameter_groups,id',
             'params.*.parameter_utama'  => 'nullable|string|max:50',
             'params.*.icon_app'  => 'nullable|string|max:255',
+            'sync_params'        => 'nullable|boolean',
+            'current_param_ids'   => 'nullable|array',
+            'current_param_ids.*' => 'integer',
+            'deleted_param_ids'   => 'nullable|array',
+            'deleted_param_ids.*' => 'integer',
         ]);
 
         $logger = t_Logger::query()
@@ -417,11 +422,22 @@ class DeviceController extends Controller
             return $v ?: '';
         };
 
-        if ($request->has('params') && is_array($request->params)) {
+        if ($request->boolean('sync_params')) {
             $keptParamIds = [];
+            $currentParamIds = collect($request->input('current_param_ids', []))
+                ->map(fn($id) => (int) $id)
+                ->filter()
+                ->values()
+                ->all();
+            $submittedParams = is_array($request->input('params')) ? $request->input('params') : [];
 
-            foreach ($request->params as $data) {
+            foreach ($submittedParams as $data) {
                 $paramId = $data['id_param'] ?? null;
+                $paramIdInt = $paramId ? (int) $paramId : null;
+
+                if ($paramIdInt && !in_array($paramIdInt, $currentParamIds, true)) {
+                    continue;
+                }
 
                 $namaParam = $normalizeParamName($data['nama_parameter'] ?? '');
                 $kolomSensor = trim((string) ($data['kolom_sensor'] ?? ''));
@@ -446,16 +462,40 @@ class DeviceController extends Controller
 
                     if ($param) {
                         $param->update($payload);
-                        $keptParamIds[] = $param->id_param;
+                        $keptParamIds[] = (int) $param->id_param;
                         continue;
                     }
                 }
 
                 $newParam = $logger->params()->create($payload);
-                $keptParamIds[] = $newParam->id_param;
+                $keptParamIds[] = (int) $newParam->id_param;
             }
 
-            $logger->params()->whereNotIn('id_param', $keptParamIds)->delete();
+            $deletedParamIds = collect($request->input('deleted_param_ids', []))
+                ->map(fn($id) => (int) $id)
+                ->filter()
+                ->values()
+                ->all();
+
+            if (!empty($deletedParamIds)) {
+                DB::table('parameter_sensor')
+                    ->where('logger_id', $logger->id_logger)
+                    ->whereIn('id_param', $deletedParamIds)
+                    ->delete();
+            }
+
+            $finalKeptParamIds = array_values(array_unique(array_merge($currentParamIds, $keptParamIds)));
+
+            if (!empty($finalKeptParamIds)) {
+                DB::table('parameter_sensor')
+                    ->where('logger_id', $logger->id_logger)
+                    ->whereNotIn('id_param', $finalKeptParamIds)
+                    ->delete();
+            } else {
+                DB::table('parameter_sensor')
+                    ->where('logger_id', $logger->id_logger)
+                    ->delete();
+            }
         }
 
         return back()->with('success', 'Data device berhasil diperbarui');

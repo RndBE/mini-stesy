@@ -66,7 +66,7 @@
             'tekanan_udara' => [
                 'label' => 'TEKANAN UDARA',
                 'satuan' => 'hPa',
-                'icon' => 'icons/awr/pressure.svg',
+                'icon' => 'icons/awr/tekanan_udara.svg',
                 'terms' => ['pressure', 'tekanan', 'barometer', 'tekanan_udara', 'baro', 'air_pressure', 'pa', 'bp'],
             ],
             'kelembaban' => [

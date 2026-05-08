@@ -628,7 +628,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                     <div>
                                                         <p class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Satuan</p>
                                                         <input :name="'params[' + index + '][satuan]'" x-model="param.satuan"
-                                                            type="text" required placeholder="cth: m"
+                                                            type="text" placeholder="cth: m"
                                                             class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
                                                     </div>
                                                 </div>
@@ -707,6 +707,14 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     <form :action="editData.updateUrl" method="POST">
                         @csrf
                         @method('PUT')
+                        <input type="hidden" name="sync_params" value="1">
+                        <template x-for="param in editData.params.filter((item) => String(item.id_param || '').trim())"
+                            :key="'current-param-' + param.id_param">
+                            <input type="hidden" name="current_param_ids[]" :value="param.id_param">
+                        </template>
+                        <template x-for="id in editData.deletedParamIds" :key="'deleted-param-' + id">
+                            <input type="hidden" name="deleted_param_ids[]" :value="id">
+                        </template>
 
                         <div class="px-6 py-4 space-y-6 max-h-[70vh] overflow-y-auto">
                             <input type="hidden" name="latitude" x-model="editData.latitude">
@@ -1104,8 +1112,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                 </div>
 <div class="mt-2 flex justify-end sm:mt-0 sm:block">
                                                     <button type="button" @click="removeEditParameter(index)"
-                                                        :disabled="editData.params.length === 1"
-                                                        class="inline-flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                                        class="inline-flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600"
                                                         title="Hapus parameter">
                                                         <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -1356,6 +1363,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     kedalaman_rata: '',
                     koefisien_debit: '',
                     params: [],
+                    deletedParamIds: [],
                     fotos: []
                 },
                 addData: {
@@ -1725,7 +1733,12 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                 },
 
                 removeEditParameter(index) {
-                    if (this.editData.params.length > 1) {
+                    if (this.editData.params.length > 0) {
+                        const removed = this.editData.params[index]
+                        const id = String(removed?.id_param || '').trim()
+                        if (id && !this.editData.deletedParamIds.includes(id)) {
+                            this.editData.deletedParamIds.push(id)
+                        }
                         this.editData.params.splice(index, 1)
                     }
                 },
@@ -2005,6 +2018,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         koefisien_debit: device.afmr_contact?.koefisien_debit != null ? parseFloat(device.afmr_contact.koefisien_debit) : '',
                         fotos: device.fotos ? [...device.fotos] : [],
                     })
+                    this.editData.deletedParamIds = []
                     this.editData.params = []
                     const sensorCount = parseInt(device.sensor_count ?? 16, 10)
                     const validSensorCount = (Number.isNaN(sensorCount) || sensorCount <= 0) ? 16 :

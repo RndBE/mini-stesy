@@ -8,7 +8,7 @@ class Parameter extends Model
 {
     protected $table= 'parameter_sensor';
     protected $primaryKey = 'id_param';   // 🔥 ini kuncinya
-    public $incrementing = false;          // karena bukan auto increment
+    public $incrementing = true;
     protected $keyType = 'int';
 
     public $timestamps = false;
