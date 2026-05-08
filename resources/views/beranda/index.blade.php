@@ -171,7 +171,8 @@
 
                             $isOnline = (bool) ($latest?->is_online ?? true);
                             $isOnline = $lg->status_logger === 'online' ? $isOnline : false;
-                            $isSdOk = (bool) ($latest?->is_sd_ok ?? true);
+                            $sdRawValue = $latest?->sensor13 ?? null;
+                            $isSdOk = is_numeric($sdRawValue) ? ((int) $sdRawValue === 1) : false;
 
                             $timeClass = $isOnline
                                 ? 'border-emerald-200 bg-[#DEF2E1] text-[#06C022]'

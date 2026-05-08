@@ -27,7 +27,10 @@ class AnalisaController extends Controller
             ->get();
 
         // Get all parameters for this logger
-        $parameters = $logger->params->map(function ($param) {
+        $parameters = $logger->params->sortBy(function ($param) {
+            preg_match('/\d+/', $param->kolom_sensor, $matches);
+            return $matches ? (int)$matches[0] : 999;
+        })->values()->map(function ($param) {
             return [
                 'nama_parameter' => $param->nama_parameter,
                 'kolom_sensor' => $param->kolom_sensor,

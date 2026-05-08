@@ -1739,7 +1739,8 @@
                                 label: function(ctx) {
                                     const v = ctx.parsed.y;
                                     if (v === null || v === undefined) return null;
-                                    return isBar ? `${ctx.dataset.label}: ${v} mm` : `${ctx.dataset.label}: ${v}`;
+                                    const formattedVal = Number.isInteger(v) ? v : Number(v).toFixed(2);
+                                    return isBar ? `${ctx.dataset.label}: ${formattedVal} mm` : `${ctx.dataset.label}: ${formattedVal}`;
                                 }
                             }
                         }
@@ -1760,7 +1761,10 @@
                             ticks: {
                                 font: { size: 11 },
                                 color: '#94a3b8',
-                                callback: function(value) { return isBar ? value + ' mm' : value; }
+                                callback: function(value) { 
+                                    const formatted = Number.isInteger(value) ? value : Number(value).toFixed(2);
+                                    return isBar ? formatted + ' mm' : formatted; 
+                                }
                             },
                             border: { display: false }
                         }
@@ -2618,7 +2622,8 @@
                                     const i = c.dataIndex;
                                     const count = counts[i] ?? 0;
                                     const pct = percentages[i] ?? 0;
-                                    return `Data: ${count} (${pct}%)`;
+                                    const formattedPct = Number.isInteger(pct) ? pct : Number(pct).toFixed(2);
+                                    return `Data: ${count} (${formattedPct}%)`;
                                 }
                             }
                         }
