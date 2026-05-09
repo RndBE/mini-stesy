@@ -30,6 +30,21 @@ class AuthApiController extends Controller
             ]);
         }
 
+        // KILL SWITCH: Cek apakah akun tersuspend atau tidak aktif
+        if ($user->isSuspended()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun Anda telah di-suspend' . ($user->suspend_reason ? ' karena ' . $user->suspend_reason : '. Silakan hubungi Administrator.'),
+            ], 403);
+        }
+
+        if ($user->isNonActive()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun Anda saat ini non-aktif. Silakan hubungi Administrator untuk mengaktifkan kembali.',
+            ], 403);
+        }
+
         // Hapus token lama (opsional: satu device satu token)
         // $user->tokens()->delete();
 
