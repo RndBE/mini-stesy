@@ -23,8 +23,8 @@ Route::prefix('v1/mobile')->group(function () {
         Route::post('/login',  [AuthApiController::class, 'login']);
     });
 
-    // ── Protected routes (Sanctum token required) ──────────────────────────────
-    Route::middleware('auth:sanctum')->group(function () {
+    // ── Protected routes (Sanctum token required & User Status Checked) ─────────
+    Route::middleware(['auth:sanctum', \App\Http\Middleware\CheckUserStatus::class])->group(function () {
 
         // Auth
         Route::post('/auth/logout', [AuthApiController::class, 'logout']);
