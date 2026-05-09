@@ -48,9 +48,11 @@ class SettingController extends Controller
 
         Storage::disk('local')->put($this->settingsFile, json_encode($settings, JSON_PRETTY_PRINT));
 
-        // Jika mode maintenance BARU SAJA dinyalakan, kirim notifikasi massal
+        // Kirim notifikasi massal berdasarkan perubahan status
         if ($newMaintenanceMode && !$oldMaintenanceMode) {
-            $this->broadcastMaintenanceNotification($maintenanceMessage);
+            $this->broadcastMaintenanceNotification("Informasi Pemeliharaan Server", $maintenanceMessage);
+        } elseif (!$newMaintenanceMode && $oldMaintenanceMode) {
+            $this->broadcastMaintenanceNotification("Pemeliharaan Selesai", "Server telah kembali beroperasi normal. Terima kasih atas kesabaran Anda.");
         }
 
         return redirect()->route('settings.index')->with('success', 'Pengaturan berhasil disimpan.');
@@ -68,15 +70,13 @@ class SettingController extends Controller
         ];
     }
 
-    private function broadcastMaintenanceNotification($message)
+    private function broadcastMaintenanceNotification($title, $body)
     {
         try {
             $tokens = DB::table('fcm_tokens')->pluck('fcm_token')->toArray();
             
             if (count($tokens) > 0) {
                 $fcm = new FcmService();
-                $title = "Informasi Pemeliharaan Server";
-                $body = $message;
                 
                 // Kirim notifikasi menggunakan broadcastNotification milik FcmService
                 // Asumsi parameter: $title, $body, $data, $tokens
