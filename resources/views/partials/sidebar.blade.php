@@ -147,6 +147,14 @@
                     </div>
                 @endif
 
+                @if(auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->hasPermission('manage_rbac')))
+                <a href="{{ route('settings.index') }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('settings.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                    <img src="{{ asset(request()->routeIs('settings.*') ? 'icons/pengaturan_fill.svg' : 'icons/pengaturan_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('settings.*') ? 'brightness-0 invert' : '' }}" alt="Pengaturan Sistem">
+                    <span class="sidebar-text truncate">Pengaturan Sistem</span>
+                </a>
+                @endif
+
                 <a href="{{ route('download.index') }}"
                     class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold {{ request()->routeIs('download.*') ? 'bg-[#303481] hover:bg-[#10134B] text-white' : 'text-slate-700 hover:bg-slate-100' }}">
                     <img src="{{ asset(request()->routeIs('download.*') ? 'icons/unduh_aplikasi_fill.svg' : 'icons/unduh_aplikasi_line.svg') }}" class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('download.*') ? 'brightness-0 invert' : '' }}" alt="Unduh Aplikasi">

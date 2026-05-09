@@ -30,6 +30,18 @@ class AuthApiController extends Controller
             ]);
         }
 
+        // MAINTENANCE SWITCH: Cek apakah server sedang maintenance
+        $settings = \App\Http\Controllers\SettingController::getSettings();
+        if (($settings['maintenance_mode'] ?? false) == true) {
+            // Izinkan Superadmin untuk tetap bisa login saat maintenance
+            if (!$user->isSuperAdmin() && !$user->hasPermission('manage_rbac')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'maintenance: ' . ($settings['maintenance_message'] ?? 'Server sedang dalam perbaikan.'),
+                ], 403);
+            }
+        }
+
         // KILL SWITCH: Cek apakah akun tersuspend atau tidak aktif
         if ($user->isSuspended()) {
             return response()->json([

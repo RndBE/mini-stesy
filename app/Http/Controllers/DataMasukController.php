@@ -496,7 +496,18 @@ class DataMasukController extends Controller
                 }
 
                 $fcm = new \App\Services\FcmService();
-                $title = "Peringatan " . $namaKategori . " - " . $nama_logger;
+                
+                // Membuat format judul yang lebih spesifik
+                $titlePrefix = "Peringatan ";
+                if ($namaKategori === 'AWLR') {
+                    $titlePrefix .= ucwords(strtolower($stateKritis)); // Contoh: "Peringatan Siaga 1"
+                } elseif ($namaKategori === 'ARR') {
+                    $titlePrefix .= "Hujan " . ucwords(strtolower($stateKritis)); // Contoh: "Peringatan Hujan Sangat Lebat"
+                } else {
+                    $titlePrefix .= ucwords(strtolower($stateKritis));
+                }
+                $title = $titlePrefix . " - " . $nama_logger;
+
                 $fcm->broadcastNotification($title, $bodyMsg, [
                     'id_logger' => $id_logger,
                     'kategori' => $namaKategori,
