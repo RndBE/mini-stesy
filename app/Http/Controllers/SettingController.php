@@ -34,7 +34,10 @@ class SettingController extends Controller
 
         $request->validate([
             'maintenance_mode' => 'nullable|boolean',
-            'maintenance_message' => 'nullable|string'
+            'maintenance_message' => 'nullable|string',
+            'latest_app_version' => 'nullable|string',
+            'force_update' => 'nullable|boolean',
+            'update_url' => 'nullable|string'
         ]);
 
         $settings = $this->getSettings();
@@ -45,6 +48,10 @@ class SettingController extends Controller
 
         $settings['maintenance_mode'] = $newMaintenanceMode;
         $settings['maintenance_message'] = $maintenanceMessage;
+        
+        $settings['latest_app_version'] = $request->input('latest_app_version', '1.0.0');
+        $settings['force_update'] = $request->has('force_update') ? true : false;
+        $settings['update_url'] = $request->input('update_url', '');
 
         Storage::disk('local')->put($this->settingsFile, json_encode($settings, JSON_PRETTY_PRINT));
 
@@ -66,7 +73,10 @@ class SettingController extends Controller
         }
         return [
             'maintenance_mode' => false,
-            'maintenance_message' => 'Server sedang dalam perbaikan. Silakan coba lagi nanti.'
+            'maintenance_message' => 'Server sedang dalam perbaikan. Silakan coba lagi nanti.',
+            'latest_app_version' => '1.0.0',
+            'force_update' => false,
+            'update_url' => 'https://play.google.com/store/apps/details?id=com.ministesy.app'
         ];
     }
 

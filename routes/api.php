@@ -21,6 +21,7 @@ Route::prefix('v1/mobile')->group(function () {
     // ── Auth (public) ──────────────────────────────────────────────────────────
     Route::prefix('auth')->group(function () {
         Route::post('/login',  [AuthApiController::class, 'login']);
+        Route::get('/config',  [AuthApiController::class, 'appConfig']);
     });
 
     // ── Protected routes (Sanctum token required & User Status Checked) ─────────

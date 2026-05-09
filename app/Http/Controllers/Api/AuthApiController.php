@@ -111,4 +111,22 @@ class AuthApiController extends Controller
             ],
         ]);
     }
+
+    /**
+     * GET /api/v1/mobile/auth/config
+     * Konfigurasi aplikasi untuk force update dll.
+     */
+    public function appConfig()
+    {
+        $settings = \App\Http\Controllers\SettingController::getSettings();
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'latest_app_version' => $settings['latest_app_version'] ?? '1.0.0',
+                'force_update' => $settings['force_update'] ?? false,
+                'update_url' => $settings['update_url'] ?? 'https://play.google.com/store/apps/details?id=com.ministesy.app',
+            ],
+        ]);
+    }
 }
