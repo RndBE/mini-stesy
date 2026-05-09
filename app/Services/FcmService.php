@@ -97,6 +97,45 @@ class FcmService
     }
 
     /**
+     * Send a silent data-only notification (no notification popup on the device).
+     */
+    public function sendSilentNotification(string $fcmToken, array $data = [])
+    {
+        $accessToken = $this->getAccessToken();
+        
+        if (!$accessToken || !$this->projectId) {
+            Log::error('Cannot send FCM: Missing access token or project ID');
+            return false;
+        }
+
+        $url = "https://fcm.googleapis.com/v1/projects/{$this->projectId}/messages:send";
+
+        $message = [
+            'message' => [
+                'token' => $fcmToken,
+                'data' => $data,
+            ]
+        ];
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => 'application/json',
+            ])->post($url, $message);
+
+            if (!$response->successful()) {
+                Log::error('FCM Silent Send Error: ' . $response->body());
+                return false;
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('FCM Request Exception: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Broadcast notification to all registered users (or filtered).
      */
     public function broadcastNotification(string $title, string $body, array $data = [])

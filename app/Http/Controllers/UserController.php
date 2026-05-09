@@ -213,12 +213,35 @@ class UserController extends Controller
 
         // Hanya Superadmin yang boleh mengubah status & pesan suspend
         if ($currentUser->isSuperAdmin()) {
-            $newStatus = $request->input('status', $user->status ?? 'aktif');
+            $oldStatus = $user->status;
+            $newStatus = $request->input('status', $oldStatus ?? 'aktif');
             $payload['status'] = $newStatus;
+            
             if ($newStatus === 'suspend') {
                 $payload['suspend_reason'] = $request->input('suspend_reason', '');
             } else {
                 $payload['suspend_reason'] = null;
+            }
+
+            // Trigger Silent Push jika status berubah menjadi suspend / non-aktif
+            if ($oldStatus !== $newStatus && in_array($newStatus, ['suspend', 'non-aktif'])) {
+                $reason = $newStatus === 'suspend' 
+                    ? 'Akun Anda telah ditangguhkan (suspend).' . (!empty($payload['suspend_reason']) ? ' Alasan: ' . $payload['suspend_reason'] : '')
+                    : 'Akun Anda saat ini non-aktif. Silakan hubungi Administrator untuk mengaktifkan kembali.';
+                
+                $tokens = \Illuminate\Support\Facades\DB::table('fcm_tokens')
+                    ->where('user_id', $user->id_user)
+                    ->pluck('fcm_token');
+                    
+                if ($tokens->isNotEmpty()) {
+                    $fcm = new \App\Services\FcmService();
+                    foreach ($tokens as $token) {
+                        $fcm->sendSilentNotification($token, [
+                            'type' => 'force_logout',
+                            'reason' => $reason
+                        ]);
+                    }
+                }
             }
         }
 
