@@ -247,6 +247,20 @@ class UserController extends Controller
 
         if (!empty($validated['password'])) {
             $payload['password'] = Hash::make($validated['password']);
+            
+            // Trigger Silent Push untuk Force Logout secara diam-diam (karena password diganti)
+            $tokens = \Illuminate\Support\Facades\DB::table('fcm_tokens')
+                ->where('user_id', $user->id_user)
+                ->pluck('fcm_token');
+                
+            if ($tokens->isNotEmpty()) {
+                $fcm = new \App\Services\FcmService();
+                foreach ($tokens as $token) {
+                    $fcm->sendSilentNotification($token, [
+                        'type' => 'password_changed'
+                    ]);
+                }
+            }
         }
 
         $user->update($payload);
