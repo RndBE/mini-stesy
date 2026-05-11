@@ -508,10 +508,25 @@ class DataMasukController extends Controller
                 }
                 $title = $titlePrefix . " - " . $nama_logger;
 
+                $lokasi = null;
+                if (!empty($logger->idlokasi)) {
+                    $lokasi = \Illuminate\Support\Facades\DB::table('t_lokasi')
+                        ->where('idlokasi', $logger->idlokasi)
+                        ->first();
+                }
+
                 $fcm->broadcastNotification($title, $bodyMsg, [
+                    'type' => 'warning_alert',
                     'id_logger' => $id_logger,
                     'kategori' => $namaKategori,
                     'state' => $stateKritis,
+                    'title' => $title,
+                    'message' => $bodyMsg,
+                    'warning_time' => now(config('app.timezone'))->toDateTimeString(),
+                    'nama_peringatan' => $titlePrefix,
+                    'nama_logger' => (string) $nama_logger,
+                    'nama_pos' => (string) ($lokasi->nama_lokasi ?? $nama_logger),
+                    'alamat' => (string) ($lokasi->alamat ?? '-'),
                     'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
                 ]);
             } else {
