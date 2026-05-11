@@ -114,6 +114,19 @@ class FcmService
             'message' => [
                 'token' => $fcmToken,
                 'data' => $data,
+                'android' => [
+                    'priority' => 'HIGH',
+                ],
+                'apns' => [
+                    'headers' => [
+                        'apns-priority' => '5',
+                    ],
+                    'payload' => [
+                        'aps' => [
+                            'content-available' => 1,
+                        ],
+                    ],
+                ],
             ]
         ];
 
