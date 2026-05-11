@@ -22,6 +22,7 @@ use App\Http\Controllers\TemplateKategoriParameterController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\SettingLoggerController;
 use App\Http\Controllers\SkemaIrigasiController;
+use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\Api\AwgcCommandController;
 use App\Http\Controllers\Api\PumpCommandController;
 use Illuminate\Support\Facades\Http;
@@ -134,6 +135,12 @@ Route::middleware(['auth', 'permission:manage_user'])->resource('users', UserCon
 Route::middleware(['auth'])->group(function () {
     Route::get('/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('settings.update');
+});
+
+// Notifikasi Custom — hanya superadmin
+Route::middleware(['auth', 'permission:manage_user'])->group(function () {
+    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
+    Route::post('/notifikasi', [NotifikasiController::class, 'send'])->name('notifikasi.send');
 });
 
 Route::middleware(['auth', 'permission:view_profile'])->get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

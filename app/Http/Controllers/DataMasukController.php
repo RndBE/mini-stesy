@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\t_Logger;
 use App\Models\Parameter_sensor;
+use App\Models\NotificationHistory;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -516,20 +517,38 @@ class DataMasukController extends Controller
                         ->first();
                 }
 
-                $fcm->sendLoggerWarningNotification($id_logger, $title, $bodyMsg, [
-                    'type' => 'warning_alert',
-                    'id_logger' => $id_logger,
-                    'kategori' => $namaKategori,
-                    'state' => $stateKritis,
-                    'title' => $title,
-                    'message' => $bodyMsg,
-                    'warning_time' => now(config('app.timezone'))->toDateTimeString(),
+                $notifData = [
+                    'type'            => 'warning_alert',
+                    'id_logger'       => $id_logger,
+                    'kategori'        => $namaKategori,
+                    'state'           => $stateKritis,
+                    'title'           => $title,
+                    'message'         => $bodyMsg,
+                    'warning_time'    => now(config('app.timezone'))->toDateTimeString(),
                     'nama_peringatan' => $titlePrefix,
-                    'nama_logger' => (string) $nama_logger,
-                    'nama_pos' => (string) ($lokasi->nama_lokasi ?? $nama_logger),
-                    'alamat' => (string) ($lokasi->alamat ?? '-'),
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
-                ]);
+                    'nama_logger'     => (string) $nama_logger,
+                    'nama_pos'        => (string) ($lokasi->nama_lokasi ?? $nama_logger),
+                    'alamat'          => (string) ($lokasi->alamat ?? '-'),
+                    'click_action'    => 'FLUTTER_NOTIFICATION_CLICK'
+                ];
+
+                $fcm->sendLoggerWarningNotification($id_logger, $title, $bodyMsg, $notifData);
+
+                // Simpan ke history notifikasi
+                try {
+                    NotificationHistory::create([
+                        'type'            => 'warning',
+                        'title'           => $title,
+                        'body'            => $bodyMsg,
+                        'data'            => $notifData,
+                        'sent_by'         => null, // otomatis
+                        'recipient_type'  => 'automatic',
+                        'recipient_ids'   => null,
+                        'recipient_count' => 0, // diisi dari FCM result
+                    ]);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error('Failed to save warning notification history: ' . $e->getMessage());
+                }
             } else {
                 \Illuminate\Support\Facades\Log::info('FCM notification skipped by throttle', [
                     'id_logger' => $id_logger,
