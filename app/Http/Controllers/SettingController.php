@@ -43,13 +43,15 @@ class SettingController extends Controller
         $settings = $this->getSettings();
         
         $oldMaintenanceMode = $settings['maintenance_mode'] ?? false;
+        $oldLatestVersion = $settings['latest_app_version'] ?? '1.0.0';
         $newMaintenanceMode = $request->has('maintenance_mode') ? true : false;
         $maintenanceMessage = $request->input('maintenance_message', 'Server sedang dalam perbaikan.');
 
         $settings['maintenance_mode'] = $newMaintenanceMode;
         $settings['maintenance_message'] = $maintenanceMessage;
         
-        $settings['latest_app_version'] = $request->input('latest_app_version', '1.0.0');
+        $newLatestVersion = $request->input('latest_app_version', '1.0.0');
+        $settings['latest_app_version'] = $newLatestVersion;
         $settings['force_update'] = $request->has('force_update') ? true : false;
         $settings['update_url'] = $request->input('update_url', '');
 
@@ -60,6 +62,14 @@ class SettingController extends Controller
             $this->broadcastMaintenanceNotification("Informasi Pemeliharaan Server", $maintenanceMessage);
         } elseif (!$newMaintenanceMode && $oldMaintenanceMode) {
             $this->broadcastMaintenanceNotification("Pemeliharaan Selesai", "Server telah kembali beroperasi normal. Terima kasih atas kesabaran Anda.");
+        }
+
+        if ($this->isNewerVersion($newLatestVersion, $oldLatestVersion)) {
+            $this->broadcastAppUpdateNotification(
+                $newLatestVersion,
+                (bool) $settings['force_update'],
+                (string) $settings['update_url']
+            );
         }
 
         return redirect()->route('settings.index')->with('success', 'Pengaturan berhasil disimpan.');
@@ -101,5 +111,57 @@ class SettingController extends Controller
         } catch (\Exception $e) {
             \Log::error('Gagal mengirim notifikasi maintenance: ' . $e->getMessage());
         }
+    }
+
+    private function broadcastAppUpdateNotification(string $latestVersion, bool $forceUpdate, string $updateUrl)
+    {
+        try {
+            $tokens = DB::table('fcm_tokens')->pluck('fcm_token')->toArray();
+
+            if (count($tokens) === 0) {
+                return;
+            }
+
+            $fcm = new FcmService();
+            $title = 'Pembaruan Aplikasi Tersedia';
+            $body = $forceUpdate
+                ? "Versi {$latestVersion} wajib dipasang untuk melanjutkan penggunaan aplikasi."
+                : "Versi {$latestVersion} telah tersedia. Buka aplikasi untuk memperbarui.";
+
+            foreach ($tokens as $token) {
+                $fcm->sendNotification($token, $title, $body, [
+                    'type' => 'app_update',
+                    'latest_app_version' => $latestVersion,
+                    'force_update' => $forceUpdate ? '1' : '0',
+                    'update_url' => $updateUrl,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Gagal mengirim notifikasi update aplikasi: ' . $e->getMessage());
+        }
+    }
+
+    private function isNewerVersion(?string $newVersion, ?string $oldVersion): bool
+    {
+        $cleanNew = $this->cleanVersion($newVersion);
+        $cleanOld = $this->cleanVersion($oldVersion);
+
+        if ($cleanNew === '') {
+            return false;
+        }
+
+        if ($cleanOld === '') {
+            return true;
+        }
+
+        return version_compare($cleanNew, $cleanOld, '>');
+    }
+
+    private function cleanVersion(?string $version): string
+    {
+        $version = trim((string) $version);
+        $version = ltrim($version, 'vV');
+        return explode('+', $version)[0] ?? '';
     }
 }
