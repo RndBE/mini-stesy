@@ -182,4 +182,78 @@ class FcmService
             'failed' => $failed,
         ]);
     }
+
+    /**
+     * Send logger warning only to users that can access the logger.
+     */
+    public function sendLoggerWarningNotification(string $idLogger, string $title, string $body, array $data = [])
+    {
+        $tokens = $this->getLoggerWarningTokens($idLogger);
+
+        if ($tokens->isEmpty()) {
+            Log::warning('FCM logger warning skipped: no eligible tokens', [
+                'id_logger' => $idLogger,
+                'title' => $title,
+            ]);
+            return;
+        }
+
+        $sent = 0;
+        $failed = 0;
+
+        foreach ($tokens as $token) {
+            if ($this->sendNotification($token, $title, $body, $data)) {
+                $sent++;
+            } else {
+                $failed++;
+            }
+        }
+
+        Log::info('FCM logger warning finished', [
+            'id_logger' => $idLogger,
+            'title' => $title,
+            'tokens' => $tokens->count(),
+            'sent' => $sent,
+            'failed' => $failed,
+        ]);
+    }
+
+    private function getLoggerWarningTokens(string $idLogger)
+    {
+        $logger = DB::table('t_logger')
+            ->where('id_logger', $idLogger)
+            ->first(['id_logger', 'instansi_id']);
+
+        if (!$logger) {
+            return collect();
+        }
+
+        return DB::table('fcm_tokens as ft')
+            ->join('t_user as u', 'u.id_user', '=', 'ft.user_id')
+            ->where(function ($query) {
+                $query->whereNull('u.status')
+                    ->orWhere('u.status', 'aktif');
+            })
+            ->where(function ($query) use ($logger) {
+                $query->whereRaw('LOWER(u.level_user) = ?', ['superadmin'])
+                    ->orWhere(function ($adminQuery) use ($logger) {
+                        $adminQuery
+                            ->whereIn(DB::raw('LOWER(u.level_user)'), ['instansi_admin', 'admin'])
+                            ->where('u.instansi_id', $logger->instansi_id);
+                    })
+                    ->orWhere(function ($pegawaiQuery) use ($logger) {
+                        $pegawaiQuery
+                            ->whereIn(DB::raw('LOWER(u.level_user)'), ['pegawai', 'user'])
+                            ->whereExists(function ($accessQuery) use ($logger) {
+                                $accessQuery->selectRaw('1')
+                                    ->from('user_logger_access as ula')
+                                    ->whereColumn('ula.user_id', 'u.id_user')
+                                    ->where('ula.logger_id', $logger->id_logger);
+                            });
+                    });
+            })
+            ->pluck('ft.fcm_token')
+            ->unique()
+            ->values();
+    }
 }

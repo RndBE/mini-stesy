@@ -515,7 +515,7 @@ class DataMasukController extends Controller
                         ->first();
                 }
 
-                $fcm->broadcastNotification($title, $bodyMsg, [
+                $fcm->sendLoggerWarningNotification($id_logger, $title, $bodyMsg, [
                     'type' => 'warning_alert',
                     'id_logger' => $id_logger,
                     'kategori' => $namaKategori,
