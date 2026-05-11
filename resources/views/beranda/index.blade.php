@@ -203,7 +203,9 @@
 
                                 return $lg->params->first(function ($param) use ($baseKeys, $normalizeParamKey) {
                                     $utama = $normalizeParamKey($param->parameter_utama);
-                                    return in_array($utama, $baseKeys, true);
+                                    $nama = $normalizeParamKey($param->nama_parameter);
+                                    return in_array($utama, $baseKeys, true)
+                                        || ($utama === '' && in_array($nama, $baseKeys, true));
                                 });
                             };
                             $paramIconPath = function ($param, string $fallback) use ($isOnline) {
