@@ -23,6 +23,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\SettingLoggerController;
 use App\Http\Controllers\SkemaIrigasiController;
 use App\Http\Controllers\NotifikasiController;
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\Api\AwgcCommandController;
 use App\Http\Controllers\Api\PumpCommandController;
 use Illuminate\Support\Facades\Http;
@@ -70,6 +71,7 @@ Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/skema-irigasi', [SkemaIrigasiController::class, 'index'])->name('skema-irigasi.index');
+    Route::get('/skema-irigasi/asbuilt-drawing', [SkemaIrigasiController::class, 'asbuiltDrawing'])->name('skema-irigasi.asbuilt-drawing');
     Route::get('/skema-irigasi/kontrol/{node_id}', [SkemaIrigasiController::class, 'kontrolPintu'])->name('skema-irigasi.kontrol');
     Route::get('/api/skema-irigasi/data', [SkemaIrigasiController::class, 'getData'])->name('skema-irigasi.api');
 
@@ -149,5 +151,6 @@ Route::middleware(['auth', 'permission:manage_profile'])->patch('/profile', [Pro
 Route::middleware(['auth', 'permission:manage_profile'])->delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 Route::middleware(['auth'])->get('/download', [DownloadController::class, 'index'])->name('download.index');
+Route::middleware(['auth'])->post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
 
 require __DIR__ . '/auth.php';

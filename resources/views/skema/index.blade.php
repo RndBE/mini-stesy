@@ -247,11 +247,58 @@
             <span class="text-[10px] text-slate-500">Aktif: <span id="api-node-count" class="text-emerald-400 font-mono font-bold">-</span> node</span>
         </div>
 
+        <!-- Tombol Preview Peta As Built -->
+        <button type="button" id="btn-open-asbuilt-map"
+            class="absolute top-16 right-4 inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-[#1e293b]/90 px-4 py-2 text-xs font-bold uppercase tracking-wider text-cyan-100 shadow-lg backdrop-blur-md transition hover:border-cyan-300 hover:bg-slate-800 active:scale-[0.98]"
+            style="z-index: 45;">
+            <svg class="h-4 w-4 text-cyan-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v15M15 6v15" />
+            </svg>
+            Lihat Peta As Built
+        </button>
+
         <!-- Banner Error Koneksi (muncul dari atas saat API gagal) -->
         <div id="api-error-banner" class="hidden absolute top-0 left-0 right-0 flex items-center justify-center gap-3 py-2 px-4 bg-red-900/95 border-b border-red-700 shadow-lg" style="z-index: 60;">
             <svg class="w-4 h-4 text-red-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
             <span class="text-sm font-semibold text-red-200">Koneksi ke server terputus — Data sensor tidak dapat diperbarui</span>
             <button onclick="document.getElementById('api-error-banner').classList.add('hidden')" class="ml-auto text-red-400 hover:text-white text-lg leading-none">&times;</button>
+        </div>
+
+        <!-- Modal Preview Peta As Built -->
+        <div id="asbuilt-map-modal" role="dialog" aria-modal="true" aria-labelledby="asbuilt-map-title"
+            class="fixed inset-0 hidden bg-slate-950/75 p-3 backdrop-blur-sm sm:p-6">
+            <div id="asbuilt-map-backdrop" class="absolute inset-0"></div>
+            <div class="relative mx-auto flex h-full max-w-7xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl">
+                <div class="flex items-center justify-between gap-4 border-b border-white/10 bg-slate-900 px-4 py-3 sm:px-5">
+                    <div class="min-w-0">
+                        <div class="text-[10px] font-bold uppercase tracking-[0.24em] text-cyan-300">Dokumen Peta</div>
+                        <h2 id="asbuilt-map-title" class="truncate text-base font-extrabold tracking-tight text-white sm:text-lg">
+                            As Built Drawing Leuwigoong AMS19A Buku 1
+                        </h2>
+                    </div>
+                    <div class="flex shrink-0 items-center gap-2">
+                        <a href="{{ route('skema-irigasi.asbuilt-drawing') }}#page=17&toolbar=1&navpanes=0" target="_blank"
+                            class="hidden rounded-full border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-200 sm:inline-flex">
+                            Buka Tab Baru
+                        </a>
+                        <button type="button" id="btn-close-asbuilt-map"
+                            class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition hover:bg-white/10 hover:text-white active:scale-[0.98]"
+                            aria-label="Tutup preview peta as built">
+                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <iframe
+                    id="asbuilt-map-frame"
+                    title="Preview peta as built drawing Leuwigoong"
+                    src="about:blank"
+                    data-src="{{ route('skema-irigasi.asbuilt-drawing') }}#page=17&toolbar=1&navpanes=0"
+                    class="h-full min-h-0 w-full flex-1 bg-slate-900"
+                ></iframe>
+            </div>
         </div>
     </div>
 @endsection
@@ -392,6 +439,11 @@
                 const edgesLayerAnim = document.getElementById('edges-layer-anim');
                 const nodesLayer = document.getElementById('nodes-layer');
                 const infoPanel = document.getElementById('info-panel');
+                const asbuiltModal = document.getElementById('asbuilt-map-modal');
+                const openAsbuiltButton = document.getElementById('btn-open-asbuilt-map');
+                const closeAsbuiltButton = document.getElementById('btn-close-asbuilt-map');
+                const asbuiltBackdrop = document.getElementById('asbuilt-map-backdrop');
+                const asbuiltFrame = document.getElementById('asbuilt-map-frame');
                 let w = svgContainer.clientWidth || 1000;
                 const panzoomInstance = panzoom(svgContainer, {
                     maxZoom: 3,
@@ -399,6 +451,27 @@
                     initialX: (w / 2) - 1000,
                     initialY: -50,
                     initialZoom: 1
+                });
+
+                const openAsbuiltModal = () => {
+                    if (asbuiltFrame && asbuiltFrame.getAttribute('src') === 'about:blank') {
+                        asbuiltFrame.src = asbuiltFrame.dataset.src;
+                    }
+                    asbuiltModal?.classList.remove('hidden');
+                    document.body.classList.add('overflow-hidden');
+                };
+                const closeAsbuiltModal = () => {
+                    asbuiltModal?.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                };
+
+                openAsbuiltButton?.addEventListener('click', openAsbuiltModal);
+                closeAsbuiltButton?.addEventListener('click', closeAsbuiltModal);
+                asbuiltBackdrop?.addEventListener('click', closeAsbuiltModal);
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape' && !asbuiltModal?.classList.contains('hidden')) {
+                        closeAsbuiltModal();
+                    }
                 });
 
                 document.getElementById('close-info').addEventListener('click', (e) => {

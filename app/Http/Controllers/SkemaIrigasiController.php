@@ -16,6 +16,18 @@ class SkemaIrigasiController extends Controller
         ]);
     }
 
+    public function asbuiltDrawing()
+    {
+        $path = base_path('ASBUILT+DRAWING+LEUWIGOONG+AMS19A+BUKU+1.pdf');
+
+        abort_unless(file_exists($path), 404, 'File as built drawing tidak ditemukan.');
+
+        return response()->file($path, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="asbuilt-drawing-leuwigoong-ams19a-buku-1.pdf"',
+        ]);
+    }
+
     public function kontrolPintu($node_id)
     {
         // Dalam implementasi nyata, kita sebaiknya melakukan DB query,
