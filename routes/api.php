@@ -54,5 +54,8 @@ Route::prefix('v1/mobile')->group(function () {
         // Analisa Data
         Route::get('/analisa/{id}',         [AnalisaApiController::class, 'index']);
         Route::get('/analisa/{id}/data',    [AnalisaApiController::class, 'data']);
+
+        // Chatbot
+        Route::post('/chatbot/ask', [\App\Http\Controllers\ChatbotController::class, 'ask']);
     });
 });
