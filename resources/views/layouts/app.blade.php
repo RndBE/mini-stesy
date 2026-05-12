@@ -45,6 +45,7 @@
             @endif
         </div>
     </div>
+    @include('partials.chatbot')
     @include('partials.script')
     @stack('scripts')
 </body>

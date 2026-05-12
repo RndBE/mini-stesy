@@ -190,6 +190,29 @@
             </svg>
         </div>
 
+        <!-- Layer Peta As Built langsung di kanvas skema -->
+        <div id="asbuilt-map-layer" class="absolute inset-0 hidden bg-slate-950" style="z-index: 35;">
+            <div class="absolute left-4 right-4 top-4 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-slate-950/90 px-4 py-3 shadow-xl backdrop-blur-md" style="z-index: 2;">
+                <div class="min-w-0">
+                    <div class="text-[10px] font-bold uppercase tracking-[0.24em] text-cyan-300">Peta As Built</div>
+                    <div class="truncate text-sm font-extrabold tracking-tight text-white sm:text-base">
+                        As Built Drawing Leuwigoong AMS19A Buku 1 - Halaman 17
+                    </div>
+                </div>
+                <a href="{{ route('skema-irigasi.asbuilt-drawing') }}#page=17&toolbar=1&navpanes=0" target="_blank"
+                    class="hidden shrink-0 rounded-full border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-200 sm:inline-flex">
+                    Buka Tab Baru
+                </a>
+            </div>
+            <iframe
+                id="asbuilt-map-frame"
+                title="Peta as built drawing Leuwigoong halaman 17"
+                src="about:blank"
+                data-src="{{ route('skema-irigasi.asbuilt-drawing') }}#page=17&toolbar=1&navpanes=0"
+                class="h-full w-full bg-slate-950"
+            ></iframe>
+        </div>
+
         <!-- Panel Legenda Warna Status -->
         <div id="legend-panel" class="absolute bottom-6 right-6 bg-[#1e293b]/95 shadow-2xl shadow-black/50 border border-slate-700/60 rounded-lg overflow-hidden backdrop-blur-md" style="z-index: 40; width: 220px;">
             <div class="px-3 py-2 bg-slate-800 border-b border-slate-700/80 flex items-center justify-between">
@@ -255,7 +278,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v15M15 6v15" />
             </svg>
-            Lihat Peta As Built
+            <span id="asbuilt-toggle-label">Lihat Peta As Built</span>
         </button>
 
         <!-- Banner Error Koneksi (muncul dari atas saat API gagal) -->
@@ -265,41 +288,6 @@
             <button onclick="document.getElementById('api-error-banner').classList.add('hidden')" class="ml-auto text-red-400 hover:text-white text-lg leading-none">&times;</button>
         </div>
 
-        <!-- Modal Preview Peta As Built -->
-        <div id="asbuilt-map-modal" role="dialog" aria-modal="true" aria-labelledby="asbuilt-map-title"
-            class="fixed inset-0 hidden bg-slate-950/75 p-3 backdrop-blur-sm sm:p-6">
-            <div id="asbuilt-map-backdrop" class="absolute inset-0"></div>
-            <div class="relative mx-auto flex h-full max-w-7xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl">
-                <div class="flex items-center justify-between gap-4 border-b border-white/10 bg-slate-900 px-4 py-3 sm:px-5">
-                    <div class="min-w-0">
-                        <div class="text-[10px] font-bold uppercase tracking-[0.24em] text-cyan-300">Dokumen Peta</div>
-                        <h2 id="asbuilt-map-title" class="truncate text-base font-extrabold tracking-tight text-white sm:text-lg">
-                            As Built Drawing Leuwigoong AMS19A Buku 1
-                        </h2>
-                    </div>
-                    <div class="flex shrink-0 items-center gap-2">
-                        <a href="{{ route('skema-irigasi.asbuilt-drawing') }}#page=17&toolbar=1&navpanes=0" target="_blank"
-                            class="hidden rounded-full border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-200 sm:inline-flex">
-                            Buka Tab Baru
-                        </a>
-                        <button type="button" id="btn-close-asbuilt-map"
-                            class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition hover:bg-white/10 hover:text-white active:scale-[0.98]"
-                            aria-label="Tutup preview peta as built">
-                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <iframe
-                    id="asbuilt-map-frame"
-                    title="Preview peta as built drawing Leuwigoong"
-                    src="about:blank"
-                    data-src="{{ route('skema-irigasi.asbuilt-drawing') }}#page=17&toolbar=1&navpanes=0"
-                    class="h-full min-h-0 w-full flex-1 bg-slate-900"
-                ></iframe>
-            </div>
-        </div>
     </div>
 @endsection
 

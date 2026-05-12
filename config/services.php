@@ -39,5 +39,12 @@ return [
         'url' => env('AWLR_FORWARD_URL'),
     ],
 
+    'ai_chatbot' => [
+        'endpoint' => env('AI_CHATBOT_ENDPOINT', 'https://api.openai.com/v1/chat/completions'),
+        'key' => env('AI_CHATBOT_API_KEY'),
+        'model' => env('AI_CHATBOT_MODEL'),
+        'verify_ssl' => env('AI_CHATBOT_VERIFY_SSL', true),
+    ],
+
 
 ];
