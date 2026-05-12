@@ -249,7 +249,7 @@
 
         <!-- Tombol Preview Peta As Built -->
         <button type="button" id="btn-open-asbuilt-map"
-            class="absolute top-16 right-4 inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-[#1e293b]/90 px-4 py-2 text-xs font-bold uppercase tracking-wider text-cyan-100 shadow-lg backdrop-blur-md transition hover:border-cyan-300 hover:bg-slate-800 active:scale-[0.98]"
+            class="absolute bottom-6 left-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-[#1e293b]/90 px-4 py-2 text-xs font-bold uppercase tracking-wider text-cyan-100 shadow-lg backdrop-blur-md transition hover:border-cyan-300 hover:bg-slate-800 active:scale-[0.98]"
             style="z-index: 45;">
             <svg class="h-4 w-4 text-cyan-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z" />
