@@ -390,31 +390,41 @@ class DataMasukController extends Controller
 
         // Deteksi AWLR Siaga (id_katlogger = 1)
         if (str_contains($kategori, 'awlr') || (isset($logger->id_katlogger) && $logger->id_katlogger == 1)) {
-            // Ambil parameter Tinggi Muka Air
+            // Ambil parameter Tinggi Muka Air. Prioritaskan TMA agar tidak keliru memakai Muka Air Tanah.
             $pTma = \Illuminate\Support\Facades\DB::table('parameter_sensor')
                 ->where('logger_id', $id_logger)
                 ->where(function($q) {
-                    $q->where('nama_parameter', 'like', '%tma%')
-                      ->orWhere('nama_parameter', 'like', '%muka air%')
-                      ->orWhere('parameter_utama', 'like', '%tma%');
-                })->first();
+                    $q->whereRaw('LOWER(TRIM(parameter_utama)) = ?', ['tma'])
+                      ->orWhereRaw('LOWER(TRIM(nama_parameter)) = ?', ['tma'])
+                      ->orWhereRaw('LOWER(TRIM(nama_parameter)) = ?', ['tinggi muka air'])
+                      ->orWhereRaw('LOWER(TRIM(parameter_utama)) = ?', ['tinggi_muka_air']);
+                })
+                ->orderByRaw("
+                    CASE
+                        WHEN LOWER(TRIM(parameter_utama)) = 'tma' THEN 0
+                        WHEN LOWER(TRIM(nama_parameter)) = 'tma' THEN 1
+                        WHEN LOWER(TRIM(parameter_utama)) = 'tinggi_muka_air' THEN 2
+                        WHEN LOWER(TRIM(nama_parameter)) = 'tinggi muka air' THEN 3
+                        ELSE 4
+                    END
+                ")
+                ->first();
 
             if ($pTma && isset($merged[$pTma->kolom_sensor])) {
                 $tma = (float) $merged[$pTma->kolom_sensor];
                 
-                // Cek dengan tabel tingkat_siaga_awlr
-                $siagaLevels = \Illuminate\Support\Facades\DB::table('tingkat_siaga_awlr')->get();
+                // Cek dengan konfigurasi Tingkat Siaga AWLR per logger.
+                $siagaLevels = \Illuminate\Support\Facades\DB::table('tingkat_siaga_awlr')
+                    ->where('id_logger', $id_logger)
+                    ->where('status', 1)
+                    ->whereNotNull('nilai')
+                    ->orderByDesc('nilai')
+                    ->get();
+
                 foreach ($siagaLevels as $siaga) {
-                    if ($siaga->min_value === null && $siaga->max_value === null) continue;
-                    $matchMin = $siaga->min_value === null || $tma >= $siaga->min_value;
-                    $matchMax = $siaga->max_value === null || $tma < $siaga->max_value;
-                    
-                    if ($matchMin && $matchMax) {
-                        $s = strtolower($siaga->tingkat_siaga);
-                        if (str_contains($s, 'siaga 1') || str_contains($s, 'siaga 2') || str_contains($s, 'siaga 3')) {
-                            $stateKritis = $siaga->tingkat_siaga;
-                            $bodyMsg = "Tinggi Muka Air mencapai {$tma}m ({$siaga->tingkat_siaga}).";
-                        }
+                    if ($tma >= (float) $siaga->nilai) {
+                        $stateKritis = $siaga->nama;
+                        $bodyMsg = "Tinggi Muka Air mencapai {$tma}m ({$siaga->nama}).";
                         break;
                     }
                 }

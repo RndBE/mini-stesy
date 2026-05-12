@@ -351,13 +351,13 @@ class AnalisaController extends Controller
         }
         else if ($range === 'custom') { // CUSTOM RANGE
 
-            // For custom range, show data grouped by date (day)
+            // For custom range, show data grouped by hour
             $grouped = $data->groupBy(function ($item) use ($timeColumn) {
-                return date('Y-m-d', strtotime($item->{$timeColumn}));
+                return date('Y-m-d H:00', strtotime($item->{$timeColumn}));
             });
 
             foreach ($grouped as $dateKey => $dateData) {
-                $labels[] = date('d M Y', strtotime($dateKey));
+                $labels[] = date('d M Y, H:i', strtotime($dateKey));
 
                 if ($dateData->isNotEmpty()) {
                     $avg = $dateData->avg($column);
@@ -369,7 +369,7 @@ class AnalisaController extends Controller
                     $maxValues[] = round($max, 4);
 
                     $tableData[] = [
-                        'waktu'   => date('d M Y', strtotime($dateKey)),
+                        'waktu'   => date('d M Y, H:i', strtotime($dateKey)),
                         'rerata'  => round($avg, 4),
                         'minimum' => round($min, 4),
                         'maksimum' => round($max, 4),
@@ -380,7 +380,7 @@ class AnalisaController extends Controller
                     $maxValues[] = null;
 
                     $tableData[] = [
-                        'waktu'   => date('d M Y', strtotime($dateKey)),
+                        'waktu'   => date('d M Y, H:i', strtotime($dateKey)),
                         'rerata'  => null,
                         'minimum' => null,
                         'maksimum' => null,
