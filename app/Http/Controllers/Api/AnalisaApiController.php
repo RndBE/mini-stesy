@@ -39,6 +39,7 @@ class AnalisaApiController extends Controller
                     'nama_parameter' => $p->nama_parameter,
                     'kolom_sensor'   => $p->kolom_sensor,
                     'satuan'         => $p->satuan,
+                    'tipe_graf'      => $p->tipe_graf ?? 'line',
                 ])->values(),
             ],
         ]);
@@ -126,6 +127,7 @@ class AnalisaApiController extends Controller
                     'nama_parameter' => $p->nama_parameter,
                     'kolom_sensor'   => $p->kolom_sensor,
                     'satuan'         => $p->satuan,
+                    'tipe_graf'      => $p->tipe_graf ?? 'line',
                 ])->values(),
                 'meta'    => [
                     'id_logger' => $id,
