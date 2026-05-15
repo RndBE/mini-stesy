@@ -168,8 +168,11 @@ class ChatbotController extends Controller
             foreach ($rows as $lid => $r) {
                 $row = DB::table($tableName)->where('id', $r->max_id)->first();
                 if ($row) {
-                    $wt = $row->temp_s19 ?? $row->temp_s16 ?? $row->waktu ?? null;
-                    $mainTableLatest[$lid] = $wt;
+                    // Gunakan kolom waktu saja — temp_s19/temp_s16 adalah nilai sensor (float), bukan timestamp
+                    $wt = $row->waktu ?? null;
+                    if ($wt) {
+                        $mainTableLatest[$lid] = $wt;
+                    }
                 }
             }
         }
