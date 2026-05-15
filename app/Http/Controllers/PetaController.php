@@ -207,16 +207,24 @@ class PetaController extends Controller
     {
         if (!$latest) return null;
 
+        $latestArr = (array) $latest;
+
         $count = 0;
         foreach ($params as $p) {
-            $name = strtolower(trim((string) $p->nama_parameter));
+            // Normalisasi: underscore → spasi, agar "muka_air_tanah" cocok dengan "Muka Air Tanah"
+            $name    = str_replace('_', ' ', strtolower(trim((string) $p->nama_parameter)));
+            $col_key = strtolower(trim((string) $p->kolom_sensor));
+
             foreach ($keywords as $kw) {
-                if (str_contains($name, strtolower($kw))) {
+                $kwNorm = str_replace('_', ' ', strtolower($kw));
+
+                if (str_contains($name, $kwNorm) || str_contains($col_key, strtolower($kw))) {
                     $count++;
                     if ($count === $nth) {
                         $col = $p->kolom_sensor;
-                        if ($col && isset($latest->{$col})) {
-                            $v = $latest->{$col};
+                        // Gunakan array_key_exists agar nilai 0 tidak dianggap null
+                        if ($col && array_key_exists($col, $latestArr)) {
+                            $v = $latestArr[$col];
                             return is_numeric($v) ? round((float) $v, 3) : null;
                         }
                     }
