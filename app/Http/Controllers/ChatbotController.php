@@ -147,12 +147,15 @@ class ChatbotController extends Controller
             $lastTime = collect([$waktu16, $waktu19])->filter()->sortDesc()->first();
 
             // Fallback: query tabel_main langsung jika snapshot kosong (sama dengan PetaController)
+            // Kolom waktu bisa temp_s19, temp_s16, atau waktu — cek semua
             if (!$lastTime && !empty($logger->tabel_main)) {
-                $lastTime = DB::table($logger->tabel_main)
+                $row = DB::table($logger->tabel_main)
                     ->where('id_logger', $logger->id_logger)
-                    ->whereNotNull('waktu')
-                    ->orderByDesc('waktu')
-                    ->value('waktu');
+                    ->orderByDesc('id')
+                    ->first();
+                if ($row) {
+                    $lastTime = $row->temp_s19 ?? $row->temp_s16 ?? $row->waktu ?? null;
+                }
             }
 
             $diff  = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
