@@ -331,13 +331,14 @@ class ChatbotController extends Controller
                 }
             })
             ->orderBy('nama_logger')
-            ->limit(8)
+            ->limit(30)   // Naikkan limit agar logger yang jauh secara alfabet tetap masuk
             ->get();
 
         $logger = $loggerCandidates
             ->sortByDesc(function ($candidate) use ($tokens) {
                 $name = Str::lower($candidate->nama_logger.' '.$candidate->id_logger);
-                return $tokens->sum(fn ($token) => Str::contains($name, $token) ? 1 : 0);
+                // Bobot berdasarkan panjang token: token lebih panjang = lebih spesifik = bobot lebih tinggi
+                return $tokens->sum(fn ($token) => Str::contains($name, $token) ? Str::length($token) : 0);
             })
             ->first();
 

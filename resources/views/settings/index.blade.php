@@ -21,8 +21,8 @@
             <p class="mt-1 text-sm text-slate-500">Aktifkan mode ini untuk memblokir login aplikasi mobile sementara server diperbaiki.</p>
         </div>
 
-        <div class="p-2">
-            <form action="{{ route('settings.update') }}" method="POST" class="space-y-2">
+        <div class="px-6 py-3">
+            <form action="{{ route('settings.update') }}" method="POST" class="space-y-3">
                 @csrf
 
                 <!-- Toggle Switch -->
