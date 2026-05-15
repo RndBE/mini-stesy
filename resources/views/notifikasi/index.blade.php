@@ -29,8 +29,8 @@
             <p class="mt-1 text-sm text-slate-500">Kirim notifikasi push ke user yang dipilih atau semua user aktif.</p>
         </div>
 
-        <div class="p-6">
-            <form action="{{ route('notifikasi.send') }}" method="POST" class="space-y-5">
+        <div class="p-2">
+            <form action="{{ route('notifikasi.send') }}" method="POST" class="space-y-2">
                 @csrf
 
                 {{-- Penerima --}}

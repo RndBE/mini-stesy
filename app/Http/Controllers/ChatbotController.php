@@ -222,6 +222,15 @@ class ChatbotController extends Controller
     private function fallbackReply(string $message, array $context, bool $configured = false): string
     {
         $query = Str::lower($message);
+        $userName = $context['user_name'] ?? 'Anda';
+
+        // Sapaan / greeting — selalu jawab ramah tanpa ekspos error AI
+        if (Str::contains($query, ['halo', 'helo', 'hello', 'hi ', 'hai', 'selamat pagi', 'selamat siang', 'selamat sore', 'selamat malam', 'assalam', 'permisi', 'apa kabar', 'terima kasih', 'makasih', 'thanks'])
+            || trim($query) === 'hi' || trim($query) === 'halo' || trim($query) === 'hai') {
+            $total  = $context['logger_total_visible'] ?? 0;
+            $online = $context['logger_online_count']  ?? 0;
+            return "Halo, {$userName}! Saya STESY Assistant. Ada yang bisa saya bantu?";
+        }
 
         if (!empty($context['matched_logger'])) {
             return $this->formatLoggerSummary($context['matched_logger']);
@@ -276,10 +285,11 @@ class ChatbotController extends Controller
         }
 
         if ($configured) {
-            return 'Konfigurasi AI sudah terbaca, tetapi koneksi ke provider AI gagal sehingga saya memakai jawaban panduan lokal. Cek log server untuk detail koneksi, model, atau billing API.';
+            // Jangan tampilkan pesan error teknis — tetap berikan balasan yang helpful
+            return 'Saya STESY Assistant. Saya bisa membantu info status logger, monitoring real-time, peta lokasi, tingkat siaga, dan panduan menu. Silakan tanyakan lebih spesifik!';
         }
 
-        return 'Saya bisa bantu panduan STESY seperti menu real-time, status logger, peta lokasi, tingkat siaga, dan data perangkat. Untuk jawaban AI yang membaca konteks lebih dalam, isi konfigurasi AI_CHATBOT_API_KEY dan AI_CHATBOT_MODEL di server.';
+        return 'Saya STESY Assistant. Saya bisa bantu panduan seperti status logger, menu real-time, peta lokasi, dan tingkat siaga. Silakan tanyakan lebih spesifik!';
     }
 
     private function resolveLoggerMention(Request $request, string $message): ?array
