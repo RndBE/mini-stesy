@@ -138,14 +138,25 @@ class ChatbotController extends Controller
             ->get();
 
         // Hitung status online/offline dari waktu data terakhir (threshold 60 menit)
+        // Logika sama dengan PetaController: cek temp16/temp19, fallback ke tabel_main
         $onlineLoggers  = [];
         $offlineLoggers = [];
         foreach ($loggers as $logger) {
             $waktu16  = optional($logger->temp16)->waktu;
             $waktu19  = optional($logger->temp19)->waktu;
             $lastTime = collect([$waktu16, $waktu19])->filter()->sortDesc()->first();
-            $diff     = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
-            $entry    = $logger->nama_logger . ' (' . $logger->id_logger . ')';
+
+            // Fallback: query tabel_main langsung jika snapshot kosong (sama dengan PetaController)
+            if (!$lastTime && !empty($logger->tabel_main)) {
+                $lastTime = DB::table($logger->tabel_main)
+                    ->where('id_logger', $logger->id_logger)
+                    ->whereNotNull('waktu')
+                    ->orderByDesc('waktu')
+                    ->value('waktu');
+            }
+
+            $diff  = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
+            $entry = $logger->nama_logger . ' (' . $logger->id_logger . ')';
             if ($diff !== null && $diff < 60) {
                 $onlineLoggers[]  = $entry;
             } else {
