@@ -244,10 +244,20 @@ class PetaController extends Controller
             ->all();
 
         return $params->first(function ($param) use ($aliases) {
-            $name = strtolower(trim((string) $param->nama_parameter));
+            $name  = strtolower(trim((string) $param->nama_parameter));
             $utama = strtolower(trim((string) $param->parameter_utama));
+            $col   = strtolower(trim((string) $param->kolom_sensor));
 
-            return in_array($name, $aliases, true) || in_array($utama, $aliases, true);
+            foreach ($aliases as $alias) {
+                if (
+                    str_contains($name, $alias)  ||
+                    str_contains($utama, $alias) ||
+                    str_contains($col, $alias)
+                ) {
+                    return true;
+                }
+            }
+            return false;
         });
     }
 
