@@ -118,6 +118,8 @@ class ChatbotController extends Controller
             ->with([
                 'kategori:id_katlogger,nama_kategori',
                 'lokasi:idlokasi,nama_lokasi',
+                'temp16',
+                'temp19',
             ])
             ->select([
                 'id',
@@ -132,38 +134,59 @@ class ChatbotController extends Controller
                 'sensor_count',
             ])
             ->orderBy('nama_logger')
-            ->limit(30)
+            ->limit(50)
             ->get();
 
+        // Hitung status online/offline dari waktu data terakhir (threshold 60 menit)
+        $onlineLoggers  = [];
+        $offlineLoggers = [];
+        foreach ($loggers as $logger) {
+            $waktu16  = optional($logger->temp16)->waktu;
+            $waktu19  = optional($logger->temp19)->waktu;
+            $lastTime = collect([$waktu16, $waktu19])->filter()->sortDesc()->first();
+            $diff     = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
+            $entry    = $logger->nama_logger . ' (' . $logger->id_logger . ')';
+            if ($diff !== null && $diff < 60) {
+                $onlineLoggers[]  = $entry;
+            } else {
+                $offlineLoggers[] = $entry;
+            }
+        }
+
         return [
-            'user_name' => $user?->nama ?? $user?->username ?? 'User',
+            'user_name'            => $user?->nama ?? $user?->username ?? 'User',
             'logger_total_visible' => $loggers->count(),
-            'categories' => $loggers
+            'logger_online_count'  => count($onlineLoggers),
+            'logger_offline_count' => count($offlineLoggers),
+            'online_loggers'       => array_slice($onlineLoggers,  0, 20),
+            'offline_loggers'      => array_slice($offlineLoggers, 0, 20),
+            'categories'           => $loggers
                 ->groupBy(fn ($logger) => $logger->kategori?->nama_kategori ?? $logger->jenis_alat ?? 'Lainnya')
                 ->map->count()
                 ->sortKeys()
                 ->all(),
-            'maintenance_loggers' => $loggers
+            'maintenance_loggers'  => $loggers
                 ->filter(fn ($logger) => ($logger->status_perbaikan ?? 'normal') !== 'normal')
-                ->map(fn ($logger) => $logger->nama_logger.' ('.$logger->id_logger.')')
+                ->map(fn ($logger) => $logger->nama_logger . ' (' . $logger->id_logger . ')')
                 ->values()
                 ->take(8)
                 ->all(),
-            'sample_loggers' => $loggers
+            'sample_loggers'       => $loggers
                 ->take(10)
                 ->map(fn ($logger) => [
-                    'id_logger' => $logger->id_logger,
-                    'nama' => $logger->nama_logger,
-                    'kategori' => $logger->kategori?->nama_kategori ?? $logger->jenis_alat ?? '-',
-                    'lokasi' => $logger->lokasi?->nama_lokasi ?? '-',
+                    'id_logger'        => $logger->id_logger,
+                    'nama'             => $logger->nama_logger,
+                    'kategori'         => $logger->kategori?->nama_kategori ?? $logger->jenis_alat ?? '-',
+                    'lokasi'           => $logger->lokasi?->nama_lokasi ?? '-',
                     'status_perbaikan' => $logger->status_perbaikan ?? 'normal',
-                    'node_skema' => $logger->node_skema_id,
+                    'node_skema'       => $logger->node_skema_id,
                 ])
                 ->values()
                 ->all(),
-            'matched_logger' => $this->resolveLoggerMention($request, $message),
+            'matched_logger'       => $this->resolveLoggerMention($request, $message),
         ];
     }
+
 
     private function systemPrompt(array $context): string
     {
@@ -182,12 +205,43 @@ class ChatbotController extends Controller
             return $this->formatLoggerSummary($context['matched_logger']);
         }
 
-        if (Str::contains($query, ['real', 'monitoring', 'data'])) {
-            return 'Untuk data real-time, buka menu Realtime Monitoring. Pilih pos atau kategori logger, lalu cek nilai sensor terakhir, waktu update, dan status koneksinya.';
+        // Pertanyaan tentang logger yang online / koneksi terhubung
+        if (Str::contains($query, ['online', 'terhubung', 'aktif', 'nyala', 'hidup'])
+            && !Str::contains($query, ['offline', 'putus', 'mati'])) {
+            $count   = $context['logger_online_count'] ?? 0;
+            $list    = $context['online_loggers']      ?? [];
+            $total   = $context['logger_total_visible'] ?? 0;
+            if ($count === 0) {
+                return "Saat ini tidak ada logger yang terdeteksi online (dari {$total} logger yang dapat diakses).";
+            }
+            $listStr = implode("\n  - ", $list);
+            $extra   = $count > count($list) ? '\n  - ...' : '';
+            return "Logger yang saat ini koneksi terhubung (online) — {$count} dari {$total} logger:\n  - {$listStr}{$extra}";
         }
 
-        if (Str::contains($query, ['offline', 'putus', 'status'])) {
-            return 'Status offline biasanya berarti logger belum mengirim data terbaru atau koneksi perangkat terputus. Cek waktu data terakhir, baterai, dan jaringan di halaman detail perangkat.';
+        // Pertanyaan tentang logger yang offline / terputus
+        if (Str::contains($query, ['offline', 'putus', 'mati', 'tidak terhubung', 'tidak aktif'])) {
+            $count = $context['logger_offline_count'] ?? 0;
+            $list  = $context['offline_loggers']      ?? [];
+            $total = $context['logger_total_visible']  ?? 0;
+            if ($count === 0) {
+                return "Semua logger ({$total}) saat ini terdeteksi online. Tidak ada yang offline.";
+            }
+            $listStr = implode("\n  - ", $list);
+            $extra   = $count > count($list) ? '\n  - ...' : '';
+            return "Logger yang koneksi terputus (offline) — {$count} dari {$total} logger:\n  - {$listStr}{$extra}\n\nCek waktu data terakhir, baterai, dan jaringan di halaman detail perangkat.";
+        }
+
+        // Pertanyaan jumlah / status semua logger
+        if (Str::contains($query, ['berapa', 'jumlah', 'total', 'semua', 'daftar', 'list', 'status'])) {
+            $total   = $context['logger_total_visible'] ?? 0;
+            $online  = $context['logger_online_count']  ?? 0;
+            $offline = $context['logger_offline_count'] ?? 0;
+            return "Total logger yang dapat diakses: {$total} unit.\n- Online (koneksi terhubung): {$online}\n- Offline (koneksi terputus): {$offline}\n\nBuka menu Peta atau Realtime Monitoring untuk detail masing-masing pos.";
+        }
+
+        if (Str::contains($query, ['real', 'monitoring', 'data'])) {
+            return 'Untuk data real-time, buka menu Realtime Monitoring. Pilih pos atau kategori logger, lalu cek nilai sensor terakhir, waktu update, dan status koneksinya.';
         }
 
         if (Str::contains($query, ['peta', 'lokasi', 'pos'])) {
