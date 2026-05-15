@@ -207,7 +207,10 @@ class PetaController extends Controller
     {
         if (!$latest) return null;
 
-        $latestArr = (array) $latest;
+        // Gunakan toArray() jika Eloquent model (agar accessor ikut), atau (array) jika stdClass dari DB::table
+        $latestArr = ($latest instanceof \Illuminate\Database\Eloquent\Model)
+            ? $latest->toArray()
+            : (array) $latest;
 
         $count = 0;
         foreach ($params as $p) {
@@ -222,11 +225,17 @@ class PetaController extends Controller
                     $count++;
                     if ($count === $nth) {
                         $col = $p->kolom_sensor;
-                        // Gunakan array_key_exists agar nilai 0 tidak dianggap null
-                        if ($col && array_key_exists($col, $latestArr)) {
+                        if (!$col) break;
+
+                        // Coba ambil nilai: langsung dari array, atau via getAttribute jika Eloquent model
+                        $v = null;
+                        if (array_key_exists($col, $latestArr)) {
                             $v = $latestArr[$col];
-                            return is_numeric($v) ? round((float) $v, 3) : null;
+                        } elseif ($latest instanceof \Illuminate\Database\Eloquent\Model) {
+                            $v = $latest->getAttribute($col);
                         }
+
+                        return is_numeric($v) ? round((float) $v, 3) : null;
                     }
                     break; // match keyword, next param
                 }
