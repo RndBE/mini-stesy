@@ -132,7 +132,6 @@ class ChatbotController extends Controller
                 'sensor_count',
             ])
             ->orderBy('nama_logger')
-            ->limit(50)
             ->get();
 
         // Hitung status online/offline — ambil waktu terbaru dari tabel_main per logger
@@ -179,6 +178,7 @@ class ChatbotController extends Controller
 
         $onlineLoggers  = [];
         $offlineLoggers = [];
+        $allLoggers     = [];
         foreach ($loggers as $logger) {
             $lid = $logger->id_logger;
 
@@ -191,7 +191,18 @@ class ChatbotController extends Controller
 
             $diff  = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
             $entry = $logger->nama_logger . ' (' . $lid . ')';
-            if ($diff !== null && $diff < 60) {
+            $status = $diff !== null && $diff < 60 ? 'online' : 'offline';
+
+            $allLoggers[] = [
+                'id_logger' => $lid,
+                'nama' => $logger->nama_logger,
+                'kategori' => $logger->kategori?->nama_kategori ?? $logger->jenis_alat ?? '-',
+                'lokasi' => $logger->lokasi?->nama_lokasi ?? '-',
+                'status' => $status,
+                'last_time' => $lastTime,
+            ];
+
+            if ($status === 'online') {
                 $onlineLoggers[]  = $entry;
             } else {
                 $offlineLoggers[] = $entry;
@@ -205,6 +216,7 @@ class ChatbotController extends Controller
             'logger_offline_count' => count($offlineLoggers),
             'online_loggers'       => array_slice($onlineLoggers,  0, 20),
             'offline_loggers'      => array_slice($offlineLoggers, 0, 20),
+            'all_loggers'          => $allLoggers,
             'categories'           => $loggers
                 ->groupBy(fn ($logger) => $logger->kategori?->nama_kategori ?? $logger->jenis_alat ?? 'Lainnya')
                 ->map->count()
@@ -259,6 +271,34 @@ class ChatbotController extends Controller
             return $this->formatLoggerSummary($context['matched_logger']);
         }
 
+        // Pertanyaan daftar semua logger
+        if (Str::contains($query, ['semua logger', 'daftar logger', 'list logger', 'tampilkan logger', 'tampilkan semua'])
+            && !Str::contains($query, ['online', 'offline', 'putus', 'terhubung'])) {
+            $loggers = $context['all_loggers'] ?? [];
+            $total   = $context['logger_total_visible'] ?? count($loggers);
+            $online  = $context['logger_online_count']  ?? 0;
+            $offline = $context['logger_offline_count'] ?? 0;
+
+            if (empty($loggers)) {
+                return 'Tidak ada logger yang dapat diakses oleh akun ini.';
+            }
+
+            $listStr = collect($loggers)
+                ->map(function ($logger, $index) {
+                    $number = $index + 1;
+                    $status = strtoupper((string) ($logger['status'] ?? '-'));
+                    $time = $logger['last_time'] ?? '-';
+
+                    return "{$number}. {$logger['nama']} ({$logger['id_logger']}) - {$status} - update: {$time}";
+                })
+                ->implode("\n");
+
+            return "Daftar semua logger yang dapat diakses ({$total} unit):\n"
+                ."- Online: {$online}\n"
+                ."- Offline: {$offline}\n\n"
+                .$listStr;
+        }
+
         // Pertanyaan tentang logger yang online / koneksi terhubung
         if (Str::contains($query, ['online', 'terhubung', 'aktif', 'nyala', 'hidup'])
             && !Str::contains($query, ['offline', 'putus', 'mati'])) {
@@ -269,7 +309,7 @@ class ChatbotController extends Controller
                 return "Saat ini tidak ada logger yang terdeteksi online (dari {$total} logger yang dapat diakses).";
             }
             $listStr = implode("\n  - ", $list);
-            $extra   = $count > count($list) ? '\n  - ...' : '';
+            $extra   = $count > count($list) ? "\n  - ..." : '';
             return "Logger yang saat ini koneksi terhubung (online) — {$count} dari {$total} logger:\n  - {$listStr}{$extra}";
         }
 
@@ -282,7 +322,7 @@ class ChatbotController extends Controller
                 return "Semua logger ({$total}) saat ini terdeteksi online. Tidak ada yang offline.";
             }
             $listStr = implode("\n  - ", $list);
-            $extra   = $count > count($list) ? '\n  - ...' : '';
+            $extra   = $count > count($list) ? "\n  - ..." : '';
             return "Logger yang koneksi terputus (offline) — {$count} dari {$total} logger:\n  - {$listStr}{$extra}\n\nCek waktu data terakhir, baterai, dan jaringan di halaman detail perangkat.";
         }
 
