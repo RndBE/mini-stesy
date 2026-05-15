@@ -23,6 +23,18 @@ class ChatbotController extends Controller
         ]);
 
         $message = trim($validated['message']);
+
+        if ($this->isGreetingMessage($message)) {
+            $user = $request->user();
+            $userName = $user?->nama ?? $user?->username ?? 'User';
+
+            return response()->json([
+                'reply' => "Halo, {$userName}! Saya STESY Assistant. Ada yang bisa saya bantu?",
+                'source' => 'local',
+                'configured' => (bool) config('services.ai_chatbot.key'),
+            ]);
+        }
+
         $context = $this->buildMonitoringContext($request, $message);
         $fallback = $this->fallbackReply($message, $context);
 
@@ -252,6 +264,20 @@ class ChatbotController extends Controller
             ."Gunakan hanya konteks sistem yang diberikan; jika data tidak ada, katakan perlu membuka halaman terkait. "
             ."Jangan mengarang angka sensor real-time. "
             ."Konteks sistem: ".json_encode($context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    private function isGreetingMessage(string $message): bool
+    {
+        $query = Str::lower(trim($message));
+
+        return in_array($query, ['halo', 'helo', 'hello', 'hi', 'hai'], true)
+            || Str::contains($query, [
+                'selamat pagi',
+                'selamat siang',
+                'selamat sore',
+                'selamat malam',
+                'assalam',
+            ]);
     }
 
     private function fallbackReply(string $message, array $context, bool $configured = false): string
