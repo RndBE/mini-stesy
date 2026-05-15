@@ -135,7 +135,9 @@ class ChatbotController extends Controller
             ->limit(50)
             ->get();
 
-        // Hitung status online/offline — query langsung ke snapshot tables (lebih reliable)
+        // Hitung status online/offline — ambil waktu terbaru dari tabel_main per logger
+        // (sama dengan resolveLatestSensorSnapshot di formatLoggerSummary)
+        // Group by tabel_main untuk batch query per tabel
         $loggerIds = $loggers->pluck('id_logger')->all();
 
         $snap16 = DB::table('temp_s16_latest')
@@ -148,26 +150,44 @@ class ChatbotController extends Controller
             ->get(['id_logger', 'waktu'])
             ->keyBy('id_logger');
 
+        // Batch query waktu terakhir dari tabel_main per grup tabel
+        $mainTableLatest = collect();
+        $loggersByTable  = $loggers->filter(fn ($l) => !empty($l->tabel_main))
+                                   ->groupBy('tabel_main');
+
+        foreach ($loggersByTable as $tableName => $tableLoggers) {
+            $ids = $tableLoggers->pluck('id_logger')->all();
+            // Subquery: MAX(id) per logger → lalu ambil waktu dari row tersebut
+            $rows = DB::table($tableName)
+                ->whereIn('id_logger', $ids)
+                ->select('id_logger', DB::raw('MAX(id) as max_id'))
+                ->groupBy('id_logger')
+                ->get()
+                ->keyBy('id_logger');
+
+            foreach ($rows as $lid => $r) {
+                $row = DB::table($tableName)->where('id', $r->max_id)->first();
+                if ($row) {
+                    $wt = $row->temp_s19 ?? $row->temp_s16 ?? $row->waktu ?? null;
+                    $mainTableLatest[$lid] = $wt;
+                }
+            }
+        }
+
         $onlineLoggers  = [];
         $offlineLoggers = [];
         foreach ($loggers as $logger) {
-            $w16      = $snap16[$logger->id_logger]->waktu ?? null;
-            $w19      = $snap19[$logger->id_logger]->waktu ?? null;
-            $lastTime = collect([$w16, $w19])->filter()->sortDesc()->first();
+            $lid = $logger->id_logger;
 
-            // Fallback: query tabel_main jika tidak ada di snapshot tables
-            if (!$lastTime && !empty($logger->tabel_main)) {
-                $row = DB::table($logger->tabel_main)
-                    ->where('id_logger', $logger->id_logger)
-                    ->orderByDesc('id')
-                    ->first();
-                if ($row) {
-                    $lastTime = $row->temp_s19 ?? $row->temp_s16 ?? $row->waktu ?? null;
-                }
-            }
+            $w16   = $snap16[$lid]->waktu ?? null;
+            $w19   = $snap19[$lid]->waktu ?? null;
+            $wMain = $mainTableLatest[$lid] ?? null;
+
+            // Ambil waktu paling baru dari semua sumber
+            $lastTime = collect([$w16, $w19, $wMain])->filter()->sortDesc()->first();
 
             $diff  = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
-            $entry = $logger->nama_logger . ' (' . $logger->id_logger . ')';
+            $entry = $logger->nama_logger . ' (' . $lid . ')';
             if ($diff !== null && $diff < 60) {
                 $onlineLoggers[]  = $entry;
             } else {
