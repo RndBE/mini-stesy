@@ -256,6 +256,14 @@ class DataMasukController extends Controller
         $allowedCols = array_merge(['id_logger', 'waktu'], array_map(fn($i) => 'sensor'.$i, range(1, $maxSensor)));
         $merged = array_intersect_key($merged, array_flip($allowedCols));
 
+        // Pastikan semua kolom sensor yang null diisi 0 agar tidak melanggar constraint NOT NULL
+        for ($i = 1; $i <= $maxSensor; $i++) {
+            $k = 'sensor' . $i;
+            if (!isset($merged[$k]) || $merged[$k] === null) {
+                $merged[$k] = 0;
+            }
+        }
+
         // Insert ke tabel besar (histori permanen) — pakai data merged agar tidak ada null
         \Illuminate\Support\Facades\DB::table($tableMain)->insert($merged);
 

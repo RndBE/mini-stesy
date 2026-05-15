@@ -118,8 +118,6 @@ class ChatbotController extends Controller
             ->with([
                 'kategori:id_katlogger,nama_kategori',
                 'lokasi:idlokasi,nama_lokasi',
-                'temp16',
-                'temp19',
             ])
             ->select([
                 'id',
@@ -137,17 +135,27 @@ class ChatbotController extends Controller
             ->limit(50)
             ->get();
 
-        // Hitung status online/offline dari waktu data terakhir (threshold 60 menit)
-        // Logika sama dengan PetaController: cek temp16/temp19, fallback ke tabel_main
+        // Hitung status online/offline — query langsung ke snapshot tables (lebih reliable)
+        $loggerIds = $loggers->pluck('id_logger')->all();
+
+        $snap16 = DB::table('temp_s16_latest')
+            ->whereIn('id_logger', $loggerIds)
+            ->get(['id_logger', 'waktu'])
+            ->keyBy('id_logger');
+
+        $snap19 = DB::table('temp_s19_latest')
+            ->whereIn('id_logger', $loggerIds)
+            ->get(['id_logger', 'waktu'])
+            ->keyBy('id_logger');
+
         $onlineLoggers  = [];
         $offlineLoggers = [];
         foreach ($loggers as $logger) {
-            $waktu16  = optional($logger->temp16)->waktu;
-            $waktu19  = optional($logger->temp19)->waktu;
-            $lastTime = collect([$waktu16, $waktu19])->filter()->sortDesc()->first();
+            $w16      = $snap16[$logger->id_logger]->waktu ?? null;
+            $w19      = $snap19[$logger->id_logger]->waktu ?? null;
+            $lastTime = collect([$w16, $w19])->filter()->sortDesc()->first();
 
-            // Fallback: query tabel_main langsung jika snapshot kosong (sama dengan PetaController)
-            // Kolom waktu bisa temp_s19, temp_s16, atau waktu — cek semua
+            // Fallback: query tabel_main jika tidak ada di snapshot tables
             if (!$lastTime && !empty($logger->tabel_main)) {
                 $row = DB::table($logger->tabel_main)
                     ->where('id_logger', $logger->id_logger)
