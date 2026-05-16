@@ -303,7 +303,7 @@
                                 .slice(-10)
                                 .map((message) => ({
                                     role: message.role,
-                                    text: message.text
+                                    text: String(message.text || '').slice(0, 650)
                                 }))
                         })
                     })
