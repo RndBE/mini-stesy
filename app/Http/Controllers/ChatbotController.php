@@ -38,6 +38,22 @@ class ChatbotController extends Controller
         $context = $this->buildMonitoringContext($request, $message);
         $fallback = $this->fallbackReply($message, $context);
 
+        if ($categoryReply = $this->categoryReply($message, $context)) {
+            return response()->json([
+                'reply' => $categoryReply,
+                'source' => 'local',
+                'configured' => (bool) config('services.ai_chatbot.key'),
+            ]);
+        }
+
+        if (!empty($context['missing_logger_reference'])) {
+            return response()->json([
+                'reply' => 'Logger atau pos yang diminta tidak ditemukan dalam akses akun ini. Pastikan ID/nama logger benar, atau minta admin memberi akses ke logger tersebut.',
+                'source' => 'local',
+                'configured' => (bool) config('services.ai_chatbot.key'),
+            ]);
+        }
+
         $key = config('services.ai_chatbot.key');
         $model = config('services.ai_chatbot.model');
         $endpoint = config('services.ai_chatbot.endpoint');
@@ -221,6 +237,8 @@ class ChatbotController extends Controller
             }
         }
 
+        $matchedLogger = $this->resolveLoggerMention($request, $message);
+
         return [
             'user_name'            => $user?->nama ?? $user?->username ?? 'User',
             'logger_total_visible' => $loggers->count(),
@@ -229,6 +247,7 @@ class ChatbotController extends Controller
             'online_loggers'       => array_slice($onlineLoggers,  0, 20),
             'offline_loggers'      => array_slice($offlineLoggers, 0, 20),
             'all_loggers'          => $allLoggers,
+            'category_definitions'  => $this->categoryDefinitions(),
             'categories'           => $loggers
                 ->groupBy(fn ($logger) => $logger->kategori?->nama_kategori ?? $logger->jenis_alat ?? 'Lainnya')
                 ->map->count()
@@ -252,7 +271,8 @@ class ChatbotController extends Controller
                 ])
                 ->values()
                 ->all(),
-            'matched_logger'       => $this->resolveLoggerMention($request, $message),
+            'matched_logger'       => $matchedLogger,
+            'missing_logger_reference' => !$matchedLogger && $this->hasSpecificLoggerReference($message),
         ];
     }
 
@@ -261,9 +281,71 @@ class ChatbotController extends Controller
     {
         return "Anda adalah STESY Assistant untuk aplikasi Smart Telemetry System. "
             ."Jawab singkat, praktis, dan dalam Bahasa Indonesia. "
-            ."Gunakan hanya konteks sistem yang diberikan; jika data tidak ada, katakan perlu membuka halaman terkait. "
+            ."Gunakan konteks sistem yang diberikan untuk data logger dan definisi kategori; jika data tidak ada, katakan perlu membuka halaman terkait. "
             ."Jangan mengarang angka sensor real-time. "
             ."Konteks sistem: ".json_encode($context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    private function categoryDefinitions(): array
+    {
+        return [
+            'AWLR' => [
+                'name' => 'Automatic Water Level Recorder',
+                'description' => 'logger untuk memantau tinggi muka air secara otomatis, misalnya sungai, saluran, bendung, atau sumur.',
+                'common_parameters' => ['tinggi muka air', 'elevasi muka air', 'debit', 'baterai', 'humidity logger', 'temperature logger'],
+            ],
+            'ARR' => [
+                'name' => 'Automatic Rain Recorder',
+                'description' => 'logger untuk mencatat curah hujan otomatis dan membantu melihat intensitas hujan per periode.',
+                'common_parameters' => ['curah hujan', 'intensitas hujan', 'baterai', 'humidity logger', 'temperature logger'],
+            ],
+            'AFMR' => [
+                'name' => 'Automatic Flow Measurement Recorder',
+                'description' => 'logger untuk memantau aliran air, seperti debit, kecepatan aliran, dan luas penampang.',
+                'common_parameters' => ['debit', 'flow velocity', 'luas penampang air', 'elevasi muka air', 'jarak sensor'],
+            ],
+            'AWR' => [
+                'name' => 'Automatic Weather Recorder',
+                'description' => 'logger untuk memantau kondisi cuaca otomatis.',
+                'common_parameters' => ['suhu udara', 'kelembapan', 'tekanan udara', 'kecepatan angin', 'arah angin'],
+            ],
+            'AWQR' => [
+                'name' => 'Automatic Water Quality Recorder',
+                'description' => 'logger untuk memantau kualitas air secara otomatis.',
+                'common_parameters' => ['pH air', 'suhu air', 'turbidity', 'conductivity', 'salinity', 'TDS', 'ORP'],
+            ],
+        ];
+    }
+
+    private function categoryReply(string $message, array $context): ?string
+    {
+        $query = Str::lower($message);
+        $definitions = $context['category_definitions'] ?? $this->categoryDefinitions();
+        $mentioned = collect(array_keys($definitions))
+            ->filter(fn ($code) => preg_match('/\b'.preg_quote(Str::lower($code), '/').'\b/i', $message))
+            ->values();
+
+        $isCategoryQuestion = Str::contains($query, [
+            'apa itu',
+            'jelaskan',
+            'pengertian',
+            'maksud',
+            'fungsi',
+            'kategori',
+        ]);
+
+        if (!$isCategoryQuestion || $mentioned->isEmpty()) {
+            return null;
+        }
+
+        return $mentioned
+            ->map(function ($code) use ($definitions) {
+                $item = $definitions[$code];
+                $params = implode(', ', $item['common_parameters']);
+
+                return "{$code} ({$item['name']}) adalah {$item['description']} Parameter yang umum dipantau: {$params}.";
+            })
+            ->implode("\n\n");
     }
 
     private function isGreetingMessage(string $message): bool
@@ -381,7 +463,18 @@ class ChatbotController extends Controller
         return 'Saya STESY Assistant. Saya bisa bantu panduan seperti status logger, menu real-time, peta lokasi, dan tingkat siaga. Silakan tanyakan lebih spesifik!';
     }
 
-    private function resolveLoggerMention(Request $request, string $message): ?array
+    private function hasSpecificLoggerReference(string $message): bool
+    {
+        $query = Str::lower($message);
+
+        if (!Str::contains($query, ['logger', 'pos']) && !preg_match('/\b([a-z]+[-_]?\d{2,}|\d{4,})\b/i', $message)) {
+            return false;
+        }
+
+        return $this->loggerMentionTokens($message)->isNotEmpty();
+    }
+
+    private function loggerMentionTokens(string $message)
     {
         $normalized = trim(Str::of($message)
             ->lower()
@@ -392,12 +485,21 @@ class ChatbotController extends Controller
         $stopWords = [
             'bisa', 'tolong', 'tampilkan', 'lihat', 'lihatkan', 'data', 'pos',
             'logger', 'untuk', 'yang', 'di', 'ke', 'dari', 'dong', 'ya', 'nya',
+            'apa', 'arti', 'maksud', 'status', 'koneksi', 'online', 'offline',
+            'terhubung', 'putus', 'aktif', 'tidak', 'semua', 'daftar', 'list',
+            'jumlah', 'total', 'buka', 'halaman', 'detail',
         ];
-        $tokens = collect(explode(' ', $normalized))
+
+        return collect(explode(' ', $normalized))
             ->map(fn ($token) => trim($token))
             ->filter(fn ($token) => Str::length($token) >= 3 && !in_array($token, $stopWords, true))
             ->unique()
             ->values();
+    }
+
+    private function resolveLoggerMention(Request $request, string $message): ?array
+    {
+        $tokens = $this->loggerMentionTokens($message);
 
         if ($tokens->isEmpty()) {
             return null;
