@@ -308,26 +308,56 @@ class ChatbotController extends Controller
                 'name' => 'Automatic Water Level Recorder',
                 'description' => 'logger untuk memantau tinggi muka air secara otomatis, misalnya sungai, saluran, bendung, atau sumur.',
                 'common_parameters' => ['tinggi muka air', 'elevasi muka air', 'debit', 'baterai', 'humidity logger', 'temperature logger'],
+                'main_functions' => [
+                    'Mencatat tinggi muka air secara berkala.',
+                    'Mengirim data secara otomatis ke sistem monitoring.',
+                    'Membantu pemantauan kondisi sungai, saluran, bendung, atau sumur.',
+                    'Mendukung peringatan dini jika terjadi kenaikan muka air yang signifikan.',
+                ],
             ],
             'ARR' => [
-                'name' => 'Automatic Rain Recorder',
+                'name' => 'Automatic Rainfall Recorder',
                 'description' => 'logger untuk mencatat curah hujan otomatis dan membantu melihat intensitas hujan per periode.',
                 'common_parameters' => ['curah hujan', 'intensitas hujan', 'baterai', 'humidity logger', 'temperature logger'],
+                'main_functions' => [
+                    'Mencatat curah hujan secara otomatis.',
+                    'Memantau intensitas hujan per periode.',
+                    'Membantu analisa kondisi hujan di area pos.',
+                    'Mendukung peringatan dini saat hujan tinggi atau ekstrem.',
+                ],
             ],
             'AFMR' => [
                 'name' => 'Automatic Flow Measurement Recorder',
                 'description' => 'logger untuk memantau aliran air, seperti debit, kecepatan aliran, dan luas penampang.',
                 'common_parameters' => ['debit', 'flow velocity', 'luas penampang air', 'elevasi muka air', 'jarak sensor'],
+                'main_functions' => [
+                    'Mengukur debit atau aliran air secara otomatis.',
+                    'Memantau kecepatan aliran dan kondisi penampang air.',
+                    'Membantu evaluasi kapasitas saluran atau sungai.',
+                    'Menyediakan data pendukung untuk analisa hidrologi.',
+                ],
             ],
             'AWR' => [
                 'name' => 'Automatic Weather Recorder',
                 'description' => 'logger untuk memantau kondisi cuaca otomatis.',
                 'common_parameters' => ['suhu udara', 'kelembapan', 'tekanan udara', 'kecepatan angin', 'arah angin'],
+                'main_functions' => [
+                    'Mencatat parameter cuaca secara otomatis.',
+                    'Memantau suhu, kelembapan, tekanan udara, dan angin.',
+                    'Membantu membaca kondisi cuaca di sekitar pos.',
+                    'Menyediakan data pendukung untuk monitoring hidrologi dan lingkungan.',
+                ],
             ],
             'AWQR' => [
                 'name' => 'Automatic Water Quality Recorder',
                 'description' => 'logger untuk memantau kualitas air secara otomatis.',
                 'common_parameters' => ['pH air', 'suhu air', 'turbidity', 'conductivity', 'salinity', 'TDS', 'ORP'],
+                'main_functions' => [
+                    'Mencatat parameter kualitas air secara otomatis.',
+                    'Memantau pH, suhu air, kekeruhan, konduktivitas, salinitas, TDS, dan ORP.',
+                    'Membantu deteksi perubahan kondisi kualitas air.',
+                    'Menyediakan data pendukung untuk pemantauan lingkungan perairan.',
+                ],
             ],
         ];
     }
@@ -358,8 +388,8 @@ class ChatbotController extends Controller
             return null;
         }
 
-        if ($mentioned->isEmpty() && Str::contains($query, ['kategori logger', 'kategori apa', 'jenis logger', 'macam logger'])) {
-            $mentioned = collect(array_keys($definitions));
+        if ($mentioned->isEmpty() && $this->isAvailableCategoryQuestion($query)) {
+            return $this->availableCategoryReply($context, $definitions);
         }
 
         if ($mentioned->isEmpty()) {
@@ -367,13 +397,126 @@ class ChatbotController extends Controller
         }
 
         return $mentioned
-            ->map(function ($code) use ($definitions) {
-                $item = $definitions[$code];
-                $params = implode(', ', $item['common_parameters']);
-
-                return "{$code} ({$item['name']}) adalah {$item['description']} Parameter yang umum dipantau: {$params}.";
+            ->map(function ($code) use ($context, $definitions) {
+                return $this->categoryDefinitionReply($code, $context, $definitions);
             })
             ->implode("\n\n");
+    }
+
+    private function categoryDefinitionReply(string $code, array $context, array $definitions): string
+    {
+        $item = $definitions[$code];
+        $params = implode(', ', $item['common_parameters']);
+        $functions = collect($item['main_functions'] ?? [])
+            ->map(fn ($function) => "- {$function}")
+            ->implode("\n");
+        $examples = $this->categoryExamples($code, $context, $definitions);
+
+        $lines = [
+            "{$code} adalah singkatan dari {$item['name']}.",
+            "{$code} merupakan {$item['description']} Pada beberapa pos, data {$code} juga dapat dikaitkan dengan parameter seperti {$params}.",
+        ];
+
+        if ($functions !== '') {
+            $lines[] = "Fungsi utama {$code}:";
+            $lines[] = $functions;
+        }
+
+        if (!empty($examples)) {
+            $exampleText = implode(', ', $examples);
+            $suffix = count($examples) >= 4 ? ', dan lainnya.' : '.';
+            $lines[] = "Dalam akses akun ini, contoh pos {$code} adalah {$exampleText}{$suffix}";
+        } else {
+            $lines[] = "Dalam akses akun ini, belum ada contoh pos {$code} yang dapat ditampilkan.";
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function categoryExamples(string $code, array $context, array $definitions): array
+    {
+        return collect($context['all_loggers'] ?? [])
+            ->filter(function ($logger) use ($code, $definitions) {
+                $category = (string) ($logger['kategori'] ?? '');
+
+                return $this->categoryCodeFromName($category, $definitions) === $code;
+            })
+            ->pluck('nama')
+            ->filter()
+            ->unique()
+            ->take(4)
+            ->values()
+            ->all();
+    }
+
+    private function isAvailableCategoryQuestion(string $query): bool
+    {
+        return Str::contains($query, [
+            'kategori logger',
+            'kategori apa',
+            'kategori yang ada',
+            'kategori tersedia',
+            'kategori di logger',
+            'kategori pada logger',
+            'jenis logger',
+            'jenis yang ada',
+            'macam logger',
+            'logger apa aja',
+            'logger apa saja',
+        ]);
+    }
+
+    private function availableCategoryReply(array $context, array $definitions): string
+    {
+        $categories = collect($context['categories'] ?? [])
+            ->filter(fn ($count) => (int) $count > 0);
+
+        if ($categories->isEmpty()) {
+            return 'Belum ada kategori logger yang dapat diakses oleh akun ini.';
+        }
+
+        $lines = ['Kategori logger yang ada pada daftar akses akun ini:'];
+        $index = 1;
+
+        foreach ($categories as $rawName => $count) {
+            $code = $this->categoryCodeFromName((string) $rawName, $definitions);
+            $definition = $code ? ($definitions[$code] ?? null) : null;
+            $title = $code ?: (string) $rawName;
+
+            if ($definition) {
+                $params = implode(', ', array_slice($definition['common_parameters'], 0, 4));
+                $lines[] = "{$index}. {$title} - {$definition['name']}";
+                $lines[] = "   - Fungsi: {$definition['description']}";
+                $lines[] = "   - Parameter umum: {$params}.";
+            } else {
+                $lines[] = "{$index}. {$title}";
+            }
+
+            $lines[] = "   - Jumlah pada akses akun: {$count} pos.";
+            $index++;
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function categoryCodeFromName(string $name, array $definitions): ?string
+    {
+        $normalized = Str::lower($name);
+
+        foreach (array_keys($definitions) as $code) {
+            if (preg_match('/\b'.preg_quote(Str::lower($code), '/').'\b/i', $name)) {
+                return $code;
+            }
+        }
+
+        return match (true) {
+            Str::contains($normalized, ['water level', 'tinggi muka', 'muka air']) => 'AWLR',
+            Str::contains($normalized, ['rainfall', 'rain recorder', 'curah hujan', 'hujan']) => 'ARR',
+            Str::contains($normalized, ['flow measurement', 'flow meter', 'debit', 'aliran']) => 'AFMR',
+            Str::contains($normalized, ['weather', 'cuaca']) => 'AWR',
+            Str::contains($normalized, ['water quality', 'kualitas air']) => 'AWQR',
+            default => null,
+        };
     }
 
     private function isGreetingMessage(string $message): bool
@@ -395,6 +538,10 @@ class ChatbotController extends Controller
         $query = Str::lower($message);
 
         if (!empty($context['matched_logger'])) {
+            if ($dateRange = $this->requestedDateRangeFromMessage($message)) {
+                return $this->formatLoggerHistoricalData($context['matched_logger'], $dateRange);
+            }
+
             return $this->formatLoggerSummary($context['matched_logger']);
         }
 
@@ -756,7 +903,238 @@ class ChatbotController extends Controller
             'selisih_menit' => $diffMinutes,
             'status_perbaikan' => $logger->status_perbaikan ?? 'normal',
             'sensor_values' => $latest['values'] ?? [],
+            'tabel_main' => $logger->tabel_main,
+            'sensor_count' => $logger->sensor_count,
+            'params' => $logger->params
+                ->map(fn ($param) => [
+                    'nama' => $param->nama_parameter,
+                    'kolom' => $param->kolom_sensor,
+                    'satuan' => $param->satuan,
+                ])
+                ->values()
+                ->all(),
         ];
+    }
+
+    private function requestedDateRangeFromMessage(string $message): ?array
+    {
+        if ($relativeRange = $this->relativeDateRangeFromMessage($message)) {
+            return $relativeRange;
+        }
+
+        $dates = $this->extractDatesFromMessage($message);
+
+        if (empty($dates)) {
+            return null;
+        }
+
+        $from = $dates[0]->copy()->startOfDay();
+        $to = ($dates[1] ?? $dates[0])->copy()->endOfDay();
+
+        if ($to->lt($from)) {
+            [$from, $to] = [$to->copy()->startOfDay(), $from->copy()->endOfDay()];
+        }
+
+        $sameDay = $from->isSameDay($to);
+
+        return [
+            'from' => $from,
+            'to' => $to,
+            'label' => $sameDay
+                ? $from->translatedFormat('d F Y')
+                : $from->translatedFormat('d F Y').' sampai '.$to->translatedFormat('d F Y'),
+        ];
+    }
+
+    private function relativeDateRangeFromMessage(string $message): ?array
+    {
+        $query = Str::lower($message);
+
+        if (Str::contains($query, ['seminggu terakhir', 'minggu terakhir', 'sepekan terakhir', '7 hari terakhir', 'tujuh hari terakhir'])) {
+            $from = now()->subDays(7)->startOfDay();
+            $to = now()->endOfDay();
+
+            return [
+                'from' => $from,
+                'to' => $to,
+                'label' => '7 hari terakhir ('.$from->translatedFormat('d F Y').' sampai '.$to->translatedFormat('d F Y').')',
+            ];
+        }
+
+        if (Str::contains($query, ['minggu ini', 'pekan ini'])) {
+            $from = now()->startOfWeek()->startOfDay();
+            $to = now()->endOfDay();
+
+            return [
+                'from' => $from,
+                'to' => $to,
+                'label' => 'minggu ini ('.$from->translatedFormat('d F Y').' sampai '.$to->translatedFormat('d F Y').')',
+            ];
+        }
+
+        if (preg_match('/\b(\d{1,2})\s+hari\s+terakhir\b/i', $message, $match)) {
+            $days = min(max((int) $match[1], 1), 31);
+            $from = now()->subDays($days)->startOfDay();
+            $to = now()->endOfDay();
+
+            return [
+                'from' => $from,
+                'to' => $to,
+                'label' => "{$days} hari terakhir (".$from->translatedFormat('d F Y').' sampai '.$to->translatedFormat('d F Y').')',
+            ];
+        }
+
+        return null;
+    }
+
+    private function extractDatesFromMessage(string $message): array
+    {
+        $query = Str::lower($message);
+        $dates = [];
+
+        if (Str::contains($query, ['hari ini', 'today'])) {
+            $dates[] = now();
+        }
+
+        if (Str::contains($query, ['kemarin', 'yesterday'])) {
+            $dates[] = now()->subDay();
+        }
+
+        preg_match_all('/\b(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})\b/', $message, $isoMatches, PREG_SET_ORDER);
+        foreach ($isoMatches as $match) {
+            $date = $this->makeDate((int) $match[1], (int) $match[2], (int) $match[3]);
+            if ($date) {
+                $dates[] = $date;
+            }
+        }
+
+        preg_match_all('/\b(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})\b/', $message, $numericMatches, PREG_SET_ORDER);
+        foreach ($numericMatches as $match) {
+            $year = (int) $match[3];
+            $year = $year < 100 ? 2000 + $year : $year;
+            $date = $this->makeDate($year, (int) $match[2], (int) $match[1]);
+            if ($date) {
+                $dates[] = $date;
+            }
+        }
+
+        $monthPattern = 'januari|jan|februari|feb|maret|mar|april|apr|mei|juni|jun|juli|jul|agustus|agu|aug|september|sep|oktober|okt|oct|november|nov|desember|des|dec';
+        preg_match_all('/\b(\d{1,2})\s+('.$monthPattern.')(?:\s+(\d{4}))?\b/i', $message, $monthMatches, PREG_SET_ORDER);
+        foreach ($monthMatches as $match) {
+            $month = $this->monthNumber($match[2]);
+            $year = isset($match[3]) && $match[3] !== '' ? (int) $match[3] : (int) now()->format('Y');
+            $date = $this->makeDate($year, $month, (int) $match[1]);
+            if ($date) {
+                $dates[] = $date;
+            }
+        }
+
+        return collect($dates)
+            ->unique(fn (Carbon $date) => $date->format('Y-m-d'))
+            ->take(2)
+            ->values()
+            ->all();
+    }
+
+    private function makeDate(int $year, int $month, int $day): ?Carbon
+    {
+        if (!checkdate($month, $day, $year)) {
+            return null;
+        }
+
+        return Carbon::create($year, $month, $day);
+    }
+
+    private function monthNumber(string $month): int
+    {
+        return [
+            'januari' => 1, 'jan' => 1,
+            'februari' => 2, 'feb' => 2,
+            'maret' => 3, 'mar' => 3,
+            'april' => 4, 'apr' => 4,
+            'mei' => 5,
+            'juni' => 6, 'jun' => 6,
+            'juli' => 7, 'jul' => 7,
+            'agustus' => 8, 'agu' => 8, 'aug' => 8,
+            'september' => 9, 'sep' => 9,
+            'oktober' => 10, 'okt' => 10, 'oct' => 10,
+            'november' => 11, 'nov' => 11,
+            'desember' => 12, 'des' => 12, 'dec' => 12,
+        ][Str::lower($month)] ?? 0;
+    }
+
+    private function formatLoggerHistoricalData(array $logger, array $dateRange): string
+    {
+        $table = trim((string) ($logger['tabel_main'] ?? ''));
+        $sensorCount = (int) ($logger['sensor_count'] ?? 0);
+        $candidateTables = array_values(array_unique(array_filter([
+            $this->isSupportedSensorTable($table) ? $table : null,
+            $sensorCount >= 19 ? 't_s19_01' : 't_s16_01',
+            $sensorCount >= 19 ? 't_s16_01' : 't_s19_01',
+        ])));
+
+        $rows = collect();
+        $tableUsed = null;
+        foreach ($candidateTables as $candidate) {
+            $rows = DB::table($candidate)
+                ->where('id_logger', $logger['id_logger'])
+                ->whereBetween('waktu', [$dateRange['from'], $dateRange['to']])
+                ->orderByDesc('waktu')
+                ->limit(5)
+                ->get();
+
+            if ($rows->isNotEmpty()) {
+                $tableUsed = $candidate;
+                break;
+            }
+        }
+
+        if ($rows->isEmpty()) {
+            return "Belum ada data logger {$logger['nama_logger']} ({$logger['id_logger']}) pada {$dateRange['label']}.\n\n"
+                ."Coba cek tanggal lain atau buka menu Analisa Data untuk rentang yang lebih luas.";
+        }
+
+        $total = DB::table($tableUsed)
+            ->where('id_logger', $logger['id_logger'])
+            ->whereBetween('waktu', [$dateRange['from'], $dateRange['to']])
+            ->count();
+
+        $params = collect($logger['params'] ?? [])
+            ->filter(fn ($param) => !empty($param['kolom']))
+            ->take(6)
+            ->values();
+
+        $lines = [
+            "Data logger {$logger['nama_logger']} ({$logger['id_logger']}) pada {$dateRange['label']}:",
+            "- Total data: {$total} record",
+            "- Tabel: {$tableUsed}",
+            "- Ditampilkan: {$rows->count()} data terbaru pada tanggal tersebut",
+        ];
+
+        foreach ($rows as $row) {
+            $sensorText = $params
+                ->map(function ($param) use ($row) {
+                    $column = $param['kolom'];
+                    if (!property_exists($row, $column)) {
+                        return null;
+                    }
+
+                    $value = $row->{$column};
+                    if ($value === null || $value === '') {
+                        return null;
+                    }
+
+                    $value = is_numeric($value) ? round((float) $value, 3) : $value;
+
+                    return trim($param['nama'].': '.$value.' '.($param['satuan'] ?? ''));
+                })
+                ->filter()
+                ->implode(', ');
+
+            $lines[] = '- '.$row->waktu.($sensorText ? " | {$sensorText}" : '');
+        }
+
+        return implode("\n", $lines);
     }
 
     private function resolveLatestSensorSnapshot(t_Logger $logger): array

@@ -264,7 +264,7 @@
                 prompts: [
                     'Lihat data pos Pogung',
                     'Apa arti logger offline?',
-                    'Buka panduan peta lokasi'
+                    'Daftar logger yang ada'
                 ],
                 messages: [
                     {
