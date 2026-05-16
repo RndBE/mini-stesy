@@ -82,11 +82,37 @@
                     </template>
                 </div>
 
-                <div x-show="loading" class="mb-4 flex items-start gap-3">
-                    <div class="mt-2 h-10 w-10 shrink-0 animate-pulse rounded-full bg-[#303481]"></div>
-                    <div class="w-56 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-2.5 shadow-sm">
-                        <div class="h-2 w-28 animate-pulse rounded-full bg-slate-200"></div>
-                        <div class="mt-3 h-2 w-40 animate-pulse rounded-full bg-slate-200"></div>
+                <div
+                    x-show="loading"
+                    x-transition:enter="transition duration-300 ease-out"
+                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition duration-200 ease-in"
+                    x-transition:leave-start="opacity-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 translate-y-1"
+                    class="mb-4 flex items-start gap-3"
+                    aria-live="polite"
+                >
+                    <div class="stesy-loading-avatar mt-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#303481] text-white shadow-[0_12px_24px_-14px_rgba(48,52,129,0.8)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8V4H8" />
+                            <rect x="5" y="8" width="14" height="10" rx="3" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h.01M15 12h.01M9 16h6" />
+                        </svg>
+                    </div>
+                    <div class="stesy-loading-bubble rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 text-slate-600 shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold tracking-wide text-slate-500">Menyusun jawaban</span>
+                            <span class="flex items-center gap-1" aria-hidden="true">
+                                <span class="stesy-loading-dot"></span>
+                                <span class="stesy-loading-dot"></span>
+                                <span class="stesy-loading-dot"></span>
+                            </span>
+                        </div>
+                        <div class="mt-3 space-y-2">
+                            <span class="stesy-loading-line block h-2 w-44 rounded-full bg-slate-100"></span>
+                            <span class="stesy-loading-line block h-2 w-32 rounded-full bg-slate-100"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -143,6 +169,90 @@
             <span class="hidden text-sm font-bold sm:inline" x-text="open ? 'Tutup' : 'Assistant'"></span>
         </button>
     </div>
+
+    <style>
+        .stesy-loading-avatar {
+            position: relative;
+            isolation: isolate;
+        }
+
+        .stesy-loading-avatar::before {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            z-index: -1;
+            border-radius: 9999px;
+            border: 1px solid rgba(48, 52, 129, 0.2);
+            animation: stesy-loading-ring 1.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+
+        .stesy-loading-bubble {
+            min-width: 230px;
+        }
+
+        .stesy-loading-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 9999px;
+            background: #303481;
+            opacity: 0.45;
+            animation: stesy-loading-dot 1.1s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+
+        .stesy-loading-dot:nth-child(2) {
+            animation-delay: 120ms;
+        }
+
+        .stesy-loading-dot:nth-child(3) {
+            animation-delay: 240ms;
+        }
+
+        .stesy-loading-line {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stesy-loading-line::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            transform: translateX(-110%);
+            background: linear-gradient(90deg, transparent, rgba(48, 52, 129, 0.12), transparent);
+            animation: stesy-loading-shimmer 1.35s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+
+        .stesy-loading-line:nth-child(2)::after {
+            animation-delay: 160ms;
+        }
+
+        @keyframes stesy-loading-dot {
+            0%, 80%, 100% {
+                opacity: 0.35;
+                transform: translateY(0) scale(0.92);
+            }
+            35% {
+                opacity: 1;
+                transform: translateY(-3px) scale(1);
+            }
+        }
+
+        @keyframes stesy-loading-ring {
+            0% {
+                opacity: 0.52;
+                transform: scale(0.92);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.42);
+            }
+        }
+
+        @keyframes stesy-loading-shimmer {
+            100% {
+                transform: translateX(110%);
+            }
+        }
+    </style>
 
     <script>
         function stesyChatbot() {
