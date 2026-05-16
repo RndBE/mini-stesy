@@ -260,8 +260,7 @@
         .stesy-response-list {
             display: grid;
             gap: 0.45rem;
-            margin: 0.7rem 0 0 0.18rem;
-            padding-left: 0.35rem;
+            margin: 0.7rem 0 0;
         }
 
         .stesy-response-item {
@@ -270,6 +269,10 @@
             gap: 0.55rem;
             align-items: start;
             line-height: 1.55;
+        }
+
+        .stesy-response-item:has(.is-dot) {
+            margin-left: 0.55rem;
         }
 
         .stesy-response-marker {
