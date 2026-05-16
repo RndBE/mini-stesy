@@ -45,6 +45,14 @@ class ChatbotController extends Controller
             ]);
         }
 
+        if ($this->isLoggerListQuestion($message) && ($localReply = $this->localIntentReply($message, $context))) {
+            return response()->json([
+                'reply' => $localReply,
+                'source' => 'local',
+                'configured' => (bool) config('services.ai_chatbot.key'),
+            ]);
+        }
+
         if (!empty($context['missing_logger_reference'])) {
             return response()->json([
                 'reply' => $this->missingLoggerReply(),
@@ -390,7 +398,7 @@ class ChatbotController extends Controller
             return $this->formatLoggerSummary($context['matched_logger']);
         }
 
-        if (Str::contains($query, ['semua logger', 'daftar logger', 'list logger', 'tampilkan logger', 'tampilkan semua'])
+        if ($this->isLoggerListQuestion($message)
             && !Str::contains($query, ['online', 'offline', 'putus', 'terhubung'])) {
             $loggers = $context['all_loggers'] ?? [];
             $total   = $context['logger_total_visible'] ?? count($loggers);
@@ -497,6 +505,27 @@ class ChatbotController extends Controller
         }
 
         return null;
+    }
+
+    private function isLoggerListQuestion(string $message): bool
+    {
+        $query = Str::lower($message);
+
+        return Str::contains($query, [
+            'semua logger',
+            'daftar logger',
+            'list logger',
+            'tampilkan logger',
+            'tampilkan semua',
+            'logger yang ada',
+            'logger di akun',
+            'logger akun',
+            'logger saya',
+            'logger apa aja',
+            'logger apa saja',
+            'logger yang bisa diakses',
+            'logger yang dapat diakses',
+        ]);
     }
 
     private function defaultGuideReply(): string
@@ -653,7 +682,8 @@ class ChatbotController extends Controller
             'logger', 'untuk', 'yang', 'di', 'ke', 'dari', 'dong', 'ya', 'nya',
             'apa', 'arti', 'maksud', 'status', 'koneksi', 'online', 'offline',
             'terhubung', 'putus', 'aktif', 'tidak', 'semua', 'daftar', 'list',
-            'jumlah', 'total', 'buka', 'halaman', 'detail',
+            'jumlah', 'total', 'buka', 'halaman', 'detail', 'ada', 'ini', 'aja',
+            'saja', 'punya', 'milik',
             'cara', 'menu', 'panduan', 'fitur', 'peta', 'lokasi', 'monitoring',
             'realtime', 'real', 'analisa', 'grafik', 'chart', 'export', 'unduh',
             'download', 'notifikasi', 'notif', 'akses', 'akun', 'user',
