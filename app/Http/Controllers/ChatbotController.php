@@ -488,6 +488,7 @@ class ChatbotController extends Controller
             'apa', 'arti', 'maksud', 'status', 'koneksi', 'online', 'offline',
             'terhubung', 'putus', 'aktif', 'tidak', 'semua', 'daftar', 'list',
             'jumlah', 'total', 'buka', 'halaman', 'detail',
+            'awlr', 'arr', 'afmr', 'awr', 'awqr', 'awgc', 'jiat', 'nonjiat',
         ];
 
         return collect(explode(' ', $normalized))
