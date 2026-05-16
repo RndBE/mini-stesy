@@ -260,7 +260,8 @@
         .stesy-response-list {
             display: grid;
             gap: 0.45rem;
-            margin: 0.7rem 0 0;
+            margin: 0.7rem 0 0 0.18rem;
+            padding-left: 0.35rem;
         }
 
         .stesy-response-item {
