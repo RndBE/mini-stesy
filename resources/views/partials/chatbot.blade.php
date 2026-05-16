@@ -46,7 +46,7 @@
 
             <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4" x-ref="messages">
                 <template x-for="message in messages" :key="message.id">
-                    <div class="mb-4 flex items-start gap-3" :class="message.role === 'user' ? 'justify-end' : 'justify-start'">
+                    <div class="stesy-chat-message mb-4 flex items-start gap-3" :class="message.role === 'user' ? 'justify-end' : 'justify-start'">
                         <template x-if="message.role !== 'user'">
                             <div class="mt-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#303481] text-white shadow-[0_12px_24px_-14px_rgba(48,52,129,0.8)]">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -62,7 +62,12 @@
                                 ? 'max-w-[42%] rounded-br-md bg-[#303481] text-white'
                                 : 'max-w-[58%] rounded-bl-md border border-slate-200 bg-white text-slate-700'"
                         >
-                            <span class="m-0 block p-0" x-text="message.text"></span>
+                            <span class="m-0 block p-0" x-text="message.displayText ?? message.text"></span>
+                            <span
+                                x-show="message.isTyping"
+                                class="stesy-type-caret ml-0.5 inline-block h-4 w-1 translate-y-0.5 rounded-full bg-current"
+                                aria-hidden="true"
+                            ></span>
                         </div>
                     </div>
                 </template>
@@ -176,6 +181,15 @@
             isolation: isolate;
         }
 
+        .stesy-chat-message {
+            animation: stesy-message-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+            will-change: transform, opacity;
+        }
+
+        .stesy-type-caret {
+            animation: stesy-caret 900ms cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+
         .stesy-loading-avatar::before {
             content: "";
             position: absolute;
@@ -252,6 +266,36 @@
                 transform: translateX(110%);
             }
         }
+
+        @keyframes stesy-message-in {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(0.985);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes stesy-caret {
+            0%, 55% {
+                opacity: 0.95;
+            }
+            56%, 100% {
+                opacity: 0.18;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .stesy-chat-message,
+            .stesy-type-caret,
+            .stesy-loading-avatar::before,
+            .stesy-loading-dot,
+            .stesy-loading-line::after {
+                animation: none;
+            }
+        }
     </style>
 
     <script>
@@ -261,6 +305,7 @@
                 input: '',
                 loading: false,
                 error: '',
+                revealTimers: new Map(),
                 prompts: [
                     'Lihat data pos Pogung',
                     'Apa arti logger offline?',
@@ -316,25 +361,69 @@
                     })
                     .then((payload) => this.waitForMinimumLoading(startedAt).then(() => payload))
                     .then((payload) => {
-                        this.messages.push({
-                            id: `assistant-${Date.now()}`,
-                            role: 'assistant',
-                            text: payload.reply || this.resolveReply(text)
-                        });
+                        this.pushAssistantReply(payload.reply || this.resolveReply(text));
                     })
                     .catch(async (error) => {
                         await this.waitForMinimumLoading(startedAt);
                         this.error = error.message || 'Koneksi chatbot terganggu.';
-                        this.messages.push({
-                            id: `assistant-${Date.now()}`,
-                            role: 'assistant',
-                            text: this.resolveReply(text)
-                        });
+                        this.pushAssistantReply(this.resolveReply(text));
                     })
                     .finally(() => {
                         this.loading = false;
                         this.scrollDown();
                     });
+                },
+                pushAssistantReply(reply) {
+                    const fullText = String(reply || '').trim();
+                    const message = {
+                        id: `assistant-${Date.now()}`,
+                        role: 'assistant',
+                        text: fullText,
+                        displayText: '',
+                        isTyping: true
+                    };
+
+                    this.messages.push(message);
+                    this.scrollDown();
+                    this.revealAssistantMessage(message);
+                },
+                revealAssistantMessage(message) {
+                    const fullText = message.text || '';
+                    if (!fullText) {
+                        message.isTyping = false;
+                        return;
+                    }
+
+                    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    if (prefersReducedMotion) {
+                        message.displayText = fullText;
+                        message.isTyping = false;
+                        return;
+                    }
+
+                    const totalLength = fullText.length;
+                    const chunkSize = Math.max(2, Math.ceil(totalLength / 180));
+                    let cursor = 0;
+                    let ticks = 0;
+
+                    const timer = window.setInterval(() => {
+                        ticks++;
+                        cursor = Math.min(cursor + chunkSize, totalLength);
+                        message.displayText = fullText.slice(0, cursor);
+
+                        if (cursor >= totalLength) {
+                            window.clearInterval(timer);
+                            this.revealTimers.delete(message.id);
+                            message.displayText = fullText;
+                            message.isTyping = false;
+                        }
+
+                        if (ticks % 4 === 0 || cursor >= totalLength) {
+                            this.scrollDown();
+                        }
+                    }, 18);
+
+                    this.revealTimers.set(message.id, timer);
                 },
                 waitForMinimumLoading(startedAt) {
                     const minimumMs = 900;
