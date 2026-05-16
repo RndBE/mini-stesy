@@ -57,17 +57,44 @@
                             </div>
                         </template>
                         <div
-                            class="inline-flex h-auto min-h-0 w-fit items-center whitespace-pre-line rounded-2xl px-3 py-2 text-sm leading-5 shadow-sm"
+                            class="group/message inline-flex h-auto min-h-0 w-fit flex-col overflow-hidden rounded-2xl text-sm leading-5 shadow-sm"
                             :class="message.role === 'user'
-                                ? 'max-w-[42%] rounded-br-md bg-[#303481] text-white'
-                                : 'max-w-[58%] rounded-bl-md border border-slate-200 bg-white text-slate-700'"
+                                ? 'max-w-[42%] rounded-br-md bg-[#303481] px-3 py-2 text-white'
+                                : 'stesy-assistant-bubble max-w-[62%] rounded-bl-md border border-slate-200 bg-white text-slate-700'"
                         >
-                            <span class="m-0 block p-0" x-text="message.displayText ?? message.text"></span>
-                            <span
-                                x-show="message.isTyping"
-                                class="stesy-type-caret ml-0.5 inline-block h-4 w-1 translate-y-0.5 rounded-full bg-current"
-                                aria-hidden="true"
-                            ></span>
+                            <template x-if="message.role === 'user'">
+                                <span class="m-0 block whitespace-pre-line p-0" x-text="message.text"></span>
+                            </template>
+
+                            <template x-if="message.role !== 'user'">
+                                <div class="relative">
+                                    <div class="stesy-rich-reply px-4 py-3" x-html="formatReply(message.displayText ?? message.text)"></div>
+                                    <span
+                                        x-show="message.isTyping"
+                                        class="stesy-type-caret absolute bottom-3 inline-block h-4 w-1 rounded-full bg-current"
+                                        aria-hidden="true"
+                                    ></span>
+                                    <div
+                                        x-show="!message.isTyping && message.id !== 'welcome'"
+                                        x-transition:enter="transition duration-300 ease-out"
+                                        x-transition:enter-start="opacity-0 translate-y-1"
+                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                        class="flex items-center justify-end border-t border-slate-100 bg-slate-50/70 px-3 py-2"
+                                    >
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-slate-500 transition duration-300 hover:bg-white hover:text-[#303481] active:scale-[0.97]"
+                                            @click="copyMessage(message)"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <rect x="8" y="8" width="11" height="11" rx="2" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V5a2 2 0 012-2h8a2 2 0 012 2v1" />
+                                            </svg>
+                                            <span x-text="message.copied ? 'Tersalin' : 'Salin'"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </template>
@@ -188,6 +215,76 @@
 
         .stesy-type-caret {
             animation: stesy-caret 900ms cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+
+        .stesy-assistant-bubble {
+            box-shadow:
+                0 18px 45px -34px rgba(15, 23, 42, 0.42),
+                inset 0 1px 0 rgba(255, 255, 255, 0.86);
+        }
+
+        .stesy-rich-reply {
+            min-width: 220px;
+            white-space: normal;
+        }
+
+        .stesy-rich-reply p {
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .stesy-rich-reply p + p,
+        .stesy-rich-reply p + .stesy-response-list,
+        .stesy-rich-reply .stesy-response-list + p {
+            margin-top: 0.65rem;
+        }
+
+        .stesy-rich-reply strong {
+            color: #1f2937;
+            font-weight: 800;
+        }
+
+        .stesy-response-title {
+            color: #111827;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
+        .stesy-response-list {
+            display: grid;
+            gap: 0.45rem;
+            margin: 0.7rem 0 0;
+        }
+
+        .stesy-response-item {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 0.55rem;
+            align-items: start;
+            line-height: 1.55;
+        }
+
+        .stesy-response-marker {
+            display: inline-flex;
+            min-width: 1.35rem;
+            height: 1.35rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            background: rgba(48, 52, 129, 0.08);
+            color: #303481;
+            font-size: 0.68rem;
+            font-weight: 800;
+            line-height: 1;
+            transform: translateY(0.1rem);
+        }
+
+        .stesy-response-marker.is-dot {
+            min-width: 0.42rem;
+            width: 0.42rem;
+            height: 0.42rem;
+            margin-top: 0.45rem;
+            background: #303481;
         }
 
         .stesy-loading-avatar::before {
@@ -380,7 +477,8 @@
                         role: 'assistant',
                         text: fullText,
                         displayText: '',
-                        isTyping: true
+                        isTyping: true,
+                        copied: false
                     };
 
                     this.messages.push(message);
@@ -424,6 +522,89 @@
                     }, 18);
 
                     this.revealTimers.set(message.id, timer);
+                },
+                formatReply(text) {
+                    const safeText = this.escapeHtml(String(text || ''));
+                    const lines = safeText.split(/\r?\n/);
+                    const chunks = [];
+                    let listItems = [];
+
+                    const flushList = () => {
+                        if (listItems.length === 0) return;
+                        chunks.push(`<div class="stesy-response-list">${listItems.join('')}</div>`);
+                        listItems = [];
+                    };
+
+                    lines.forEach((rawLine, index) => {
+                        const line = rawLine.trim();
+
+                        if (!line) {
+                            flushList();
+                            return;
+                        }
+
+                        const numbered = line.match(/^(\d+)\.\s+(.+)$/);
+                        if (numbered) {
+                            listItems.push(
+                                `<div class="stesy-response-item"><span class="stesy-response-marker">${numbered[1]}</span><span>${this.inlineFormat(numbered[2])}</span></div>`
+                            );
+                            return;
+                        }
+
+                        const bullet = line.match(/^-\s+(.+)$/);
+                        if (bullet) {
+                            listItems.push(
+                                `<div class="stesy-response-item"><span class="stesy-response-marker is-dot"></span><span>${this.inlineFormat(bullet[1])}</span></div>`
+                            );
+                            return;
+                        }
+
+                        flushList();
+                        const className = index === 0 || /:$/.test(line) ? ' class="stesy-response-title"' : '';
+                        chunks.push(`<p${className}>${this.inlineFormat(line)}</p>`);
+                    });
+
+                    flushList();
+                    return chunks.join('');
+                },
+                inlineFormat(text) {
+                    return String(text)
+                        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.+?)\*/g, '<strong>$1</strong>');
+                },
+                escapeHtml(value) {
+                    return String(value)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                },
+                async copyMessage(message) {
+                    const text = message.text || '';
+                    if (!text) return;
+
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        message.copied = true;
+                        window.setTimeout(() => {
+                            message.copied = false;
+                        }, 1400);
+                    } catch (_) {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        textarea.setAttribute('readonly', '');
+                        textarea.style.position = 'fixed';
+                        textarea.style.opacity = '0';
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        message.copied = true;
+                        window.setTimeout(() => {
+                            message.copied = false;
+                        }, 1400);
+                    }
                 },
                 waitForMinimumLoading(startedAt) {
                     const minimumMs = 900;
