@@ -68,7 +68,14 @@
 
                             <template x-if="message.role !== 'user'">
                                 <div class="relative">
-                                    <div class="stesy-rich-reply px-4 py-3" x-html="formatReply(message.displayText ?? message.text)"></div>
+                                    <div class="stesy-rich-reply px-4 py-3">
+                                        <template x-if="message.isTyping">
+                                            <span class="block whitespace-pre-line" x-text="message.displayText || message.text"></span>
+                                        </template>
+                                        <template x-if="!message.isTyping">
+                                            <div x-html="formatReply(message.text)"></div>
+                                        </template>
+                                    </div>
                                     <span
                                         x-show="message.isTyping"
                                         class="stesy-type-caret absolute bottom-3 inline-block h-4 w-1 rounded-full bg-current"
@@ -483,19 +490,20 @@
 
                     this.messages.push(message);
                     this.scrollDown();
-                    this.revealAssistantMessage(message);
+                    this.revealAssistantMessage(message.id, fullText);
                 },
-                revealAssistantMessage(message) {
-                    const fullText = message.text || '';
+                revealAssistantMessage(messageId, fullText) {
                     if (!fullText) {
-                        message.isTyping = false;
+                        this.updateMessage(messageId, { isTyping: false });
                         return;
                     }
 
                     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                     if (prefersReducedMotion) {
-                        message.displayText = fullText;
-                        message.isTyping = false;
+                        this.updateMessage(messageId, {
+                            displayText: fullText,
+                            isTyping: false
+                        });
                         return;
                     }
 
@@ -507,13 +515,17 @@
                     const timer = window.setInterval(() => {
                         ticks++;
                         cursor = Math.min(cursor + chunkSize, totalLength);
-                        message.displayText = fullText.slice(0, cursor);
+                        this.updateMessage(messageId, {
+                            displayText: fullText.slice(0, cursor)
+                        });
 
                         if (cursor >= totalLength) {
                             window.clearInterval(timer);
-                            this.revealTimers.delete(message.id);
-                            message.displayText = fullText;
-                            message.isTyping = false;
+                            this.revealTimers.delete(messageId);
+                            this.updateMessage(messageId, {
+                                displayText: fullText,
+                                isTyping: false
+                            });
                         }
 
                         if (ticks % 4 === 0 || cursor >= totalLength) {
@@ -521,7 +533,16 @@
                         }
                     }, 18);
 
-                    this.revealTimers.set(message.id, timer);
+                    this.revealTimers.set(messageId, timer);
+                },
+                updateMessage(messageId, changes) {
+                    const index = this.messages.findIndex((item) => item.id === messageId);
+                    if (index === -1) return;
+
+                    this.messages.splice(index, 1, {
+                        ...this.messages[index],
+                        ...changes
+                    });
                 },
                 formatReply(text) {
                     const safeText = this.escapeHtml(String(text || ''));
