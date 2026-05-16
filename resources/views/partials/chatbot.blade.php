@@ -272,7 +272,7 @@
         }
 
         .stesy-response-item:has(.is-dot) {
-            margin-left: 0.55rem;
+            margin-left: 1rem;
         }
 
         .stesy-response-marker {
