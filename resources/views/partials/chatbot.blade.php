@@ -166,6 +166,7 @@
                 ask(value) {
                     const text = (value || '').trim();
                     if (!text || this.loading) return;
+                    const startedAt = Date.now();
 
                     this.error = '';
                     this.input = '';
@@ -203,6 +204,7 @@
                         }
                         return response.json();
                     })
+                    .then((payload) => this.waitForMinimumLoading(startedAt).then(() => payload))
                     .then((payload) => {
                         this.messages.push({
                             id: `assistant-${Date.now()}`,
@@ -210,7 +212,8 @@
                             text: payload.reply || this.resolveReply(text)
                         });
                     })
-                    .catch((error) => {
+                    .catch(async (error) => {
+                        await this.waitForMinimumLoading(startedAt);
                         this.error = error.message || 'Koneksi chatbot terganggu.';
                         this.messages.push({
                             id: `assistant-${Date.now()}`,
@@ -222,6 +225,12 @@
                         this.loading = false;
                         this.scrollDown();
                     });
+                },
+                waitForMinimumLoading(startedAt) {
+                    const minimumMs = 900;
+                    const remaining = Math.max(0, minimumMs - (Date.now() - startedAt));
+
+                    return new Promise((resolve) => setTimeout(resolve, remaining));
                 },
                 resolveReply(text) {
                     const query = text.toLowerCase();

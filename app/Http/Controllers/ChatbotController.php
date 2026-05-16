@@ -36,7 +36,6 @@ class ChatbotController extends Controller
         }
 
         $context = $this->buildMonitoringContext($request, $message);
-        $fallback = $this->fallbackReply($message, $context);
 
         if ($categoryReply = $this->categoryReply($message, $context)) {
             return response()->json([
@@ -49,6 +48,14 @@ class ChatbotController extends Controller
         if (!empty($context['missing_logger_reference'])) {
             return response()->json([
                 'reply' => 'Logger atau pos yang diminta tidak ditemukan dalam akses akun ini. Pastikan ID/nama logger benar, atau minta admin memberi akses ke logger tersebut.',
+                'source' => 'local',
+                'configured' => (bool) config('services.ai_chatbot.key'),
+            ]);
+        }
+
+        if ($localReply = $this->localIntentReply($message, $context)) {
+            return response()->json([
+                'reply' => $localReply,
                 'source' => 'local',
                 'configured' => (bool) config('services.ai_chatbot.key'),
             ]);
@@ -332,9 +339,22 @@ class ChatbotController extends Controller
             'maksud',
             'fungsi',
             'kategori',
+            'beda',
+            'bedanya',
+            'perbedaan',
+            'mengukur apa',
+            'untuk apa',
         ]);
 
-        if (!$isCategoryQuestion || $mentioned->isEmpty()) {
+        if (!$isCategoryQuestion) {
+            return null;
+        }
+
+        if ($mentioned->isEmpty() && Str::contains($query, ['kategori logger', 'kategori apa', 'jenis logger', 'macam logger'])) {
+            $mentioned = collect(array_keys($definitions));
+        }
+
+        if ($mentioned->isEmpty()) {
             return null;
         }
 
@@ -362,6 +382,134 @@ class ChatbotController extends Controller
             ]);
     }
 
+    private function localIntentReply(string $message, array $context): ?string
+    {
+        $query = Str::lower($message);
+
+        if (!empty($context['matched_logger'])) {
+            return $this->formatLoggerSummary($context['matched_logger']);
+        }
+
+        if (Str::contains($query, ['semua logger', 'daftar logger', 'list logger', 'tampilkan logger', 'tampilkan semua'])
+            && !Str::contains($query, ['online', 'offline', 'putus', 'terhubung'])) {
+            $loggers = $context['all_loggers'] ?? [];
+            $total   = $context['logger_total_visible'] ?? count($loggers);
+            $online  = $context['logger_online_count']  ?? 0;
+            $offline = $context['logger_offline_count'] ?? 0;
+
+            if (empty($loggers)) {
+                return 'Tidak ada logger yang dapat diakses oleh akun ini.';
+            }
+
+            $listStr = collect($loggers)
+                ->map(function ($logger, $index) {
+                    $number = $index + 1;
+                    $status = strtoupper((string) ($logger['status'] ?? '-'));
+                    $time = $logger['last_time'] ?? '-';
+
+                    return "{$number}. {$logger['nama']} ({$logger['id_logger']}) - {$status} - update: {$time}";
+                })
+                ->implode("\n");
+
+            return "Daftar semua logger yang dapat diakses ({$total} unit):\n"
+                ."- Online: {$online}\n"
+                ."- Offline: {$offline}\n\n"
+                .$listStr;
+        }
+
+        if (Str::contains($query, ['online', 'terhubung', 'aktif', 'nyala', 'hidup'])
+            && !Str::contains($query, ['offline', 'putus', 'mati'])) {
+            $count   = $context['logger_online_count'] ?? 0;
+            $list    = $context['online_loggers']      ?? [];
+            $total   = $context['logger_total_visible'] ?? 0;
+
+            if ($count === 0) {
+                return "Saat ini tidak ada logger yang terdeteksi online (dari {$total} logger yang dapat diakses).";
+            }
+
+            $listStr = implode("\n  - ", $list);
+            $extra   = $count > count($list) ? "\n  - ..." : '';
+
+            return "Logger yang saat ini koneksi terhubung (online) - {$count} dari {$total} logger:\n  - {$listStr}{$extra}";
+        }
+
+        if (Str::contains($query, ['offline', 'putus', 'mati', 'tidak terhubung', 'tidak aktif'])) {
+            $count = $context['logger_offline_count'] ?? 0;
+            $list  = $context['offline_loggers']      ?? [];
+            $total = $context['logger_total_visible']  ?? 0;
+
+            if ($count === 0) {
+                return "Semua logger ({$total}) saat ini terdeteksi online. Tidak ada yang offline.";
+            }
+
+            $listStr = implode("\n  - ", $list);
+            $extra   = $count > count($list) ? "\n  - ..." : '';
+
+            return "Logger yang koneksi terputus (offline) - {$count} dari {$total} logger:\n  - {$listStr}{$extra}\n\nCek waktu data terakhir, baterai, dan jaringan di halaman detail perangkat.";
+        }
+
+        if (Str::contains($query, ['berapa', 'jumlah', 'total', 'semua', 'daftar', 'list', 'status'])) {
+            $total   = $context['logger_total_visible'] ?? 0;
+            $online  = $context['logger_online_count']  ?? 0;
+            $offline = $context['logger_offline_count'] ?? 0;
+
+            return "Total logger yang dapat diakses: {$total} unit.\n- Online (koneksi terhubung): {$online}\n- Offline (koneksi terputus): {$offline}\n\nBuka menu Peta atau Realtime Monitoring untuk detail masing-masing pos.";
+        }
+
+        if (Str::contains($query, ['real', 'realtime', 'monitoring', 'sensor terbaru', 'data terbaru', 'data sensor'])) {
+            return "Untuk data real-time, buka menu Realtime Monitoring. Pilih pos/logger, lalu cek nilai sensor terakhir, waktu update, dan status koneksinya.\n\nJika data kosong atau tidak berubah, cek waktu update terakhir, baterai, jaringan alat, dan konfigurasi parameter logger.";
+        }
+
+        if (Str::contains($query, ['peta', 'lokasi', 'pos'])) {
+            $count = $context['logger_total_visible'] ?? 0;
+
+            return "Untuk melihat lokasi pos, buka menu Peta. Akun ini memiliki akses ke {$count} logger yang bisa ditinjau sesuai izin pengguna. Marker hijau biasanya berarti koneksi terhubung, sedangkan marker merah/abu menandakan koneksi terputus atau data tidak terbaru.";
+        }
+
+        if (Str::contains($query, ['analisa', 'grafik', 'chart', 'export', 'unduh', 'download', 'rekap'])) {
+            return "Untuk analisa data, buka menu Analisa Data, pilih logger, pilih parameter, lalu tentukan rentang tanggal. Gunakan tombol export/unduh jika ingin mengambil data dalam bentuk file.\n\nJika logger tidak muncul, biasanya akun belum diberi akses ke logger tersebut.";
+        }
+
+        if (Str::contains($query, ['data masuk', 'tidak masuk', 'data kosong', 'sensor 0', 'baterai 0', 'update terakhir'])) {
+            return "Kalau data logger tidak masuk atau nilainya aneh, cek waktu update terakhir, status koneksi, baterai/power, jaringan SIM/modem, kondisi sensor, dan mapping parameter. Untuk riwayat mentahnya, buka menu Data Masuk atau halaman detail logger.";
+        }
+
+        if (Str::contains($query, ['siaga', 'banjir', 'hujan'])) {
+            return 'Level siaga mengikuti ambang batas yang dikonfigurasi pada data AWLR atau ARR. Cek halaman detail pos untuk melihat klasifikasi dan parameter pendukung.';
+        }
+
+        if (Str::contains($query, ['akses', 'tidak muncul', 'tidak ada', 'user', 'akun', 'admin lihat', 'kenapa cuma'])) {
+            $total = $context['logger_total_visible'] ?? 0;
+
+            return "Akses logger mengikuti role dan izin akun. Superadmin bisa melihat semua logger, admin instansi melihat logger instansinya, sedangkan user/pegawai hanya melihat logger yang diberikan lewat akses user.\n\nAkun ini saat ini dapat mengakses {$total} logger. Jika logger tertentu tidak muncul, minta admin menambahkan akses logger tersebut.";
+        }
+
+        if (Str::contains($query, ['tambah logger', 'edit logger', 'setting logger', 'data perangkat', 'parameter', 'instansi'])) {
+            return 'Pengaturan logger, parameter, kategori, dan instansi ada di menu master/perangkat sesuai hak akses akun. Jika menu tidak terlihat, berarti akun belum memiliki permission untuk mengelola data tersebut.';
+        }
+
+        if (Str::contains($query, ['notifikasi', 'notif', 'peringatan', 'fcm'])) {
+            return 'Notifikasi dipakai untuk memberi peringatan kondisi logger, seperti siaga, hujan, atau gangguan koneksi. Jika notifikasi tidak masuk, cek akses user ke logger, token perangkat/login mobile, jeda notifikasi, dan riwayat notifikasi.';
+        }
+
+        if (Str::contains($query, ['bisa bantu', 'panduan', 'cara pakai', 'menu apa', 'fitur'])) {
+            return $this->defaultGuideReply();
+        }
+
+        return null;
+    }
+
+    private function defaultGuideReply(): string
+    {
+        return "Saya STESY Assistant. Saya bisa membantu:\n"
+            ."- status logger online/offline\n"
+            ."- detail logger dan sensor terakhir\n"
+            ."- penjelasan kategori AWLR, ARR, AFMR, AWR, AWQR\n"
+            ."- panduan Peta, Realtime Monitoring, Analisa Data, Data Masuk, dan Notifikasi\n"
+            ."- penjelasan akses user jika logger tidak muncul\n\n"
+            ."Silakan tanyakan lebih spesifik, misalnya: tampilkan logger online, apa itu AWLR, atau kenapa logger saya tidak muncul.";
+    }
+
     private function fallbackReply(string $message, array $context, bool $configured = false): string
     {
         $query = Str::lower($message);
@@ -373,6 +521,18 @@ class ChatbotController extends Controller
             $total  = $context['logger_total_visible'] ?? 0;
             $online = $context['logger_online_count']  ?? 0;
             return "Halo, {$userName}! Saya STESY Assistant. Ada yang bisa saya bantu?";
+        }
+
+        if ($categoryReply = $this->categoryReply($message, $context)) {
+            return $categoryReply;
+        }
+
+        if (!empty($context['missing_logger_reference'])) {
+            return 'Logger atau pos yang diminta tidak ditemukan dalam akses akun ini. Pastikan ID/nama logger benar, atau minta admin memberi akses ke logger tersebut.';
+        }
+
+        if ($localReply = $this->localIntentReply($message, $context)) {
+            return $localReply;
         }
 
         if (!empty($context['matched_logger'])) {
@@ -488,6 +648,9 @@ class ChatbotController extends Controller
             'apa', 'arti', 'maksud', 'status', 'koneksi', 'online', 'offline',
             'terhubung', 'putus', 'aktif', 'tidak', 'semua', 'daftar', 'list',
             'jumlah', 'total', 'buka', 'halaman', 'detail',
+            'cara', 'menu', 'panduan', 'fitur', 'peta', 'lokasi', 'monitoring',
+            'realtime', 'real', 'analisa', 'grafik', 'chart', 'export', 'unduh',
+            'download', 'notifikasi', 'notif', 'akses', 'akun', 'user',
             'awlr', 'arr', 'afmr', 'awr', 'awqr', 'awgc', 'jiat', 'nonjiat',
         ];
 
