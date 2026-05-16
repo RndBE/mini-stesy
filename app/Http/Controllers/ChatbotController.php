@@ -47,7 +47,7 @@ class ChatbotController extends Controller
 
         if (!empty($context['missing_logger_reference'])) {
             return response()->json([
-                'reply' => 'Logger atau pos yang diminta tidak ditemukan dalam akses akun ini. Pastikan ID/nama logger benar, atau minta admin memberi akses ke logger tersebut.',
+                'reply' => $this->missingLoggerReply(),
                 'source' => 'local',
                 'configured' => (bool) config('services.ai_chatbot.key'),
             ]);
@@ -510,6 +510,12 @@ class ChatbotController extends Controller
             ."Silakan tanyakan lebih spesifik, misalnya: tampilkan logger online, apa itu AWLR, atau kenapa logger saya tidak muncul.";
     }
 
+    private function missingLoggerReply(): string
+    {
+        return "Saya belum menemukan logger itu di daftar akses akun ini.\n\n"
+            ."Coba cek lagi nama atau ID logger yang diketik. Jika loggernya memang ada tetapi belum muncul di akun ini, minta admin menambahkan akses logger tersebut.";
+    }
+
     private function fallbackReply(string $message, array $context, bool $configured = false): string
     {
         $query = Str::lower($message);
@@ -528,7 +534,7 @@ class ChatbotController extends Controller
         }
 
         if (!empty($context['missing_logger_reference'])) {
-            return 'Logger atau pos yang diminta tidak ditemukan dalam akses akun ini. Pastikan ID/nama logger benar, atau minta admin memberi akses ke logger tersebut.';
+            return $this->missingLoggerReply();
         }
 
         if ($localReply = $this->localIntentReply($message, $context)) {
