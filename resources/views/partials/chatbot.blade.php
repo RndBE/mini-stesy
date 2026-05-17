@@ -60,7 +60,9 @@
                             class="group/message inline-flex h-auto min-h-0 w-fit flex-col overflow-hidden rounded-2xl text-sm leading-5 shadow-sm"
                             :class="message.role === 'user'
                                 ? 'max-w-[42%] rounded-br-md bg-[#303481] px-3 py-2 text-white'
-                                : 'stesy-assistant-bubble max-w-[62%] rounded-bl-md border border-slate-200 bg-white text-slate-700'"
+                                : (message.chart
+                                    ? 'stesy-assistant-bubble w-full max-w-[88%] rounded-bl-md border border-slate-200 bg-white text-slate-700'
+                                    : 'stesy-assistant-bubble max-w-[62%] rounded-bl-md border border-slate-200 bg-white text-slate-700')"
                         >
                             <template x-if="message.role === 'user'">
                                 <span class="m-0 block whitespace-pre-line p-0" x-text="message.text"></span>
@@ -76,6 +78,18 @@
                                             <div x-html="formatReply(message.text)"></div>
                                         </template>
                                     </div>
+                                    <template x-if="message.chart">
+                                        <div class="px-4 pb-3">
+                                            <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+                                                <p class="mb-2 truncate text-xs font-bold text-slate-700" x-text="message.chart.title"></p>
+                                                <div class="relative h-[230px] w-full">
+                                                    <canvas :id="'stesy-chart-' + message.id"></canvas>
+                                                </div>
+                                                <p class="mt-2 text-[11px] font-medium text-slate-400"
+                                                   x-text="message.chart.agg + ' per ' + (message.chart.granularity === 'hourly' ? 'jam' : 'hari') + ' • satuan ' + (message.chart.unit || '-')"></p>
+                                            </div>
+                                        </div>
+                                    </template>
                                     <span
                                         x-show="message.isTyping"
                                         class="stesy-type-caret absolute bottom-3 inline-block h-4 w-1 rounded-full bg-current"
@@ -414,16 +428,20 @@
                 loading: false,
                 error: '',
                 revealTimers: new Map(),
+                chartInstances: new Map(),
+                _chartJsPromise: null,
                 prompts: [
-                    'Lihat data pos Pogung',
-                    'Apa arti logger offline?',
-                    'Daftar logger yang ada'
+                    'Ada berapa logger yang offline?',
+                    'Pos mana saja yang sedang hujan?',
+                    'Grafik tinggi muka air pos AWLR Sinduadi seminggu',
+                    'Bandingkan dua pos AWLR',
+                    'Rincian curah hujan per jam hari ini'
                 ],
                 messages: [
                     {
                         id: 'welcome',
                         role: 'assistant',
-                        text: 'Halo, apakah ada yang bisa saya bantu?'
+                        text: 'Selamat datang. Saya STESY Assistant. Ada yang bisa dibantu terkait pemantauan logger Anda?'
                     }
                 ],
                 ask(value) {
@@ -469,7 +487,7 @@
                     })
                     .then((payload) => this.waitForMinimumLoading(startedAt).then(() => payload))
                     .then((payload) => {
-                        this.pushAssistantReply(payload.reply || this.resolveReply(text));
+                        this.pushAssistantReply(payload.reply || this.resolveReply(text), payload.chart || null);
                     })
                     .catch(async (error) => {
                         await this.waitForMinimumLoading(startedAt);
@@ -481,20 +499,92 @@
                         this.scrollDown();
                     });
                 },
-                pushAssistantReply(reply) {
+                pushAssistantReply(reply, chart = null) {
                     const fullText = String(reply || '').trim();
                     const message = {
                         id: `assistant-${Date.now()}`,
                         role: 'assistant',
                         text: fullText,
-                        displayText: '',
-                        isTyping: true,
-                        copied: false
+                        displayText: chart ? fullText : '',
+                        isTyping: !chart,
+                        copied: false,
+                        chart: chart
                     };
 
                     this.messages.push(message);
                     this.scrollDown();
+
+                    if (chart) {
+                        // Pesan grafik: tampilkan penjelasan langsung lalu render kanvas.
+                        this.$nextTick(() => {
+                            this.renderChart(message.id, chart);
+                            this.scrollDown();
+                        });
+                        return;
+                    }
+
                     this.revealAssistantMessage(message.id, fullText);
+                },
+                ensureChartJs() {
+                    if (window.Chart) return Promise.resolve(window.Chart);
+                    if (this._chartJsPromise) return this._chartJsPromise;
+
+                    this._chartJsPromise = new Promise((resolve, reject) => {
+                        const s = document.createElement('script');
+                        s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+                        s.async = true;
+                        s.onload = () => resolve(window.Chart);
+                        s.onerror = () => reject(new Error('Gagal memuat pustaka grafik.'));
+                        document.head.appendChild(s);
+                    });
+
+                    return this._chartJsPromise;
+                },
+                renderChart(messageId, chart) {
+                    this.ensureChartJs().then((Chart) => {
+                        const canvas = document.getElementById('stesy-chart-' + messageId);
+                        if (!canvas || !Chart) return;
+
+                        if (this.chartInstances.has(messageId)) {
+                            this.chartInstances.get(messageId).destroy();
+                        }
+
+                        const accent = '#303481';
+                        const instance = new Chart(canvas.getContext('2d'), {
+                            type: chart.type === 'bar' ? 'bar' : 'line',
+                            data: {
+                                labels: chart.labels,
+                                datasets: [{
+                                    label: (chart.param || 'Nilai') + (chart.unit ? ' (' + chart.unit + ')' : ''),
+                                    data: chart.values,
+                                    borderColor: accent,
+                                    backgroundColor: chart.type === 'bar' ? 'rgba(48,52,129,0.55)' : 'rgba(48,52,129,0.12)',
+                                    borderWidth: 2,
+                                    fill: chart.type !== 'bar',
+                                    tension: 0.35,
+                                    pointRadius: chart.values.length > 40 ? 0 : 3,
+                                    pointHoverRadius: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                interaction: { mode: 'index', intersect: false },
+                                plugins: {
+                                    legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } },
+                                    tooltip: { enabled: true }
+                                },
+                                scales: {
+                                    x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8, font: { size: 10 } }, grid: { display: false } },
+                                    y: { beginAtZero: false, ticks: { font: { size: 10 } }, grid: { color: 'rgba(15,23,42,0.06)' } }
+                                }
+                            }
+                        });
+
+                        this.chartInstances.set(messageId, instance);
+                    }).catch(() => {
+                        /* Pustaka grafik gagal dimuat — penjelasan teks tetap tampil. */
+                    });
                 },
                 revealAssistantMessage(messageId, fullText) {
                     if (!fullText) {
@@ -632,7 +722,7 @@
                     }
                 },
                 waitForMinimumLoading(startedAt) {
-                    const minimumMs = 900;
+                    const minimumMs = 450;
                     const remaining = Math.max(0, minimumMs - (Date.now() - startedAt));
 
                     return new Promise((resolve) => setTimeout(resolve, remaining));
@@ -656,7 +746,7 @@
                         return 'Level siaga mengikuti ambang batas yang dikonfigurasi pada data AWLR atau ARR. Cek halaman detail pos untuk melihat klasifikasi dan parameter pendukung.';
                     }
 
-                    return 'Saya belum terhubung ke mesin AI penuh, tetapi bisa dipakai sebagai asisten panduan. Untuk versi berikutnya, input ini bisa diarahkan ke endpoint chatbot agar jawabannya membaca data sistem secara langsung.';
+                    return 'Koneksi ke layanan asisten sedang terganggu. Silakan coba kirim ulang pertanyaan Anda dalam beberapa saat. Untuk sementara, status logger dan data pos dapat ditinjau melalui menu Peta atau Realtime Monitoring.';
                 },
                 scrollDown() {
                     this.$nextTick(() => {

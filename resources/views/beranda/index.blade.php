@@ -284,6 +284,22 @@
                             $afmrDebit    = $latest && $pAfmrDebit    && $pAfmrDebit->kolom_sensor    ? $latest->{$pAfmrDebit->kolom_sensor}    ?? null : null;
                             $flowVelocity = $latest && $pFlowVelocity && $pFlowVelocity->kolom_sensor ? $latest->{$pFlowVelocity->kolom_sensor} ?? null : null;
 
+                            // AFMR contact (pipe flowmeter) parameters
+                            $pFlowrate   = $findParamByBase(['flowrate', 'flow_rate']);
+                            $pTotalizer1 = $findParamByBase(['totalizer_1', 'totalizer1']);
+                            $pTotalizer2 = $findParamByBase(['totalizer_2', 'totalizer2']);
+                            $pPressure1  = $findParamByBase(['pressure_1', 'pressure1', 'tekanan_1']);
+                            $pPressure2  = $findParamByBase(['pressure_2', 'pressure2', 'tekanan_2']);
+                            $pFmBattery  = $findParamByBase(['flowmeter_battery']);
+                            $pFault      = $findParamByBase(['fault']);
+                            $flowrate   = $latest && $pFlowrate   && $pFlowrate->kolom_sensor   ? $latest->{$pFlowrate->kolom_sensor}   ?? null : null;
+                            $totalizer1 = $latest && $pTotalizer1 && $pTotalizer1->kolom_sensor ? $latest->{$pTotalizer1->kolom_sensor} ?? null : null;
+                            $totalizer2 = $latest && $pTotalizer2 && $pTotalizer2->kolom_sensor ? $latest->{$pTotalizer2->kolom_sensor} ?? null : null;
+                            $pressure1  = $latest && $pPressure1  && $pPressure1->kolom_sensor  ? $latest->{$pPressure1->kolom_sensor}  ?? null : null;
+                            $pressure2  = $latest && $pPressure2  && $pPressure2->kolom_sensor  ? $latest->{$pPressure2->kolom_sensor}  ?? null : null;
+                            $fmBattery  = $latest && $pFmBattery  && $pFmBattery->kolom_sensor  ? $latest->{$pFmBattery->kolom_sensor}  ?? null : null;
+                            $fault      = $latest && $pFault      && $pFault->kolom_sensor      ? $latest->{$pFault->kolom_sensor}      ?? null : null;
+
                             $muted = !$isOnline;
                             $iconClass = $muted ? 'grayscale opacity-40' : '';
 
@@ -348,6 +364,20 @@
                             'luasPenampang'   => $luasPenampang  ?? null,
                             'afmrDebit'       => $afmrDebit      ?? null,
                             'flowVelocity'    => $flowVelocity   ?? null,
+                            'pFlowrate'       => $pFlowrate      ?? null,
+                            'pTotalizer1'     => $pTotalizer1    ?? null,
+                            'pTotalizer2'     => $pTotalizer2    ?? null,
+                            'pPressure1'      => $pPressure1     ?? null,
+                            'pPressure2'      => $pPressure2     ?? null,
+                            'pFmBattery'      => $pFmBattery     ?? null,
+                            'pFault'          => $pFault         ?? null,
+                            'flowrate'        => $flowrate       ?? null,
+                            'totalizer1'      => $totalizer1     ?? null,
+                            'totalizer2'      => $totalizer2     ?? null,
+                            'pressure1'       => $pressure1      ?? null,
+                            'pressure2'       => $pressure2      ?? null,
+                            'fmBattery'       => $fmBattery      ?? null,
+                            'fault'           => $fault          ?? null,
                         ])
                     @endforeach
                 </div>
