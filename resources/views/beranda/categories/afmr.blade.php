@@ -32,7 +32,7 @@
                     @if ($pTotalizer1)
                     <a href="{{ route('analisa.index', $lg->id_logger) }}?parameter={{ urlencode($pTotalizer1->nama_parameter) }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-sky-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
-                            <img src="{{ asset($paramIconPath($pTotalizer1, 'icons/afmr/luas_penampang_air.svg')) }}" alt="Totalizer 1" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset('icons/afmr/totalizer_debit.svg') }}" alt="Totalizer 1" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pTotalizer1->nama_parameter }}</div>
@@ -47,7 +47,7 @@
                     @if ($pTotalizer2)
                     <a href="{{ route('analisa.index', $lg->id_logger) }}?parameter={{ urlencode($pTotalizer2->nama_parameter) }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-indigo-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
-                            <img src="{{ asset($paramIconPath($pTotalizer2, 'icons/afmr/luas_penampang_air.svg')) }}" alt="Totalizer 2" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset('icons/afmr/totalizer_debit.svg') }}" alt="Totalizer 2" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pTotalizer2->nama_parameter }}</div>
@@ -62,7 +62,7 @@
                     @if ($pPressure1)
                     <a href="{{ route('analisa.index', $lg->id_logger) }}?parameter={{ urlencode($pPressure1->nama_parameter) }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-rose-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
-                            <img src="{{ asset($paramIconPath($pPressure1, 'icons/afmr/flow_velocity.svg')) }}" alt="Pressure 1" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset('icons/afmr/sensor_prv.svg') }}" alt="Pressure 1" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pPressure1->nama_parameter }}</div>
@@ -77,7 +77,7 @@
                     @if ($pPressure2)
                     <a href="{{ route('analisa.index', $lg->id_logger) }}?parameter={{ urlencode($pPressure2->nama_parameter) }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-amber-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
-                            <img src="{{ asset($paramIconPath($pPressure2, 'icons/afmr/flow_velocity.svg')) }}" alt="Pressure 2" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset('icons/afmr/sensor_prv.svg') }}" alt="Pressure 2" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pPressure2->nama_parameter }}</div>
@@ -118,7 +118,7 @@
                     @endphp
                     <a href="{{ route('analisa.index', $lg->id_logger) }}?parameter={{ urlencode($pFault->nama_parameter) }}" class="flex items-center gap-3 rounded-xl border px-3 py-2 bg-white shadow-sm hover:shadow-md transition-all {{ $faultOk ? 'border-emerald-200' : 'border-rose-200' }} {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-slate-100 bg-slate-50">
-                            <img src="{{ asset($paramIconPath($pFault, 'icons/afmr/perbaikan.svg')) }}" alt="Fault" class="h-5 w-5 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset('icons/afmr/fault_wm.svg') }}" alt="Fault" class="h-5 w-5 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[8px] font-bold uppercase tracking-widest text-slate-500">{{ $pFault->nama_parameter }}</div>
