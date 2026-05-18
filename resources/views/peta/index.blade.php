@@ -650,183 +650,67 @@ background: rgba(0, 0, 0, 0.28);
                                     </div>
                                 </div>
 
-@if ($kat === 'AWLR' && ($point['sub_kategori'] ?? '') === 'jiat')
-                                    <div class="text-center my-2">
-                                        <div class="text-xl font-bold text-slate-900">
-                                            {{ is_numeric($point['muka_air_tanah']) ? $fmt($point['muka_air_tanah'], 3) . ' m' : '-' }}
+                                @php
+                                    $measurementParams = $point['parameter_groups']['pengukuran'] ?? [];
+                                    $loggerParams = $point['parameter_groups']['logger'] ?? [];
+                                @endphp
+
+                                @if (count($measurementParams) > 0)
+                                    @if (count($measurementParams) === 1)
+                                        @php $param = $measurementParams[0]; @endphp
+                                        <div class="text-center my-2">
+                                            <div class="text-xl font-bold text-slate-900">{{ $param['display_value'] ?? '-' }}</div>
+                                            <div class="text-xs text-slate-500">{{ $param['nama'] ?? '-' }}</div>
                                         </div>
-                                        <div class="text-xs text-slate-500">Muka Air Tanah</div>
-                                    </div>
-
-@elseif ($kat === 'AWLR')
-                                    <div class="grid grid-cols-2 gap-x-2 my-2">
-                                        <div class="text-center">
-                                            <div class="text-lg font-bold text-slate-900">
-                                                {{ is_numeric($point['tma']) ? $fmt($point['tma'], 3) . ' m' : '-' }}
-                                            </div>
-                                            <div class="text-[10px] text-slate-500">Tinggi Muka Air</div>
-                                        </div>
-                                        <div class="text-center">
-                                            <div class="text-lg font-bold text-slate-900">
-                                                {{ is_numeric($point['debit']) ? $fmt($point['debit'], 3) . ' m³/s' : '-' }}
-                                            </div>
-                                            <div class="text-[10px] text-slate-500">Debit</div>
+                                    @else
+                                    <div class="my-2">
+                                        <div class="grid grid-cols-2 gap-x-2 gap-y-1">
+                                            @foreach ($measurementParams as $param)
+                                                <div class="text-center py-0.5">
+                                                    <div class="text-sm font-bold text-slate-900">{{ $param['display_value'] ?? '-' }}</div>
+                                                    <div class="text-[10px] text-slate-500">{{ $param['nama'] ?? '-' }}</div>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     </div>
-
-@elseif ($kat === 'AFMR')
-                                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
-                                        @php
-                                            $afmrUnits = $point['afmr_units'] ?? [];
-                                            $displayAfmr = function ($value, $unit = '', $decimals = 2) use ($fmt) {
-                                                if (is_numeric($value)) {
-                                                    return $fmt($value, $decimals) . ($unit ? ' ' . $unit : '');
-                                                }
-
-                                                return is_string($value) && trim($value) !== '' ? $value : '-';
-                                            };
-
-                                            if (($point['sub_kategori'] ?? '') === 'contact') {
-                                                $faultRaw = $point['fault'] ?? null;
-                                                $faultText = is_numeric($faultRaw)
-                                                    ? (((int) $faultRaw === 0) ? 'Normal' : 'Fault')
-                                                    : '-';
-
-                                                $afmrRows = [
-                                                    [$point['flowrate'] ?? null, $afmrUnits['flowrate'] ?? 'liter/s', 'Flowrate', $point['totalizer_1'] ?? null, $afmrUnits['totalizer_1'] ?? 'm³', 'Totalizer 1', 2, 2],
-                                                    [$point['totalizer_2'] ?? null, $afmrUnits['totalizer_2'] ?? 'm³', 'Totalizer 2', $point['pressure_1'] ?? null, $afmrUnits['pressure_1'] ?? 'bar', 'Pressure 1', 2, 2],
-                                                    [$point['pressure_2'] ?? null, $afmrUnits['pressure_2'] ?? 'bar', 'Pressure 2', $faultText, '', 'Fault', 2, 0],
-                                                    [$point['flowmeter_battery'] ?? null, $afmrUnits['flowmeter_battery'] ?? '%', 'Flowmeter Battery', null, '', '', 1, 0],
-                                                ];
-                                            } else {
-                                                $afmrRows = [
-                                                    [$point['luas_penampang'],   'm²',  'Luas Penampang Basah',  $point['debit'],            'm³/s', 'Debit',            2, 3],
-                                                    [$point['flow_velocity'],    'm/s', 'Flow Velocity',          $point['elevasi_muka_air'], 'm',    'Elevasi Muka Air', 2, 3],
-                                                    [$point['jarak_sensor'],     'm',   'Jarak Sensor',           $point['elevasi_sensor'],   'm',    'Elevasi Sensor',   2, 3],
-                                                ];
-                                            }
-                                        @endphp
-                                        @foreach ($afmrRows as [$v1, $u1, $l1, $v2, $u2, $l2, $d1, $d2])
-                                            <div class="text-center py-0.5">
-                                                <div class="text-sm font-bold text-slate-900">
-                                                    {{ $displayAfmr($v1, $u1, $d1) }}
-                                                </div>
-                                                <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
-                                            </div>
-                                            <div class="text-center py-0.5">
-                                                @if($l2 !== '')
-                                                    <div class="text-sm font-bold text-slate-900">
-                                                        {{ $displayAfmr($v2, $u2, $d2) }}
-                                                    </div>
-                                                    <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    </div>
-
-@elseif ($kat === 'ARR')
-                                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
-                                        @php
-                                            $arrRows = [
-                                                [$point['kecepatan_angin'], 'Km',  'Kecepatan Angin',  $point['arah_angin'],   '°',  'Arah Angin'],
-                                                [$point['kecerahan'],      'K Lux','Kecerahan',        $point['arah_cahaya'],  '°',  'Arah Cahaya'],
-                                                [$point['curah_hujan'],    'mm',  'Curah Hujan 1',     $point['curah_hujan_2'],'mm', 'Curah Hujan 2'],
-                                            ];
-                                        @endphp
-                                        @foreach ($arrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
-                                            <div class="text-center py-0.5">
-                                                <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : '-' }}
-                                                </div>
-                                                <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
-                                            </div>
-                                            <div class="text-center py-0.5">
-                                                <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '-' }}
-                                                </div>
-                                                <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-
-@elseif ($kat === 'AWR')
-                                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
-                                        @php
-                                            $awrRows = [
-                                                [$point['kecepatan_angin'],  'Km',   'Kecepatan Angin',   $point['arah_angin'],      '°',    'Arah Angin'],
-                                                [$point['temperatur_udara'], '°C',   'Temperatur Udara',  $point['kelembaban_udara'], '%',    'Kelembaban Udara'],
-                                                [$point['tekanan_udara'],    'hPa',  'Tekanan Udara',     $point['kecerahan'],        'K Lux','Kecerahan'],
-                                                [$point['arah_cahaya'],      '°',    'Arah Cahaya',       $point['curah_hujan'],      'mm',   'Curah Hujan 1'],
-                                                [$point['curah_hujan_2'],    'mm',   'Curah Hujan 2',     null,                       '',     ''],
-                                            ];
-                                        @endphp
-                                        @foreach ($awrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
-                                            <div class="text-center py-0.5">
-                                                <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 3) . ' ' . $u1 : '-' }}
-                                                </div>
-                                                <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
-                                            </div>
-                                            <div class="text-center py-0.5">
-                                                @if($l2 !== '')
-                                                    <div class="text-sm font-bold text-slate-900">
-                                                        {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '-' }}
-                                                    </div>
-                                                    <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    </div>
-
-@elseif ($kat === 'AWQR')
-                                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
-                                        @php
-                                            $awqrRows = [
-                                                [$point['tma'],          'mdpl', 'Tinggi Muka Air',  $point['ph_air'],     '',    'pH Air'],
-                                                [$point['suhu_air'],     '°C',   'Suhu Air',          $point['orp'],        'mV',  'ORP'],
-                                                [$point['conductivity'], 'µS/cm','Conductivity',      $point['salinity'],   'PSU', 'Salinity'],
-                                                [$point['tds'],          '°',    'Total Dissolved Solids', $point['turbidity'], 'NTU', 'Turbidity'],
-                                            ];
-                                        @endphp
-                                        @foreach ($awqrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
-                                            <div class="text-center py-0.5">
-                                                <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ($u1 ? ' '.$u1 : '') : '-' }}
-                                                </div>
-                                                <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
-                                            </div>
-                                            <div class="text-center py-0.5">
-                                                <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v2) ? $fmt($v2, 2) . ($u2 ? ' '.$u2 : '') : '-' }}
-                                                </div>
-                                                <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
-                                            </div>
-                                        @endforeach
-                                        @if(is_numeric($point['tinggi_sensor_awqr'] ?? null))
-                                            <div class="col-span-2 text-center py-0.5">
-                                                <div class="text-sm font-bold text-slate-900">{{ $fmt($point['tinggi_sensor_awqr'], 2) }} m</div>
-                                                <div class="text-[10px] text-slate-500">Tinggi Sensor</div>
-                                            </div>
-                                        @endif
-                                    </div>
-
-@else
+                                    @endif
+                                @else
                                     <div class="text-center my-2 text-sm text-slate-500">{{ $kat ?: '-' }}</div>
                                 @endif
-<div class="grid grid-cols-3 text-xs text-slate-600 border-t mt-1">
-                                    <div class="flex flex-col items-center py-2">
-                                        <span class="text-blue-500 font-semibold">{{ $point['humidity'] !== null ? $point['humidity'].'%' : '-' }}</span>
-                                        <span>humidity</span>
+
+                                @if (count($loggerParams) > 0)
+                                    <div class="grid grid-cols-3 text-xs text-slate-600 border-t mt-1">
+                                        @foreach ($loggerParams as $param)
+                                            @php
+                                                $loggerKey = strtolower((string) ($param['key'] ?? $param['nama'] ?? ''));
+                                                $valueClass = str_contains($loggerKey, 'humidity')
+                                                    ? 'text-blue-500'
+                                                    : (str_contains($loggerKey, 'battery') ? 'text-amber-500' : (str_contains($loggerKey, 'temp') ? 'text-rose-500' : 'text-slate-800'));
+                                                $loggerLabel = trim((string) ($param['nama'] ?? '-'));
+                                                $loggerLabel = trim((string) preg_replace('/[_\s-]*logger$/i', '', $loggerLabel));
+                                            @endphp
+                                            <div class="flex flex-col items-center py-2 text-center {{ $loop->index % 3 !== 0 ? 'border-l' : '' }}">
+                                                    <span class="{{ $valueClass }} font-semibold">{{ $param['display_value'] ?? '-' }}</span>
+                                                    <span>{{ $loggerLabel !== '' ? $loggerLabel : ($param['nama'] ?? '-') }}</span>
+                                            </div>
+                                        @endforeach
                                     </div>
-                                    <div class="flex flex-col items-center border-l border-r py-2">
-                                        <span class="text-amber-500 font-semibold">{{ $point['battery'] !== null ? $point['battery'].' V' : '-' }}</span>
-                                        <span>battery</span>
+                                @else
+                                    <div class="grid grid-cols-3 text-xs text-slate-600 border-t mt-1">
+                                        <div class="flex flex-col items-center py-2">
+                                            <span class="text-blue-500 font-semibold">{{ $point['humidity'] !== null ? $point['humidity'].'%' : '-' }}</span>
+                                            <span>humidity</span>
+                                        </div>
+                                        <div class="flex flex-col items-center border-l border-r py-2">
+                                            <span class="text-amber-500 font-semibold">{{ $point['battery'] !== null ? $point['battery'].' V' : '-' }}</span>
+                                            <span>battery</span>
+                                        </div>
+                                        <div class="flex flex-col items-center py-2">
+                                            <span class="text-rose-500 font-semibold">{{ $point['temp'] !== null ? $point['temp'].' °C' : '-' }}</span>
+                                            <span>temp</span>
+                                        </div>
                                     </div>
-                                    <div class="flex flex-col items-center py-2">
-                                        <span class="text-rose-500 font-semibold">{{ $point['temp'] !== null ? $point['temp'].' °C' : '-' }}</span>
-                                        <span>temp</span>
-                                    </div>
-                                </div>
+                                @endif
 
                             </div>
                         @empty

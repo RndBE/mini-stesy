@@ -25,7 +25,7 @@ class PetaController extends Controller
             });
         $points = t_Logger::query()
             ->forUser(auth()->user())
-            ->with(['lokasi', 'params', 'temp16', 'temp19', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'klasifikasiHujan', 'kategori'])
+            ->with(['lokasi', 'params.parameterGroup', 'temp16', 'temp19', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'klasifikasiHujan', 'kategori'])
             ->whereNotNull('idlokasi')
             ->get()
             ->map(function ($l) use ($thresholds) {
@@ -82,6 +82,7 @@ class PetaController extends Controller
 
                     'status'   => $status,
                     'last_time' => $lastTime,
+                    'parameter_groups' => $this->buildParameterGroups($l, $latest),
                     'kedalaman_sumur' => $l->jiat?->kedalaman_sumur,
                     'muka_air_tanah'  => $this->sensorVal($l->params, $latest, ['muka_air_tanah', 'muka_air', 'water_table', 'mat']),
 
@@ -223,14 +224,130 @@ class PetaController extends Controller
     /**
      * Cari nilai sensor berdasarkan keyword dalam nama_parameter (ambil kemunculan pertama).
      */
+    private function buildParameterGroups($logger, $latest): array
+    {
+        $latestArr = $this->snapshotToArray($latest);
+
+        $parameters = $logger->params
+            ->sortBy([
+                fn ($a, $b) => ($a->parameterGroup?->sort_order ?? 99) <=> ($b->parameterGroup?->sort_order ?? 99),
+                fn ($a, $b) => ($a->id_param ?? 0) <=> ($b->id_param ?? 0),
+            ])
+            ->map(function ($p) use ($latest, $latestArr) {
+                $value = $this->valueFromSnapshot($latest, $latestArr, $p->kolom_sensor);
+                $groupCode = strtoupper(trim((string) ($p->parameterGroup?->kode_group ?? 'PENGUKURAN')));
+
+                return [
+                    'id_param' => $p->id_param,
+                    'nama' => $p->nama_parameter ?: ($p->parameter_utama ?: $p->kolom_sensor),
+                    'key' => $this->normalizeSensorKey((string) ($p->parameter_utama ?: $p->nama_parameter ?: $p->kolom_sensor)),
+                    'kolom_sensor' => $p->kolom_sensor,
+                    'parameter_utama' => $p->parameter_utama,
+                    'satuan' => trim((string) $p->satuan),
+                    'nilai' => is_numeric($value) ? round((float) $value, 3) : null,
+                    'display_value' => $this->displayParameterValue($p, $value),
+                    'icon_app' => $p->icon_app,
+                    'group_code' => $groupCode,
+                    'group_name' => $p->parameterGroup?->nama_group,
+                    'is_logger' => $this->isLoggerParameter($p),
+                ];
+            })
+            ->values();
+
+        return [
+            'pengukuran' => $parameters
+                ->reject(fn ($p) => $p['is_logger'])
+                ->values()
+                ->all(),
+            'logger' => $parameters
+                ->filter(fn ($p) => $p['is_logger'])
+                ->values()
+                ->all(),
+        ];
+    }
+
+    private function displayParameterValue($param, mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $key = $this->normalizeSensorKey(
+            (string) $param->nama_parameter . ' ' .
+            (string) $param->parameter_utama . ' ' .
+            (string) $param->kolom_sensor
+        );
+
+        if (str_contains($key, 'fault') && is_numeric($value)) {
+            return ((int) $value === 0) ? 'Normal' : 'Fault';
+        }
+
+        if (!is_numeric($value)) {
+            return (string) $value;
+        }
+
+        $formatted = rtrim(rtrim(number_format((float) $value, 3, '.', ','), '0'), '.');
+        $unit = trim((string) $param->satuan);
+
+        return $formatted . ($unit !== '' ? ' ' . $unit : '');
+    }
+
+    private function isLoggerParameter($param): bool
+    {
+        $key = $this->normalizeSensorKey(
+            (string) $param->nama_parameter . ' ' .
+            (string) $param->parameter_utama . ' ' .
+            (string) $param->kolom_sensor
+        );
+
+        if (str_contains($key, 'flowmeter_battery')) {
+            return false;
+        }
+
+        $groupCode = strtoupper(trim((string) ($param->parameterGroup?->kode_group ?? '')));
+        if ($groupCode === 'LOGGER') {
+            return true;
+        }
+
+        return str_contains($key, 'battery_logger')
+            || str_contains($key, 'humidity_logger')
+            || str_contains($key, 'temperature_logger');
+    }
+
+    private function snapshotToArray($latest): array
+    {
+        if (!$latest) {
+            return [];
+        }
+
+        return ($latest instanceof \Illuminate\Database\Eloquent\Model)
+            ? $latest->toArray()
+            : (array) $latest;
+    }
+
+    private function valueFromSnapshot($latest, array $latestArr, ?string $column): mixed
+    {
+        if (!$latest || !$column) {
+            return null;
+        }
+
+        if (array_key_exists($column, $latestArr)) {
+            return $latestArr[$column];
+        }
+
+        if ($latest instanceof \Illuminate\Database\Eloquent\Model) {
+            return $latest->getAttribute($column);
+        }
+
+        return null;
+    }
+
     private function sensorVal($params, $latest, array $keywords, int $nth = 1): mixed
     {
         if (!$latest) return null;
 
         // Gunakan toArray() jika Eloquent model (agar accessor ikut), atau (array) jika stdClass dari DB::table
-        $latestArr = ($latest instanceof \Illuminate\Database\Eloquent\Model)
-            ? $latest->toArray()
-            : (array) $latest;
+        $latestArr = $this->snapshotToArray($latest);
 
         $count = 0;
         foreach ($params as $p) {
@@ -241,12 +358,7 @@ class PetaController extends Controller
                     if (!$col) break;
 
                     // Coba ambil nilai: langsung dari array, atau via getAttribute jika Eloquent model
-                    $v = null;
-                    if (array_key_exists($col, $latestArr)) {
-                        $v = $latestArr[$col];
-                    } elseif ($latest instanceof \Illuminate\Database\Eloquent\Model) {
-                        $v = $latest->getAttribute($col);
-                    }
+                    $v = $this->valueFromSnapshot($latest, $latestArr, $col);
 
                     return is_numeric($v) ? round((float) $v, 3) : null;
                 }
