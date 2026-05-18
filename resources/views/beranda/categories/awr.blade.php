@@ -396,6 +396,7 @@
 
     </div>
 </div>
+@once
 <script>
     (function() {
         var COMPASS_IMG_SRC = '{{ asset('icons/awr/kompas.svg') }}';
@@ -523,37 +524,40 @@
 
         window.drawWindCompass = drawWindCompass; // expose untuk re-draw
 
-        document.addEventListener('DOMContentLoaded', function() {
-            var canvasId = 'windCompass_{{ $lg->id_logger }}';
-            var canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-
+        function redrawCanvas(canvas) {
+            if (!canvas || !canvas.id) return;
             var dir = parseFloat(canvas.dataset.direction) || 0;
-            var muted = {{ $muted ? 'true' : 'false' }};
-            drawWindCompass(canvasId, dir, false);
+            drawWindCompass(canvas.id, dir, false);
+        }
 
-            var _resizeTimer = null;
-            if (typeof IntersectionObserver !== 'undefined') {
-                new IntersectionObserver(function(entries) {
-                    entries.forEach(function(entry) {
-                        if (entry.isIntersecting) {
-                            clearTimeout(_resizeTimer);
-                            drawWindCompass(canvasId, dir, false);
-                        }
+        document.addEventListener('DOMContentLoaded', function() {
+            var canvases = Array.from(document.querySelectorAll('canvas[id^="windCompass_"]'));
+            if (canvases.length === 0) return;
+
+            var resizeTimer = null;
+            var redrawVisible = function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    canvases.forEach(function(canvas) {
+                        if (canvas.offsetParent !== null) redrawCanvas(canvas);
                     });
-                }, { threshold: 0.01 }).observe(canvas);
+                }, 80);
+            };
+
+            if (typeof IntersectionObserver !== 'undefined') {
+                var observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) redrawCanvas(entry.target);
+                    });
+                }, { threshold: 0.01 });
+                canvases.forEach(function(canvas) { observer.observe(canvas); });
+            } else {
+                canvases.forEach(redrawCanvas);
             }
-            if (typeof ResizeObserver !== 'undefined') {
-                var wrap = canvas.parentElement;
-                if (wrap) {
-                    new ResizeObserver(function() {
-                        clearTimeout(_resizeTimer);
-                        _resizeTimer = setTimeout(function() {
-                            drawWindCompass(canvasId, dir, false);
-                        }, 30); // debounce 30ms
-                    }).observe(wrap);
-                }
-            }
+
+            window.addEventListener('resize', redrawVisible, { passive: true });
+            document.addEventListener('alpine:initialized', redrawVisible);
         });
     })();
 </script>
+@endonce

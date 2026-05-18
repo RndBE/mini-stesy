@@ -41,9 +41,17 @@
             border-radius: 20px;
         }
 .sidebar-panel {
-            transition: width 0.3s ease, min-width 0.3s ease;
+            transition: width 0.24s ease;
             overflow: hidden;
             white-space: nowrap;
+            will-change: width;
+            contain: layout paint;
+        }
+
+        .sidebar-panel > * {
+            width: 24rem;
+            max-width: 24rem;
+            flex-shrink: 0;
         }
 
         .sidebar-panel.collapsed {
@@ -118,6 +126,10 @@ overflow: hidden;
                 white-space: normal !important;
                 display: flex !important;
                 flex-direction: column;
+            }
+            .sidebar-panel > * {
+                width: 100%;
+                max-width: 100%;
             }
 .sidebar-panel.collapsed {
                 width: 100% !important;
@@ -570,13 +582,7 @@ background: rgba(0, 0, 0, 0.28);
                     @click="
                         sidebarOpen = !sidebarOpen;
                         togglePetaSidebar(sidebarOpen);
-                        const dur = 320, step = 16;
-                        let t = 0;
-                        const iv = setInterval(() => {
-                            if(typeof map !== 'undefined') map.invalidateSize({animate: false});
-                            t += step;
-                            if(t >= dur) clearInterval(iv);
-                        }, step);"
+                        scheduleMapInvalidate(260);"
                     :class="!sidebarOpen ? 'collapsed' : ''" class="sidebar-toggle-btn"
                     :title="sidebarOpen ? 'Tutup sidebar' : 'Buka sidebar'">
 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none"
@@ -1501,30 +1507,34 @@ const backdrop = document.getElementById('petaSidebarBackdrop');
             if (el) el.addEventListener('change', applyKategoriFilter);
         });
         applyKategoriFilter();
-        applyKategoriFilter();
+        let invalidateTimer = null;
         function safeInvalidate() {
             if (typeof map !== 'undefined') map.invalidateSize({ animate: false });
         }
-        [200, 500, 1000, 2000].forEach(ms => setTimeout(safeInvalidate, ms));
-        window.addEventListener('resize', safeInvalidate);
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', safeInvalidate);
-            window.visualViewport.addEventListener('scroll', safeInvalidate);
+        function scheduleMapInvalidate(delay = 0) {
+            if (invalidateTimer) clearTimeout(invalidateTimer);
+            invalidateTimer = setTimeout(() => {
+                requestAnimationFrame(safeInvalidate);
+            }, delay);
         }
-        if (typeof ResizeObserver !== 'undefined') {
-            new ResizeObserver(safeInvalidate).observe(document.getElementById('map'));
+        window.scheduleMapInvalidate = scheduleMapInvalidate;
+        [200, 500, 1000, 2000].forEach(ms => setTimeout(safeInvalidate, ms));
+        window.addEventListener('resize', () => scheduleMapInvalidate(80));
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => scheduleMapInvalidate(80));
+            window.visualViewport.addEventListener('scroll', () => scheduleMapInvalidate(80));
         }
         const mainContent = document.getElementById('mainContent');
         if (mainContent) {
             mainContent.addEventListener('transitionend', function(e) {
-                if (e.propertyName === 'margin-left') safeInvalidate();
+                if (e.propertyName === 'margin-left') scheduleMapInvalidate();
             });
         }
         const sidebarPanel = document.querySelector('.sidebar-panel');
         if (sidebarPanel) {
             sidebarPanel.addEventListener('transitionend', function(e) {
                 if (e.propertyName === 'transform' || e.propertyName === 'width') {
-                    safeInvalidate();
+                    scheduleMapInvalidate();
                 }
             });
         }
@@ -1627,6 +1637,5 @@ const backdrop = document.getElementById('petaSidebarBackdrop');
             }
         };
         setTimeout(() => map.invalidateSize(), 500);
-        window.addEventListener('resize', () => map.invalidateSize());
     </script>
 @endpush

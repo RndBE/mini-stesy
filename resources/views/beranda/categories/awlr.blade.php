@@ -204,6 +204,8 @@
                     </style>
                     <div class="w-full sumur-scale-wrapper">
                         <div class="mx-auto py-3 sumur-inner-container"
+                            data-base-width="{{ $contW }}"
+                            data-base-height="{{ $contH }}"
                             style="position:relative; width:{{ $contW }}px; height:{{ $contH }}px;">
 
                             <svg style="position:absolute; top:0; left:0; overflow:visible; pointer-events:none; z-index:50;"
@@ -430,18 +432,18 @@
                         </div>
                     </div>
 
+                    @once
                     <script>
                         (function() {
-                            var contW = {{ $contW }};
-                            var contH = {{ $contH }};
-                            var innerH = contH;
-
                             function applyScale() {
                                 document.querySelectorAll('.sumur-scale-wrapper').forEach(function(wrap) {
                                     var inner = wrap.querySelector('.sumur-inner-container');
                                     if (!inner) return;
                                     var availW = wrap.getBoundingClientRect().width - 4;
                                     if (availW <= 0) return;
+                                    var contW = parseFloat(inner.dataset.baseWidth || inner.offsetWidth || 0);
+                                    var innerH = parseFloat(inner.dataset.baseHeight || inner.offsetHeight || 0);
+                                    if (contW <= 0 || innerH <= 0) return;
                                     if (availW >= contW) {
                                         wrap.classList.remove('is-scaled');
                                         inner.style.transform = '';
@@ -473,6 +475,7 @@
                             });
                         })();
                     </script>
+                    @endonce
                 </div>
             </div>
 

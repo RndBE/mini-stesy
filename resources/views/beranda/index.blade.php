@@ -113,6 +113,11 @@
                 margin-top: 8rem;
             }
         }
+
+        .beranda-logger-grid > * {
+            content-visibility: auto;
+            contain-intrinsic-size: 460px;
+        }
     </style>
 
     @php
@@ -163,7 +168,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div class="beranda-logger-grid grid grid-cols-1 gap-6 lg:grid-cols-2">
                     @foreach ($loggerItems as $lg)
                         @php
                             $latest = $lg->temp;
