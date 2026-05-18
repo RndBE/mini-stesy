@@ -24,7 +24,7 @@ class PetaApiController extends Controller
 
         $points = t_Logger::query()
             ->forUser($request->user())
-            ->with(['lokasi', 'params', 'temp16', 'temp19', 'jiat', 'nonjiat', 'kategori', 'informasi', 'fotos'])
+            ->with(['lokasi', 'params', 'temp16', 'temp19', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'kategori', 'informasi', 'fotos'])
             ->whereNotNull('idlokasi')
             ->get()
             ->map(function ($l) use ($thresholds) {
@@ -52,6 +52,11 @@ class PetaApiController extends Controller
 
                 $kategori = $l->kategori?->kode ?? $l->kategori?->nama_kategori ?? null;
                 $kategori = $kategori ? strtoupper(trim($kategori)) : null;
+                $isAfmr = $kategori && str_contains($kategori, 'AFMR');
+                $subKategori = $isAfmr
+                    ? ($l->afmrContact ? 'contact' : ($l->afmrNonContact ? 'non_contact' : null))
+                    : ($l->jiat ? 'jiat' : ($l->nonjiat ? 'non_jiat' : null));
+                $nonContactData = $isAfmr ? $l->afmrNonContact : $l->nonjiat;
 
                 $arrState = null;
                 if ($kategori && isset($thresholds[$kategori])) {
@@ -117,6 +122,13 @@ class PetaApiController extends Controller
                         'curah_hujan'      => $this->sensorVal($l->params, $latest, ['hujan', 'rain', 'curah']),
                         'elevasi_muka_air' => $this->sensorVal($l->params, $latest, ['elevasi_muka']),
                         'flow_velocity'    => $this->sensorVal($l->params, $latest, ['flow_velocity', 'velocity']),
+                        'flowrate'         => $this->sensorVal($l->params, $latest, ['flowrate', 'flow_rate']),
+                        'totalizer_1'      => $this->sensorVal($l->params, $latest, ['totalizer_1', 'totalizer1']),
+                        'totalizer_2'      => $this->sensorVal($l->params, $latest, ['totalizer_2', 'totalizer2']),
+                        'pressure_1'       => $this->sensorVal($l->params, $latest, ['pressure_1', 'pressure1', 'tekanan_1']),
+                        'pressure_2'       => $this->sensorVal($l->params, $latest, ['pressure_2', 'pressure2', 'tekanan_2']),
+                        'flowmeter_battery' => $this->sensorVal($l->params, $latest, ['flowmeter_battery']),
+                        'fault'            => $this->sensorVal($l->params, $latest, ['fault']),
                         'jarak_sensor'     => $this->sensorVal($l->params, $latest, ['jarak_sensor']),
                         'muka_air_tanah'   => $this->sensorVal($l->params, $latest, ['muka_air_tanah', 'air_tanah']),
                           'kecepatan_angin'  => $this->sensorVal($l->params, $latest, ['kecepatan_angin', 'wind_speed']),
@@ -138,7 +150,7 @@ class PetaApiController extends Controller
                           'turbidity'        => $this->sensorVal($l->params, $latest, ['turbidity', 'kekeruhan']),
                           'tds'              => $this->sensorVal($l->params, $latest, ['tds', 'total_dissolved_solids', 'dissolved_solids']),
                     ],
-                    'sub_kategori' => $l->jiat ? 'jiat' : ($l->nonjiat ? 'non_jiat' : null),
+                    'sub_kategori' => $subKategori,
                     'parameters_list' => $this->buildParametersList($l, $latest),
                     'jiat_data' => $l->jiat ? [
                         'kedalaman_sumur'  => is_numeric($l->jiat->kedalaman_sumur)  ? (float) $l->jiat->kedalaman_sumur  : null,
@@ -146,11 +158,11 @@ class PetaApiController extends Controller
                         'kedalaman_pompa'  => is_numeric($l->jiat->kedalaman_pompa)  ? (float) $l->jiat->kedalaman_pompa  : null,
                         'has_pump'         => (bool) ($l->jiat->has_pump ?? false),
                     ] : null,
-                    'nonjiat_data' => $l->nonjiat ? [
-                        'elevasi_min'          => is_numeric($l->nonjiat->elevasi_min)          ? (float) $l->nonjiat->elevasi_min          : null,
-                        'elevasi_max'          => is_numeric($l->nonjiat->elevasi_max)          ? (float) $l->nonjiat->elevasi_max          : null,
-                        'tinggi_sensor'        => is_numeric($l->nonjiat->tinggi_sensor)        ? (float) $l->nonjiat->tinggi_sensor        : null,
-                        'jarak_sensor_ke_air'  => is_numeric($l->nonjiat->jarak_sensor_ke_air)  ? (float) $l->nonjiat->jarak_sensor_ke_air  : null,
+                    'nonjiat_data' => $nonContactData ? [
+                        'elevasi_min'          => is_numeric($nonContactData->elevasi_min)          ? (float) $nonContactData->elevasi_min          : null,
+                        'elevasi_max'          => is_numeric($nonContactData->elevasi_max)          ? (float) $nonContactData->elevasi_max          : null,
+                        'tinggi_sensor'        => is_numeric($nonContactData->tinggi_sensor)        ? (float) $nonContactData->tinggi_sensor        : null,
+                        'jarak_sensor_ke_air'  => is_numeric($nonContactData->jarak_sensor_ke_air)  ? (float) $nonContactData->jarak_sensor_ke_air  : null,
                     ] : null,
                 ];
             })
@@ -223,8 +235,11 @@ class PetaApiController extends Controller
         if (!$latest) return null;
         foreach ($params as $p) {
             $name = strtolower(trim((string) $p->nama_parameter));
+            $utama = strtolower(trim((string) $p->parameter_utama));
+            $haystack = strtolower((string) preg_replace('/[^a-z0-9]+/i', '_', $name . ' ' . $utama));
             foreach ($keywords as $kw) {
-                if (str_contains($name, strtolower($kw))) {
+                $keyword = strtolower((string) preg_replace('/[^a-z0-9]+/i', '_', (string) $kw));
+                if (str_contains($haystack, $keyword)) {
                     $col = $p->kolom_sensor;
                     if ($col && isset($latest->{$col})) {
                         $v = $latest->{$col};

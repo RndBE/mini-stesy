@@ -677,24 +677,49 @@ background: rgba(0, 0, 0, 0.28);
 @elseif ($kat === 'AFMR')
                                     <div class="grid grid-cols-2 gap-x-2 gap-y-1 my-2">
                                         @php
-                                            $afmrRows = [
-                                                [$point['luas_penampang'],   'm²',  'Luas Penampang Basah',  $point['debit'],         'm³/s', 'Debit'],
-                                                [$point['flow_velocity'],    'm/s', 'Flow Velocity',          $point['elevasi_muka_air'], 'm',   'Elevasi Muka Air'],
-                                                [$point['jarak_sensor'],     'm',   'Jarak Sensor',           $point['elevasi_sensor'],   'm',   'Elevasi Sensor'],
-                                            ];
+                                            $afmrUnits = $point['afmr_units'] ?? [];
+                                            $displayAfmr = function ($value, $unit = '', $decimals = 2) use ($fmt) {
+                                                if (is_numeric($value)) {
+                                                    return $fmt($value, $decimals) . ($unit ? ' ' . $unit : '');
+                                                }
+
+                                                return is_string($value) && trim($value) !== '' ? $value : '-';
+                                            };
+
+                                            if (($point['sub_kategori'] ?? '') === 'contact') {
+                                                $faultRaw = $point['fault'] ?? null;
+                                                $faultText = is_numeric($faultRaw)
+                                                    ? (((int) $faultRaw === 0) ? 'Normal' : 'Fault')
+                                                    : '-';
+
+                                                $afmrRows = [
+                                                    [$point['flowrate'] ?? null, $afmrUnits['flowrate'] ?? 'liter/s', 'Flowrate', $point['totalizer_1'] ?? null, $afmrUnits['totalizer_1'] ?? 'm³', 'Totalizer 1', 2, 2],
+                                                    [$point['totalizer_2'] ?? null, $afmrUnits['totalizer_2'] ?? 'm³', 'Totalizer 2', $point['pressure_1'] ?? null, $afmrUnits['pressure_1'] ?? 'bar', 'Pressure 1', 2, 2],
+                                                    [$point['pressure_2'] ?? null, $afmrUnits['pressure_2'] ?? 'bar', 'Pressure 2', $faultText, '', 'Fault', 2, 0],
+                                                    [$point['flowmeter_battery'] ?? null, $afmrUnits['flowmeter_battery'] ?? '%', 'Flowmeter Battery', null, '', '', 1, 0],
+                                                ];
+                                            } else {
+                                                $afmrRows = [
+                                                    [$point['luas_penampang'],   'm²',  'Luas Penampang Basah',  $point['debit'],            'm³/s', 'Debit',            2, 3],
+                                                    [$point['flow_velocity'],    'm/s', 'Flow Velocity',          $point['elevasi_muka_air'], 'm',    'Elevasi Muka Air', 2, 3],
+                                                    [$point['jarak_sensor'],     'm',   'Jarak Sensor',           $point['elevasi_sensor'],   'm',    'Elevasi Sensor',   2, 3],
+                                                ];
+                                            }
                                         @endphp
-                                        @foreach ($afmrRows as [$v1, $u1, $l1, $v2, $u2, $l2])
+                                        @foreach ($afmrRows as [$v1, $u1, $l1, $v2, $u2, $l2, $d1, $d2])
                                             <div class="text-center py-0.5">
                                                 <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v1) ? $fmt($v1, 2) . ' ' . $u1 : '-' }}
+                                                    {{ $displayAfmr($v1, $u1, $d1) }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-500">{{ $l1 }}</div>
                                             </div>
                                             <div class="text-center py-0.5">
-                                                <div class="text-sm font-bold text-slate-900">
-                                                    {{ is_numeric($v2) ? $fmt($v2, 3) . ' ' . $u2 : '-' }}
-                                                </div>
-                                                <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
+                                                @if($l2 !== '')
+                                                    <div class="text-sm font-bold text-slate-900">
+                                                        {{ $displayAfmr($v2, $u2, $d2) }}
+                                                    </div>
+                                                    <div class="text-[10px] text-slate-500">{{ $l2 }}</div>
+                                                @endif
                                             </div>
                                         @endforeach
                                     </div>

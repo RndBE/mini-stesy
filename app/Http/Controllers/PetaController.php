@@ -25,7 +25,7 @@ class PetaController extends Controller
             });
         $points = t_Logger::query()
             ->forUser(auth()->user())
-            ->with(['lokasi', 'params', 'temp16', 'temp19', 'jiat', 'nonjiat', 'klasifikasiHujan', 'kategori'])
+            ->with(['lokasi', 'params', 'temp16', 'temp19', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'klasifikasiHujan', 'kategori'])
             ->whereNotNull('idlokasi')
             ->get()
             ->map(function ($l) use ($thresholds) {
@@ -56,6 +56,10 @@ class PetaController extends Controller
 
                 $kategori = $l->kategori?->kode ?? $l->kategori?->nama_kategori ?? $l->kategori?->nama ?? null;
                 $kategori = $kategori ? strtoupper(trim($kategori)) : null;
+                $isAfmr = $kategori && str_contains($kategori, 'AFMR');
+                $subKategori = $isAfmr
+                    ? ($l->afmrContact ? 'contact' : ($l->afmrNonContact ? 'non_contact' : null))
+                    : ($l->nonjiat ? 'non_jiat' : ($l->jiat && (float)($l->jiat->kedalaman_sumur ?? 0) > 0 ? 'jiat' : 'non_jiat'));
 
                 $arrState = null;
                 if ($kategori && isset($thresholds[$kategori])) {
@@ -83,7 +87,7 @@ class PetaController extends Controller
 
 
                     // ── AWLR Non-JIAT ──────────────────────────────────────────────
-                    'sub_kategori' => $l->nonjiat ? 'non_jiat' : ($l->jiat && (float)($l->jiat->kedalaman_sumur ?? 0) > 0 ? 'jiat' : 'non_jiat'),
+                    'sub_kategori' => $subKategori,
                     'tma'          => $this->sensorVal($l->params, $latest, ['tma', 'muka_air', 'tinggi_muka', 'water_level']),
                     'debit'        => $this->sensorVal($l->params, $latest, ['debit']),
 
@@ -93,6 +97,22 @@ class PetaController extends Controller
                     'elevasi_muka_air' => $this->sensorVal($l->params, $latest, ['elevasi_muka']),
                     'jarak_sensor'     => $this->sensorVal($l->params, $latest, ['jarak_sensor']),
                     'elevasi_sensor'   => $this->sensorVal($l->params, $latest, ['elevasi_sensor', 'tinggi_sensor']),
+                    'flowrate'         => $this->sensorVal($l->params, $latest, ['flowrate', 'flow_rate']),
+                    'totalizer_1'      => $this->sensorVal($l->params, $latest, ['totalizer_1', 'totalizer1']),
+                    'totalizer_2'      => $this->sensorVal($l->params, $latest, ['totalizer_2', 'totalizer2']),
+                    'pressure_1'       => $this->sensorVal($l->params, $latest, ['pressure_1', 'pressure1', 'tekanan_1']),
+                    'pressure_2'       => $this->sensorVal($l->params, $latest, ['pressure_2', 'pressure2', 'tekanan_2']),
+                    'flowmeter_battery'=> $this->sensorVal($l->params, $latest, ['flowmeter_battery']),
+                    'fault'            => $this->sensorVal($l->params, $latest, ['fault']),
+                    'afmr_units'       => [
+                        'flowrate'          => $this->sensorUnit($l->params, ['flowrate', 'flow_rate']),
+                        'totalizer_1'       => $this->sensorUnit($l->params, ['totalizer_1', 'totalizer1']),
+                        'totalizer_2'       => $this->sensorUnit($l->params, ['totalizer_2', 'totalizer2']),
+                        'pressure_1'        => $this->sensorUnit($l->params, ['pressure_1', 'pressure1', 'tekanan_1']),
+                        'pressure_2'        => $this->sensorUnit($l->params, ['pressure_2', 'pressure2', 'tekanan_2']),
+                        'flowmeter_battery' => $this->sensorUnit($l->params, ['flowmeter_battery']),
+                        'fault'             => $this->sensorUnit($l->params, ['fault']),
+                    ],
 
                     // ── ARR / AWR – atmosfer ─────────────────────────────────────
                     'curah_hujan'     => $this->sensorVal($l->params, $latest, ['hujan', 'rain', 'curah']),
@@ -214,34 +234,59 @@ class PetaController extends Controller
 
         $count = 0;
         foreach ($params as $p) {
-            // Normalisasi: underscore → spasi, agar "muka_air_tanah" cocok dengan "Muka Air Tanah"
-            $name    = str_replace('_', ' ', strtolower(trim((string) $p->nama_parameter)));
-            $col_key = strtolower(trim((string) $p->kolom_sensor));
+            if ($this->paramMatchesAnyKeyword($p, $keywords)) {
+                $count++;
+                if ($count === $nth) {
+                    $col = $p->kolom_sensor;
+                    if (!$col) break;
 
-            foreach ($keywords as $kw) {
-                $kwNorm = str_replace('_', ' ', strtolower($kw));
-
-                if (str_contains($name, $kwNorm) || str_contains($col_key, strtolower($kw))) {
-                    $count++;
-                    if ($count === $nth) {
-                        $col = $p->kolom_sensor;
-                        if (!$col) break;
-
-                        // Coba ambil nilai: langsung dari array, atau via getAttribute jika Eloquent model
-                        $v = null;
-                        if (array_key_exists($col, $latestArr)) {
-                            $v = $latestArr[$col];
-                        } elseif ($latest instanceof \Illuminate\Database\Eloquent\Model) {
-                            $v = $latest->getAttribute($col);
-                        }
-
-                        return is_numeric($v) ? round((float) $v, 3) : null;
+                    // Coba ambil nilai: langsung dari array, atau via getAttribute jika Eloquent model
+                    $v = null;
+                    if (array_key_exists($col, $latestArr)) {
+                        $v = $latestArr[$col];
+                    } elseif ($latest instanceof \Illuminate\Database\Eloquent\Model) {
+                        $v = $latest->getAttribute($col);
                     }
-                    break; // match keyword, next param
+
+                    return is_numeric($v) ? round((float) $v, 3) : null;
                 }
             }
         }
         return null;
+    }
+
+    private function sensorUnit($params, array $keywords): ?string
+    {
+        foreach ($params as $p) {
+            if ($this->paramMatchesAnyKeyword($p, $keywords)) {
+                $unit = trim((string) $p->satuan);
+                return $unit !== '' ? $unit : null;
+            }
+        }
+
+        return null;
+    }
+
+    private function paramMatchesAnyKeyword($param, array $keywords): bool
+    {
+        $name = trim((string) $param->nama_parameter);
+        $utama = trim((string) $param->parameter_utama);
+        $col = trim((string) $param->kolom_sensor);
+        $haystack = $this->normalizeSensorKey($name . ' ' . $utama . ' ' . $col);
+
+        foreach ($keywords as $kw) {
+            $keyword = $this->normalizeSensorKey((string) $kw);
+            if ($keyword !== '' && str_contains($haystack, $keyword)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function normalizeSensorKey(string $value): string
+    {
+        return strtolower((string) preg_replace('/[^a-z0-9]+/i', '_', $value));
     }
 
     /**
