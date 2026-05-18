@@ -113,7 +113,7 @@
 
                 <div class="mt-8 flex w-full justify-center items-center gap-4">
                     <img src="{{ asset('images/beacon-logo.png') }}" alt="Beacon Logo" class="h-8 object-contain" />
-                    <img src="{{ asset('images/mini_stesy.png') }}" alt="Mini Stesy" class="h-7 object-contain" />
+                    <img src="{{ asset('images/mini_stesy.svg') }}" alt="Mini Stesy" class="h-10 object-contain" />
                 </div>
             </div>
         </section>
