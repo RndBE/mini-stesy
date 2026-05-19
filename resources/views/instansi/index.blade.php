@@ -9,6 +9,7 @@
             ? [
                 'id' => $ownInstansi->id,
                 'nama' => $ownInstansi->nama,
+                'judul_mobile' => $ownInstansi->judul_mobile,
                 'alamat' => $ownInstansi->alamat,
                 'telp' => $ownInstansi->telp,
                 'latitude' => $ownInstansi->latitude,
@@ -220,6 +221,16 @@
                                             placeholder="Masukkan Nama Instansi"
                                             class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                         @error('nama')
+                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-900 mb-2">Judul Mobile</label>
+                                        <input type="text" name="judul_mobile" value="{{ old('judul_mobile') }}"
+                                            placeholder="Contoh: Telemetri BBWS C3"
+                                            class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                        @error('judul_mobile')
                                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -437,6 +448,15 @@
                                     @enderror
                                 </div>
                                 <div>
+                                    <label class="block text-sm font-semibold text-gray-900 mb-2">Judul Mobile</label>
+                                    <input type="text" name="judul_mobile" x-model="editData.judul_mobile"
+                                        placeholder="Contoh: Telemetri BBWS C3"
+                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    @error('judul_mobile')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
                                     <label class="block text-sm font-semibold text-gray-900 mb-2">Telepon</label>
                                     <div class="relative">
                                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
@@ -573,6 +593,7 @@
                 editData: {
                     id: null,
                     nama: '',
+                    judul_mobile: '',
                     alamat: '',
                     telp: '',
                     latitude: '',
@@ -722,6 +743,7 @@
                     this.editData = {
                         id: instansi.id,
                         nama: instansi.nama,
+                        judul_mobile: instansi.judul_mobile || '',
                         alamat: instansi.alamat || '',
                         telp: instansi.telp || '',
                         latitude: instansi.latitude || '',
@@ -744,6 +766,7 @@
                     this.editData = {
                         id: null,
                         nama: '',
+                        judul_mobile: '',
                         alamat: '',
                         telp: '',
                         latitude: '',
@@ -894,6 +917,7 @@
                     alpineEl.__x.$data.editData = {
                         id: {{ old('id', 'null') }},
                         nama: '{{ old('nama', '') }}',
+                        judul_mobile: '{{ old('judul_mobile', '') }}',
                         alamat: '{{ old('alamat', '') }}',
                         telp: '{{ old('telp', '') }}',
                         latitude: '{{ old('latitude', '') }}',

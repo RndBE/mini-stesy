@@ -28,6 +28,10 @@ class BerandaApiController extends Controller
         if ($user->instansi_id) {
             $instansi = Instansi::find($user->instansi_id);
         }
+        $judulMobile = $instansi ? trim((string) $instansi->judul_mobile) : '';
+        $headerTitle = $judulMobile !== ''
+            ? $judulMobile
+            : ($instansi ? 'Telemetri ' . $instansi->nama : 'Telemetri');
 
         // Hitung logger yang online/offline milik user
         $loggers = t_Logger::query()
@@ -75,11 +79,13 @@ class BerandaApiController extends Controller
                 ],
                 'instansi' => $instansi ? [
                     'nama'         => $instansi->nama,
+                    'judul_mobile' => $instansi->judul_mobile,
                     'alamat'       => $instansi->alamat,
                     'telp'         => $instansi->telp,
                     'logo'         => $instansi->logo ? asset('storage/' . $instansi->logo) : null,
                     'logo_mobile'  => $instansi->logo_mobile ? asset('storage/' . $instansi->logo_mobile) : null,
                 ] : null,
+                'header_title'  => $headerTitle,
                 'monitoring' => [
                     'is_live'       => $onlineCount > 0,
                     'online_count'  => $onlineCount,

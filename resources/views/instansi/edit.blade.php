@@ -23,6 +23,16 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-slate-700">Judul Mobile</label>
+                    <input type="text" name="judul_mobile" value="{{ old('judul_mobile', $instansi->judul_mobile) }}"
+                        placeholder="Contoh: Telemetri BBWS C3"
+                        class="mt-1 w-full rounded-md border-slate-300 shadow-sm p-2 text-sm">
+                    @error('judul_mobile')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-slate-700">Alamat</label>
                     <textarea name="alamat" rows="3"
                         class="mt-1 w-full rounded-md border-slate-300 shadow-sm p-2 text-sm">{{ old('alamat', $instansi->alamat) }}</textarea>

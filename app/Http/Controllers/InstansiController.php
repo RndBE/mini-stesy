@@ -54,6 +54,7 @@ class InstansiController extends Controller
 
         $validated = $request->validate([
             'nama' => 'required|string|max:100|unique:instansi,nama',
+            'judul_mobile' => 'nullable|string|max:120',
             'alamat' => 'nullable|string',
             'telp' => 'nullable|string|max:25',
             'latitude' => 'nullable|string|max:50',
@@ -93,6 +94,7 @@ class InstansiController extends Controller
 
         $validated = $request->validate([
             'nama' => 'required|string|max:100|unique:instansi,nama,' . $instansi->id,
+            'judul_mobile' => 'nullable|string|max:120',
             'alamat' => 'nullable|string',
             'telp' => 'nullable|string|max:25',
             'latitude' => 'nullable|string|max:50',

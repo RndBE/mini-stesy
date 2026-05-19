@@ -181,10 +181,10 @@ class PetaApiController extends Controller
         $healthKeys = ['humidity_logger', 'battery_logger', 'temperature_logger'];
 
         return $logger->params->map(function ($p) use ($latest, $healthKeys) {
-            $paramUtama = strtolower(trim((string) ($p->parameter_utama ?? '')));
-            $namaParam  = strtolower(trim((string) ($p->nama_parameter ?? '')));
+            $paramUtama = $this->normalizeParamKey($p->parameter_utama ?? '');
+            $namaParam  = $this->normalizeParamKey($p->nama_parameter ?? '');
 
-            if (in_array($paramUtama, $healthKeys)) return null;
+            if (in_array($paramUtama, $healthKeys, true) || in_array($namaParam, $healthKeys, true)) return null;
 
             $col   = $p->kolom_sensor;
             $nilai = null;
@@ -255,17 +255,24 @@ class PetaApiController extends Controller
     private function findParamByAliases($params, array $aliases): mixed
     {
         $aliases = collect($aliases)
-            ->map(fn($alias) => strtolower(trim((string) $alias)))
+            ->map(fn($alias) => $this->normalizeParamKey($alias))
             ->filter()
             ->values()
             ->all();
 
         return $params->first(function ($param) use ($aliases) {
-            $name = strtolower(trim((string) $param->nama_parameter));
-            $utama = strtolower(trim((string) $param->parameter_utama));
+            $name = $this->normalizeParamKey($param->nama_parameter ?? '');
+            $utama = $this->normalizeParamKey($param->parameter_utama ?? '');
 
             return in_array($name, $aliases, true) || in_array($utama, $aliases, true);
         });
+    }
+
+    private function normalizeParamKey($value): string
+    {
+        $normalized = strtolower(trim((string) $value));
+        $normalized = preg_replace('/[^a-z0-9]+/', '_', $normalized) ?? '';
+        return trim($normalized, '_');
     }
 
     private function resolveLatestSnapshot($logger): mixed

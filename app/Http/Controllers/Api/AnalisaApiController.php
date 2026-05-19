@@ -37,6 +37,7 @@ class AnalisaApiController extends Controller
                 'params'      => $device->params->map(fn($p) => [
                     'id_param'       => $p->id_param,
                     'nama_parameter' => $p->nama_parameter,
+                    'parameter_utama' => $p->parameter_utama,
                     'kolom_sensor'   => $p->kolom_sensor,
                     'satuan'         => $p->satuan,
                     'tipe_graf'      => $p->tipe_graf ?? 'line',
@@ -86,9 +87,19 @@ class AnalisaApiController extends Controller
         // Filter kolom sensor jika ada parameter
         $sensorColumns = [];
         if ($paramFilter) {
-            $matchedParam = $device->params->first(function ($p) use ($paramFilter) {
-                return strtolower($p->nama_parameter ?? '') === strtolower($paramFilter)
-                    || strtolower($p->kolom_sensor ?? '') === strtolower($paramFilter);
+            $normalizeParamKey = function ($value) {
+                $normalized = strtolower(trim((string) $value));
+                $normalized = preg_replace('/[^a-z0-9]+/', '_', $normalized) ?? '';
+                return trim($normalized, '_');
+            };
+            $filterKey = $normalizeParamKey($paramFilter);
+
+            $matchedParam = $device->params->first(function ($p) use ($filterKey, $normalizeParamKey) {
+                return in_array($filterKey, [
+                    $normalizeParamKey($p->nama_parameter ?? ''),
+                    $normalizeParamKey($p->kolom_sensor ?? ''),
+                    $normalizeParamKey($p->parameter_utama ?? ''),
+                ], true);
             });
             if ($matchedParam) {
                 $sensorColumns = [$matchedParam->kolom_sensor];
@@ -125,6 +136,7 @@ class AnalisaApiController extends Controller
                 'data'    => $data,
                 'params'  => $device->params->map(fn($p) => [
                     'nama_parameter' => $p->nama_parameter,
+                    'parameter_utama' => $p->parameter_utama,
                     'kolom_sensor'   => $p->kolom_sensor,
                     'satuan'         => $p->satuan,
                     'tipe_graf'      => $p->tipe_graf ?? 'line',

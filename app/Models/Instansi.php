@@ -10,6 +10,7 @@ class Instansi extends Model
 
     protected $fillable = [
         'nama',
+        'judul_mobile',
         'alamat',
         'telp',
         'latitude',
