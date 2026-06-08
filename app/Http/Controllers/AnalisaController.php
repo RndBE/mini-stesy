@@ -35,6 +35,7 @@ class AnalisaController extends Controller
                 'nama_parameter' => $param->nama_parameter,
                 'kolom_sensor' => $param->kolom_sensor,
                 'satuan' => $param->satuan ?? '',
+                'tipe_graf' => $this->chartTypeFor($param),
             ];
         });
 
@@ -189,16 +190,7 @@ class AnalisaController extends Controller
             ->where('nama_parameter', $parameter)
             ->first();
 
-        // Fetch klasifikasi hujan per jam for this logger
-        $klasifikasiRaw = DB::table('klasifikasi_hujan')
-            ->where('logger_id', $id_logger)
-            ->where('waktu', 'perjam')
-            ->orderBy('debit_air')
-            ->get(['debit_air', 'intensitas']);
-        $klasifikasi = $klasifikasiRaw->map(fn($r) => [
-            'debit_air' => (float) $r->debit_air,
-            'intensitas' => $r->intensitas,
-        ])->values()->toArray();
+        $klasifikasi = $this->rainfallClassificationsFor($logger);
 
         if (!$param || !$logger->tabel_main) {
             return [
@@ -210,12 +202,13 @@ class AnalisaController extends Controller
                 'rerata'       => 0,
                 'minimum'      => 0,
                 'maksimum'     => 0,
-                'tipe_graf'    => $param->tipe_graf ?? 'line',
+                'tipe_graf'    => $this->chartTypeFor($param),
                 'akumulasi'    => 0,
                 'klasifikasi'  => $klasifikasi,
             ];
         }
 
+        $tipeGraf = $this->chartTypeFor($param);
         $column = $param->kolom_sensor;
 
         // 3. Determine time column
@@ -279,17 +272,17 @@ class AnalisaController extends Controller
                 $hourData = $grouped->get($hour, collect());
 
                 if ($hourData->isNotEmpty()) {
-                    $avg = $hourData->avg($column);
+                    $value = $this->aggregateValueFor($hourData, $column, $tipeGraf);
                     $min = $hourData->min($column);
                     $max = $hourData->max($column);
 
-                    $values[] = round($avg, 3);
+                    $values[] = round($value, 3);
                     $minValues[] = round($min, 3);
                     $maxValues[] = round($max, 3);
 
                     $tableData[] = [
                         'waktu'   => $hour,
-                        'rerata'  => round($avg, 3),
+                        'rerata'  => round($value, 3),
                         'minimum' => round($min, 3),
                         'maksimum' => round($max, 3),
                     ];
@@ -320,17 +313,17 @@ class AnalisaController extends Controller
                 $dayData = $grouped->get((string)$i, collect());
 
                 if ($dayData->isNotEmpty()) {
-                    $avg = $dayData->avg($column);
+                    $value = $this->aggregateValueFor($dayData, $column, $tipeGraf);
                     $min = $dayData->min($column);
                     $max = $dayData->max($column);
 
-                    $values[] = round($avg, 4);
+                    $values[] = round($value, 4);
                     $minValues[] = round($min, 4);
                     $maxValues[] = round($max, 4);
 
                     $tableData[] = [
                         'waktu'   => "Tanggal $i",
-                        'rerata'  => round($avg, 4),
+                        'rerata'  => round($value, 4),
                         'minimum' => round($min, 4),
                         'maksimum' => round($max, 4),
                     ];
@@ -360,17 +353,17 @@ class AnalisaController extends Controller
                 $labels[] = date('d M Y, H:i', strtotime($dateKey));
 
                 if ($dateData->isNotEmpty()) {
-                    $avg = $dateData->avg($column);
+                    $value = $this->aggregateValueFor($dateData, $column, $tipeGraf);
                     $min = $dateData->min($column);
                     $max = $dateData->max($column);
 
-                    $values[] = round($avg, 4);
+                    $values[] = round($value, 4);
                     $minValues[] = round($min, 4);
                     $maxValues[] = round($max, 4);
 
                     $tableData[] = [
                         'waktu'   => date('d M Y, H:i', strtotime($dateKey)),
-                        'rerata'  => round($avg, 4),
+                        'rerata'  => round($value, 4),
                         'minimum' => round($min, 4),
                         'maksimum' => round($max, 4),
                     ];
@@ -402,17 +395,17 @@ class AnalisaController extends Controller
                 $monthData = $grouped->get($monthNum, collect());
 
                 if ($monthData->isNotEmpty()) {
-                    $avg = $monthData->avg($column);
+                    $value = $this->aggregateValueFor($monthData, $column, $tipeGraf);
                     $min = $monthData->min($column);
                     $max = $monthData->max($column);
 
-                    $values[] = round($avg, 4);
+                    $values[] = round($value, 4);
                     $minValues[] = round($min, 4);
                     $maxValues[] = round($max, 4);
 
                     $tableData[] = [
                         'waktu'   => $mName,
-                        'rerata'  => round($avg, 4),
+                        'rerata'  => round($value, 4),
                         'minimum' => round($min, 4),
                         'maksimum' => round($max, 4),
                     ];
@@ -432,7 +425,7 @@ class AnalisaController extends Controller
         }
 
         $numericValues = collect($values)->filter();
-        $akumulasi = ($param->tipe_graf ?? 'line') === 'bar'
+        $akumulasi = $tipeGraf === 'bar'
             ? round($numericValues->sum(), 2)
             : 0;
 
@@ -446,7 +439,7 @@ class AnalisaController extends Controller
             'rerata'       => $numericValues->avg() ? round($numericValues->avg(), 4) : 0,
             'minimum'      => $numericValues->min() ? round($numericValues->min(), 4) : 0,
             'maksimum'     => $numericValues->max() ? round($numericValues->max(), 4) : 0,
-            'tipe_graf'    => $param->tipe_graf ?? 'line',
+            'tipe_graf'    => $tipeGraf,
             'akumulasi'    => $akumulasi,
             'klasifikasi'  => $klasifikasi,
         ];
@@ -617,5 +610,86 @@ class AnalisaController extends Controller
             ->forUser(auth()->user())
             ->where('id_logger', $idLogger)
             ->first();
+    }
+
+    private function rainfallClassificationsFor(t_Logger $logger): array
+    {
+        $fromLogger = function ($query) {
+            return $query
+                ->where('klasifikasi_hujan.waktu', 'perjam')
+                ->distinct()
+                ->orderByRaw('CAST(klasifikasi_hujan.debit_air AS DECIMAL(10, 2))')
+                ->get(['klasifikasi_hujan.debit_air', 'klasifikasi_hujan.intensitas'])
+                ->map(fn($row) => [
+                    'debit_air' => (float) $row->debit_air,
+                    'intensitas' => $row->intensitas,
+                ])
+                ->values()
+                ->toArray();
+        };
+
+        $classifications = $fromLogger(
+            DB::table('klasifikasi_hujan')
+                ->where('klasifikasi_hujan.logger_id', $logger->id_logger)
+        );
+
+        if ($classifications) {
+            return $classifications;
+        }
+
+        if ($logger->id_katlogger) {
+            $classifications = $fromLogger(
+                DB::table('klasifikasi_hujan')
+                    ->join('t_logger', 't_logger.id_logger', '=', 'klasifikasi_hujan.logger_id')
+                    ->where('t_logger.id_katlogger', $logger->id_katlogger)
+            );
+
+            if ($classifications) {
+                return $classifications;
+            }
+
+            return DB::table('klasifikasi_threshold')
+                ->where('id_kategori', $logger->id_katlogger)
+                ->where(function ($query) {
+                    $query->whereNotNull('min_value')
+                        ->orWhereNotNull('max_value');
+                })
+                ->orderBy('sort_order')
+                ->get(['min_value', 'state_label'])
+                ->map(fn($row) => [
+                    'debit_air' => (float) ($row->min_value ?? 0),
+                    'intensitas' => $row->state_label,
+                ])
+                ->values()
+                ->toArray();
+        }
+
+        return [];
+    }
+
+    private function chartTypeFor($param): string
+    {
+        if ($this->isRainfallParameter($param)) {
+            return 'bar';
+        }
+
+        return $param->tipe_graf ?? 'line';
+    }
+
+    private function isRainfallParameter($param): bool
+    {
+        $name = strtolower((string) ($param->nama_parameter ?? ''));
+        $name = preg_replace('/\s+/', ' ', str_replace('_', ' ', trim($name)));
+
+        return $name === 'curah hujan';
+    }
+
+    private function aggregateValueFor($rows, string $column, string $tipeGraf): float
+    {
+        if ($tipeGraf === 'bar') {
+            return (float) $rows->sum($column);
+        }
+
+        return (float) $rows->avg($column);
     }
 }

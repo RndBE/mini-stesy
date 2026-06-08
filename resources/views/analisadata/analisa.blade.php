@@ -972,7 +972,8 @@
                             class="calendar-input text-sm py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700">
                             <option value="">Pilih Parameter</option>
                             @foreach ($parameters as $param)
-                                <option value="{{ $param['nama_parameter'] }}" data-unit="{{ $param['satuan'] ?? '' }}">
+                                <option value="{{ $param['nama_parameter'] }}" data-unit="{{ $param['satuan'] ?? '' }}"
+                                    data-tipe-graf="{{ $param['tipe_graf'] ?? 'line' }}">
                                     {{ str_replace('_', ' ', $param['nama_parameter']) }}</option>
                             @endforeach
                         </select>
@@ -1657,13 +1658,18 @@
 
         function updateChartTitle() {
             const range = document.querySelector('input[name="range"]:checked').value;
-            const param = document.getElementById('parameterSelect').value;
+            const parameterSelect = document.getElementById('parameterSelect');
+            const param = parameterSelect.value;
             const paramLabel = param.replace(/_/g, ' ');
+            const selectedOption = parameterSelect.options[parameterSelect.selectedIndex];
+            const normalizedParam = paramLabel.toLowerCase().replace(/\s+/g, ' ').trim();
+            const isAccumulation = selectedOption?.dataset?.tipeGraf === 'bar' || normalizedParam === 'curah hujan';
+            const summaryLabel = isAccumulation ? 'Akumulasi' : 'Rerata';
             const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
                 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
             ];
-            let titleText = `Rerata ${paramLabel} `;
-            let tableTitleText = `Tabel Rerata ${paramLabel} `;
+            let titleText = `${summaryLabel} ${paramLabel} `;
+            let tableTitleText = `Tabel ${summaryLabel} ${paramLabel} `;
             if (range === 'day') {
                 const dateInput = String(document.getElementById('dateInput').value || '').trim();
                 const m = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})$/);
