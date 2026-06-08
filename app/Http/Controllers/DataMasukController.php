@@ -232,6 +232,34 @@ class DataMasukController extends Controller
             }
         }
 
+        // ── Remap khusus per logger ───────────────────────────────────────────
+        // Sebagian alat mengirim data pada slot sensor tinggi (mis. 48/49/50)
+        // yang perlu dipetakan ke kolom tabel (mis. sensor14/15/16).
+        //   id_alat => [kolom_tujuan => sensor_sumber]
+        $sensorRemap = [
+            '20092' => [
+                'sensor14' => 'sensor48', // Humi_Logger (%Rh)
+                'sensor15' => 'sensor49', // Batt_Logger (V)
+                'sensor16' => 'sensor50', // Temp_Logger (C)
+            ],
+        ];
+
+        if (isset($sensorRemap[(string) $id])) {
+            foreach ($sensorRemap[(string) $id] as $target => $source) {
+                // Hanya remap jika kolom tujuan ada di tabel ini
+                if (!array_key_exists($target, $row)) {
+                    continue;
+                }
+                $srcRaw = $request->input($source);
+                $srcVal = is_array($srcRaw)
+                    ? (array_key_exists('nilai', $srcRaw) ? $srcRaw['nilai'] : null)
+                    : $srcRaw;
+                if ($srcVal !== null) {
+                    $row[$target] = $srcVal;
+                }
+            }
+        }
+
         // Merge dengan snapshot terkini agar kolom NOT NULL tidak kosong
         // Sensor yang tidak dikirim alat ini diisi dari nilai sebelumnya (bukan null/0)
         $existing = \Illuminate\Support\Facades\DB::table($tableTemp)
