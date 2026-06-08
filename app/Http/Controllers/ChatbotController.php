@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\t_Logger;
+use App\Support\SensorFamily;
 use App\Services\ChatbotPersona;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -284,6 +285,11 @@ class ChatbotController extends Controller
             ->get(['id_logger', 'waktu'])
             ->keyBy('id_logger');
 
+        $snap50 = DB::table('temp_s50_latest')
+            ->whereIn('id_logger', $loggerIds)
+            ->get(['id_logger', 'waktu'])
+            ->keyBy('id_logger');
+
         // Batch query waktu terakhir dari tabel_main per grup tabel
         $mainTableLatest = collect();
         $loggersByTable  = $loggers->filter(fn ($l) => !empty($l->tabel_main))
@@ -319,10 +325,11 @@ class ChatbotController extends Controller
 
             $w16   = $snap16[$lid]->waktu ?? null;
             $w19   = $snap19[$lid]->waktu ?? null;
+            $w50   = $snap50[$lid]->waktu ?? null;
             $wMain = $mainTableLatest[$lid] ?? null;
 
             // Ambil waktu paling baru dari semua sumber
-            $lastTime = collect([$w16, $w19, $wMain])->filter()->sortDesc()->first();
+            $lastTime = collect([$w16, $w19, $w50, $wMain])->filter()->sortDesc()->first();
 
             $diff  = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
             $entry = $logger->nama_logger . ' (' . $lid . ')';
@@ -914,6 +921,7 @@ class ChatbotController extends Controller
                 'params:id_param,logger_id,nama_parameter,kolom_sensor,satuan',
                 'temp16',
                 'temp19',
+                'temp50',
             ])
             ->where(function ($builder) use ($tokens) {
                 foreach ($tokens as $token) {
@@ -966,6 +974,7 @@ class ChatbotController extends Controller
         $lastTime = collect([
             optional($logger->temp16)->waktu,
             optional($logger->temp19)->waktu,
+            optional($logger->temp50)->waktu,
             $latest['waktu'] ?? null,
         ])->filter()->sortDesc()->first();
         $diffMinutes = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
@@ -1125,10 +1134,13 @@ class ChatbotController extends Controller
      */
     private function candidateSensorTables(?string $table, int $sensorCount): array
     {
+        $primary = SensorFamily::mainTablePrefix(SensorFamily::familyFor($sensorCount)) . '01';
         return array_values(array_unique(array_filter([
             $this->isSupportedSensorTable((string) $table) ? $table : null,
-            $sensorCount >= 19 ? 't_s19_01' : 't_s16_01',
-            $sensorCount >= 19 ? 't_s16_01' : 't_s19_01',
+            $primary,
+            't_s50_01',
+            't_s19_01',
+            't_s16_01',
         ])));
     }
 
@@ -1542,9 +1554,10 @@ class ChatbotController extends Controller
         // Data terbaru diambil langsung dari tabel snapshot "latest"
         // (satu baris per logger, lookup terindeks by id_logger) — jauh
         // lebih ringan dari scan tabel sensor utama.
-        $snapshotTables = $sensorCount >= 19
-            ? ['temp_s19_latest', 'temp_s16_latest']
-            : ['temp_s16_latest', 'temp_s19_latest'];
+        $primaryTemp = 'temp_s' . SensorFamily::familyFor($sensorCount) . '_latest';
+        $snapshotTables = array_values(array_unique([
+            $primaryTemp, 'temp_s50_latest', 'temp_s19_latest', 'temp_s16_latest',
+        ]));
 
         $row = null;
         $tableUsed = null;
@@ -1606,7 +1619,7 @@ class ChatbotController extends Controller
 
     private function isSupportedSensorTable(string $table): bool
     {
-        return (bool) preg_match('/^t_s(16|19)_\d{2,}$/', $table) && Schema::hasTable($table);
+        return SensorFamily::isFamilyTable($table) && Schema::hasTable($table);
     }
 
     private function formatLoggerSummary(array $logger): string
@@ -1816,7 +1829,7 @@ class ChatbotController extends Controller
             }
 
             $col = $rainParam->kolom_sensor;
-            $snapTable = (int) $logger->sensor_count >= 19 ? 'temp_s19_latest' : 'temp_s16_latest';
+            $snapTable = 'temp_s' . SensorFamily::familyFor((int) $logger->sensor_count) . '_latest';
             $snap = DB::table($snapTable)->where('id_logger', $logger->id_logger)->first();
 
             $lastVal = $snap && isset($snap->{$col}) && is_numeric($snap->{$col})

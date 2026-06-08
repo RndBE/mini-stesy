@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\t_Logger;
+use App\Services\ParameterIconResolver;
+use App\Support\SensorFamily;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -41,6 +43,7 @@ class AnalisaApiController extends Controller
                     'kolom_sensor'   => $p->kolom_sensor,
                     'satuan'         => $p->satuan,
                     'tipe_graf'      => $p->tipe_graf ?? 'line',
+                    'icon_app'       => ParameterIconResolver::url($p->icon_app, $p->parameter_utama),
                 ])->values(),
             ],
         ]);
@@ -80,8 +83,8 @@ class AnalisaApiController extends Controller
 
         // Tentukan tabel yang dipakai
         $tableMain = trim((string) ($device->tabel_main ?? ''));
-        if (!$tableMain || !preg_match('/^t_s(16|19)_\d{2,}$/', $tableMain)) {
-            $tableMain = 't_s16_01';
+        if (!$tableMain || !SensorFamily::isFamilyTable($tableMain)) {
+            $tableMain = SensorFamily::mainTablePrefix(SensorFamily::familyFor((int) ($device->sensor_count ?? 0))) . '01';
         }
 
         // Filter kolom sensor jika ada parameter
@@ -140,6 +143,7 @@ class AnalisaApiController extends Controller
                     'kolom_sensor'   => $p->kolom_sensor,
                     'satuan'         => $p->satuan,
                     'tipe_graf'      => $p->tipe_graf ?? 'line',
+                    'icon_app'       => ParameterIconResolver::url($p->icon_app, $p->parameter_utama),
                 ])->values(),
                 'meta'    => [
                     'id_logger' => $id,

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @php
-    $sensorOptions = collect(range(1, 19))->map(fn($number) => 'sensor' . $number)->values();
+    $sensorOptions = collect(range(1, max(\App\Support\SensorFamily::FAMILIES)))->map(fn($number) => 'sensor' . $number)->values();
 @endphp
 
 @section('content')

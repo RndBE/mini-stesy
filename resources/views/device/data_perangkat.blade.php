@@ -334,6 +334,7 @@
                                             <option value="">Pilih Sensor</option>
                                             <option value="16">16 Sensor</option>
                                             <option value="19">19 Sensor</option>
+                                            <option value="50">50 Sensor</option>
                                         </select>
 <div class="sm:hidden mt-1 relative" x-data="{ openCSensor: false }">
                                             <button type="button" @click="openCSensor = !openCSensor"
@@ -572,6 +573,7 @@
                                             <option value="">Pilih Sensor</option>
                                             <option value="16">16 Sensor</option>
                                             <option value="19">19 Sensor</option>
+                                            <option value="50">50 Sensor</option>
                                         </select>
 <div class="sm:hidden mt-1 relative" x-data="{ openESensor: false }">
                                             <button type="button" @click="openESensor = !openESensor"
@@ -695,7 +697,7 @@
                 allDevices: @json($devices),
                 kategoris: @json($kategoris),
                 instansis: @json($instansis),
-                sensorOptions: ['16', '19'],
+                sensorOptions: ['16', '19', '50'],
                 _fpCreate: [],
                 _fpEdit: [],
                 detailData: {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\t_Logger;
+use App\Support\SensorFamily;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -54,8 +55,9 @@ class AnalisaController extends Controller
         // 🔹 Ambil waktu terakhir dari relasi temp16 dan temp19
         $waktu16 = optional($logger->temp16)->waktu;
         $waktu19 = optional($logger->temp19)->waktu;
+        $waktu50 = optional($logger->temp50)->waktu;
 
-        $lastTime = collect([$waktu16, $waktu19])
+        $lastTime = collect([$waktu16, $waktu19, $waktu50])
             ->filter()
             ->sortDesc()
             ->first();
@@ -460,7 +462,7 @@ class AnalisaController extends Controller
 
         for ($i = 0; $i < 30; $i++) {
             $date = $start->copy()->addDays($i);
-            $tableName = $logger->tabel_main ?: (((int) $logger->sensor_count === 19) ? 't_s19_01' : 't_s16_01');
+            $tableName = $logger->tabel_main ?: (SensorFamily::mainTablePrefix(SensorFamily::familyFor((int) $logger->sensor_count)) . '01');
             $count = DB::table($tableName)
                 ->where('id_logger', $logger->id_logger)
                 ->whereDate('waktu', $date)
@@ -488,19 +490,14 @@ class AnalisaController extends Controller
         }
 
         // Determine which relation to use based on table name or sensor count
-        $query = null;
-        if ($logger->tabel_main && str_contains($logger->tabel_main, '19')) {
-            $query = $logger->s19data();
-        } elseif ($logger->tabel_main && str_contains($logger->tabel_main, '16')) {
-            $query = $logger->s16data();
-        } else {
-            // Fallback: check sensor count or default to s16
-            if ($logger->sensor_count == 19) {
-                $query = $logger->s19data();
-            } else {
-                $query = $logger->s16data();
-            }
-        }
+        $family = ($logger->tabel_main && SensorFamily::isFamilyTable($logger->tabel_main))
+            ? SensorFamily::familyOf($logger->tabel_main)
+            : SensorFamily::familyFor((int) ($logger->sensor_count ?? 0));
+        $query = match ($family) {
+            50 => $logger->s50data(),
+            19 => $logger->s19data(),
+            default => $logger->s16data(),
+        };
 
         // Expected complete data per day is always 1440 (1 record per minute)
         $expectedPerDay = 1440;

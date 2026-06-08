@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\t_Logger;
+use App\Support\SensorFamily;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -31,13 +32,14 @@ class RealtimeApiController extends Controller
     {
         $devices = t_Logger::query()
             ->forUser($request->user())
-            ->with(['lokasi', 'kategori', 'jiat', 'params', 'temp16', 'temp19'])
+            ->with(['lokasi', 'kategori', 'jiat', 'params', 'temp16', 'temp19', 'temp50'])
             ->orderBy('nama_logger')
             ->get()
             ->map(function ($lg) {
                 $waktu16 = optional($lg->temp16)->waktu;
                 $waktu19 = optional($lg->temp19)->waktu;
-                $lastTime = collect([$waktu16, $waktu19])->filter()->sortDesc()->first();
+                $waktu50 = optional($lg->temp50)->waktu;
+                $lastTime = collect([$waktu16, $waktu19, $waktu50])->filter()->sortDesc()->first();
                 $diffMin  = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
                 $status   = ($diffMin !== null && $diffMin < 60) ? 'online' : 'offline';
 
@@ -82,8 +84,8 @@ class RealtimeApiController extends Controller
 
         if (!$this->isSupportedTable($tableMain)) {
             $sensorCount = (int) ($device->sensor_count ?? $device->jumlah_sensor ?? 0);
-            if (!$sensorCount) $sensorCount = $params->count() >= 19 ? 19 : 16;
-            $tableMain = $sensorCount >= 19 ? 't_s19_01' : 't_s16_01';
+            if (!$sensorCount) $sensorCount = $params->count();
+            $tableMain = SensorFamily::mainTablePrefix(SensorFamily::familyFor($sensorCount)) . '01';
         }
 
         $historyMin = max((int) env('REALTIME_HISTORY_MINUTES', 60), 1);
@@ -141,6 +143,7 @@ class RealtimeApiController extends Controller
             'port'    => (int) env('MQTT_WS_PORT', 8383),
             'path'    => env('MQTT_WS_PATH', '/mqtt'),
             'user'    => env('MQTT_WS_USER', env('MQTT_USER', 'beacon')),
+            'pass'    => env('MQTT_WS_PASS', env('MQTT_PASS', 'be_jogja')),
             'use_ssl' => filter_var(env('MQTT_WS_SSL', false), FILTER_VALIDATE_BOOLEAN),
         ];
     }
@@ -157,15 +160,17 @@ class RealtimeApiController extends Controller
 
     private function isSupportedTable(string $table): bool
     {
-        return preg_match('/^t_s(16|19)_\d{2,}$/', $table) && Schema::hasTable($table);
+        return SensorFamily::isFamilyTable($table) && Schema::hasTable($table);
     }
 
     private function buildFallbackTable(string $table): string
     {
+        // Legacy 16↔19 pair: try the sibling family at the same shard suffix.
         if (preg_match('/^t_s(16|19)_(\d{2,})$/', $table, $m)) {
             $other = ((int) $m[1] === 19) ? 16 : 19;
             return "t_s{$other}_{$m[2]}";
         }
-        return 't_s16_01';
+        // No sibling family (e.g. t_s50_*): nothing better to try.
+        return $table;
     }
 }

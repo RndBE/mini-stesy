@@ -2,7 +2,7 @@
 
 @section('content')
     @php
-        $sensorOptions = collect(range(1, 19))->map(fn($number) => 'sensor' . $number);
+        $sensorOptions = collect(range(1, max(\App\Support\SensorFamily::FAMILIES)))->map(fn($number) => 'sensor' . $number);
     @endphp
 
     <div class="max-w-3xl space-y-6">

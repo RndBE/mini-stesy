@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\t_Logger;
 use App\Models\Parameter;
+use App\Support\SensorFamily;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -19,7 +20,7 @@ class DataPerangkatApiController extends Controller
     {
         $query = t_Logger::query()
             ->forUser($request->user())
-            ->with(['lokasi', 'kategori', 'params', 'jiat', 'nonjiat', 'temp16', 'temp19'])
+            ->with(['lokasi', 'kategori', 'params', 'jiat', 'nonjiat', 'temp16', 'temp19', 'temp50'])
             ->orderBy('id_logger');
 
         // Filter by kategori name (e.g. ?kategori=AWLR) or id (e.g. ?id_katlogger=2)
@@ -122,7 +123,8 @@ class DataPerangkatApiController extends Controller
     {
         $waktu16  = optional($d->temp16)->waktu;
         $waktu19  = optional($d->temp19)->waktu;
-        $lastTime = collect([$waktu16, $waktu19])->filter()->sortDesc()->first();
+        $waktu50  = optional($d->temp50)->waktu;
+        $lastTime = collect([$waktu16, $waktu19, $waktu50])->filter()->sortDesc()->first();
         $diffMin  = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
         $status   = ($diffMin !== null && $diffMin < 60) ? 'online' : 'offline';
 
@@ -132,7 +134,7 @@ class DataPerangkatApiController extends Controller
             'id_katlogger' => $d->id_katlogger,
             'kategori'     => $d->kategori?->nama_kategori,
             'tabel_main'   => $d->tabel_main,
-            'sensor_count' => (int) ($d->sensor_count ?? (str_contains((string) $d->tabel_main, '19') ? 19 : 16)),
+            'sensor_count' => (int) ($d->sensor_count ?? SensorFamily::maxSensorFor((string) $d->tabel_main)),
             'status'       => $status,
             'last_time'    => $lastTime,
             'lokasi'       => [

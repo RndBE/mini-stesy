@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\t_Logger;
 use App\Models\Parameter_sensor;
 use App\Models\NotificationHistory;
+use App\Support\SensorFamily;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -84,12 +85,11 @@ class DataMasukController extends Controller
             }
 
             $tableMain = $this->resolveMainTable($loggerRow?->tabel_main, $sensorCount);
-            $useS19 = str_contains($tableMain, '19');
             $query = DB::table($tableMain)
                 ->where('id_logger', $logger_id)
                 ->whereBetween('waktu', [$tanggalAwal, $tanggalAkhir])
                 ->orderBy('waktu', 'desc');
-            $sensorCount = $useS19 ? 19 : 16;
+            $sensorCount = SensorFamily::maxSensorFor($tableMain);
 
             if ($query->count() === 0) {
                 $fallbackTable = $this->buildFallbackTableName($tableMain, $sensorCount);
@@ -102,8 +102,7 @@ class DataMasukController extends Controller
                     if ($fallbackQuery->count() > 0) {
                         $query = $fallbackQuery;
                         $tableMain = $fallbackTable;
-                        $useS19 = str_contains($tableMain, '19');
-                        $sensorCount = $useS19 ? 19 : 16;
+                        $sensorCount = SensorFamily::maxSensorFor($tableMain);
                     }
                 }
             }
@@ -208,14 +207,14 @@ class DataMasukController extends Controller
         if (!$sensorCount) $sensorCount = 16;
 
         $tableMain = $this->resolveMainTable($logger->tabel_main ?? null, $sensorCount);
-        $tableTemp = str_contains($tableMain, '19') ? 'temp_s19_latest' : 'temp_s16_latest';
+        $tableTemp = SensorFamily::tempTableFor($tableMain);
 
         $row = [
             'id_logger' => $id,
             'waktu' => $waktuParsed,
         ];
 
-        $maxSensor = str_contains($tableMain, '19') ? 19 : 16;
+        $maxSensor = SensorFamily::maxSensorFor($tableMain);
 
         // ── Parsing sensor: dukung format nested {"nama":...,"nilai":...,"satuan":...}
         //    maupun format flat (nilai langsung)
@@ -393,12 +392,12 @@ class DataMasukController extends Controller
             return $tableMain;
         }
 
-        return $sensorCount >= 19 ? 't_s19_01' : 't_s16_01';
+        return SensorFamily::mainTablePrefix(SensorFamily::familyFor($sensorCount)) . '01';
     }
 
     private function isSupportedTable(string $tableName): bool
     {
-        if (!preg_match('/^t_s(16|19)_\d{2,}$/', $tableName)) {
+        if (!SensorFamily::isFamilyTable($tableName)) {
             return false;
         }
 
@@ -407,12 +406,14 @@ class DataMasukController extends Controller
 
     private function buildFallbackTableName(string $tableMain, int $sensorCount): string
     {
+        // Legacy 16↔19 pair: try the sibling family at the same shard suffix.
         if (preg_match('/^t_s(16|19)_(\d{2,})$/', $tableMain, $m)) {
             $otherFamily = ((int) $m[1] === 19) ? 16 : 19;
             return 't_s' . $otherFamily . '_' . $m[2];
         }
 
-        return $sensorCount >= 19 ? 't_s16_01' : 't_s19_01';
+        // No sibling (e.g. t_s50_*): fall back to the canonical table for the count.
+        return SensorFamily::mainTablePrefix(SensorFamily::familyFor($sensorCount)) . '01';
     }
 
     private function checkAndSendNotification($logger, array $merged)

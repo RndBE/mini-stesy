@@ -21,16 +21,17 @@ class BerandaController extends Controller
         $loggers = t_Logger::query()
             ->forUser($user)
             ->whereNotNull('idlokasi')
-            ->with(['lokasi', 'kategori', 'jiat', 'nonjiat', 'params', 'temp16', 'temp19'])
+            ->with(['lokasi', 'kategori', 'jiat', 'nonjiat', 'params', 'temp16', 'temp19', 'temp50'])
             ->orderBy('nama_logger')
             ->get()
             ->map(function ($lg) {
 
-                // Ambil waktu terbaru dari temp16 & temp19
+                // Ambil waktu terbaru dari temp16, temp19 & temp50
                 $waktu16 = optional($lg->temp16)->waktu;
                 $waktu19 = optional($lg->temp19)->waktu;
+                $waktu50 = optional($lg->temp50)->waktu;
 
-                $latestWaktu = collect([$waktu16, $waktu19])
+                $latestWaktu = collect([$waktu16, $waktu19, $waktu50])
                     ->filter()
                     ->sortDesc()
                     ->first();

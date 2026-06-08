@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\SensorFamily;
 use Illuminate\Database\Eloquent\Model;
 
 class t_Logger extends Model
@@ -112,9 +113,18 @@ class t_Logger extends Model
         return $this->hasOne(Temp_16s::class, 'id_logger', 'id_logger');
     }
 
+    public function temp50()
+    {
+        return $this->hasOne(Temp_50s::class, 'id_logger', 'id_logger');
+    }
+
     public function getTempAttribute()
     {
-        return ((int) $this->sensor_count === 19) ? $this->temp19 : $this->temp16;
+        return match (SensorFamily::familyFor((int) $this->sensor_count)) {
+            50 => $this->temp50,
+            19 => $this->temp19,
+            default => $this->temp16,
+        };
     }
 
     public function informasi()
@@ -135,6 +145,11 @@ class t_Logger extends Model
     public function s19data()
     {
         return $this->hasMany(T_s19::class, 'id_logger', 'id_logger');
+    }
+
+    public function s50data()
+    {
+        return $this->hasMany(T_s50::class, 'id_logger', 'id_logger');
     }
 
     public function klasifikasiHujan()

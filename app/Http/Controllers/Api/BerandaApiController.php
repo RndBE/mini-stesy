@@ -36,7 +36,7 @@ class BerandaApiController extends Controller
         // Hitung logger yang online/offline milik user
         $loggers = t_Logger::query()
             ->forUser($user)
-            ->with(['temp16', 'temp19'])
+            ->with(['temp16', 'temp19', 'temp50'])
             ->get();
 
         $totalLogger  = $loggers->count();
@@ -46,7 +46,8 @@ class BerandaApiController extends Controller
         foreach ($loggers as $lg) {
             $waktu16  = optional($lg->temp16)->waktu;
             $waktu19  = optional($lg->temp19)->waktu;
-            $lastTime = collect([$waktu16, $waktu19])->filter()->sortDesc()->first();
+            $waktu50  = optional($lg->temp50)->waktu;
+            $lastTime = collect([$waktu16, $waktu19, $waktu50])->filter()->sortDesc()->first();
             $diffMin  = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
             $isOnline = $diffMin !== null && $diffMin < 60;
 

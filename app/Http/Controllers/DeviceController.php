@@ -18,6 +18,7 @@ use App\Models\ListParameter;
 use App\Models\TemplateKategoriParameter;
 use App\Models\List_das;
 use App\Models\Perbaikan;
+use App\Support\SensorFamily;
 use App\Models\Foto_pos;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -69,7 +70,7 @@ class DeviceController extends Controller
                             'icon_app'           => $p->icon_app,
                         ];
                     })->values(),
-                    'sensor_count'       => $d->sensor_count ?? (str_contains($d->tabel_main, '19') ? 19 : 16),
+                    'sensor_count'       => $d->sensor_count ?? SensorFamily::maxSensorFor((string) ($d->tabel_main ?? '')),
                     'status_perbaikan'   => $d->status_perbaikan ?? 'normal',
                     'perbaikan_history'  => $d->perbaikan
                         ->take(5)
@@ -155,7 +156,7 @@ class DeviceController extends Controller
                     'id_logger' => $logger->id_logger,
                     'nama_logger' => $logger->nama_logger,
                     'id_katlogger' => $logger->id_katlogger,
-                    'sensor_count' => $logger->sensor_count ?? (str_contains($logger->tabel_main, '19') ? 19 : 16),
+                    'sensor_count' => $logger->sensor_count ?? SensorFamily::maxSensorFor((string) ($logger->tabel_main ?? '')),
                 ];
             });
 
@@ -643,7 +644,7 @@ class DeviceController extends Controller
             'tanggal_pemasangan' => 'nullable|date',
             'masa_garansi'       => 'nullable|date',
             'nama_penjaga'       => 'nullable|string|max:255',
-            'jumlah_sensor'      => 'nullable|integer|in:16,19',
+            'jumlah_sensor'      => 'nullable|integer|in:16,19,50',
             'elevasi'            => 'nullable|string|max:10',
             'imei'               => 'nullable|string|max:100',
             'awal_kontrak'       => 'nullable|date',
@@ -699,7 +700,7 @@ class DeviceController extends Controller
             'masa_garansi'       => 'nullable|date',
             'nama_penjaga'       => 'nullable|string|max:255',
             'elevasi'            => 'nullable|string|max:10',
-            'jumlah_sensor'      => 'nullable|integer|in:16,19',
+            'jumlah_sensor'      => 'nullable|integer|in:16,19,50',
             'imei'               => 'nullable|string|max:100',
             'awal_kontrak'       => 'nullable|date',
         ]);
@@ -711,8 +712,8 @@ class DeviceController extends Controller
 
         $sensorCount = (int) ($validated['jumlah_sensor'] ?? $logger->sensor_count ?? 16);
         $currentTable = (string) ($logger->tabel_main ?? '');
-        $sameFamily = ($sensorCount >= 19 && str_starts_with($currentTable, 't_s19_'))
-            || ($sensorCount < 19 && str_starts_with($currentTable, 't_s16_'));
+        $sameFamily = $currentTable !== ''
+            && SensorFamily::familyOf($currentTable) === SensorFamily::familyFor($sensorCount);
         $preferredTable = $sameFamily ? $currentTable : null;
         $tabelMain = $this->allocateMainTableForSensorCount($sensorCount, $logger->id_logger, $preferredTable);
 
@@ -747,8 +748,8 @@ class DeviceController extends Controller
 
     private function allocateMainTableForSensorCount(int $sensorCount, ?string $ignoreLoggerId = null, ?string $preferredTable = null): string
     {
-        $normalizedSensorCount = $sensorCount >= 19 ? 19 : 16;
-        $prefix = $normalizedSensorCount === 19 ? 't_s19_' : 't_s16_';
+        $normalizedSensorCount = SensorFamily::familyFor($sensorCount);
+        $prefix = SensorFamily::mainTablePrefix($normalizedSensorCount);
         $maxLoggerPerTable = max((int) env('MAX_LOGGER_PER_TABLE', 5), 1);
 
         $query = DB::table('t_logger')
@@ -836,7 +837,7 @@ class DeviceController extends Controller
                 $table->string('id_logger', 15);
                 $table->dateTime('waktu');
 
-                $maxSensor = $sensorCount >= 19 ? 19 : 16;
+                $maxSensor = SensorFamily::familyFor($sensorCount);
                 for ($i = 1; $i <= $maxSensor; $i++) {
                     $table->float('sensor' . $i)->nullable();
                 }

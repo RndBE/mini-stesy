@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Models\t_Logger;
+use App\Support\SensorFamily;
 
 class RekapDataController extends Controller
 {
@@ -150,7 +151,7 @@ class RekapDataController extends Controller
         // Resolusi tabel target
         $sensorCount = $this->resolveSensorCount($logger);
         $tableMain   = $this->resolveMainTable($logger->tabel_main ?? null, $sensorCount);
-        $maxSensor   = str_contains($tableMain, '19') ? 19 : 16;
+        $maxSensor   = SensorFamily::maxSensorFor($tableMain);
 
         // Parse CSV
         $file   = $request->file('csv_file');
@@ -328,12 +329,12 @@ class RekapDataController extends Controller
         if ($this->isSupportedTable($tableMain)) {
             return $tableMain;
         }
-        return $sensorCount >= 19 ? 't_s19_01' : 't_s16_01';
+        return SensorFamily::mainTablePrefix(SensorFamily::familyFor($sensorCount)) . '01';
     }
 
     private function isSupportedTable(string $tableName): bool
     {
-        if (!preg_match('/^t_s(16|19)_\d{2,}$/', $tableName)) {
+        if (!SensorFamily::isFamilyTable($tableName)) {
             return false;
         }
         return Schema::hasTable($tableName);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\t_Logger;
 use App\Models\KlasifikasiThreshold;
+use App\Services\ParameterIconResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -24,7 +25,7 @@ class PetaApiController extends Controller
 
         $points = t_Logger::query()
             ->forUser($request->user())
-            ->with(['lokasi', 'params', 'temp16', 'temp19', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'kategori', 'informasi', 'fotos'])
+            ->with(['lokasi', 'params', 'temp16', 'temp19', 'temp50', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'kategori', 'informasi', 'fotos'])
             ->whereNotNull('idlokasi')
             ->get()
             ->map(function ($l) use ($thresholds) {
@@ -46,7 +47,8 @@ class PetaApiController extends Controller
                 // Status online/offline
                 $waktu16  = optional($l->temp16)->waktu;
                 $waktu19  = optional($l->temp19)->waktu;
-                $lastTime = ($latest->waktu ?? null) ?: collect([$waktu16, $waktu19])->filter()->sortDesc()->first();
+                $waktu50  = optional($l->temp50)->waktu;
+                $lastTime = ($latest->waktu ?? null) ?: collect([$waktu16, $waktu19, $waktu50])->filter()->sortDesc()->first();
                 $diffMin  = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
                 $status   = ($diffMin !== null && $diffMin < 60) ? 'online' : 'offline';
 
@@ -199,6 +201,7 @@ class PetaApiController extends Controller
                 'nilai'           => $nilai,
                 'key'             => $col ?? $paramUtama,
                 'parameter_utama' => $paramUtama,
+                'icon_app'        => ParameterIconResolver::url($p->icon_app, $p->parameter_utama),
             ];
         })
         ->filter(fn ($p) => $p !== null && $p['nilai'] !== null)
@@ -277,7 +280,7 @@ class PetaApiController extends Controller
 
     private function resolveLatestSnapshot($logger): mixed
     {
-        $latestTemp = collect([$logger->temp16, $logger->temp19])
+        $latestTemp = collect([$logger->temp16, $logger->temp19, $logger->temp50])
             ->filter(fn($row) => $row && !empty($row->waktu))
             ->sortByDesc(fn($row) => (string) $row->waktu)
             ->first();

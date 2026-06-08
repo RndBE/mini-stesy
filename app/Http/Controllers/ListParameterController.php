@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ListParameter;
 use App\Models\ParameterGroup;
+use App\Support\SensorFamily;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -129,7 +130,7 @@ class ListParameterController extends Controller
 
     private function sensorColumnOptions(): array
     {
-        return array_map(fn($number) => 'sensor' . $number, range(1, 19));
+        return array_map(fn($number) => 'sensor' . $number, range(1, max(SensorFamily::FAMILIES)));
     }
 
     private function iconOptions(): array

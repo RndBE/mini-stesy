@@ -25,7 +25,7 @@ class PetaController extends Controller
             });
         $points = t_Logger::query()
             ->forUser(auth()->user())
-            ->with(['lokasi', 'params.parameterGroup', 'temp16', 'temp19', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'klasifikasiHujan', 'kategori'])
+            ->with(['lokasi', 'params.parameterGroup', 'temp16', 'temp19', 'temp50', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'klasifikasiHujan', 'kategori'])
             ->whereNotNull('idlokasi')
             ->get()
             ->map(function ($l) use ($thresholds) {
@@ -45,8 +45,9 @@ class PetaController extends Controller
 
                 $waktu16 = optional($l->temp16)->waktu;
                 $waktu19 = optional($l->temp19)->waktu;
+                $waktu50 = optional($l->temp50)->waktu;
 
-                $lastTime = ($latest->waktu ?? null) ?: collect([$waktu16, $waktu19])
+                $lastTime = ($latest->waktu ?? null) ?: collect([$waktu16, $waktu19, $waktu50])
                     ->filter()
                     ->sortDesc()
                     ->first();
@@ -437,7 +438,7 @@ class PetaController extends Controller
 
     private function resolveLatestSnapshot($logger): mixed
     {
-        $latestTemp = collect([$logger->temp16, $logger->temp19])
+        $latestTemp = collect([$logger->temp16, $logger->temp19, $logger->temp50])
             ->filter(fn($row) => $row && !empty($row->waktu))
             ->sortByDesc(fn($row) => (string) $row->waktu)
             ->first();

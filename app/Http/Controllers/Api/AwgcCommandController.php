@@ -6,6 +6,7 @@ use App\Events\SensorDataUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\AwgcCommandLog;
 use App\Models\t_Logger;
+use App\Support\SensorFamily;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -106,13 +107,13 @@ class AwgcCommandController extends Controller
 
         // Resolve tabel utama dari konfigurasi logger (sama seperti DataMasukController)
         $tableMain = $this->resolveMainTable($logger->tabel_main ?? null, $logger);
-        $tableTemp = str_contains($tableMain, '19') ? 'temp_s19_latest' : 'temp_s16_latest';
+        $tableTemp = SensorFamily::tempTableFor($tableMain);
 
         // Ambil snapshot terkini dari temp table sebagai base row
         // Ini memastikan kolom NOT NULL terisi nilai nyata, dan sensor lain tidak corrupt
         $latestRow = DB::table($tableTemp)->where('id_logger', $request->id_logger)->first();
 
-        $maxSensor = str_contains($tableMain, '19') ? 19 : 16;
+        $maxSensor = SensorFamily::maxSensorFor($tableMain);
         $row = [
             'id_logger' => $request->id_logger,
             'waktu'     => $waktuNow,
@@ -266,12 +267,12 @@ class AwgcCommandController extends Controller
         $tableMain = trim((string) $tableMain);
 
         // Gunakan tabel_main dari logger jika valid
-        if (preg_match('/^t_s(16|19)_\d{2,}$/', $tableMain) && Schema::hasTable($tableMain)) {
+        if (SensorFamily::isFamilyTable($tableMain) && Schema::hasTable($tableMain)) {
             return $tableMain;
         }
 
         // Fallback: tentukan dari jumlah sensor
         $sensorCount = (int) ($logger->jumlah_sensor ?? $logger->sensor_count ?? 16);
-        return $sensorCount >= 19 ? 't_s19_01' : 't_s16_01';
+        return SensorFamily::mainTablePrefix(SensorFamily::familyFor($sensorCount)) . '01';
     }
 }

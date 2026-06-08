@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\t_Logger;
+use App\Support\SensorFamily;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
@@ -19,15 +20,16 @@ class RealtimeController extends Controller
         // ]);
         $devices = t_Logger::query()
             ->forUser(auth()->user())
-            ->with(['lokasi', 'kategori', 'jiat', 'params', 'temp16', 'temp19'])
+            ->with(['lokasi', 'kategori', 'jiat', 'params', 'temp16', 'temp19', 'temp50'])
             ->orderBy('nama_logger')
             ->get()
             ->map(function ($lg) {
 
                 $waktu16 = optional($lg->temp16)->waktu;
                 $waktu19 = optional($lg->temp19)->waktu;
+                $waktu50 = optional($lg->temp50)->waktu;
 
-                $latestWaktu = collect([$waktu16, $waktu19])
+                $latestWaktu = collect([$waktu16, $waktu19, $waktu50])
                     ->filter()
                     ->sortDesc()
                     ->first();
@@ -89,9 +91,9 @@ class RealtimeController extends Controller
                 $sensorCount = (int) $device->jumlah_sensor;
             }
             if (!$sensorCount) {
-                $sensorCount = $params->count() >= 19 ? 19 : 16;
+                $sensorCount = $params->count();
             }
-            $tableMain = $sensorCount >= 19 ? 't_s19_01' : 't_s16_01';
+            $tableMain = SensorFamily::mainTablePrefix(SensorFamily::familyFor($sensorCount)) . '01';
         }
 
         $primaryTable = $tableMain;
@@ -154,7 +156,7 @@ class RealtimeController extends Controller
 
     private function isSupportedTable(string $tableName): bool
     {
-        if (!preg_match('/^t_s(16|19)_\d{2,}$/', $tableName)) {
+        if (!SensorFamily::isFamilyTable($tableName)) {
             return false;
         }
 
@@ -168,6 +170,7 @@ class RealtimeController extends Controller
             return 't_s' . $otherFamily . '_' . $m[2];
         }
 
-        return 't_s16_01';
+        // No sibling family (e.g. t_s50_*): nothing better to try.
+        return $tableMain;
     }
 }

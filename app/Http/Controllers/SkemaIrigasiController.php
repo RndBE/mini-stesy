@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\t_Logger;
+use App\Support\SensorFamily;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -615,7 +616,7 @@ class SkemaIrigasiController extends Controller
             ], 404);
         }
 
-        $tableMain = $logger->tabel_main ?? 't_s16_01';
+        $tableMain = $logger->tabel_main ?: (SensorFamily::mainTablePrefix(SensorFamily::familyFor((int) $logger->sensor_count)) . '01');
         $since     = Carbon::now()->subHours(6);
 
         try {
@@ -648,7 +649,7 @@ class SkemaIrigasiController extends Controller
     private function injectSensorData(array &$nodes, array $edges = []): void
     {
         $loggers = \App\Models\t_Logger::linkedToSkema()
-            ->with(['temp16', 'temp19', 'tingkatSiagaAwlr'])
+            ->with(['temp16', 'temp19', 'temp50', 'tingkatSiagaAwlr'])
             ->get()
             ->keyBy('node_skema_id');
 
@@ -743,8 +744,8 @@ class SkemaIrigasiController extends Controller
 
             $logger = $loggers[$node['id']];
 
-            // Tentukan data terbaru berdasarkan sensor_count
-            $latestData = ($logger->sensor_count == 19) ? $logger->temp19 : $logger->temp16;
+            // Tentukan data terbaru berdasarkan family sensor (16/19/50) via accessor.
+            $latestData = $logger->temp;
             $lastTime   = $latestData?->waktu;
             $diffMin    = $lastTime ? Carbon::parse($lastTime)->diffInMinutes(now()) : null;
             $isOnline   = $diffMin !== null && $diffMin < 60;
