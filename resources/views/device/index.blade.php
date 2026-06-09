@@ -2044,8 +2044,8 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         this.editData.params = (device.params ?? []).map(p => ({
                             id_param: p.id_param,
                             list_parameter_id: this.listParameterIdForParam(p),
-                            nama_parameter: (this.listParameterOptionForParam(p)?.nama_parameter ?? p
-                                .nama_parameter ?? '').toString().replaceAll('_', ' '),
+                            nama_parameter: (p.nama_parameter ?? this.listParameterOptionForParam(p)
+                                ?.nama_parameter ?? '').toString().replaceAll('_', ' '),
                             kolom_sensor: p.kolom_sensor ?? '',
                             satuan: p.satuan ?? '',
                             parameter_group_id: p.parameter_group_id ?? '',
