@@ -749,8 +749,8 @@
                                             <p class="text-sm font-semibold text-slate-900">Status Pompa</p>
                                         </div>
                                         <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300"
-                                            :class="pumpRunning ? 'bg-amber-100 text-amber-700 animate-pulse' : pumpState === 'on' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'"
-                                            x-text="pumpRunning ? (pumpTargetState === 'on' ? '⚙ Starting...' : '⚙ Stopping...') : pumpState === 'on' ? 'Pump ON' : 'Pump OFF'"></span>
+                                            :class="pumpChecking || pumpRunning ? 'bg-amber-100 text-amber-700 animate-pulse' : pumpState === 'on' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'"
+                                            x-text="pumpChecking ? '⟳ Mengecek status...' : pumpRunning ? (pumpTargetState === 'on' ? '⚙ Starting...' : '⚙ Stopping...') : pumpState === 'on' ? 'Pump ON' : 'Pump OFF'"></span>
                                     </div>
 <div class="mt-6 flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-stretch">
 <div class="relative flex w-full flex-col items-center justify-center rounded-xl bg-gradient-to-b from-[#0b132b] to-[#0a2342] p-4 sm:w-1/3 shadow-[inset_0_4px_20px_rgba(0,0,0,0.8)] overflow-hidden">
@@ -832,7 +832,7 @@
 <div class="flex w-full flex-col justify-center space-y-4 sm:w-2/3">
                                             <button type="button" @click="runPumpAction('on')"
                                                 class="group relative flex items-center justify-between rounded-xl bg-emerald-600 px-5 py-4 shadow-md transition-all hover:bg-emerald-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-                                                :disabled="pumpRunning || pumpState === 'on'">
+                                                :disabled="!pumpStatusReady || pumpRunning || pumpState === 'on'">
                                                 <div class="flex items-center gap-3">
                                                     <span class="flex h-3 w-3 rounded-full bg-emerald-300"
                                                         :class="pumpRunning && pumpTargetState === 'on' ? 'animate-pulse' : 'group-hover:animate-pulse'"></span>
@@ -854,7 +854,7 @@
 
                                             <button type="button" @click="runPumpAction('off')"
                                                 class="group relative flex items-center justify-between rounded-xl bg-red-600 px-5 py-4 shadow-md transition-all hover:bg-red-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-                                                :disabled="pumpRunning || pumpState === 'off'">
+                                                :disabled="!pumpStatusReady || pumpRunning || pumpState === 'off'">
                                                 <div class="flex items-center gap-3">
                                                     <span class="flex h-3 w-3 rounded-full bg-red-300"
                                                         :class="pumpRunning && pumpTargetState === 'off' ? 'animate-pulse' : ''"></span>
@@ -3482,19 +3482,57 @@
                 pumpSteps: [],
                 pumpTimers: [],
                 pumpError: null,
+                pumpChecking: false,
+                pumpStatusReady: false,
 
                 openPumpModal() {
                     this.showPumpModal = true
+                    this.checkPumpStatus()
                 },
 
                 closePumpModal() {
-                    if (this.pumpRunning) return
+                    if (this.pumpRunning || this.pumpChecking) return
                     this.pumpTimers.forEach(t => clearTimeout(t))
                     this.pumpTimers = []
                     this.pumpWorkflowVisible = false
                     this.pumpSteps = []
                     this.pumpError = null
+                    this.pumpStatusReady = false
                     this.showPumpModal = false
+                },
+
+                // Cek status pompa via command GET sebelum kontrol diizinkan.
+                async checkPumpStatus() {
+                    this.resetPump()
+                    this.pumpStatusReady = false
+                    this.pumpChecking = true
+                    try {
+                        const res = await fetch('{{ route("pump.command") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                id_logger: '{{ $logger->id_logger }}',
+                                action: 'get',
+                            }),
+                        })
+                        const data = await res.json()
+                        if (!res.ok) {
+                            // Gagal cek: anggap pompa OFF, tanpa pesan.
+                            this.pumpState = 'off'
+                            return
+                        }
+                        this.pumpState = Number(data.pump?.state) === 1 ? 'on' : 'off'
+                    } catch (e) {
+                        console.error('Pump status check error:', e)
+                        this.pumpState = 'off'
+                    } finally {
+                        this.pumpChecking = false
+                        this.pumpStatusReady = true
+                    }
                 },
 
                 pumpPercent() {
@@ -3556,19 +3594,9 @@
                         const data = await res.json()
 
                         if (!res.ok) {
-                            const failStep = data.step || 'mqtt_connect'
-
-                            if (failStep === 'mqtt_connect') {
-                                // Gagal konek ke MQTT — revert mqtt step
-                                this.mark('mqtt', 'error', data.message || 'Gagal terhubung ke broker')
-                                this.mark('logger', 'pending', 'Mengirim perintah...')
-                            } else {
-                                // timeout atau logger_error — mqtt sudah ok, logger yang gagal
-                                this.mark('logger', 'error', data.message || 'Logger tidak merespons')
-                            }
-
-                            this.pumpError = data.message || 'Gagal mengirim perintah'
-                            this.pumpRunning = false
+                            // Error: anggap pompa OFF, jangan tampilkan pesan.
+                            this.resetPump()
+                            this.pumpState = 'off'
                             return
                         }
 
@@ -3581,10 +3609,10 @@
                         this.pumpTimers.push(setTimeout(() => { this.pumpWorkflowVisible = false }, 3000))
 
                     } catch (e) {
+                        // Error: anggap pompa OFF, jangan tampilkan pesan.
                         console.error('Pump command error:', e)
-                        this.mark('mqtt', 'error', 'Network error: ' + (e.message || 'Tidak dapat terhubung'))
-                        this.pumpError = 'Gagal menghubungi server'
-                        this.pumpRunning = false
+                        this.resetPump()
+                        this.pumpState = 'off'
                     }
                 }
             }

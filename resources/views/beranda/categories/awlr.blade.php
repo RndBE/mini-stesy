@@ -479,13 +479,25 @@
                 </div>
             </div>
 
-            @if ($pHumidity || $pBattery || $pTemp)
-            <div class="col-span-12 md:col-span-4 space-y-3">
-                <div class="text-md font-semibold text-slate-700">Parameter Logger</div>
-                @include('beranda.categories.partials.logger_health_cards')
+            @php $jiatHasPump = (bool) ($lg?->jiat?->has_pump); @endphp
+            @if ($pHumidity || $pBattery || $pTemp || $jiatHasPump)
+            <div class="col-span-12 md:col-span-4 space-y-4">
+                @if ($pHumidity || $pBattery || $pTemp)
+                <div class="space-y-3">
+                    <div class="text-md font-semibold text-slate-700">Parameter Logger</div>
+                    @include('beranda.categories.partials.logger_health_cards')
+                </div>
+                @endif
+                @if ($jiatHasPump)
+                    @include('beranda.categories.partials.jiat_flow_cards')
+                @endif
             </div>
             @endif
         </div>
+
+        @if ($lg?->jiat?->has_pump)
+            @include('beranda.categories.partials.jiat_pump_panels')
+        @endif
     @else
 <div class="p-5 space-y-4">
 <div class="grid grid-cols-12 gap-4">

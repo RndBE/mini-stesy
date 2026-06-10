@@ -305,6 +305,23 @@
                             $fmBattery  = $latest && $pFmBattery  && $pFmBattery->kolom_sensor  ? $latest->{$pFmBattery->kolom_sensor}  ?? null : null;
                             $fault      = $latest && $pFault      && $pFault->kolom_sensor      ? $latest->{$pFault->kolom_sensor}      ?? null : null;
 
+                            // AWLR Jiat — parameter monitoring pompa (listrik 3-fasa, flow, kualitas air)
+                            $pumpBases = [
+                                'voltage_r', 'voltage_s', 'voltage_t',
+                                'ampere_r', 'ampere_s', 'ampere_t',
+                                'flow_rate', 'flow_rate_signal',
+                                'amonia', 'ph_air', 'suhu_air',
+                            ];
+                            $jiatPumpParams = [];
+                            $jiatPumpValues = [];
+                            foreach ($pumpBases as $base) {
+                                $p = $findParamByBase([$base]);
+                                $jiatPumpParams[$base] = $p;
+                                $jiatPumpValues[$base] = $latest && $p && $p->kolom_sensor
+                                    ? $latest->{$p->kolom_sensor} ?? null
+                                    : null;
+                            }
+
                             $muted = !$isOnline;
                             $iconClass = $muted ? 'grayscale opacity-40' : '';
 
@@ -383,6 +400,8 @@
                             'pressure2'       => $pressure2      ?? null,
                             'fmBattery'       => $fmBattery      ?? null,
                             'fault'           => $fault          ?? null,
+                            'jiatPumpParams'  => $jiatPumpParams ?? [],
+                            'jiatPumpValues'  => $jiatPumpValues ?? [],
                         ])
                     @endforeach
                 </div>

@@ -21,12 +21,12 @@ use PhpMqtt\Client\MqttClient;
  *   Subscribe balasan  : pub_{id_logger}
  *
  * Commands:
- *   GET status : {"AWLR_PUMP": {"cmd": "GET"}}
- *   SET ON     : {"AWLR_PUMP": {"cmd": "SET", "state": 1}}
- *   SET OFF    : {"AWLR_PUMP": {"cmd": "SET", "state": 0}}
+ *   GET status : {"GCM_PUMP": {"cmd": "GET", "id": 1}}
+ *   SET ON     : {"GCM_PUMP": {"cmd": "SET", "id": 1, "state": 1}}
+ *   SET OFF    : {"GCM_PUMP": {"cmd": "SET", "id": 1, "state": 0}}
  *
  * Response dari logger:
- *   {"AWLR_PUMP": {"status": "OK", "state": 1|0, "msg": "Pump ON|OFF"}}
+ *   {"GCM_PUMP": {"status": "OK", "id": 1, "slave": 2, "state": 1|0, "msg": "Pump ON|OFF"}}
  */
 class PumpCommandController extends Controller
 {
@@ -89,7 +89,11 @@ class PumpCommandController extends Controller
 
                 $decoded = json_decode($message, true);
 
-                if (isset($decoded['AWLR_PUMP'])) {
+                if (isset($decoded['GCM_PUMP'])) {
+                    $response = $decoded['GCM_PUMP'];
+                    $mqtt->interrupt();
+                } elseif (isset($decoded['AWLR_PUMP'])) {
+                    // Fallback untuk logger yang masih pakai protokol lama.
                     $response = $decoded['AWLR_PUMP'];
                     $mqtt->interrupt();
                 }
@@ -251,13 +255,13 @@ class PumpCommandController extends Controller
     {
         return match ($action) {
             'get' => [
-                'AWLR_PUMP' => ['cmd' => 'GET'],
+                'GCM_PUMP' => ['cmd' => 'GET', 'id' => 1],
             ],
             'on' => [
-                'AWLR_PUMP' => ['cmd' => 'SET', 'state' => 1],
+                'GCM_PUMP' => ['cmd' => 'SET', 'id' => 1, 'state' => 1],
             ],
             'off' => [
-                'AWLR_PUMP' => ['cmd' => 'SET', 'state' => 0],
+                'GCM_PUMP' => ['cmd' => 'SET', 'id' => 1, 'state' => 0],
             ],
         };
     }
