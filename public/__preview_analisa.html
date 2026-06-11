@@ -1,7 +1,25 @@
-@extends('layouts.app')
-@section('title', $title)
-@push('head')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta http-equiv="refresh" content="600" />
+    <title>Smart Telemetry System</title>
+
+    <link rel="icon" type="image/x-icon" href="http://localhost/favicon.ico?v=2">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script type="module" src="http://[::1]:5173/@vite/client"></script><link rel="stylesheet" href="http://[::1]:5173/resources/css/app.css" /><script type="module" src="http://[::1]:5173/resources/js/app.js"></script>    <style>
+        html, body { font-family: "Geist", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial; }
+        [x-cloak]{ display:none !important; }
+    </style>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Sometype+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         [x-cloak] { display: none !important; }
@@ -10,20 +28,18 @@
             --ink: #14163f;
             --ink-2: #23266b;
             --brand: #303481;
-            --analysis-header: #ffffff;
-            --analysis-header-text: #303481;
-            --deck: #ffffff;
-            --deck-2: #f8fafc;
-            --deck-edge: #d9deee;
-            --deck-field: #f8fafc;
-            --deck-text: #111827;
-            --deck-muted: #64748b;
+            --deck: #14163f;
+            --deck-2: #1a1d4f;
+            --deck-edge: #34387a;
+            --deck-field: #0e1033;
+            --deck-text: #e8e9fb;
+            --deck-muted: #9aa0d6;
             --accent: #4cc9f0;
             --hairline: #e3e5f2;
             --mono: 'Sometype Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         }
 
-        /* Select2 fields inside the control deck */
+        /* Select2: dark instrument fields inside the control deck */
         .control-deck .select2-container--default .select2-selection--single {
             background: var(--deck-field);
             border: 1px solid var(--deck-edge);
@@ -60,7 +76,7 @@
         .control-deck .select2-container--default.select2-container--focus .select2-selection--single,
         .control-deck .select2-container--default.select2-container--open .select2-selection--single {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(76, 201, 240, .24);
+            box-shadow: 0 0 0 3px rgba(76, 201, 240, .18);
             outline: none;
         }
 
@@ -87,12 +103,11 @@
         }
 
         .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #e0f2fe;
-            color: #0f172a;
+            background-color: var(--brand);
         }
 
         .select2-container--default .select2-results__option[aria-selected=true] {
-            background-color: #eff6ff;
+            background-color: #e9eafb;
             color: var(--brand);
             font-weight: 600;
         }
@@ -102,11 +117,6 @@
         @keyframes rise {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: none; }
-        }
-
-        @keyframes fade-in {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         @keyframes led-ping {
@@ -120,7 +130,7 @@
 
         /* — Station header — */
         .station-bar {
-            animation: fade-in .45s ease-out both;
+            animation: rise .45s ease-out both;
         }
 
         .station-back {
@@ -185,88 +195,43 @@
         }
 
         /* — Console buttons (header actions) — */
-        .station-actions {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .station-action {
+        .cbtn {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
-            min-height: 40px;
-            padding: 9px 13px;
-            border-radius: 11px;
-            border: 1px solid #d5daef;
-            background: #ffffff;
-            color: var(--brand);
-            font-size: .82rem;
-            font-weight: 700;
-            line-height: 1;
-            box-shadow: 0 1px 2px rgba(20, 22, 63, .05);
+            padding: 9px 14px;
+            border-radius: 10px;
+            font-size: .825rem;
+            font-weight: 600;
+            border: 1px solid transparent;
             cursor: pointer;
-            transition: background .15s ease, border-color .15s ease, color .15s ease, transform .15s ease, box-shadow .15s ease;
-            white-space: nowrap;
+            transition: background .15s, color .15s, border-color .15s;
         }
 
-        .station-action:hover {
-            background: #f8fafc;
-            border-color: #bfc6e8;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 18px -16px rgba(20, 22, 63, .45);
-        }
-
-        .station-action svg,
-        .station-action img {
-            width: 17px;
-            height: 17px;
-            flex: 0 0 auto;
-        }
-
-        .station-action-primary {
+        .cbtn-solid {
             background: var(--ink);
-            border-color: var(--ink);
-            color: #ffffff;
-            box-shadow: 0 10px 24px -18px rgba(20, 22, 63, .8);
+            color: #fff;
         }
 
-        .station-action-primary:hover {
-            background: var(--ink);
-            border-color: var(--ink);
-            color: #ffffff;
+        .cbtn-solid:hover {
+            background: var(--ink-2);
         }
 
-        .station-action-outline {
-            background: #ffffff;
+        .cbtn-ghost {
+            background: #fff;
+            border-color: #c9cce6;
             color: var(--brand);
         }
 
-        .station-action-warning {
-            background: #fff7ed;
-            border-color: #fed7aa;
-            color: #b45309;
+        .cbtn-ghost:hover {
+            background: #f1f2fc;
         }
 
-        .station-action-warning:hover {
-            background: #ffedd5;
-            border-color: #fdba74;
-        }
-
-        .station-action-active,
-        .station-action-active:hover {
+        .cbtn-on,
+        .cbtn-on:hover {
             background: var(--ink);
             border-color: var(--ink);
-            color: #ffffff;
-        }
-
-        @media (min-width: 768px) {
-            .analysis-filter-toggle {
-                display: none !important;
-            }
+            color: #fff;
         }
 
         /* — Ruler strip — */
@@ -283,10 +248,10 @@
 
         /* — Control deck (filter sidebar) — */
         .control-deck {
-            background: #fff;
+            background: linear-gradient(180deg, var(--deck-2), var(--deck) 70%);
             border: 1px solid var(--deck-edge);
             border-radius: 14px;
-            box-shadow: 0 12px 28px -22px rgba(20, 22, 63, .35);
+            box-shadow: 0 16px 40px -28px rgba(20, 22, 63, .8);
             animation: rise .45s .07s ease-out both;
         }
 
@@ -295,7 +260,7 @@
             align-items: center;
             gap: 8px;
             padding: 12px 16px;
-            border-bottom: 1px dashed #d9deee;
+            border-bottom: 1px dashed rgba(154, 160, 214, .3);
             font-family: var(--mono);
             font-size: 10.5px;
             letter-spacing: .22em;
@@ -308,7 +273,7 @@
             height: 7px;
             border-radius: 2px;
             background: var(--accent);
-            box-shadow: 0 0 8px rgba(76, 201, 240, .55);
+            box-shadow: 0 0 8px rgba(76, 201, 240, .8);
         }
 
         .deck-body {
@@ -326,7 +291,7 @@
         }
 
         .deck-sep {
-            border-top: 1px dashed #d9deee;
+            border-top: 1px dashed rgba(154, 160, 214, .3);
             margin: 18px 0 14px;
         }
 
@@ -334,7 +299,7 @@
             margin-bottom: 0;
         }
 
-        /* Control deck inputs override Tailwind utilities on the inputs */
+        /* Dark instrument inputs (overrides the Tailwind utilities on the inputs) */
         .calendar-input {
             width: 100%;
         }
@@ -349,12 +314,12 @@
         }
 
         .control-deck .calendar-input::placeholder {
-            color: #94a3b8;
+            color: #5d62a3;
         }
 
         .control-deck .calendar-input:focus {
             border-color: var(--accent) !important;
-            box-shadow: 0 0 0 3px rgba(76, 201, 240, .24) !important;
+            box-shadow: 0 0 0 3px rgba(76, 201, 240, .18) !important;
             outline: none;
         }
 
@@ -397,21 +362,19 @@
             letter-spacing: .08em;
             text-transform: uppercase;
             color: var(--deck-muted);
-            background: #fff;
             transition: all .15s;
         }
 
         .seg:hover span {
-            background: var(--deck-field);
-            border-color: #9bdff3;
+            border-color: #4a4f9b;
             color: var(--deck-text);
         }
 
         .seg input:checked + span {
-            background: #e0f7ff;
+            background: rgba(76, 201, 240, .12);
             border-color: var(--accent);
-            color: #075985;
-            box-shadow: 0 8px 18px -14px rgba(14, 116, 144, .55);
+            color: #bfeefe;
+            box-shadow: 0 0 12px -4px rgba(76, 201, 240, .7);
         }
 
         .seg input:focus-visible + span {
@@ -441,23 +404,11 @@
             background: #34d399;
         }
 
-        .btn-success-soft {
-            background: #ecfdf5;
-            color: #047857;
-            border: 1px solid #bbf7d0;
-            box-shadow: none;
-        }
-
-        .btn-success-soft:hover {
-            background: #d1fae5;
-            border-color: #86efac;
-        }
-
         .btn-outline {
             width: 100%;
             padding: 10px;
-            background: #fff;
-            color: var(--brand);
+            background: transparent;
+            color: var(--deck-text);
             border: 1px solid var(--deck-edge);
             border-radius: 9px;
             font-weight: 600;
@@ -471,8 +422,8 @@
         }
 
         .btn-outline:hover {
-            background: #eff6ff;
-            border-color: #9bdff3;
+            background: rgba(255, 255, 255, .06);
+            border-color: #4a4f9b;
         }
 
         /* — Measurement panel (chart + table card) — */
@@ -491,49 +442,6 @@
         .panel-head {
             padding-bottom: 10px;
             border-bottom: 1px dashed #d9dcef;
-        }
-
-        .chart-panel-head {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .chart-panel-heading {
-            min-width: 0;
-        }
-
-        .chart-export-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-height: 36px;
-            padding: 8px 13px;
-            border-radius: 9px;
-            border: 1px solid #d7dbef;
-            background: #ffffff;
-            color: #303481;
-            font-weight: 700;
-            font-size: 12px;
-            line-height: 1;
-            box-shadow: 0 1px 2px rgba(20, 22, 63, .05);
-            transition: background .18s ease, border-color .18s ease, transform .18s ease;
-            white-space: nowrap;
-        }
-
-        .chart-export-btn:hover {
-            background: #f8fafc;
-            border-color: #bfc6e8;
-            transform: translateY(-1px);
-        }
-
-        .chart-export-btn svg {
-            width: 15px;
-            height: 15px;
-            flex: 0 0 auto;
         }
 
         .panel-eyebrow {
@@ -604,9 +512,8 @@
         }
 
         .data-table thead th {
-            background: var(--analysis-header);
-            color: var(--analysis-header-text);
-            border-bottom: 1px solid var(--hairline);
+            background: var(--ink);
+            color: #d7daf3;
             font-family: var(--mono);
             font-size: 10.5px;
             font-weight: 600;
@@ -643,13 +550,13 @@
 
         /* — Info slide-over & modal reskins (ID-scoped to win the cascade) — */
         #infoPanel .info-panel-header {
-            background: var(--analysis-header);
-            color: var(--analysis-header-text);
-            border-bottom: 1px solid var(--hairline);
+            background: var(--ink);
+            color: #fff;
+            border-bottom: none;
         }
 
         #infoPanel .info-panel-close {
-            color: var(--analysis-header-text);
+            color: #fff;
         }
 
         #infoPanel .info-label {
@@ -666,13 +573,13 @@
         }
 
         .doc-modal .doc-modal-header {
-            background: var(--analysis-header);
-            color: var(--analysis-header-text);
-            border-bottom: 1px solid var(--hairline);
+            background: var(--ink);
+            color: #fff;
+            border-bottom: none;
         }
 
         .doc-modal .doc-modal-close {
-            color: var(--analysis-header-text);
+            color: #fff;
         }
 
         .doc-modal .doc-modal-content {
@@ -682,10 +589,6 @@
         .doc-modal .photo-nav {
             background: rgba(255, 255, 255, .92);
             box-shadow: 0 2px 10px rgba(20, 22, 63, .25);
-        }
-
-        .pump-modal-shell[role="dialog"].fixed {
-            z-index: 2100 !important;
         }
 .info-panel {
             position: fixed;
@@ -925,9 +828,450 @@
             color: #9ca3af;
         }
     </style>
-@endpush
-@section('content')
-    <div class="info-panel-overlay" id="infoPanelOverlay" onclick="closeInfoPanel()"></div>
+</head>
+
+<body class="bg-slate-50" x-data="{ pageTitle: 'Analisa Data' }">
+    <style>
+        @media (max-width: 1023px) {
+            #mainContent {
+                margin-left: 0 !important;
+            }
+        }
+
+        
+        [role="dialog"].fixed {
+            z-index: 500 !important;
+        }
+        
+        body.overflow-hidden #topbarLogoWrapper {
+            z-index: 20 !important;
+        }
+    </style>
+    <div class="min-h-screen flex">
+                    <aside id="mainSidebar" class="fixed top-0 left-0 z-[40] w-64 h-full transition-all duration-300 bg-white border-r">
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between px-6 py-5">
+            <img src="http://localhost/images/beacon-logo.png" alt="Beacon Engineering" class="h-full w-auto sidebar-logo">
+            <button type="button" onclick="toggleMainSidebar()" aria-label="Toggle sidebar"
+                class="ml-auto flex items-center justify-center rounded-md  text-slate-500 sidebar-icon hover:bg-slate-100">
+                <img src="http://localhost/images/sidebar.svg" alt="" class="h-5 w-5">
+            </button>
+        </div>
+
+        <nav class="px-3 sidebar-nav flex-1 overflow-y-auto">
+            <div class="space-y-1">
+                                    <a href="http://localhost/beranda"
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                        <img src="http://localhost/icons/beranda_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Beranda">
+                        <span class="sidebar-text truncate">Beranda</span>
+                    </a>
+                
+                                    <a href="http://localhost/peta-lokasi"
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                        <img src="http://localhost/icons/peta_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Peta Lokasi">
+                        <span class="sidebar-text truncate">Peta Lokasi</span>
+                    </a>
+
+                    <a href="http://localhost/rekap-data"
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                        <img src="http://localhost/icons/data_perangkat_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Rekap Data">
+                        <span class="sidebar-text truncate">Rekap Data</span>
+                    </a>
+                
+                                    <a href="http://localhost/realtime-monitoring"
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                        <img src="http://localhost/icons/realtime_monitoring_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Realtime">
+                        <span class="sidebar-text truncate">Realtime Monitoring</span>
+                    </a>
+
+                    <a href="http://localhost/tingkat-siaga-awlr"
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                        <img src="http://localhost/icons/pengaturan_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Tingkat Siaga">
+                        <span class="sidebar-text truncate">Tingkat Siaga AWLR</span>
+                    </a>
+                
+                                    <a href="http://localhost/data-perangkat"
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                        <img src="http://localhost/icons/data_perangkat_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Data Perangkat">
+                        <span class="sidebar-text truncate">Data Perangkat</span>
+                    </a>
+                
+                                    <a href="http://localhost/pengaturan-device"
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                        <img src="http://localhost/icons/pengaturan_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Pengaturan Device">
+                        <span class="sidebar-text truncate">Pengaturan Device</span>
+                    </a>
+                
+                                    <div x-data="{ open: false }" class="rounded-xl border border-slate-200 bg-slate-50/60">
+                        <button type="button"
+                            @click="
+                                const sidebar = document.getElementById('mainSidebar');
+                                if (sidebar && sidebar.classList.contains('collapsed')) {
+                                    toggleMainSidebar();
+                                    open = true;
+                                } else {
+                                    open = !open;
+                                }
+                            "
+                            class="sidebar-parent-btn flex w-full items-center justify-between gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                            <span class="sidebar-parent-label flex items-center gap-3">
+                                <img src="http://localhost/icons/master_line.svg" class="h-5 w-5 flex-shrink-0" alt="Master Data">
+                                <span class="sidebar-text truncate">Master Data</span>
+                            </span>
+                            <svg class="sidebar-parent-chevron h-4 w-4 text-slate-500 transition-transform"
+                                :class="open ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </button>
+
+                        <div x-show="open" x-collapse x-cloak class="relative space-y-1 pb-3 pt-1 pl-3 pr-2 ml-[22px] border-l-[2px] border-slate-200">
+                                                            <a href="http://localhost/instansi"
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-white">
+                                                                        <img src="http://localhost/icons/instansi_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Instansi">
+                                    <span class="sidebar-text truncate">Instansi</span>
+                                </a>
+                            
+                                                            <a href="http://localhost/kategori-logger"
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-white">
+                                                                        <img src="http://localhost/icons/kategori_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Kategori Logger">
+                                    <span class="sidebar-text truncate">Kategori Logger</span>
+                                </a>
+                                <a href="http://localhost/list-parameter"
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-white">
+                                                                        <img src="http://localhost/icons/list_line.svg" class="h-5 w-5 flex-shrink-0 " alt="List Parameter">
+                                    <span class="sidebar-text truncate">List Parameter</span>
+                                </a>
+                                <a href="http://localhost/template-kategori-parameter"
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-white">
+                                                                        <img src="http://localhost/icons/template_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Template Parameter">
+                                    <span class="sidebar-text truncate">Template Parameter</span>
+                                </a>
+                            
+                                                            <a href="http://localhost/roles"
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-white">
+                                                                        <img src="http://localhost/icons/rbac_role_line.svg" class="h-5 w-5 flex-shrink-0 " alt="RBAC Role">
+                                    <span class="sidebar-text truncate">RBAC Role</span>
+                                </a>
+                                <a href="http://localhost/permissions"
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-white">
+                                                                        <img src="http://localhost/icons/rbac_permission_line.svg" class="h-5 w-5 flex-shrink-0 " alt="RBAC Permission">
+                                    <span class="sidebar-text truncate">RBAC Permission</span>
+                                </a>
+                            
+                                                            <a href="http://localhost/users"
+                                    class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-white">
+                                                                        <img src="http://localhost/icons/user_line.svg" class="h-5 w-5 flex-shrink-0 " alt="User">
+                                    <span class="sidebar-text truncate">User</span>
+                                </a>
+                                                    </div>
+                    </div>
+                
+                                <a href="http://localhost/settings"
+                    class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                    <img src="http://localhost/icons/pengaturan_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Pengaturan Sistem">
+                    <span class="sidebar-text truncate">Pengaturan Sistem</span>
+                </a>
+                
+                                <a href="http://localhost/notifikasi"
+                    class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                    <span class="sidebar-text truncate">Kirim Notifikasi</span>
+                </a>
+                
+
+                <a href="http://localhost/download"
+                    class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                    <img src="http://localhost/icons/unduh_aplikasi_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Unduh Aplikasi">
+                    <span class="sidebar-text truncate">Unduh Aplikasi</span>
+                </a>
+
+                                <a href="http://localhost/audit-log"
+                    class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                    <img src="http://localhost/icons/log_audit_line.svg" class="h-5 w-5 flex-shrink-0 " alt="Log Audit">
+                    <span class="sidebar-text truncate">Log Audit</span>
+                </a>
+                            </div>
+        </nav>
+
+        <div class="mt-auto px-3 pb-5">
+            <form method="POST" action="http://localhost/logout">
+                <input type="hidden" name="_token" value="xtzGm2qnMrj2jfGuUfh0j3yUlrE1kYusAjwnX9jz" autocomplete="off">                <button type="submit"
+                    class="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                    <img src="http://localhost/icons/keluar_line.svg" class="h-5 w-5 flex-shrink-0" alt="Logout">
+                    <span class="sidebar-text truncate">Logout</span>
+                </button>
+            </form>
+
+            <div class="mt-4 px-3 text-[11px] text-slate-400 sidebar-footer">© Beacon Engineering 2026
+            </div>
+        </div>
+    </div>
+</aside>
+
+<style>
+[x-cloak] {
+        display: none !important;
+    }
+
+    #mainSidebar.collapsed .sidebar-icon {
+        margin-left: 0 !important;
+    }
+@media (max-width: 1023px) {
+        #mainSidebar {
+            transform: translateX(-100%);
+            width: 16rem;
+        }
+
+        #mainSidebar.collapsed {
+            transform: translateX(-100%);
+            width: 16rem;
+        }
+
+        #mainSidebar:not(.collapsed) {
+            transform: translateX(0);
+        }
+
+        #mainSidebar.collapsed .sidebar-text,
+        #mainSidebar.collapsed .sidebar-logo,
+        #mainSidebar.collapsed .sidebar-footer {
+            display: none;
+        }
+
+        #mainSidebar.collapsed .sidebar-nav a {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        #mainSidebar.collapsed .sidebar-nav a span.text-\[11px\] {
+            display: none;
+        }
+
+        #mainSidebar.collapsed .sidebar-parent-btn {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        #mainSidebar.collapsed .sidebar-parent-label {
+            gap: 0;
+        }
+
+        #mainSidebar.collapsed .sidebar-parent-chevron {
+            display: none;
+        }
+
+        #mainSidebar.collapsed .px-6.py-5 {
+            justify-content: center;
+            padding: 1.25rem 0;
+        }
+
+    }
+@media (min-width: 1024px) {
+        #mainSidebar.collapsed {
+            width: 5rem;
+transform: none;
+        }
+
+        #mainSidebar.collapsed .sidebar-text,
+        #mainSidebar.collapsed .sidebar-logo,
+        #mainSidebar.collapsed .sidebar-footer {
+            display: none;
+}
+
+        #mainSidebar.collapsed .sidebar-nav a {
+            justify-content: center;
+padding-left: 0;
+            padding-right: 0;
+        }
+
+        #mainSidebar.collapsed .sidebar-nav a span.text-\[11px\] {
+            display: none;
+        }
+
+        #mainSidebar.collapsed .sidebar-parent-btn {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        #mainSidebar.collapsed .sidebar-parent-label {
+            gap: 0;
+        }
+
+        #mainSidebar.collapsed .sidebar-parent-chevron {
+            display: none;
+        }
+#mainSidebar.collapsed .px-6.py-5 {
+            justify-content: center;
+            padding: 1.25rem 0;
+        }
+}
+</style>
+
+<script>
+    function syncSidebarBackdrop() {
+        const sidebar = document.getElementById('mainSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const isMobile = window.innerWidth < 1024;
+
+        if (!sidebar || !backdrop) return;
+
+        const showBackdrop = isMobile && !sidebar.classList.contains('collapsed');
+        backdrop.classList.toggle('hidden', !showBackdrop);
+        document.body.classList.toggle('overflow-hidden', showBackdrop);
+        const mapContainer = document.getElementById('mapContainer');
+        if (mapContainer) {
+            mapContainer.style.zIndex = showBackdrop ? '1' : '';
+            mapContainer.style.position  = showBackdrop ? 'relative' : '';
+        }
+    }
+
+    function applySidebarLayout() {
+        const sidebar = document.getElementById('mainSidebar');
+        const mainContent = document.getElementById('mainContent');
+        const isMobile = window.innerWidth < 1024;
+
+        if (!sidebar || !mainContent) return;
+
+        mainContent.style.paddingLeft = '0';
+
+        if (isMobile) {
+            mainContent.style.marginLeft = '0';
+            mainContent.style.width = '100%';
+            syncSidebarBackdrop();
+            return;
+        }
+
+        const sidebarWidth = sidebar.classList.contains('collapsed') ? '5rem' : '16rem';
+        mainContent.style.marginLeft = sidebarWidth;
+        mainContent.style.width = `calc(100% - ${sidebarWidth})`;
+        syncSidebarBackdrop();
+    }
+
+    function toggleMainSidebar() {
+        const sidebar = document.getElementById('mainSidebar');
+        if (!sidebar) return;
+
+        sidebar.classList.toggle('collapsed');
+        applySidebarLayout();
+        localStorage.setItem('sidebarCollapsed', String(sidebar.classList.contains('collapsed')));
+        if (typeof map !== 'undefined') {
+            const dur = 320, step = 16;
+            let t = 0;
+            const iv = setInterval(() => {
+                map.invalidateSize({ animate: false });
+                t += step;
+                if (t >= dur) clearInterval(iv);
+            }, step);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const isMobile = window.innerWidth < 1024;
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        const isSkemaIrigasi = false;
+
+        const sidebar = document.getElementById('mainSidebar');
+        const mainContent = document.getElementById('mainContent');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        if (!sidebar || !mainContent) return;
+
+        if (isMobile) {
+            sidebar.classList.add('collapsed');
+        } else if (isSkemaIrigasi) {
+            sidebar.classList.add('collapsed');
+        } else if (isCollapsed) {
+            sidebar.classList.add('collapsed');
+        } else {
+            sidebar.classList.remove('collapsed');
+        }
+
+        applySidebarLayout();
+
+        if (backdrop) {
+            backdrop.addEventListener('click', function() {
+                const isMobileNow = window.innerWidth < 1024;
+                if (!isMobileNow) return;
+
+                sidebar.classList.add('collapsed');
+                applySidebarLayout();
+            });
+        }
+    });
+
+    window.addEventListener('resize', function() {
+        const isMobile = window.innerWidth < 1024;
+        const sidebar = document.getElementById('mainSidebar');
+        if (!sidebar) return;
+
+        if (isMobile) {
+            sidebar.classList.add('collapsed');
+        }
+
+        applySidebarLayout();
+    });
+</script>
+            <div id="sidebarBackdrop" class="fixed inset-0 z-30 hidden bg-black/50 lg:hidden"></div>
+        
+        <div id="mainContent" class="flex min-h-screen w-full flex-col transition-all duration-300"
+            style="margin-left: 16rem; width: calc(100% - 16rem);">
+            <header class="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-2">
+    <div class="flex items-center gap-2">
+                    <button type="button" onclick="toggleMainSidebar()" aria-label="Open sidebar"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 lg:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+                <div class="text-xl sm:text-xl font-extrabold tracking-tight text-slate-900" x-text="pageTitle"></div>
+    </div>
+    <div class="flex items-center gap-3 sm:gap-4">
+        
+                    <div class="text-right hidden sm:block">
+                <div class="text-[11px] font-semibold tracking-wider text-slate-500">
+                    Super Admin
+                </div>
+                <div class="text-sm font-semibold text-slate-800">
+                    Beacon Engineering
+                </div>
+            </div>
+
+            <div id="topbarLogoWrapper" class="relative z-[200]" x-data="{ open: false }">
+                <button type="button" class="flex items-center gap-3 py-2 px-2 rounded hover:bg-slate-50"
+                    @click="open = !open" @keydown.escape.window="open = false">
+                    <img src="http://localhost/images/logo-avatar.png" class="h-8 rounded object-cover" alt="Super Admin">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </button>
+
+                <div x-show="open" x-cloak x-transition @click.outside="open = false"
+                    class="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+
+                    <a href="http://localhost/profile/password"
+                        class="block px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">Ubah Kata Sandi</a>
+                    <div class="h-px bg-slate-200"></div>
+                    <form method="POST" action="http://localhost/logout">
+                        <input type="hidden" name="_token" value="xtzGm2qnMrj2jfGuUfh0j3yUlrE1kYusAjwnX9jz" autocomplete="off">                        <button type="submit"
+                            class="block w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+            </div>
+</header>
+            <main class="flex-1 min-h-[calc(100vh-5rem)] min-w-0">
+                <div class=" bg-white min-h-[calc(100vh-5rem)] min-w-0 overflow-x-hidden">
+                    <div class="w-full max-w-full p-4">
+                            <div class="info-panel-overlay" id="infoPanelOverlay" onclick="closeInfoPanel()"></div>
     <div class="info-panel rounded-lg" id="infoPanel">
         <div class="info-panel-header">
             <div class="info-panel-title">Informasi Logger</div>
@@ -936,39 +1280,39 @@
         <div class="info-panel-body">
             <div class="info-item mb-2 pb-1">
                 <div class="info-label">ID Logger</div>
-                <div class="info-value">{{ $logger->id_logger }}</div>
+                <div class="info-value">10002</div>
             </div>
             <div class="info-item mb-2 pb-1">
                 <div class="info-label">Nama Logger</div>
-                <div class="info-value">{{ $logger->nama_logger }}</div>
+                <div class="info-value">ARR Pogung</div>
             </div>
             <div class="info-item mb-2 pb-1">
                 <div class="info-label">Seri Logger</div>
-                <div class="info-value">{{ $logger->informasi->seri_logger ?? '-' }}</div>
+                <div class="info-value">Beacon Logger V1</div>
             </div>
             <div class="info-item mb-2 pb-1">
                 <div class="info-label">Sensor</div>
-                <div class="info-value">{{ $logger->sensor_count ?? '-' }}</div>
+                <div class="info-value">16</div>
             </div>
             <div class="info-item mb-2 pb-1">
                 <div class="info-label">Serial Number</div>
-                <div class="info-value">{{ $logger->informasi->serial_number ?? '-' }}</div>
+                <div class="info-value">SN-10002</div>
             </div>
             <div class="info-item mb-2 pb-1">
                 <div class="info-label">No. Seluler</div>
-                <div class="info-value">{{ $logger->no_seluler ?? '-' }}</div>
+                <div class="info-value">-</div>
             </div>
             <div class="info-item mb-2 pb-1">
                 <div class="info-label">Nama Penjaga</div>
-                <div class="info-value">{{ $logger->informasi->nama_pic ?? '-' }}</div>
+                <div class="info-value">PIC 2</div>
             </div>
             <div class="info-item mb-2 pb-1">
                 <div class="info-label">Nomor Penjaga</div>
-                <div class="info-value">{{ $logger->informasi->no_pic ?? '-' }}</div>
+                <div class="info-value">081234000002</div>
             </div>
             <div class="info-item mb-2 pb-1">
                 <div class="info-label">Lokasi</div>
-                <div class="info-value">{{ $logger->lokasi->nama_lokasi ?? '-' }}</div>
+                <div class="info-value">Pos Pogung</div>
             </div>
         </div>
     </div>
@@ -979,17 +1323,9 @@
                 <button class="doc-modal-close" onclick="closeDocModal()">×</button>
             </div>
             <div class="doc-modal-body">
-                @if ($photos->count() > 0)
-                    @php
-                        $firstPhotoRaw = (string) ($photos->first()->url_foto ?? '');
-                        $firstPhotoUrl =
-                            str_starts_with($firstPhotoRaw, 'http://') || str_starts_with($firstPhotoRaw, 'https://')
-                                ? $firstPhotoRaw
-                                : asset('storage/' . ltrim($firstPhotoRaw, '/'));
-                    @endphp
-                    <div class="photo-gallery">
+                                                        <div class="photo-gallery">
                         <div class="photo-main">
-                            <img id="docMainPhoto" src="{{ $firstPhotoUrl }}" alt="Dokumentasi">
+                            <img id="docMainPhoto" src="http://localhost/storage/pos/10002.png" alt="Dokumentasi">
                             <button type="button" class="photo-nav prev" onclick="prevDocPhoto(event)">
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -1004,30 +1340,16 @@
                                         stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                             </button>
-                            <div class="photo-counter" id="docPhotoCounter">1 / {{ $photos->count() }}</div>
+                            <div class="photo-counter" id="docPhotoCounter">1 / 1</div>
                         </div>
                         <div class="photo-thumbs" id="docThumbs">
-                            @foreach ($photos as $photo)
-                                @php
-                                    $photoRaw = (string) ($photo->url_foto ?? '');
-                                    $photoUrl =
-                                        str_starts_with($photoRaw, 'http://') || str_starts_with($photoRaw, 'https://')
-                                            ? $photoRaw
-                                            : asset('storage/' . ltrim($photoRaw, '/'));
-                                @endphp
-                                <button type="button" class="photo-thumb {{ $loop->first ? 'active' : '' }}"
-                                    data-src="{{ $photoUrl }}" onclick="setDocPhoto({{ $loop->index }})">
-                                    <img src="{{ $photoUrl }}" alt="Dokumentasi {{ $loop->iteration }}">
+                                                                                            <button type="button" class="photo-thumb active"
+                                    data-src="http://localhost/storage/pos/10002.png" onclick="setDocPhoto(0)">
+                                    <img src="http://localhost/storage/pos/10002.png" alt="Dokumentasi 1">
                                 </button>
-                            @endforeach
-                        </div>
+                                                    </div>
                     </div>
-                @else
-                    <div class="no-photos">
-                        <p>Tidak ada foto dokumentasi untuk logger ini</p>
-                    </div>
-                @endif
-            </div>
+                            </div>
         </div>
     </div>
     <div class="doc-modal" id="dataMasukModal" onclick="closeDataMasukModal(event)">
@@ -1049,7 +1371,7 @@
     <div x-data="{ filterOpen: false }">
     <div class="station-bar flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div class="flex items-center gap-3 min-w-0">
-            <button type="button" onclick="window.location.href='{{ route('peta.lokasi') }}'"
+            <button type="button" onclick="window.location.href='http://localhost/peta-lokasi'"
                 class="station-back flex-shrink-0" aria-label="Kembali">
                 <svg width="8" height="20" viewBox="0 0 10 20" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
@@ -1058,303 +1380,48 @@
                 </svg>
             </button>
 
-            <span class="led {{ $status === 'online' ? 'led-on' : 'led-off' }} flex-shrink-0"></span>
+            <span class="led led-off flex-shrink-0"></span>
             <div class="min-w-0">
                 <div class="station-eyebrow">
-                    {{ strtoupper($logger->kategori_logger ?? $logger->kategori?->nama_kategori ?? 'Logger') }} &middot; ID {{ $logger->id_logger }}
+                    ARR &middot; ID 10002
                 </div>
-                <div class="station-name truncate">{{ $logger->nama_pos }}</div>
-                <div class="station-sub {{ $status === 'online' ? 'text-emerald-600' : 'text-rose-600' }}">
-                    {{ $status === 'online' ? 'Koneksi Terhubung' : 'Koneksi Terputus' }}
+                <div class="station-name truncate">Pos Pogung</div>
+                <div class="station-sub text-rose-600">
+                    Koneksi Terputus
                 </div>
             </div>
         </div>
 
-        <div class="station-actions">
-            <button @click="filterOpen = !filterOpen" :class="filterOpen ? 'station-action-active' : ''"
-                class="station-action station-action-outline analysis-filter-toggle">
+        <div class="flex gap-2 flex-shrink-0">
+            <button @click="filterOpen = !filterOpen" :class="filterOpen ? 'cbtn-on' : ''"
+                class="cbtn cbtn-ghost md:hidden">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
                 </svg>
                 <span>Filter</span>
             </button>
-            <button class="station-action station-action-primary" onclick="openInfoPanel()">
+            <button class="cbtn cbtn-solid" onclick="openInfoPanel()">
                 <svg class="sm:me-2" width="18" height="18" viewBox="0 0 20 20" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M10 18.3334C14.6024 18.3334 18.3334 14.6025 18.3334 10.0001C18.3334 5.39771 14.6024 1.66675 10 1.66675C5.39765 1.66675 1.66669 5.39771 1.66669 10.0001C1.66669 14.6025 5.39765 18.3334 10 18.3334Z"
-                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M10 13.3334V10.0001M10 6.66675H10.0083" stroke="currentColor" stroke-width="1.5"
+                        stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M10 13.3334V10.0001M10 6.66675H10.0083" stroke="white" stroke-width="1.5"
                         stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
                 <span class="hidden sm:inline">Informasi</span>
             </button>
 
-            @if($logger->jiat?->has_pump && strtolower($logger->kategori->nama_kategori ?? '') === 'awlr')
-<div x-data="pumpControlApp()">
-                <button @click="openPumpModal()"
-                    class="station-action station-action-warning">
-                    <img src="{{ asset('icons/pump.svg') }}"
-                         class="h-5 w-5 sm:me-2 flex-shrink-0"
-                         style="filter: invert(52%) sepia(60%) saturate(700%) hue-rotate(5deg) brightness(95%) contrast(90%);"
-                         alt="Pump Icon" />
-	                    <span class="hidden sm:inline font-semibold">Kontrol Pompa</span>
-	                </button>
-<template x-teleport="body">
-<div x-show="showPumpModal" x-cloak class="pump-modal-shell fixed inset-0" role="dialog" aria-modal="true" style="display:none;">
-<div x-show="showPumpModal"
-	                        x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-	                        x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-	                        class="absolute inset-0 z-0 bg-slate-900/40 transition-opacity" @click="closePumpModal()"></div>
-
-	                    <div class="absolute inset-0 z-10 flex items-center justify-center overflow-y-auto p-4" @click="closePumpModal()">
-                        <div x-show="showPumpModal"
-                            x-transition:enter="ease-out duration-300"
-                            x-transition:enter-start="opacity-0 scale-95 translate-y-4"
-                            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                            x-transition:leave="ease-in duration-200"
-                            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                            x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-                            class="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-white text-left shadow-xl"
-                            @click.stop>
-<div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-                                <div class="flex items-center gap-2">
-                                    <div class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700">
-                                        <img src="{{ asset('icons/pump.svg') }}"
-                                             class="h-6 w-6"
-                                             style="filter: invert(52%) sepia(60%) saturate(700%) hue-rotate(5deg) brightness(95%) contrast(90%);"
-                                             alt="Pump Icon" />
-                                    </div>
-                                    <div>
-                                        <h3 class="text-xl font-bold text-slate-900">Kontrol Pompa Air</h3>
-                                    </div>
-                                </div>
-                                <button @click="closePumpModal()"
-                                    :disabled="pumpRunning"
-                                    class="transition-colors"
-                                    :class="pumpRunning ? 'text-slate-300 cursor-not-allowed' : 'text-slate-500 hover:text-slate-700'">
-                                    <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-<div class="space-y-2 px-6 py-5">
-<div class="grid grid-cols-1 gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
-                                    <div>
-                                        <p class="text-xs uppercase tracking-wide text-slate-400">Nama Pos</p>
-                                        <p class="mt-1 text-sm font-bold text-slate-900">{{ $logger->lokasi->nama_lokasi ?? '-' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs uppercase tracking-wide text-slate-400">ID Logger</p>
-                                        <p class="mt-1 text-sm font-bold text-slate-900">{{ $logger->id_logger }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs uppercase tracking-wide text-slate-400">Nama Logger</p>
-                                        <p class="mt-1 text-sm font-bold text-slate-900">{{ $logger->nama_logger }}</p>
-                                    </div>
-                                </div>
-<div class="rounded-xl border border-slate-200 bg-white p-4">
-                                    <div class="flex items-center justify-between gap-4">
-                                        <div>
-                                            <p class="text-sm font-semibold text-slate-900">Status Pompa</p>
-                                        </div>
-                                        <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300"
-                                            :class="pumpChecking || pumpRunning ? 'bg-amber-100 text-amber-700 animate-pulse' : pumpState === 'on' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'"
-                                            x-text="pumpChecking ? '⟳ Mengecek status...' : pumpRunning ? (pumpTargetState === 'on' ? '⚙ Starting...' : '⚙ Stopping...') : pumpState === 'on' ? 'Pump ON' : 'Pump OFF'"></span>
-                                    </div>
-<div class="mt-6 flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-stretch">
-<div class="relative flex w-full flex-col items-center justify-center rounded-xl bg-gradient-to-b from-[#0b132b] to-[#0a2342] p-4 sm:w-1/3 shadow-[inset_0_4px_20px_rgba(0,0,0,0.8)] overflow-hidden">
-<div class="absolute inset-x-0 bottom-0 transition-all duration-[2500ms] ease-in-out border-t-2"
-                                                :class="pumpState === 'on' && !pumpRunning ? 'top-[20%] bg-[#0077b6]/30 border-[#00b4d8]/60 shadow-[0_-5px_20px_rgba(0,180,216,0.2)]' : pumpRunning ? 'top-[18%] bg-amber-900/20 border-amber-400/40 shadow-[0_-5px_20px_rgba(245,158,11,0.15)]' : 'top-[25%] bg-slate-800/60 border-slate-600/50 shadow-none'">
-<div class="absolute inset-0 overflow-hidden transition-opacity duration-[1500ms] ease-in-out pointer-events-none"
-                                                     :class="pumpState === 'on' && !pumpRunning ? 'opacity-100' : 'opacity-0'">
-                                                    <div class="absolute bottom-4 left-[20%] w-1.5 h-1.5 rounded-full bg-cyan-200 animate-[ping_2s_linear_infinite]"></div>
-                                                    <div class="absolute bottom-10 right-[30%] w-2 h-2 rounded-full bg-cyan-300 animate-[ping_2.5s_linear_infinite]" style="animation-delay:0.5s"></div>
-                                                    <div class="absolute bottom-20 left-[40%] w-1 h-1 rounded-full bg-cyan-100 animate-[ping_1.5s_linear_infinite]" style="animation-delay:1.2s"></div>
-                                                </div>
-<div class="absolute inset-0 overflow-hidden transition-opacity duration-[800ms] ease-in-out pointer-events-none"
-                                                     :class="pumpRunning ? 'opacity-100' : 'opacity-0'">
-                                                    <div class="absolute bottom-3 left-[25%] w-1 h-1 rounded-full bg-amber-300 animate-[ping_3s_linear_infinite]"></div>
-                                                    <div class="absolute bottom-8 right-[35%] w-1.5 h-1.5 rounded-full bg-amber-200 animate-[ping_4s_linear_infinite]" style="animation-delay:1s"></div>
-                                                    <div class="absolute bottom-16 left-[45%] w-1 h-1 rounded-full bg-yellow-200 animate-[ping_3.5s_linear_infinite]" style="animation-delay:2s"></div>
-                                                </div>
-                                            </div>
-                                            <div class="relative flex h-40 w-28 items-end justify-center z-10 mt-2">
-                                                <div class="absolute left-2 top-0 bottom-[1.8rem] w-3 flex flex-col items-center z-0">
-                                                    <div class="w-2.5 h-full bg-gradient-to-r from-slate-800 via-slate-600 to-slate-800 border-x border-slate-900 shadow-md"></div>
-<div class="absolute bottom-0 w-1.5 transition-all duration-[1500ms] ease-in-out origin-bottom"
-                                                         :class="pumpRunning ? 'h-[50%] opacity-80 bg-amber-400 shadow-[0_0_6px_#f59e0b]' : pumpState === 'on' ? 'h-full opacity-100 bg-cyan-300 shadow-[0_0_8px_#22d3ee]' : 'h-0 opacity-0 bg-cyan-300 shadow-none'"></div>
-                                                </div>
-                                                <div class="absolute left-1.5 bottom-[1.5rem] w-4 h-3 bg-gradient-to-r from-slate-700 to-slate-600 border border-slate-900 rounded-sm z-10 transition-all duration-[1000ms] ease-in-out"
-                                                     :class="pumpRunning ? 'shadow-[0_0_8px_#f59e0b]' : pumpState === 'on' ? 'shadow-[0_0_8px_#00b4d8]' : 'shadow-[0_2px_5px_rgba(0,0,0,0.5)]'">
-                                                    <div class="w-full h-0.5 mt-0.5 transition-colors duration-[1000ms] ease-in-out"
-                                                         :class="pumpRunning ? 'bg-amber-400' : pumpState === 'on' ? 'bg-[#00f8ff]' : 'bg-slate-500'"></div>
-                                                </div>
-                                                <div class="absolute left-2.5 bottom-1 h-5 w-6 border-l-[10px] border-b-[10px] border-slate-700 border-opacity-90 rounded-bl-xl z-0 shadow-lg"></div>
-                                                <div class="absolute left-[8px] bottom-[2px] h-6 w-7 border-l-2 border-b-2 border-slate-900 rounded-bl-xl z-20 pointer-events-none"></div>
-                                                <div class="relative w-[3.5rem] h-[8.5rem] flex flex-col items-center bg-gradient-to-r from-[#2a3a4c] via-[#4a5f78] to-[#1e2a38] border-x-2 border-[#0d1622] rounded-sm shadow-2xl z-10">
-                                                    <div class="w-[85%] h-6 border-b-2 border-[#0d1622] overflow-hidden relative">
-<div class="absolute inset-0 bg-gradient-to-r from-[#1c2836] via-[#3a4f6b] to-[#1c2836]"></div>
-<div class="absolute inset-0 opacity-60 mix-blend-multiply"
-                                                             :class="pumpState === 'on' && !pumpRunning ? 'animate-[rotor-spin_0.2s_linear_infinite]' : ''"
-                                                             style="background: repeating-linear-gradient(90deg, #000 0px, #000 6px, transparent 6px, transparent 15px); background-size: 15px 100%;">
-                                                        </div>
-<div class="absolute inset-0 bg-gradient-to-r from-[#000]/90 via-transparent to-[#000]/90 pointer-events-none"></div>
-                                                    </div>
-<div class="w-[105%] h-1.5 rounded-full transition-colors duration-[800ms] ease-in-out z-20 border"
-                                                         :class="pumpRunning ? 'border-transparent shadow-[0_0_12px_#f59e0b] animate-[pump-flicker_0.7s_ease-in-out_infinite] bg-amber-400' : pumpState === 'on' ? 'bg-[#00f8ff] border-transparent shadow-[0_0_15px_#00f8ff]' : 'bg-slate-700 border-slate-800 shadow-none'"></div>
-                                                    <div class="w-full flex-grow flex items-center justify-center relative shadow-[inset_4px_0_10px_rgba(255,255,255,0.1),inset_-6px_0_15px_rgba(0,0,0,0.6)]">
-                                                        <div class="w-5 h-[4.5rem] bg-[#070b12] rounded-full border border-slate-800 shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col justify-end p-[1.5px]">
-<div class="relative w-full rounded-full transition-all duration-[1500ms] ease-in-out overflow-hidden flex flex-col justify-end"
-                                                                 :class="pumpRunning ? 'h-[45%]' : pumpState === 'on' ? 'h-[85%] shadow-[0_0_10px_#00f8ff]' : 'h-[15%] shadow-none'">
-<div class="absolute inset-0 w-full h-full bg-gradient-to-b from-[#00f8ff] to-[#0077b6] transition-opacity duration-[1000ms] ease-in-out"
-                                                                     :class="pumpState === 'on' && !pumpRunning ? 'opacity-100 animate-[pulse_1.5s_infinite]' : 'opacity-0'"></div>
-<div class="absolute inset-0 w-full h-full bg-gradient-to-b from-amber-300 to-amber-600 transition-opacity duration-[800ms] ease-in-out"
-                                                                     :class="pumpRunning ? 'opacity-100 animate-[pulse_0.8s_infinite]' : 'opacity-0'"></div>
-<div class="absolute inset-0 w-full h-full bg-slate-600 transition-opacity duration-[1000ms] ease-in-out"
-                                                                     :class="!pumpRunning && pumpState !== 'on' ? 'opacity-100' : 'opacity-0'"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-<div class="w-[105%] h-1.5 rounded-full transition-colors duration-[800ms] ease-in-out z-20 border"
-                                                         :class="pumpRunning ? 'border-transparent shadow-[0_0_12px_#f59e0b] animate-[pump-flicker_0.7s_ease-in-out_infinite_0.35s] bg-amber-400' : pumpState === 'on' ? 'bg-[#00f8ff] border-transparent shadow-[0_0_15px_#00f8ff]' : 'bg-slate-700 border-slate-800 shadow-none'"></div>
-                                                    <div class="w-[90%] h-5 bg-gradient-to-r from-[#1c2836] to-[#2d3f54] border-x border-b border-[#0d1622] rounded-b-md flex flex-col justify-between items-center shadow-lg pb-1">
-                                                        <div class="w-full h-1.5 border-b border-slate-800 opacity-50"></div>
-                                                        <div class="flex w-[70%] justify-between">
-                                                            <div class="w-1.5 h-2 bg-[#070b12] rounded-sm"></div>
-                                                            <div class="w-1.5 h-2 bg-[#070b12] rounded-sm"></div>
-                                                            <div class="w-1.5 h-2 bg-[#070b12] rounded-sm"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-<div class="absolute top-3 right-3 rounded bg-[#0b132b]/80 backdrop-blur-sm border px-2 py-1 flex items-center justify-center z-40 transition-all duration-500"
-                                                 :class="pumpRunning ? 'border-amber-700/60' : 'border-cyan-900/50'">
-                                                <div class="w-1.5 h-1.5 rounded-full mr-1.5 transition-all duration-500"
-                                                     :class="pumpRunning ? 'bg-amber-400 shadow-[0_0_5px_#f59e0b] animate-[pump-flicker_0.7s_ease-in-out_infinite]' : pumpState === 'on' ? 'bg-[#00f8ff] shadow-[0_0_5px_#00f8ff] animate-pulse' : 'bg-slate-500'"></div>
-                                                <span class="text-[9px] font-bold tracking-widest uppercase transition-colors duration-500 mt-0.5"
-                                                      :class="pumpRunning ? 'text-amber-300' : pumpState === 'on' ? 'text-cyan-300' : 'text-slate-400'"
-                                                      x-text="pumpRunning ? (pumpTargetState === 'on' ? 'Starting' : 'Stopping') : pumpState === 'on' ? 'Running' : 'Standby'"></span>
-                                            </div>
-<div class="absolute inset-0 rounded-xl pointer-events-none transition-opacity duration-500"
-                                                 :class="pumpRunning ? 'animate-[pump-flash_1.8s_ease-in-out_infinite] bg-amber-400/5' : 'opacity-0'"></div>
-                                        </div>
-<div class="flex w-full flex-col justify-center space-y-4 sm:w-2/3">
-                                            <button type="button" @click="runPumpAction('on')"
-                                                class="group relative flex items-center justify-between rounded-xl bg-emerald-600 px-5 py-4 shadow-md transition-all hover:bg-emerald-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-                                                :disabled="!pumpStatusReady || pumpRunning || pumpState === 'on'">
-                                                <div class="flex items-center gap-3">
-                                                    <span class="flex h-3 w-3 rounded-full bg-emerald-300"
-                                                        :class="pumpRunning && pumpTargetState === 'on' ? 'animate-pulse' : 'group-hover:animate-pulse'"></span>
-                                                    <div class="text-left">
-                                                        <p class="text-sm font-bold text-white uppercase tracking-wider">Start Pump</p>
-                                                        <p class="mt-0.5 text-xs text-emerald-100"
-                                                            x-text="pumpRunning && pumpTargetState === 'on' ? 'Sending command...' : 'Kirim perintah untuk menyalakan'"></p>
-                                                    </div>
-                                                </div>
-<svg x-show="!(pumpRunning && pumpTargetState === 'on')" class="h-6 w-6 text-emerald-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-<svg x-show="pumpRunning && pumpTargetState === 'on'" style="display: none;" class="h-6 w-6 animate-spin text-emerald-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                                                </svg>
-                                            </button>
-
-                                            <button type="button" @click="runPumpAction('off')"
-                                                class="group relative flex items-center justify-between rounded-xl bg-red-600 px-5 py-4 shadow-md transition-all hover:bg-red-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-                                                :disabled="!pumpStatusReady || pumpRunning || pumpState === 'off'">
-                                                <div class="flex items-center gap-3">
-                                                    <span class="flex h-3 w-3 rounded-full bg-red-300"
-                                                        :class="pumpRunning && pumpTargetState === 'off' ? 'animate-pulse' : ''"></span>
-                                                    <div class="text-left">
-                                                        <p class="text-sm font-bold text-white uppercase tracking-wider">Stop Pump</p>
-                                                        <p class="mt-0.5 text-xs text-red-100"
-                                                            x-text="pumpRunning && pumpTargetState === 'off' ? 'Sending command...' : 'Hentikan seketika mekanisme pompa'"></p>
-                                                    </div>
-                                                </div>
-<svg x-show="!(pumpRunning && pumpTargetState === 'off')" class="h-6 w-6 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10h6v4H9z" />
-                                                </svg>
-<svg x-show="pumpRunning && pumpTargetState === 'off'" style="display: none;" class="h-6 w-6 animate-spin text-red-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-<div x-show="pumpWorkflowVisible" x-cloak
-                                        x-transition:enter="transition ease-out duration-200"
-                                        x-transition:enter-start="opacity-0 translate-y-2"
-                                        x-transition:enter-end="opacity-100 translate-y-0"
-                                        class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                                        <div class="mb-3 flex items-start justify-between gap-3">
-                                            <div>
-                                                <p class="text-sm font-semibold text-slate-900">Progress</p>
-                                                <p class="mt-1 text-xs text-slate-500"
-                                                    x-text="pumpRunning ? 'Menjalankan urutan simulasi koneksi...' : 'Seluruh tahap operasional pompa telah selesai.'"></p>
-                                            </div>
-                                            <div class="text-right">
-                                                <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Overall Progress</p>
-                                                <p class="mt-1 text-sm font-semibold text-slate-700" x-text="`${pumpPercent()}%`"></p>
-                                            </div>
-                                        </div>
-                                        <div class="mb-4 h-2 w-full overflow-hidden rounded-full bg-slate-200">
-                                            <div class="h-full rounded-full bg-emerald-500 transition-all duration-500" :style="`width: ${pumpPercent()}%`"></div>
-                                        </div>
-                                        <div class="space-y-2">
-                                            <template x-for="(step, index) in pumpSteps" :key="step.key">
-                                                <div class="rounded-xl border p-3 transition"
-                                                    :class="step.status === 'done' ? 'border-emerald-200 bg-emerald-50/70' : step.status === 'active' ? 'border-emerald-200 bg-emerald-50/40' : step.status === 'error' ? 'border-red-200 bg-red-50/70' : 'border-slate-200 bg-white/70 opacity-80'">
-                                                    <div class="flex items-center gap-2.5">
-                                                        <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl"
-                                                            :class="step.status === 'done' ? 'bg-emerald-100' : step.status === 'active' ? 'bg-emerald-100/80' : step.status === 'error' ? 'bg-red-100' : 'bg-slate-100'">
-                                                            <template x-if="step.status === 'done'">
-                                                                <svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-                                                                    <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 010 1.42l-7.2 7.2a1 1 0 01-1.415 0l-3-3a1 1 0 111.414-1.42l2.293 2.295 6.493-6.495a1 1 0 011.415 0z" clip-rule="evenodd" />
-                                                                </svg>
-                                                            </template>
-                                                            <template x-if="step.status === 'active'">
-                                                                <span class="inline-block h-4 w-4 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></span>
-                                                            </template>
-                                                            <template x-if="step.status === 'error'">
-                                                                <svg class="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                                </svg>
-                                                            </template>
-                                                            <template x-if="step.status === 'pending'">
-                                                                <span class="h-2 w-2 rounded-full bg-slate-300"></span>
-                                                            </template>
-                                                        </div>
-                                                        <div class="min-w-0 flex-1">
-                                                            <p class="text-sm font-semibold" :class="step.status === 'pending' ? 'text-slate-500' : step.status === 'error' ? 'text-red-700' : 'text-slate-900'" x-text="step.title"></p>
-                                                            <p class="mt-0.5 text-xs" :class="step.status === 'pending' ? 'text-slate-400' : step.status === 'error' ? 'text-red-500' : 'text-slate-500'" x-text="step.subtitle"></p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-	                    </div>
-	                </div>
-	                </template>
-	            </div>
-	            @endif
-            <button class="station-action station-action-outline" onclick="openDocModal()">
+                        <button class="cbtn cbtn-ghost" onclick="openDocModal()">
                 <svg width="18" height="16" viewBox="0 0 20 18" class="sm:me-2" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M9.91667 13.5833C11.9417 13.5833 13.5833 11.9417 13.5833 9.91667C13.5833 7.89162 11.9417 6.25 9.91667 6.25C7.89162 6.25 6.25 7.89162 6.25 9.91667C6.25 11.9417 7.89162 13.5833 9.91667 13.5833Z"
-                        stroke="currentColor" stroke-width="1.5" />
+                        stroke="#303481" stroke-width="1.5" />
                     <path
                         d="M7.87983 17.25H11.9535C14.8144 17.25 16.2453 17.25 17.2729 16.5763C17.7164 16.2858 18.0983 15.9108 18.3967 15.4726C19.0833 14.4643 19.0833 13.059 19.0833 10.2504C19.0833 7.44171 19.0833 6.03646 18.3967 5.02813C18.0983 4.58995 17.7164 4.21491 17.2729 3.92446C16.6129 3.49088 15.7861 3.33596 14.5202 3.28096C13.9161 3.28096 13.3963 2.83179 13.2781 2.24971C13.1877 1.82334 12.9529 1.44124 12.6134 1.168C12.2738 0.894753 11.8503 0.747117 11.4145 0.750043H8.41883C7.51317 0.750043 6.73308 1.37796 6.55525 2.24971C6.437 2.83179 5.91725 3.28096 5.31317 3.28096C4.04817 3.33596 3.22133 3.49179 2.56042 3.92446C2.11724 4.21501 1.73567 4.59004 1.4375 5.02813C0.75 6.03646 0.75 7.44079 0.75 10.2504C0.75 13.06 0.75 14.4634 1.43658 15.4726C1.73358 15.909 2.11492 16.2839 2.56042 16.5763C3.588 17.25 5.01892 17.25 7.87983 17.25Z"
-                        stroke="currentColor" stroke-width="1.5" />
-                    <path d="M16.3333 7.16675H15.4166" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        stroke="#303481" stroke-width="1.5" />
+                    <path d="M16.3333 7.16675H15.4166" stroke="#303481" stroke-width="1.5" stroke-linecap="round" />
                 </svg>
                 <span class="hidden sm:inline">Dokumentasi</span>
             </button>
@@ -1370,22 +1437,455 @@
                     <div>
                         <label class="deck-label">Pilih Logger</label>
                         <select id="loggerSelect" class="calendar-input text-sm py-2">
-                            @foreach ($allLoggers as $l)
-                                <option value="{{ $l->id_logger }}"
-                                    {{ $logger->id_logger == $l->id_logger ? 'selected' : '' }}>
-                                    {{ $l->nama_pos ?? $l->nama_logger ?? 'Logger' }}
+                                                            <option value="10005"
+                                    >
+                                    10005 - Pos Kranggan
                                 </option>
-                            @endforeach
-                        </select>
+                                                            <option value="10004"
+                                    >
+                                    10004 - Pos Bantar
+                                </option>
+                                                            <option value="20092"
+                                    >
+                                    20092 - Pos DSDA DKI
+                                </option>
+                                                            <option value="10002"
+                                    selected>
+                                    10002 - Pos Pogung
+                                </option>
+                                                            <option value="90042"
+                                    >
+                                    90042 - AWGC Percabangan BAGENDIT
+                                </option>
+                                                            <option value="90020"
+                                    >
+                                    90020 - AWGC Percabangan BCD_1
+                                </option>
+                                                            <option value="90029"
+                                    >
+                                    90029 - AWGC Percabangan BCD_10
+                                </option>
+                                                            <option value="90030"
+                                    >
+                                    90030 - AWGC Percabangan BCD_11
+                                </option>
+                                                            <option value="90031"
+                                    >
+                                    90031 - AWGC Percabangan BCD_12
+                                </option>
+                                                            <option value="90032"
+                                    >
+                                    90032 - AWGC Percabangan BCD_13
+                                </option>
+                                                            <option value="90033"
+                                    >
+                                    90033 - AWGC Percabangan BCD_14
+                                </option>
+                                                            <option value="90034"
+                                    >
+                                    90034 - AWGC Percabangan BCD_15
+                                </option>
+                                                            <option value="90035"
+                                    >
+                                    90035 - AWGC Percabangan BCD_16
+                                </option>
+                                                            <option value="90060"
+                                    >
+                                    90060 - AWGC Percabangan BCD_17
+                                </option>
+                                                            <option value="90061"
+                                    >
+                                    90061 - AWGC Percabangan BCD_18
+                                </option>
+                                                            <option value="90062"
+                                    >
+                                    90062 - AWGC Percabangan BCD_19
+                                </option>
+                                                            <option value="90021"
+                                    >
+                                    90021 - AWGC Percabangan BCD_2
+                                </option>
+                                                            <option value="90063"
+                                    >
+                                    90063 - AWGC Percabangan BCD_20
+                                </option>
+                                                            <option value="90022"
+                                    >
+                                    90022 - AWGC Percabangan BCD_3
+                                </option>
+                                                            <option value="90023"
+                                    >
+                                    90023 - AWGC Percabangan BCD_4
+                                </option>
+                                                            <option value="90024"
+                                    >
+                                    90024 - AWGC Percabangan BCD_5
+                                </option>
+                                                            <option value="90025"
+                                    >
+                                    90025 - AWGC Percabangan BCD_6
+                                </option>
+                                                            <option value="90026"
+                                    >
+                                    90026 - AWGC Percabangan BCD_7
+                                </option>
+                                                            <option value="90027"
+                                    >
+                                    90027 - AWGC Percabangan BCD_8
+                                </option>
+                                                            <option value="90028"
+                                    >
+                                    90028 - AWGC Percabangan BCD_9
+                                </option>
+                                                            <option value="90052"
+                                    >
+                                    90052 - AWGC Percabangan BCK_1
+                                </option>
+                                                            <option value="90054"
+                                    >
+                                    90054 - AWGC Percabangan BCN_1
+                                </option>
+                                                            <option value="90055"
+                                    >
+                                    90055 - AWGC Percabangan BCN_2
+                                </option>
+                                                            <option value="90056"
+                                    >
+                                    90056 - AWGC Percabangan BCN_3
+                                </option>
+                                                            <option value="90057"
+                                    >
+                                    90057 - AWGC Percabangan BCN_4
+                                </option>
+                                                            <option value="90058"
+                                    >
+                                    90058 - AWGC Percabangan BCN_5
+                                </option>
+                                                            <option value="90059"
+                                    >
+                                    90059 - AWGC Percabangan BCN_6
+                                </option>
+                                                            <option value="90019"
+                                    >
+                                    90019 - AWGC Percabangan BCP_Ki_1
+                                </option>
+                                                            <option value="90036"
+                                    >
+                                    90036 - AWGC Percabangan BCP_Ko_1
+                                </option>
+                                                            <option value="90037"
+                                    >
+                                    90037 - AWGC Percabangan BCP_Ko_2
+                                </option>
+                                                            <option value="90038"
+                                    >
+                                    90038 - AWGC Percabangan BCP_Ko_3
+                                </option>
+                                                            <option value="90039"
+                                    >
+                                    90039 - AWGC Percabangan BCP_Ko_4
+                                </option>
+                                                            <option value="90040"
+                                    >
+                                    90040 - AWGC Percabangan BCP_Ko_5
+                                </option>
+                                                            <option value="90064"
+                                    >
+                                    90064 - AWGC Percabangan BCS_1
+                                </option>
+                                                            <option value="90065"
+                                    >
+                                    90065 - AWGC Percabangan BCS_2
+                                </option>
+                                                            <option value="90066"
+                                    >
+                                    90066 - AWGC Percabangan BCS_3
+                                </option>
+                                                            <option value="90053"
+                                    >
+                                    90053 - AWGC Percabangan BC_1
+                                </option>
+                                                            <option value="90016"
+                                    >
+                                    90016 - AWGC Percabangan BGP_1
+                                </option>
+                                                            <option value="90017"
+                                    >
+                                    90017 - AWGC Percabangan BGP_2
+                                </option>
+                                                            <option value="90018"
+                                    >
+                                    90018 - AWGC Percabangan BGP_3
+                                </option>
+                                                            <option value="90067"
+                                    >
+                                    90067 - AWGC Percabangan BKL_2
+                                </option>
+                                                            <option value="90068"
+                                    >
+                                    90068 - AWGC Percabangan BLG_1
+                                </option>
+                                                            <option value="90077"
+                                    >
+                                    90077 - AWGC Percabangan BLG_10
+                                </option>
+                                                            <option value="90078"
+                                    >
+                                    90078 - AWGC Percabangan BLG_11
+                                </option>
+                                                            <option value="90079"
+                                    >
+                                    90079 - AWGC Percabangan BLG_12
+                                </option>
+                                                            <option value="90080"
+                                    >
+                                    90080 - AWGC Percabangan BLG_13
+                                </option>
+                                                            <option value="90081"
+                                    >
+                                    90081 - AWGC Percabangan BLG_14
+                                </option>
+                                                            <option value="90082"
+                                    >
+                                    90082 - AWGC Percabangan BLG_15
+                                </option>
+                                                            <option value="90069"
+                                    >
+                                    90069 - AWGC Percabangan BLG_2
+                                </option>
+                                                            <option value="90070"
+                                    >
+                                    90070 - AWGC Percabangan BLG_3
+                                </option>
+                                                            <option value="90071"
+                                    >
+                                    90071 - AWGC Percabangan BLG_4
+                                </option>
+                                                            <option value="90072"
+                                    >
+                                    90072 - AWGC Percabangan BLG_5
+                                </option>
+                                                            <option value="90073"
+                                    >
+                                    90073 - AWGC Percabangan BLG_6
+                                </option>
+                                                            <option value="90074"
+                                    >
+                                    90074 - AWGC Percabangan BLG_7
+                                </option>
+                                                            <option value="90075"
+                                    >
+                                    90075 - AWGC Percabangan BLG_8
+                                </option>
+                                                            <option value="90076"
+                                    >
+                                    90076 - AWGC Percabangan BLG_9
+                                </option>
+                                                            <option value="90043"
+                                    >
+                                    90043 - AWGC Percabangan BPG_0
+                                </option>
+                                                            <option value="90044"
+                                    >
+                                    90044 - AWGC Percabangan BPG_1
+                                </option>
+                                                            <option value="90045"
+                                    >
+                                    90045 - AWGC Percabangan BPG_2
+                                </option>
+                                                            <option value="90046"
+                                    >
+                                    90046 - AWGC Percabangan BPG_3
+                                </option>
+                                                            <option value="90047"
+                                    >
+                                    90047 - AWGC Percabangan BPG_4
+                                </option>
+                                                            <option value="90048"
+                                    >
+                                    90048 - AWGC Percabangan BPG_5
+                                </option>
+                                                            <option value="90049"
+                                    >
+                                    90049 - AWGC Percabangan BPG_6
+                                </option>
+                                                            <option value="90050"
+                                    >
+                                    90050 - AWGC Percabangan BPG_7
+                                </option>
+                                                            <option value="90051"
+                                    >
+                                    90051 - AWGC Percabangan BRU_1
+                                </option>
+                                                            <option value="90083"
+                                    >
+                                    90083 - AWGC Percabangan BSB_1
+                                </option>
+                                                            <option value="90084"
+                                    >
+                                    90084 - AWGC Percabangan BSB_2
+                                </option>
+                                                            <option value="90085"
+                                    >
+                                    90085 - AWGC Percabangan BSB_3
+                                </option>
+                                                            <option value="90015"
+                                    >
+                                    90015 - AWGC Percabangan WEIR_COPONG
+                                </option>
+                                                            <option value="90041"
+                                    >
+                                    90041 - AWGC Pintu BCP_Ko_6
+                                </option>
+                                                            <option value="10367"
+                                    >
+                                    10367 - Pos ATAB Prambanan
+                                </option>
+                                                            <option value="90008"
+                                    >
+                                    90008 - AWLR BCD.12
+                                </option>
+                                                            <option value="90007"
+                                    >
+                                    90007 - AWLR BCD.5
+                                </option>
+                                                            <option value="90006"
+                                    >
+                                    90006 - AWLR BGP.1
+                                </option>
+                                                            <option value="90011"
+                                    >
+                                    90011 - AWLR BLG.6
+                                </option>
+                                                            <option value="90010"
+                                    >
+                                    90010 - AWLR BPG.3
+                                </option>
+                                                            <option value="90012"
+                                    >
+                                    90012 - AWLR Cinanti.3
+                                </option>
+                                                            <option value="90014"
+                                    >
+                                    90014 - AWLR Ciseureuh.2
+                                </option>
+                                                            <option value="90003"
+                                    >
+                                    90003 - AWLR Copong Kanan Main
+                                </option>
+                                                            <option value="90001"
+                                    >
+                                    90001 - AWLR Copong Main Canal
+                                </option>
+                                                            <option value="90002"
+                                    >
+                                    90002 - AWLR Copong Pra-Cabang
+                                </option>
+                                                            <option value="30069"
+                                    >
+                                    30069 - Pos Bussiness Matching
+                                </option>
+                                                            <option value="10366"
+                                    >
+                                    10366 - Pos JIAT Playen
+                                </option>
+                                                            <option value="10008"
+                                    >
+                                    10008 - Pos Bangunjiwo
+                                </option>
+                                                            <option value="90004"
+                                    >
+                                    90004 - AWLR Parigi Intake
+                                </option>
+                                                            <option value="90005"
+                                    >
+                                    90005 - AWLR Pra-Split LG/CS
+                                </option>
+                                                            <option value="90013"
+                                    >
+                                    90013 - AWLR Sawah Bera.2
+                                </option>
+                                                            <option value="10003"
+                                    >
+                                    10003 - Pos Sinduadi
+                                </option>
+                                                            <option value="90009"
+                                    >
+                                    90009 - AWLR Situ Bagendit
+                                </option>
+                                                            <option value="10007"
+                                    >
+                                    10007 - Pos Kretek
+                                </option>
+                                                            <option value="10006"
+                                    >
+                                    10006 - Pos Nanggulan
+                                </option>
+                                                            <option value="10373"
+                                    >
+                                    10373 - AFMR DMA 1 MOJOLABAN
+                                </option>
+                                                            <option value="10369"
+                                    >
+                                    10369 - DMA 11
+                                </option>
+                                                            <option value="10370"
+                                    >
+                                    10370 - DMA 12 OUTLET
+                                </option>
+                                                            <option value="10371"
+                                    >
+                                    10371 - AFMR DMA 15 OUTLET
+                                </option>
+                                                            <option value="10372"
+                                    >
+                                    10372 - AFMR DMA 16
+                                </option>
+                                                            <option value="10374"
+                                    >
+                                    10374 - DMA 3 MOJOLABAN
+                                </option>
+                                                            <option value="10375"
+                                    >
+                                    10375 - AFMR DMA 5 MOJOLABAN
+                                </option>
+                                                            <option value="10376"
+                                    >
+                                    10376 - AFMR DMA 6 MOJOLABAN
+                                </option>
+                                                            <option value="10368"
+                                    >
+                                    10368 - AFMR DMA 9 OUTLET
+                                </option>
+                                                            <option value="10378"
+                                    >
+                                    10378 - AFMR INLET DMA 12
+                                </option>
+                                                            <option value="10379"
+                                    >
+                                    10379 - AFMR DMA 15
+                                </option>
+                                                            <option value="10377"
+                                    >
+                                    10377 - AFMR INLET DMA 9
+                                </option>
+                                                    </select>
                         <label class="deck-label mt-4">Parameter</label>
                         <select id="parameterSelect" class="calendar-input text-sm py-2">
                             <option value="">Pilih Parameter</option>
-                            @foreach ($parameters as $param)
-                                <option value="{{ $param['nama_parameter'] }}" data-unit="{{ $param['satuan'] ?? '' }}"
-                                    data-tipe-graf="{{ $param['tipe_graf'] ?? 'line' }}">
-                                    {{ str_replace('_', ' ', $param['nama_parameter']) }}</option>
-                            @endforeach
-                        </select>
+                                                            <option value="Curah_Hujan" data-unit="mm"
+                                    data-tipe-graf="bar">
+                                    Curah Hujan</option>
+                                                            <option value="humidity_logger" data-unit="%"
+                                    data-tipe-graf="line">
+                                    humidity logger</option>
+                                                            <option value="battery_logger" data-unit="volt"
+                                    data-tipe-graf="line">
+                                    battery logger</option>
+                                                            <option value="temperature_logger" data-unit="°C"
+                                    data-tipe-graf="line">
+                                    temperature logger</option>
+                                                    </select>
                         <label class="deck-label mt-4">Analisa Dalam</label>
                         <div class="seg-grid">
                             <label class="seg"><input type="radio" name="range" value="day" checked><span>Hari</span></label>
@@ -1399,7 +1899,7 @@
                             <div class="relative w-full" id="dpWrap">
                                 <input type="text" id="dateInput"
                                     class="calendar-input text-sm py-2 rounded-lg pr-10 border border-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-700"
-                                    value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" autocomplete="off" />
+                                    value="2026-06-11" placeholder="YYYY-MM-DD" autocomplete="off" />
 
                                 <button type="button" id="dpBtn"
                                     class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
@@ -1431,7 +1931,7 @@
                                                 <button type="button" id="dpMonthBtn"
                                                     class="h-8 rounded-full border border-slate-200 bg-slate-100 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 inline-flex items-center gap-2">
                                                     <span
-                                                        id="dpMonthLabel">{{ ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][(int) date('n') - 1] }}</span>
+                                                        id="dpMonthLabel">Juni</span>
                                                     <svg width="12" height="12" viewBox="0 0 20 20"
                                                         fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M5 7.5L10 12.5L15 7.5" stroke="#64748B" stroke-width="2"
@@ -1448,7 +1948,7 @@
                                             <div class="relative">
                                                 <button type="button" id="dpYearBtn"
                                                     class="h-8 rounded-full border border-slate-200 bg-slate-100 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 inline-flex items-center gap-2">
-                                                    <span id="dpYearLabel">{{ date('Y') }}</span>
+                                                    <span id="dpYearLabel">2026</span>
                                                     <svg width="12" height="12" viewBox="0 0 20 20"
                                                         fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M5 7.5L10 12.5L15 7.5" stroke="#64748B" stroke-width="2"
@@ -1499,7 +1999,7 @@
                                     </svg>
                                 </button>
 
-                                <input type="hidden" id="monthInput" value="{{ date('Y-m') }}" />
+                                <input type="hidden" id="monthInput" value="2026-06" />
 
                                 <div id="mpPanel"
                                     class="fixed w-[320px] rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-[9999] hidden">
@@ -1542,7 +2042,7 @@
                                     </svg>
                                 </button>
 
-                                <input type="hidden" id="yearInput" value="{{ date('Y') }}" />
+                                <input type="hidden" id="yearInput" value="2026" />
 
                                 <div id="ypPanel"
                                     class="fixed w-[320px] rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-[9999] hidden">
@@ -1581,8 +2081,8 @@
                                     </svg>
                                 </button>
 
-                                <input type="hidden" id="startDateTime" value="{{ date('Y-m-d\T00:00') }}">
-                                <input type="hidden" id="endDateTime" value="{{ date('Y-m-d\T23:59') }}">
+                                <input type="hidden" id="startDateTime" value="2026-06-11T00:00">
+                                <input type="hidden" id="endDateTime" value="2026-06-11T23:59">
 
                                 <div id="rpPanel"
                                     class="fixed w-[640px] rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-[9999] hidden">
@@ -1724,7 +2224,7 @@
                     </div>
                     <div class="deck-sep"></div>
                     <div>
-                        <button type="button" class="btn-success btn-success-soft" onclick="downloadExcel()">
+                        <button type="button" class="btn-success" onclick="downloadExcel()">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 3v12" />
@@ -1765,8 +2265,8 @@
                                     </div>
                                     <div class="mt-1 text-xs font-medium" id="rainfallCardCategory">–</div>
                                 </div>
-                                <img id="rainfallCardIcon" src="{{ asset('klasifikasi_hujan/tidak_hujan.png') }}"
-                                    onerror="this.onerror=null;this.src='{{ asset('klasifikasi_hujan/tidak_hujan.png') }}';"
+                                <img id="rainfallCardIcon" src="http://localhost/klasifikasi_hujan/tidak_hujan.png"
+                                    onerror="this.onerror=null;this.src='http://localhost/klasifikasi_hujan/tidak_hujan.png';"
                                     alt="Status Hujan"
                                     class="pointer-events-none absolute right-[-0.5rem] top-6 h-24 w-24 object-contain opacity-90">
                             </div>
@@ -1779,81 +2279,10 @@
                         </div>
                     </div>
 
-                    @php
-                        $loggerKategoriName = strtoupper(
-                            $logger->kategori_logger
-                            ?? $logger->kategori?->nama_kategori
-                            ?? ''
-                        );
-                    @endphp
-                    @if($loggerKategoriName === 'AWQR')
-                    @php
-                        $latestAwgrRow = ($logger->temp19 instanceof \Illuminate\Database\Eloquent\Model)
-                            ? $logger->temp19 : $logger->temp16;
-                        $phParamAwgr = $logger->params->first(fn($p) =>
-                            in_array(strtolower(trim($p->nama_parameter)), ['ph_air','ph air','ph']) ||
-                            in_array(strtolower(trim($p->kolom_sensor ?? '')), ['ph_air','ph'])
-                        );
-                        $phKolomAwgr = $phParamAwgr?->kolom_sensor;
-                        $latestPhAwgr = $latestAwgrRow && $phKolomAwgr ? ($latestAwgrRow->{$phKolomAwgr} ?? null) : null;
-                        $latestPhTimeAwgr = $latestAwgrRow?->waktu ?? null;
-                        $phDisplayAwgr = is_numeric($latestPhAwgr) ? number_format((float)$latestPhAwgr, 2) : '-';
-                        $phTimeDisplayAwgr = $latestPhTimeAwgr ? date('d-m-Y H:i:s', strtotime($latestPhTimeAwgr)) : '-';
-                        $phVal = is_numeric($latestPhAwgr) ? (float)$latestPhAwgr : null;
-                        $phClassLabel = $phVal !== null ? ($phVal >= 6 && $phVal <= 9 ? 'Kelas I – III' : ($phVal >= 5 ? 'Kelas IV' : 'Di Luar Baku Mutu')) : '';
-                        $phClassColor = $phVal !== null ? ($phVal >= 6 && $phVal <= 9 ? '#3b82f6' : ($phVal >= 5 ? '#ef4444' : '#6b7280')) : '#6b7280';
-                    @endphp
-<div id="awqrParamHeader" class="hidden mb-3">
-                        <div class="flex flex-col md:flex-row gap-3">
-<div class="relative overflow-hidden flex-shrink-0 bg-white border border-slate-200 rounded-xl px-5 py-2 shadow-sm" style="min-width:290px">
-                                <div class="z-10 relative">
-                                    <div class="flex items-start justify-between gap-4 mt-2">
-                                        <div>
-                                            <div class="text-xs font-semibold text-slate-700 uppercase tracking-wide" id="awqrParamLabel">NILAI PARAMETER</div>
-                                            <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
-                                                <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 16 16" stroke="currentColor"><rect x="1" y="2" width="14" height="13" rx="2" stroke-width="1.5"/><path d="M1 6h14" stroke-width="1.5"/><path d="M5 1v3M11 1v3" stroke-width="1.5" stroke-linecap="round"/></svg>
-                                                <span id="awqrParamTimeSpan">–</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-right leading-none">
-                                            <span class="text-3xl font-bold text-slate-800" id="awqrParamValue">–</span>
-                                            <span class="text-xs text-slate-400 ml-1" id="awqrParamUnit"></span>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3 flex items-center gap-1.5" id="awqrParamBadge">
-                                        <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" id="awqrParamClassDot" style="background:#009CD9"></span>
-                                        <span class="text-sm font-semibold" id="awqrParamClass" style="color:#009CD9"></span>
-                                    </div>
-                                </div>
-                                <div class="pointer-events-none absolute inset-x-0 bottom-0 h-12 opacity-60" aria-hidden="true">
-                                    <img src="{{ asset('icons/gelombang.svg') }}" class="w-full h-full object-cover object-center" alt="">
-                                </div>
-                            </div>
-<div class="flex-1 bg-white border border-slate-200 rounded-xl px-5 py-2 shadow-sm">
-                                <div class="text-base font-bold text-slate-700 mb-2">Keterangan:</div>
-                                <div class="flex flex-wrap gap-x-8 gap-y-3" id="awqrKeteranganItems">
-</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    @endif
-
-                    <div class="panel-head chart-panel-head">
-                        <div class="chart-panel-heading">
-                            <div class="panel-eyebrow">Grafik Pengukuran</div>
-                            <span id="chartPostName" class="hidden">{{ $logger->nama_pos ?? $logger->nama_logger ?? 'Logger' }}</span>
-                            <div class="chart-title" id="chartTitle">{{ date('F Y') }} - {{ $logger->nama_pos ?? $logger->nama_logger ?? 'Logger' }}</div>
-                        </div>
-                        <button type="button" class="chart-export-btn" onclick="downloadChart()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M12 3v12" />
-                                <path d="m7 10 5 5 5-5" />
-                                <path d="M5 21h14" />
-                            </svg>
-                            <span>Download Chart</span>
-                        </button>
+                                        
+                    <div class="panel-head">
+                        <div class="panel-eyebrow">Grafik Pengukuran</div>
+                        <div class="chart-title" id="chartTitle">June 2026</div>
                     </div>
                     <div class="chart-wrapper mb-3 mt-3">
                         <canvas id="dataChart" height="400"></canvas>
@@ -1862,7 +2291,7 @@
                 <div class="data-table-section px-4 pb-4 pt-2">
                     <div class="panel-head mb-3">
                         <div class="panel-eyebrow">Tabel Data</div>
-                        <div class="table-title" id="tableTitle">{{ date('F Y') }}</div>
+                        <div class="table-title" id="tableTitle">June 2026</div>
                     </div>
                     <div id="mainTableWrap" class="table-shell mb-3">
                         <table class="data-table">
@@ -1905,15 +2334,784 @@
             </div>
         </div>
     </div>
-@endsection
-@push('scripts')
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+                    </div>
+                </div>
+            </main>
+
+                            <footer class="border-t border-slate-200 bg-white px-4 py-4">
+    <div class="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 text-center">
+        <div class="text-sm text-slate-600">Beacon Engineering @ 2026</div>
+        <img src="http://localhost/images/mini_stesy.svg" alt="Beacon Engineering" class="h-10 w-auto">
+    </div>
+</footer>
+                    </div>
+    </div>
+    <div
+        x-data="stesyChatbot()"
+        x-cloak
+        class="fixed inset-0 z-[260] pointer-events-none"
+        @keydown.escape.window="open = false"
+    >
+        <div
+            x-show="open"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-[0.98]"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-[0.98]"
+            class="pointer-events-auto fixed inset-x-4 top-[11vh] mx-auto flex h-[min(78vh,720px)] max-w-[850px] origin-top flex-col overflow-hidden rounded-[1.35rem] border border-white/80 bg-slate-50/95 shadow-[0_30px_90px_-35px_rgba(15,23,42,0.52),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-xl sm:top-[12vh]"
+            style="display: none;"
+        >
+            <div class="relative flex h-[60px] shrink-0 items-center justify-between border-b border-slate-200/80 bg-white px-5 text-slate-900">
+                <div class="flex min-w-0 items-center gap-3">
+                    <div class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#303481]/10 text-[#303481] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z" />
+                        </svg>
+                    </div>
+                    <div class="flex min-w-0 items-center gap-3">
+                        <h2 class="truncate text-lg font-extrabold tracking-tight">STESY Assistant</h2>
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-[#303481] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+                            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-white/70"></span>
+                            Beta
+                        </span>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 active:scale-[0.98]"
+                    @click="open = false"
+                    aria-label="Tutup chat"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4" x-ref="messages">
+                <template x-for="message in messages" :key="message.id">
+                    <div class="stesy-chat-message mb-4 flex items-start gap-3" :class="message.role === 'user' ? 'justify-end' : 'justify-start'">
+                        <template x-if="message.role !== 'user'">
+                            <div class="mt-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#303481] text-white shadow-[0_12px_24px_-14px_rgba(48,52,129,0.8)]">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8V4H8" />
+                                    <rect x="5" y="8" width="14" height="10" rx="3" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h.01M15 12h.01M9 16h6" />
+                                </svg>
+                            </div>
+                        </template>
+                        <div
+                            class="group/message inline-flex h-auto min-h-0 w-fit flex-col overflow-hidden rounded-2xl text-sm leading-5 shadow-sm"
+                            :class="message.role === 'user'
+                                ? 'max-w-[42%] rounded-br-md bg-[#303481] px-3 py-2 text-white'
+                                : (message.chart
+                                    ? 'stesy-assistant-bubble w-full max-w-[88%] rounded-bl-md border border-slate-200 bg-white text-slate-700'
+                                    : 'stesy-assistant-bubble max-w-[62%] rounded-bl-md border border-slate-200 bg-white text-slate-700')"
+                        >
+                            <template x-if="message.role === 'user'">
+                                <span class="m-0 block whitespace-pre-line p-0" x-text="message.text"></span>
+                            </template>
+
+                            <template x-if="message.role !== 'user'">
+                                <div class="relative">
+                                    <div class="stesy-rich-reply px-4 py-3">
+                                        <template x-if="message.isTyping">
+                                            <span class="block whitespace-pre-line" x-text="message.displayText || message.text"></span>
+                                        </template>
+                                        <template x-if="!message.isTyping">
+                                            <div x-html="formatReply(message.text)"></div>
+                                        </template>
+                                    </div>
+                                    <template x-if="message.chart">
+                                        <div class="px-4 pb-3">
+                                            <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+                                                <p class="mb-2 truncate text-xs font-bold text-slate-700" x-text="message.chart.title"></p>
+                                                <div class="relative h-[230px] w-full">
+                                                    <canvas :id="'stesy-chart-' + message.id"></canvas>
+                                                </div>
+                                                <p class="mt-2 text-[11px] font-medium text-slate-400"
+                                                   x-text="message.chart.agg + ' per ' + (message.chart.granularity === 'hourly' ? 'jam' : 'hari') + ' • satuan ' + (message.chart.unit || '-')"></p>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <span
+                                        x-show="message.isTyping"
+                                        class="stesy-type-caret absolute bottom-3 inline-block h-4 w-1 rounded-full bg-current"
+                                        aria-hidden="true"
+                                    ></span>
+                                    <div
+                                        x-show="!message.isTyping && message.id !== 'welcome'"
+                                        x-transition:enter="transition duration-300 ease-out"
+                                        x-transition:enter-start="opacity-0 translate-y-1"
+                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                        class="flex items-center justify-end border-t border-slate-100 bg-slate-50/70 px-3 py-2"
+                                    >
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-slate-500 transition duration-300 hover:bg-white hover:text-[#303481] active:scale-[0.97]"
+                                            @click="copyMessage(message)"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <rect x="8" y="8" width="11" height="11" rx="2" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V5a2 2 0 012-2h8a2 2 0 012 2v1" />
+                                            </svg>
+                                            <span x-text="message.copied ? 'Tersalin' : 'Salin'"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="messages.length === 1" class="ml-[52px] flex max-w-[680px] flex-wrap gap-2 pb-1">
+                    <template x-for="prompt in prompts" :key="prompt">
+                        <button
+                            type="button"
+                            class="group inline-flex max-w-[220px] items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-left text-xs font-semibold leading-5 text-slate-700 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-[#303481]/25 hover:bg-[#303481]/5 active:scale-[0.98]"
+                            @click="ask(prompt)"
+                        >
+                            <span class="truncate" x-text="prompt"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-[#303481]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+                            </svg>
+                        </button>
+                    </template>
+                </div>
+
+                <div
+                    x-show="loading"
+                    x-transition:enter="transition duration-300 ease-out"
+                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition duration-200 ease-in"
+                    x-transition:leave-start="opacity-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 translate-y-1"
+                    class="mb-4 flex items-start gap-3"
+                    aria-live="polite"
+                >
+                    <div class="stesy-loading-avatar mt-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#303481] text-white shadow-[0_12px_24px_-14px_rgba(48,52,129,0.8)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8V4H8" />
+                            <rect x="5" y="8" width="14" height="10" rx="3" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h.01M15 12h.01M9 16h6" />
+                        </svg>
+                    </div>
+                    <div class="stesy-loading-bubble rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 text-slate-600 shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold tracking-wide text-slate-500">Menyusun jawaban</span>
+                            <span class="flex items-center gap-1" aria-hidden="true">
+                                <span class="stesy-loading-dot"></span>
+                                <span class="stesy-loading-dot"></span>
+                                <span class="stesy-loading-dot"></span>
+                            </span>
+                        </div>
+                        <div class="mt-3 space-y-2">
+                            <span class="stesy-loading-line block h-2 w-44 rounded-full bg-slate-100"></span>
+                            <span class="stesy-loading-line block h-2 w-32 rounded-full bg-slate-100"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form class="shrink-0 bg-slate-50 px-5 py-4" @submit.prevent="ask(input)">
+                <label for="stesy-chatbot-input" class="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Pesan</label>
+                <div class="flex min-h-[72px] items-center gap-3 rounded-[1.35rem] border border-[#303481]/20 bg-white px-4 py-2 shadow-[0_16px_42px_-30px_rgba(48,52,129,0.45),inset_0_1px_0_rgba(255,255,255,0.9)] transition duration-300 focus-within:border-[#303481] focus-within:shadow-[0_18px_48px_-32px_rgba(48,52,129,0.68),inset_0_1px_0_rgba(255,255,255,0.9)]">
+                    <textarea
+                        id="stesy-chatbot-input"
+                        x-model="input"
+                        rows="1"
+                        class="max-h-28 min-h-10 flex-1 resize-none border-0 bg-transparent px-0 py-2 text-sm leading-6 text-slate-800 placeholder:text-slate-400 focus:ring-0"
+                        placeholder="Tulis pertanyaan..."
+                    ></textarea>
+                    <button
+                        type="button"
+                        class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-[#303481] active:scale-[0.96]"
+                        aria-label="Input suara"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3a3 3 0 00-3 3v6a3 3 0 006 0V6a3 3 0 00-3-3z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-14 0M12 18v3M9 21h6" />
+                        </svg>
+                    </button>
+                    <button
+                        type="submit"
+                        class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[#303481] transition hover:bg-[#303481]/10 active:scale-[0.96] disabled:cursor-not-allowed disabled:text-slate-300"
+                        :disabled="loading || input.trim().length === 0"
+                        aria-label="Kirim pesan"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M22 2l-7 20-4-9-9-4 20-7z" />
+                        </svg>
+                    </button>
+                </div>
+                <p x-show="error" class="mt-2 text-xs font-medium text-red-600" x-text="error"></p>
+            </form>
+        </div>
+
+        <button
+            type="button"
+            class="pointer-events-auto fixed bottom-5 right-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#303481] text-white shadow-[0_18px_45px_-22px_rgba(48,52,129,0.9),inset_0_1px_0_rgba(255,255,255,0.22)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#10134B] active:scale-[0.97] sm:bottom-6 sm:right-6 sm:h-16 sm:w-36"
+            @click="open = !open"
+            :aria-label="open ? 'Tutup STESY Assistant' : 'Buka STESY Assistant'"
+        >
+            <span class="absolute -right-0.5 -top-0.5 h-4 w-4 rounded-full border-2 border-white bg-[#303481]" x-show="!open"></span>
+            <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h7M5 19l3.4-2H18a3 3 0 003-3V7a3 3 0 00-3-3H6a3 3 0 00-3 3v7a3 3 0 003 3" />
+            </svg>
+            <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18" />
+            </svg>
+            <span class="hidden text-sm font-bold sm:inline" x-text="open ? 'Tutup' : 'Assistant'"></span>
+        </button>
+    </div>
+
+    <style>
+        .stesy-loading-avatar {
+            position: relative;
+            isolation: isolate;
+        }
+
+        .stesy-chat-message {
+            animation: stesy-message-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+            will-change: transform, opacity;
+        }
+
+        .stesy-type-caret {
+            animation: stesy-caret 900ms cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+
+        .stesy-assistant-bubble {
+            box-shadow:
+                0 18px 45px -34px rgba(15, 23, 42, 0.42),
+                inset 0 1px 0 rgba(255, 255, 255, 0.86);
+        }
+
+        .stesy-rich-reply {
+            min-width: 220px;
+            white-space: normal;
+        }
+
+        .stesy-rich-reply p {
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .stesy-rich-reply p + p,
+        .stesy-rich-reply p + .stesy-response-list,
+        .stesy-rich-reply .stesy-response-list + p {
+            margin-top: 0.65rem;
+        }
+
+        .stesy-rich-reply strong {
+            color: #1f2937;
+            font-weight: 800;
+        }
+
+        .stesy-response-title {
+            color: #111827;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
+        .stesy-response-list {
+            display: grid;
+            gap: 0.45rem;
+            margin: 0.7rem 0 0;
+        }
+
+        .stesy-response-item {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 0.55rem;
+            align-items: start;
+            line-height: 1.55;
+        }
+
+        .stesy-response-item:has(.is-dot) {
+            margin-left: 1rem;
+        }
+
+        .stesy-response-marker {
+            display: inline-flex;
+            min-width: 1.35rem;
+            height: 1.35rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            background: rgba(48, 52, 129, 0.08);
+            color: #303481;
+            font-size: 0.68rem;
+            font-weight: 800;
+            line-height: 1;
+            transform: translateY(0.1rem);
+        }
+
+        .stesy-response-marker.is-dot {
+            min-width: 0.42rem;
+            width: 0.42rem;
+            height: 0.42rem;
+            margin-top: 0.45rem;
+            background: #303481;
+        }
+
+        .stesy-loading-avatar::before {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            z-index: -1;
+            border-radius: 9999px;
+            border: 1px solid rgba(48, 52, 129, 0.2);
+            animation: stesy-loading-ring 1.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+
+        .stesy-loading-bubble {
+            min-width: 230px;
+        }
+
+        .stesy-loading-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 9999px;
+            background: #303481;
+            opacity: 0.45;
+            animation: stesy-loading-dot 1.1s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+
+        .stesy-loading-dot:nth-child(2) {
+            animation-delay: 120ms;
+        }
+
+        .stesy-loading-dot:nth-child(3) {
+            animation-delay: 240ms;
+        }
+
+        .stesy-loading-line {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stesy-loading-line::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            transform: translateX(-110%);
+            background: linear-gradient(90deg, transparent, rgba(48, 52, 129, 0.12), transparent);
+            animation: stesy-loading-shimmer 1.35s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+
+        .stesy-loading-line:nth-child(2)::after {
+            animation-delay: 160ms;
+        }
+
+        @keyframes stesy-loading-dot {
+            0%, 80%, 100% {
+                opacity: 0.35;
+                transform: translateY(0) scale(0.92);
+            }
+            35% {
+                opacity: 1;
+                transform: translateY(-3px) scale(1);
+            }
+        }
+
+        @keyframes stesy-loading-ring {
+            0% {
+                opacity: 0.52;
+                transform: scale(0.92);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.42);
+            }
+        }
+
+        @keyframes stesy-loading-shimmer {
+            100% {
+                transform: translateX(110%);
+            }
+        }
+
+        @keyframes stesy-message-in {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(0.985);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes stesy-caret {
+            0%, 55% {
+                opacity: 0.95;
+            }
+            56%, 100% {
+                opacity: 0.18;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .stesy-chat-message,
+            .stesy-type-caret,
+            .stesy-loading-avatar::before,
+            .stesy-loading-dot,
+            .stesy-loading-line::after {
+                animation: none;
+            }
+        }
+    </style>
+
+    <script>
+        function stesyChatbot() {
+            return {
+                open: false,
+                input: '',
+                loading: false,
+                error: '',
+                revealTimers: new Map(),
+                chartInstances: new Map(),
+                _chartJsPromise: null,
+                prompts: [
+                    'Ada berapa logger yang offline?',
+                    'Pos mana saja yang sedang hujan?',
+                    'Grafik tinggi muka air pos AWLR Sinduadi seminggu',
+                    'Bandingkan dua pos AWLR',
+                    'Rincian curah hujan per jam hari ini'
+                ],
+                messages: [
+                    {
+                        id: 'welcome',
+                        role: 'assistant',
+                        text: 'Selamat datang. Saya STESY Assistant. Ada yang bisa dibantu terkait pemantauan logger Anda?'
+                    }
+                ],
+                ask(value) {
+                    const text = (value || '').trim();
+                    if (!text || this.loading) return;
+                    const startedAt = Date.now();
+
+                    this.error = '';
+                    this.input = '';
+                    this.messages.push({
+                        id: `user-${Date.now()}`,
+                        role: 'user',
+                        text
+                    });
+                    this.loading = true;
+                    this.scrollDown();
+
+                    fetch('http://localhost/chatbot/ask', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': 'xtzGm2qnMrj2jfGuUfh0j3yUlrE1kYusAjwnX9jz',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            message: text,
+                            messages: this.messages
+                                .filter((message) => message.id !== 'welcome')
+                                .slice(-10)
+                                .map((message) => ({
+                                    role: message.role,
+                                    text: String(message.text || '').slice(0, 650)
+                                }))
+                        })
+                    })
+                    .then(async (response) => {
+                        if (!response.ok) {
+                            const payload = await response.json().catch(() => ({}));
+                            throw new Error(payload.message || 'Chatbot belum bisa merespons.');
+                        }
+                        return response.json();
+                    })
+                    .then((payload) => this.waitForMinimumLoading(startedAt).then(() => payload))
+                    .then((payload) => {
+                        this.pushAssistantReply(payload.reply || this.resolveReply(text), payload.chart || null);
+                    })
+                    .catch(async (error) => {
+                        await this.waitForMinimumLoading(startedAt);
+                        this.error = error.message || 'Koneksi chatbot terganggu.';
+                        this.pushAssistantReply(this.resolveReply(text));
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                        this.scrollDown();
+                    });
+                },
+                pushAssistantReply(reply, chart = null) {
+                    const fullText = String(reply || '').trim();
+                    const message = {
+                        id: `assistant-${Date.now()}`,
+                        role: 'assistant',
+                        text: fullText,
+                        displayText: chart ? fullText : '',
+                        isTyping: !chart,
+                        copied: false,
+                        chart: chart
+                    };
+
+                    this.messages.push(message);
+                    this.scrollDown();
+
+                    if (chart) {
+                        // Pesan grafik: tampilkan penjelasan langsung lalu render kanvas.
+                        this.$nextTick(() => {
+                            this.renderChart(message.id, chart);
+                            this.scrollDown();
+                        });
+                        return;
+                    }
+
+                    this.revealAssistantMessage(message.id, fullText);
+                },
+                ensureChartJs() {
+                    if (window.Chart) return Promise.resolve(window.Chart);
+                    if (this._chartJsPromise) return this._chartJsPromise;
+
+                    this._chartJsPromise = new Promise((resolve, reject) => {
+                        const s = document.createElement('script');
+                        s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+                        s.async = true;
+                        s.onload = () => resolve(window.Chart);
+                        s.onerror = () => reject(new Error('Gagal memuat pustaka grafik.'));
+                        document.head.appendChild(s);
+                    });
+
+                    return this._chartJsPromise;
+                },
+                renderChart(messageId, chart) {
+                    this.ensureChartJs().then((Chart) => {
+                        const canvas = document.getElementById('stesy-chart-' + messageId);
+                        if (!canvas || !Chart) return;
+
+                        if (this.chartInstances.has(messageId)) {
+                            this.chartInstances.get(messageId).destroy();
+                        }
+
+                        const accent = '#303481';
+                        const instance = new Chart(canvas.getContext('2d'), {
+                            type: chart.type === 'bar' ? 'bar' : 'line',
+                            data: {
+                                labels: chart.labels,
+                                datasets: [{
+                                    label: (chart.param || 'Nilai') + (chart.unit ? ' (' + chart.unit + ')' : ''),
+                                    data: chart.values,
+                                    borderColor: accent,
+                                    backgroundColor: chart.type === 'bar' ? 'rgba(48,52,129,0.55)' : 'rgba(48,52,129,0.12)',
+                                    borderWidth: 2,
+                                    fill: chart.type !== 'bar',
+                                    tension: 0.35,
+                                    pointRadius: chart.values.length > 40 ? 0 : 3,
+                                    pointHoverRadius: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                interaction: { mode: 'index', intersect: false },
+                                plugins: {
+                                    legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } },
+                                    tooltip: { enabled: true }
+                                },
+                                scales: {
+                                    x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8, font: { size: 10 } }, grid: { display: false } },
+                                    y: { beginAtZero: false, ticks: { font: { size: 10 } }, grid: { color: 'rgba(15,23,42,0.06)' } }
+                                }
+                            }
+                        });
+
+                        this.chartInstances.set(messageId, instance);
+                    }).catch(() => {
+                        /* Pustaka grafik gagal dimuat — penjelasan teks tetap tampil. */
+                    });
+                },
+                revealAssistantMessage(messageId, fullText) {
+                    if (!fullText) {
+                        this.updateMessage(messageId, { isTyping: false });
+                        return;
+                    }
+
+                    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    if (prefersReducedMotion) {
+                        this.updateMessage(messageId, {
+                            displayText: fullText,
+                            isTyping: false
+                        });
+                        return;
+                    }
+
+                    const totalLength = fullText.length;
+                    const chunkSize = Math.max(2, Math.ceil(totalLength / 180));
+                    let cursor = 0;
+                    let ticks = 0;
+
+                    const timer = window.setInterval(() => {
+                        ticks++;
+                        cursor = Math.min(cursor + chunkSize, totalLength);
+                        this.updateMessage(messageId, {
+                            displayText: fullText.slice(0, cursor)
+                        });
+
+                        if (cursor >= totalLength) {
+                            window.clearInterval(timer);
+                            this.revealTimers.delete(messageId);
+                            this.updateMessage(messageId, {
+                                displayText: fullText,
+                                isTyping: false
+                            });
+                        }
+
+                        if (ticks % 4 === 0 || cursor >= totalLength) {
+                            this.scrollDown();
+                        }
+                    }, 18);
+
+                    this.revealTimers.set(messageId, timer);
+                },
+                updateMessage(messageId, changes) {
+                    const index = this.messages.findIndex((item) => item.id === messageId);
+                    if (index === -1) return;
+
+                    this.messages.splice(index, 1, {
+                        ...this.messages[index],
+                        ...changes
+                    });
+                },
+                formatReply(text) {
+                    const safeText = this.escapeHtml(String(text || ''));
+                    const lines = safeText.split(/\r?\n/);
+                    const chunks = [];
+                    let listItems = [];
+
+                    const flushList = () => {
+                        if (listItems.length === 0) return;
+                        chunks.push(`<div class="stesy-response-list">${listItems.join('')}</div>`);
+                        listItems = [];
+                    };
+
+                    lines.forEach((rawLine, index) => {
+                        const line = rawLine.trim();
+
+                        if (!line) {
+                            flushList();
+                            return;
+                        }
+
+                        const numbered = line.match(/^(\d+)\.\s+(.+)$/);
+                        if (numbered) {
+                            listItems.push(
+                                `<div class="stesy-response-item"><span class="stesy-response-marker">${numbered[1]}</span><span>${this.inlineFormat(numbered[2])}</span></div>`
+                            );
+                            return;
+                        }
+
+                        const bullet = line.match(/^-\s+(.+)$/);
+                        if (bullet) {
+                            listItems.push(
+                                `<div class="stesy-response-item"><span class="stesy-response-marker is-dot"></span><span>${this.inlineFormat(bullet[1])}</span></div>`
+                            );
+                            return;
+                        }
+
+                        flushList();
+                        const className = index === 0 || /:$/.test(line) ? ' class="stesy-response-title"' : '';
+                        chunks.push(`<p${className}>${this.inlineFormat(line)}</p>`);
+                    });
+
+                    flushList();
+                    return chunks.join('');
+                },
+                inlineFormat(text) {
+                    return String(text)
+                        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.+?)\*/g, '<strong>$1</strong>');
+                },
+                escapeHtml(value) {
+                    return String(value)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                },
+                async copyMessage(message) {
+                    const text = message.text || '';
+                    if (!text) return;
+
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        message.copied = true;
+                        window.setTimeout(() => {
+                            message.copied = false;
+                        }, 1400);
+                    } catch (_) {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        textarea.setAttribute('readonly', '');
+                        textarea.style.position = 'fixed';
+                        textarea.style.opacity = '0';
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        message.copied = true;
+                        window.setTimeout(() => {
+                            message.copied = false;
+                        }, 1400);
+                    }
+                },
+                waitForMinimumLoading(startedAt) {
+                    const minimumMs = 450;
+                    const remaining = Math.max(0, minimumMs - (Date.now() - startedAt));
+
+                    return new Promise((resolve) => setTimeout(resolve, remaining));
+                },
+                resolveReply(text) {
+                    const query = text.toLowerCase();
+
+                    if (query.includes('real') || query.includes('monitoring') || query.includes('data')) {
+                        return 'Untuk data real-time, buka menu Realtime Monitoring. Pilih pos atau kategori logger, lalu cek nilai sensor terakhir, waktu update, dan status koneksinya.';
+                    }
+
+                    if (query.includes('offline') || query.includes('putus') || query.includes('status')) {
+                        return 'Status offline biasanya berarti logger belum mengirim data terbaru atau koneksi perangkat terputus. Cek waktu data terakhir, baterai, dan jaringan di halaman detail perangkat.';
+                    }
+
+                    if (query.includes('peta') || query.includes('lokasi') || query.includes('pos')) {
+                        return 'Untuk melihat lokasi pos, buka menu Peta. Marker menunjukkan posisi logger dan bisa dibuka untuk melihat informasi pos terkait.';
+                    }
+
+                    if (query.includes('siaga') || query.includes('banjir') || query.includes('hujan')) {
+                        return 'Level siaga mengikuti ambang batas yang dikonfigurasi pada data AWLR atau ARR. Cek halaman detail pos untuk melihat klasifikasi dan parameter pendukung.';
+                    }
+
+                    return 'Koneksi ke layanan asisten sedang terganggu. Silakan coba kirim ulang pertanyaan Anda dalam beberapa saat. Untuk sementara, status logger dan data pos dapat ditinjau melalui menu Peta atau Realtime Monitoring.';
+                },
+                scrollDown() {
+                    this.$nextTick(() => {
+                        const el = this.$refs.messages;
+                        if (el) el.scrollTop = el.scrollHeight;
+                    });
+                }
+            };
+        }
+    </script>
+    <script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script>
         let chart = null;
-        const loggerId = '{{ $logger->id_logger }}';
+        const loggerId = '10002';
         document.addEventListener('DOMContentLoaded', function() {
             const paramSelectEl = document.getElementById('parameterSelect');
             const refreshCurrentParamData = () => {
@@ -1939,7 +3137,7 @@
                 }).on('change', function() {
                     const selectedId = $(this).val();
                     if (selectedId) {
-                        window.location.href = '{{ url('/analisa') }}/' + selectedId;
+                        window.location.href = 'http://localhost/analisa/' + selectedId;
                     }
                 });
 
@@ -2007,7 +3205,7 @@
 
             const hasParamOption = (value) => options.some((opt) => opt.value === value);
             const firstValidParam = options.find((opt) => String(opt.value || '').trim() !== '')?.value || '';
-            const defaultParam = '{{ $defaultParameter ?? '' }}';
+            const defaultParam = 'Curah_Hujan';
 
             let initialParam = '';
             if (paramFromUrl && hasParamOption(paramFromUrl)) {
@@ -2050,10 +3248,6 @@
             } else if (rangeType === 'custom') {
                 document.getElementById('rangeCustom').style.display = 'block';
             }
-        }
-
-        function getChartPostName() {
-            return formatChartLabel(document.getElementById('chartPostName')?.textContent || 'Logger');
         }
 
         function updateChartTitle() {
@@ -2099,10 +3293,6 @@
                 const endDateTime = document.getElementById('endDateTime').value;
                 titleText += `Dari ${startDateTime} hingga ${endDateTime}`;
                 tableTitleText += `Dari ${startDateTime} hingga ${endDateTime}`;
-            }
-            const postName = getChartPostName();
-            if (postName) {
-                titleText += ` - ${postName}`;
             }
             document.getElementById('chartTitle').textContent = titleText;
             document.getElementById('tableTitle').textContent = tableTitleText;
@@ -2214,7 +3404,7 @@
                 range: range,
                 date: date
             });
-            fetch(`{{ route('analisa.data', ':id') }}`.replace(':id', loggerId) + `?${query.toString()}`)
+            fetch(`http://localhost/api/analisa/data/:id`.replace(':id', loggerId) + `?${query.toString()}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('chartTitle').textContent = originalTitle;
@@ -2465,7 +3655,7 @@
             const iconEl = document.getElementById('rainfallCardIcon');
             const iconState = getRainfallIconState(total, data.klasifikasi ?? []);
             if (iconEl) {
-                iconEl.src = `{{ asset('klasifikasi_hujan') }}/${iconState}.png`;
+                iconEl.src = `http://localhost/klasifikasi_hujan/${iconState}.png`;
                 iconEl.alt = iconState.replace(/_/g, ' ');
             }
             const range = document.querySelector('input[name="range"]:checked')?.value ?? 'day';
@@ -2493,9 +3683,7 @@
             catEl.textContent = cat.label;
             catEl.style.color = cat.color;
         }
-        const _isAwgr = @php
-            echo (strtoupper($logger->kategori_logger ?? $logger->kategori?->nama_kategori ?? '') === 'AWQR') ? 'true' : 'false';
-        @endphp;
+        const _isAwgr = false;
         const _awqrParamDefs = {
             tinggi_muka_air: {
                 aliases: ['tinggi_muka_air','tinggi muka air','water level','tma'],
@@ -2858,172 +4046,6 @@
             tbody.innerHTML = html;
         }
 
-        function normalizeChartText(value) {
-            return String(value || '')
-                .replace(/[_-]+/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
-        }
-
-        function formatChartWord(word) {
-            const lower = word.toLowerCase();
-            if (lower === 'ph') return 'pH';
-            if (/^[A-Z0-9]{2,5}$/.test(word)) return word;
-            if (/[A-Z]/.test(word) && /[a-z]/.test(word)) return word;
-            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-        }
-
-        function formatChartLabel(value) {
-            const text = normalizeChartText(value);
-            if (!text) return '';
-            return text.split(' ').map(formatChartWord).join(' ');
-        }
-
-        function formatChartFilename(value) {
-            const filename = formatChartLabel(value)
-                .replace(/[\\/:*?"<>|]+/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
-
-            return filename || 'Chart Analisa';
-        }
-
-        function getSelectedParameterLabel() {
-            const select = document.getElementById('parameterSelect');
-            if (!select) return 'Parameter';
-
-            const selectedOption = select.options[select.selectedIndex];
-            return formatChartLabel(selectedOption?.textContent || select.value || 'Parameter');
-        }
-
-        function formatChartDate(value, includeTime = false) {
-            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-            ];
-            const text = String(value || '').trim();
-            const match = text.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2}))?/);
-            if (!match) return normalizeChartText(text) || '-';
-
-            const dateText = `${Number(match[3])} ${monthNames[Number(match[2]) - 1] || match[2]} ${match[1]}`;
-            if (!includeTime || !match[4] || !match[5]) return dateText;
-
-            return `${dateText} ${match[4]}:${match[5]}`;
-        }
-
-        function getChartDateMetadata() {
-            const range = document.querySelector('input[name="range"]:checked')?.value || 'day';
-            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-            ];
-
-            if (range === 'day') {
-                return {
-                    datePrefix: 'Tanggal Data',
-                    dateLabel: formatChartDate(document.getElementById('dateInput')?.value)
-                };
-            }
-
-            if (range === 'month') {
-                const [year, month] = String(document.getElementById('monthInput')?.value || '').split('-');
-                return {
-                    datePrefix: 'Periode Data',
-                    dateLabel: year && month ? `${monthNames[Number(month) - 1] || month} ${year}` : '-'
-                };
-            }
-
-            if (range === 'year') {
-                return {
-                    datePrefix: 'Periode Data',
-                    dateLabel: document.getElementById('yearInput')?.value || '-'
-                };
-            }
-
-            const start = formatChartDate(document.getElementById('startDateTime')?.value, true);
-            const end = formatChartDate(document.getElementById('endDateTime')?.value, true);
-            return {
-                datePrefix: 'Periode Data',
-                dateLabel: `${start} sampai ${end}`
-            };
-        }
-
-        function getChartExportMetadata() {
-            const dateMeta = getChartDateMetadata();
-            const postName = getChartPostName();
-            const parameterLabel = getSelectedParameterLabel();
-            const filename = [postName, parameterLabel, dateMeta.dateLabel]
-                .map(formatChartFilename)
-                .filter(Boolean)
-                .join(' ');
-
-            return {
-                postName,
-                parameterLabel,
-                datePrefix: dateMeta.datePrefix,
-                dateLabel: dateMeta.dateLabel,
-                filename
-            };
-        }
-
-        function drawChartExportHeader(ctx, metadata, scale, width, padding) {
-            ctx.fillStyle = '#38bdf8';
-            ctx.fillRect(padding, Math.round(35 * scale), Math.round(7 * scale), Math.round(7 * scale));
-            ctx.fillStyle = '#9094c5';
-            ctx.font = `${Math.round(10 * scale)}px "Courier New", monospace`;
-            ctx.letterSpacing = `${Math.round(2 * scale)}px`;
-            ctx.fillText('GRAFIK PENGUKURAN', padding + Math.round(15 * scale), Math.round(42 * scale));
-
-            ctx.letterSpacing = '0px';
-            ctx.fillStyle = '#14163f';
-            ctx.font = `700 ${Math.round(18 * scale)}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-            ctx.fillText(metadata.postName, padding, Math.round(74 * scale));
-
-            ctx.fillStyle = '#303481';
-            ctx.font = `600 ${Math.round(12 * scale)}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-            ctx.fillText(`Parameter: ${metadata.parameterLabel}`, padding, Math.round(108 * scale));
-            ctx.fillText(`${metadata.datePrefix}: ${metadata.dateLabel}`, padding, Math.round(132 * scale));
-
-            ctx.strokeStyle = '#d9dcef';
-            ctx.lineWidth = Math.max(1, scale);
-            ctx.beginPath();
-            ctx.moveTo(padding, Math.round(154 * scale));
-            ctx.lineTo(width - padding, Math.round(154 * scale));
-            ctx.stroke();
-        }
-
-        function downloadChart() {
-            if (!chart) {
-                alert('Chart belum tersedia');
-                return;
-            }
-
-            const sourceCanvas = chart.canvas || document.getElementById('dataChart');
-            if (!sourceCanvas) {
-                alert('Canvas chart belum tersedia');
-                return;
-            }
-
-            const scale = sourceCanvas.width / (sourceCanvas.clientWidth || sourceCanvas.width || 1);
-            const exportPadding = Math.round(40 * scale);
-            const headerHeight = Math.round(174 * scale);
-            const exportCanvas = document.createElement('canvas');
-            exportCanvas.width = sourceCanvas.width + (exportPadding * 2);
-            exportCanvas.height = sourceCanvas.height + headerHeight + exportPadding;
-
-            const ctx = exportCanvas.getContext('2d');
-            const metadata = getChartExportMetadata();
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-            drawChartExportHeader(ctx, metadata, scale, exportCanvas.width, exportPadding);
-            ctx.drawImage(sourceCanvas, exportPadding, headerHeight);
-
-            const link = document.createElement('a');
-            link.href = exportCanvas.toDataURL('image/png', 1);
-            link.download = `${formatChartFilename(metadata.filename)}.png`;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        }
-
         function downloadExcel() {
             const selectedParam = document.getElementById('parameterSelect').value;
             if (!selectedParam) {
@@ -3048,7 +4070,7 @@
                 range: range,
                 date: date
             });
-            const url = `{{ route('analisa.export', ['id_logger' => 'PLACEHOLDER']) }}`.replace('PLACEHOLDER', loggerId) +
+            const url = `http://localhost/analisa/export/PLACEHOLDER`.replace('PLACEHOLDER', loggerId) +
                 `?${query.toString()}`;
             window.location.href = url;
         }
@@ -3142,7 +4164,7 @@
             const loading = document.getElementById('dataMasukLoading');
             loading.style.display = 'block';
             try {
-                const url = `{{ route('analisa.dataMasuk', ':id') }}`.replace(':id', loggerId);
+                const url = `http://localhost/analisa/data-masuk/:id`.replace(':id', loggerId);
                 const res = await fetch(url, {
                     headers: {
                         'Accept': 'application/json'
@@ -4040,7 +5062,6 @@
             })()
         })
     </script>
-@if($logger->jiat?->has_pump)
     <script>
         function pumpControlApp() {
             return {
@@ -4077,15 +5098,15 @@
                     this.pumpStatusReady = false
                     this.pumpChecking = true
                     try {
-                        const res = await fetch('{{ route("pump.command") }}', {
+                        const res = await fetch('http://localhost/api/pump/command', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-CSRF-TOKEN': 'xtzGm2qnMrj2jfGuUfh0j3yUlrE1kYusAjwnX9jz',
                                 'Accept': 'application/json',
                             },
                             body: JSON.stringify({
-                                id_logger: '{{ $logger->id_logger }}',
+                                id_logger: '10002',
                                 action: 'get',
                             }),
                         })
@@ -4142,15 +5163,15 @@
                         this.mark('mqtt', 'active', 'Menghubungkan ke MQTT broker...')
 
                         // Langsung set logger ke active karena API akan konek + publish + tunggu respon sekaligus
-                        const fetchPromise = fetch('{{ route("pump.command") }}', {
+                        const fetchPromise = fetch('http://localhost/api/pump/command', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-CSRF-TOKEN': 'xtzGm2qnMrj2jfGuUfh0j3yUlrE1kYusAjwnX9jz',
                                 'Accept': 'application/json',
                             },
                             body: JSON.stringify({
-                                id_logger: '{{ $logger->id_logger }}',
+                                id_logger: '10002',
                                 action: target === 'on' ? 'on' : 'off',
                             }),
                         })
@@ -4215,5 +5236,6 @@
             document.head.appendChild(style)
         })()
     </script>
-    @endif
-@endpush
+    </body>
+
+</html>

@@ -1,7 +1,7 @@
 <div class="flex items-center justify-between bg-neutral-100 px-5 py-3">
     <div class="relative sm:static flex items-center gap-2">
         <div class="text-md font-semibold text-slate-900">
-            {{ $lg->nama_logger }}
+            {{ $lg->nama_pos }}
         </div>
         <div x-data="{ open: false }" class="sm:relative">
             <button type="button" @click="open = !open" @keydown.escape.window="open = false"

@@ -23,7 +23,8 @@ class AnalisaController extends Controller
 
         $allLoggers = t_Logger::query()
             ->forUser(auth()->user())
-            ->select('id_logger', 'nama_logger')
+            ->select('id_logger', 'nama_logger', 'idlokasi')
+            ->with('lokasi')
             ->orderBy('nama_logger')
             ->get();
 

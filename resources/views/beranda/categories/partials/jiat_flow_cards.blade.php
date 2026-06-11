@@ -42,8 +42,8 @@
                     <span class="text-xs font-bold text-slate-400">{{ $unitP('flow_rate') ?: 'm³/h' }}</span>
                 </div>
             </div>
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/70 text-cyan-500 ring-1 ring-cyan-100">
-                <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5"><path d="M3 12h3l2-6 4 14 3-9 2 4h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/70 ring-1 ring-cyan-100">
+                <img src="{{ asset('icons/awlr/flow_rate.svg') }}" alt="Flow Rate" class="h-5 w-5 object-contain {{ $iconClass ?? '' }}">
             </span>
         </div>
     </a>

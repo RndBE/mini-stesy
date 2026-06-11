@@ -71,6 +71,7 @@ class PetaController extends Controller
                     'id_logger'   => $l->id_logger,
                     'nama_logger' => $l->nama_logger,
                     'nama_lokasi' => $l->lokasi?->nama_lokasi,
+                    'nama_pos'    => $l->nama_pos,
                     'lat'         => $lat !== null ? (float) $lat : null,
                     'lng'         => $lng !== null ? (float) $lng : null,
 

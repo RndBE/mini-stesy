@@ -61,6 +61,16 @@ class t_Logger extends Model
         return $this->belongsTo(t_Lokasi::class, 'idlokasi', 'idlokasi');
     }
 
+    /**
+     * Nama pos yang ditampilkan ke pengguna: selalu ambil dari t_lokasi
+     * (nama_lokasi). Fallback ke nama_logger hanya bila lokasi belum diisi,
+     * supaya judul pos tidak pernah kosong.
+     */
+    public function getNamaPosAttribute()
+    {
+        return $this->lokasi?->nama_lokasi ?: $this->nama_logger;
+    }
+
     public function kategori()
     {
         return $this->belongsTo(Kategori_logger::class, 'id_katlogger', 'id_katlogger');

@@ -637,7 +637,7 @@ background: rgba(0, 0, 0, 0.28);
                             <div class="sidebar-item mb-4 rounded-lg bg-white pt-3 pb-2 px-3 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md"
                                 data-kategori="{{ $point['kategori'] }}" data-status="{{ $point['status'] }}"
                                 data-arr-state="{{ $point['arr_state'] ?? '' }}"
-                                data-logger-name="{{ strtolower($point['nama_logger']) }}"
+                                data-logger-name="{{ strtolower($point['nama_pos']) }}"
                                 data-logger-id="{{ strtolower($point['id_logger']) }}"
                                 onclick="focusLogger({{ $point['lat'] }}, {{ $point['lng'] }}, '{{ $point['id_logger'] }}')">
 <div class="flex items-center justify-between">
@@ -650,7 +650,7 @@ background: rgba(0, 0, 0, 0.28);
                                     </div>
                                 </div>
 <div class="flex justify-between items-center mt-1 border-b border-slate-200 pb-2">
-                                    <div class="font-semibold leading-tight text-sm">{{ $point['nama_logger'] }}</div>
+                                    <div class="font-semibold leading-tight text-sm">{{ $point['nama_pos'] }}</div>
                                     <div class="text-xs border border-slate-300 bg-slate-100 px-2 rounded-lg">
                                         ID: {{ substr($point['id_logger'], -5) }}
                                     </div>
@@ -1239,7 +1239,7 @@ const backdrop = document.getElementById('petaSidebarBackdrop');
                 '';
             marker.bindPopup(`
                 <div class="popup-header">
-                <div class="popup-title">${p.nama_logger}</div>
+                <div class="popup-title">${p.nama_pos}</div>
                 <div class="popup-close" onclick="document.querySelector('.leaflet-popup-close-button')?.click()">X</div>
                 </div>
                 <div class="popup-body">
