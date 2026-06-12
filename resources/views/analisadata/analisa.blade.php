@@ -418,6 +418,188 @@
             box-shadow: 0 0 0 3px rgba(76, 201, 240, .25);
         }
 
+        .analysis-mode-toggle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            padding: 4px;
+            border: 1px solid var(--deck-edge);
+            border-radius: 10px;
+            background: var(--deck-field);
+        }
+
+        .analysis-mode-btn {
+            border: 0;
+            border-radius: 7px;
+            padding: 8px 6px;
+            background: transparent;
+            color: var(--deck-muted);
+            font-family: var(--mono);
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+        }
+
+        .analysis-mode-btn.is-active {
+            background: #ffffff;
+            color: var(--brand);
+            box-shadow: 0 8px 18px -16px rgba(20, 22, 63, .5);
+        }
+
+        .multi-parameter-checklist {
+            max-height: 16rem;
+            overflow: auto;
+            border: 1px solid var(--deck-edge);
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        .multi-param-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-bottom: 1px solid #eef0f8;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .multi-param-option:last-child {
+            border-bottom: 0;
+        }
+
+        .multi-param-option:hover {
+            background: #f8fafc;
+        }
+
+        .multi-param-checkbox {
+            width: 15px;
+            height: 15px;
+            border-radius: 4px;
+            color: var(--brand);
+        }
+
+        .multi-param-text {
+            min-width: 0;
+            flex: 1;
+            color: var(--deck-text);
+            font-family: var(--mono);
+            font-size: .78rem;
+            line-height: 1.25;
+        }
+
+        .multi-param-unit {
+            color: #94a3b8;
+            font-size: .7rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .multi-param-action {
+            border: 0;
+            background: transparent;
+            color: var(--brand);
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 0;
+        }
+
+        .multi-chart-empty {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-weight: 600;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        @keyframes multichart-shimmer {
+            0% { background-position: 120% 0; }
+            100% { background-position: -120% 0; }
+        }
+
+        .multi-loading-overlay {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: stretch;
+            justify-content: stretch;
+            padding: 18px;
+            background: rgba(255, 255, 255, .82);
+            backdrop-filter: blur(2px);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .multi-loading-overlay.is-active {
+            display: flex;
+        }
+
+        .multi-loading-card {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(217, 222, 238, .9);
+            background: rgba(248, 250, 252, .72);
+            box-shadow: 0 18px 38px -28px rgba(20, 22, 63, .5);
+            overflow: hidden;
+        }
+
+        .multi-loading-chart-grid {
+            height: 100%;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 16px;
+            padding: 22px;
+        }
+
+        .multi-loading-line {
+            background: linear-gradient(90deg, #dbeafe 0%, #ffffff 38%, #38bdf8 52%, #ffffff 66%, #dbeafe 100%);
+            background-size: 260% 100%;
+            animation: multichart-shimmer .85s linear infinite;
+            box-shadow: 0 10px 26px -18px rgba(15, 163, 209, .75);
+        }
+
+        .multi-loading-table {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .multi-loading-table .multi-loading-card {
+            padding: 16px;
+        }
+
+        .multi-loading-line {
+            height: 14px;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+
+        .multi-loading-chart-lines .multi-loading-line {
+            height: 12px;
+            margin-bottom: 0;
+            transform-origin: left center;
+        }
+
+        #analysisShell[data-analysis-mode="single"] [data-multichart-checklist],
+        #analysisShell[data-analysis-mode="single"] [data-multichart-panel],
+        #analysisShell[data-analysis-mode="multi"] #singleParameterField,
+        #analysisShell[data-analysis-mode="multi"] #singleAnalysisActions,
+        #analysisShell[data-analysis-mode="multi"] #singleAnalysisPanel {
+            display: none !important;
+        }
+
+        #analysisShell[data-analysis-mode="multi"] [data-multichart-checklist],
+        #analysisShell[data-analysis-mode="multi"] [data-multichart-panel] {
+            display: block !important;
+        }
+
         /* — Deck action buttons — */
         .btn-success {
             width: 100%;
@@ -1361,7 +1543,8 @@
         </div>
     </div>
     <div class="ruler-strip mt-3 mb-4"></div>
-    <div class="analysis-container grid grid-cols-1 md:grid-cols-12 gap-4">
+    <div id="analysisShell" class="analysis-container grid grid-cols-1 md:grid-cols-12 gap-4"
+        data-analysis-mode="single">
         <div :class="filterOpen ? 'block' : 'hidden md:block'"
             class="col-span-1 md:col-span-5 xl:col-span-3 2xl:col-span-2">
             <div class="control-deck">
@@ -1377,15 +1560,18 @@
                                 </option>
                             @endforeach
                         </select>
-                        <label class="deck-label mt-4">Parameter</label>
-                        <select id="parameterSelect" class="calendar-input text-sm py-2">
-                            <option value="">Pilih Parameter</option>
-                            @foreach ($parameters as $param)
-                                <option value="{{ $param['nama_parameter'] }}" data-unit="{{ $param['satuan'] ?? '' }}"
-                                    data-tipe-graf="{{ $param['tipe_graf'] ?? 'line' }}">
-                                    {{ str_replace('_', ' ', $param['nama_parameter']) }}</option>
-                            @endforeach
-                        </select>
+                        @include('analisadata.partials.multi_chart_panel', ['multiChartSlot' => 'controls'])
+                        <div id="singleParameterField" class="mt-4">
+                            <label class="deck-label">Parameter</label>
+                            <select id="parameterSelect" class="calendar-input text-sm py-2">
+                                <option value="">Pilih Parameter</option>
+                                @foreach ($parameters as $param)
+                                    <option value="{{ $param['nama_parameter'] }}" data-unit="{{ $param['satuan'] ?? '' }}"
+                                        data-tipe-graf="{{ $param['tipe_graf'] ?? 'line' }}">
+                                        {{ str_replace('_', ' ', $param['nama_parameter']) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <label class="deck-label mt-4">Analisa Dalam</label>
                         <div class="seg-grid">
                             <label class="seg"><input type="radio" name="range" value="day" checked><span>Hari</span></label>
@@ -1723,7 +1909,7 @@
                         </div>
                     </div>
                     <div class="deck-sep"></div>
-                    <div>
+                    <div id="singleAnalysisActions">
                         <button type="button" class="btn-success btn-success-soft" onclick="downloadExcel()">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1748,7 +1934,7 @@
             </div>
         </div>
         <div class="col-span-1 md:col-span-7 xl:col-span-9 2xl:col-span-10">
-            <div class="panel-card">
+            <div id="singleAnalysisPanel" class="panel-card">
                 <div class="chart-section px-4 pt-4 pb-0 mb-0">
 <div id="rainfallHeader" class="hidden mb-3">
                         <div class="flex flex-col md:flex-row gap-3">
@@ -1903,6 +2089,7 @@
 
                 </div>
             </div>
+            @include('analisadata.partials.multi_chart_panel', ['multiChartSlot' => 'panel'])
         </div>
     </div>
 @endsection
@@ -1910,14 +2097,24 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        window.AnalisaMultiChartConfig = {
+            loggerId: @json((string) $logger->id_logger),
+            dataUrlTemplate: @json(route('analisa.data', ':id')),
+            postName: @json($logger->nama_pos ?? $logger->nama_logger ?? 'Logger')
+        };
+    </script>
+    <script src="{{ asset('js/analisa-multichart.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script>
         let chart = null;
         const loggerId = '{{ $logger->id_logger }}';
         document.addEventListener('DOMContentLoaded', function() {
             const paramSelectEl = document.getElementById('parameterSelect');
+            const isMultiChartModeActive = () => window.AnalisaMultiChart?.isMultiMode?.() === true;
             const refreshCurrentParamData = () => {
                 const param = paramSelectEl ? String(paramSelectEl.value || '').trim() : '';
+                if (isMultiChartModeActive()) return;
                 if (!param) return;
                 updateChartTitle();
                 loadData();
@@ -1965,34 +2162,34 @@
             document.getElementById('dateInput').addEventListener('change', () => {
                 updateChartTitle();
                 const param = document.getElementById('parameterSelect').value;
-                if (param) loadData();
+                if (param && !isMultiChartModeActive()) loadData();
             });
             document.getElementById('monthInput').addEventListener('change', () => {
                 updateChartTitle();
                 const param = document.getElementById('parameterSelect').value;
-                if (param) loadData();
+                if (param && !isMultiChartModeActive()) loadData();
             });
             document.getElementById('yearInput').addEventListener('change', () => {
                 updateChartTitle();
                 const param = document.getElementById('parameterSelect').value;
-                if (param) loadData();
+                if (param && !isMultiChartModeActive()) loadData();
             });
             document.getElementById('startDateTime').addEventListener('change', () => {
                 updateChartTitle();
                 const param = document.getElementById('parameterSelect').value;
-                if (param) loadData();
+                if (param && !isMultiChartModeActive()) loadData();
             });
             document.getElementById('endDateTime').addEventListener('change', () => {
                 updateChartTitle();
                 const param = document.getElementById('parameterSelect').value;
-                if (param) loadData();
+                if (param && !isMultiChartModeActive()) loadData();
             });
             document.querySelectorAll('input[name="range"]').forEach(radio => {
                 radio.addEventListener('change', () => {
                     toggleRangeInputs(radio.value);
                     updateChartTitle();
                     const param = document.getElementById('parameterSelect').value;
-                    if (param) loadData();
+                    if (param && !isMultiChartModeActive()) loadData();
                 });
             });
             if (parameterUsesSelect2 && typeof $ !== 'undefined') {
@@ -2110,6 +2307,211 @@
 
         let currentChartType = 'line';
 
+        const BATTERY_THRESHOLDS = [
+            {
+                value: 12.2,
+                color: '#16a34a',
+                label: 'Normal',
+                caption: '> 12.2 V',
+                description: 'Baterai aman, sistem dapat beroperasi normal'
+            },
+            {
+                value: 11.8,
+                color: '#dc2626',
+                label: 'Kritis',
+                caption: '< 11.8 V',
+                description: 'Baterai rendah, berisiko mengganggu operasional logger'
+            }
+        ];
+
+        const BATTERY_STATUS_DEFINITIONS = [
+            {
+                label: 'Normal',
+                color: '#16a34a',
+                description: 'Baterai aman, sistem dapat beroperasi normal',
+                test: (value) => value > 12.2
+            },
+            {
+                label: 'Siaga',
+                color: '#f59e0b',
+                description: 'Baterai mulai menurun, perlu dipantau',
+                test: (value) => value >= 11.8 && value <= 12.2
+            },
+            {
+                label: 'Kritis',
+                color: '#dc2626',
+                description: 'Baterai rendah, berisiko mengganggu operasional logger',
+                test: (value) => value < 11.8
+            }
+        ];
+
+        function drawBatteryThresholdRoundedRect(ctx, x, y, width, height, radius) {
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(x, y, width, height, radius);
+                return;
+            }
+
+            const r = Math.min(radius, width / 2, height / 2);
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + width - r, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+            ctx.lineTo(x + width, y + height - r);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+            ctx.lineTo(x + r, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+        }
+
+        const batteryThresholdPlugin = {
+            id: 'batteryThresholds',
+            afterDraw(chart, args, options) {
+                if (!options || !options.enabled || chart.config.type !== 'line') return;
+
+                const yScale = chart.scales && chart.scales.y;
+                const area = chart.chartArea;
+                if (!yScale || !area) return;
+
+                const ctx = chart.ctx;
+                ctx.save();
+
+                const normalY = yScale.getPixelForValue(12.2);
+                const criticalY = yScale.getPixelForValue(11.8);
+                if (normalY >= area.top && normalY <= area.bottom && criticalY >= area.top && criticalY <= area.bottom) {
+                    const bandTop = Math.min(normalY, criticalY);
+                    const bandHeight = Math.abs(criticalY - normalY);
+                    ctx.fillStyle = 'rgba(245, 158, 11, .08)';
+                    ctx.fillRect(area.left, bandTop, area.right - area.left, bandHeight);
+
+                    ctx.fillStyle = '#b45309';
+                    ctx.font = '700 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+                    ctx.fillText('Siaga 11.8-12.2 V', area.left + 10, bandTop + Math.max(16, bandHeight / 2));
+                }
+
+                (options.thresholds || []).forEach((threshold) => {
+                    const y = yScale.getPixelForValue(threshold.value);
+                    if (y < area.top || y > area.bottom) return;
+
+                    ctx.beginPath();
+                    ctx.setLineDash([6, 5]);
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeStyle = threshold.color;
+                    ctx.moveTo(area.left, y);
+                    ctx.lineTo(area.right, y);
+                    ctx.stroke();
+
+                    const text = `${threshold.label} ${threshold.caption}`;
+                    ctx.setLineDash([]);
+                    ctx.font = '600 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+                    const textWidth = ctx.measureText(text).width;
+                    const pillWidth = textWidth + 16;
+                    const pillHeight = 22;
+                    const pillX = Math.max(area.left + 8, area.right - pillWidth - 8);
+                    const pillY = Math.max(area.top + 4, Math.min(y - 28, area.bottom - pillHeight - 4));
+
+                    ctx.beginPath();
+                    drawBatteryThresholdRoundedRect(ctx, pillX, pillY, pillWidth, pillHeight, 7);
+                    ctx.fillStyle = 'rgba(255,255,255,.92)';
+                    ctx.fill();
+                    ctx.strokeStyle = threshold.color;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.fillStyle = threshold.color;
+                    ctx.fillText(text, pillX + 8, pillY + 15);
+                });
+
+                if (options.status) {
+                    const statusText = `Status: ${options.status.label}`;
+                    const description = options.status.description;
+                    const latestText = Number.isFinite(options.latestValue)
+                        ? `${Number(options.latestValue).toFixed(2)} V`
+                        : '';
+                    const maxPillWidth = Math.max(220, area.right - area.left - 20);
+                    const pillWidth = Math.min(maxPillWidth, 320);
+                    const pillHeight = 48;
+                    const pillX = area.left + 10;
+                    const pillY = area.top + 10;
+
+                    ctx.beginPath();
+                    drawBatteryThresholdRoundedRect(ctx, pillX, pillY, pillWidth, pillHeight, 10);
+                    ctx.fillStyle = 'rgba(255,255,255,.95)';
+                    ctx.fill();
+                    ctx.strokeStyle = options.status.color;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+
+                    ctx.fillStyle = options.status.color;
+                    ctx.font = '700 12px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+                    ctx.fillText(latestText ? `${statusText} (${latestText})` : statusText, pillX + 10, pillY + 18);
+                    ctx.fillStyle = '#475569';
+                    ctx.font = '500 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+                    let descriptionText = description;
+                    while (ctx.measureText(descriptionText).width > pillWidth - 20 && descriptionText.length > 4) {
+                        descriptionText = `${descriptionText.slice(0, -4).trim()}...`;
+                    }
+                    ctx.fillText(descriptionText, pillX + 10, pillY + 36);
+                }
+
+                ctx.restore();
+            }
+        };
+
+        function isBatteryParameterSelected() {
+            const select = document.getElementById('parameterSelect');
+            if (!select) return false;
+
+            const selectedOption = select.options[select.selectedIndex];
+            const label = [
+                select.value,
+                selectedOption?.textContent,
+                selectedOption?.dataset?.unit
+            ].join(' ').toLowerCase().replace(/[_-]+/g, ' ');
+
+            return /\b(baterai|battery|vbat|aki)\b/.test(label);
+        }
+
+        function getBatteryStatusForValue(value) {
+            const numeric = Number(value);
+            if (!Number.isFinite(numeric)) return null;
+
+            return BATTERY_STATUS_DEFINITIONS.find((status) => status.test(numeric)) || null;
+        }
+
+        function getLatestNumericValue(values) {
+            if (!Array.isArray(values)) return null;
+
+            for (let i = values.length - 1; i >= 0; i--) {
+                const numeric = Number(values[i]);
+                if (Number.isFinite(numeric)) return numeric;
+            }
+
+            return null;
+        }
+
+        function applyBatteryThresholdOptions(isBar, values) {
+            if (!chart || !chart.options || !chart.options.plugins || !chart.options.scales?.y) return;
+
+            const active = !isBar && isBatteryParameterSelected();
+            const latestValue = getLatestNumericValue(values);
+            chart.options.plugins.batteryThresholds = {
+                enabled: active,
+                thresholds: BATTERY_THRESHOLDS,
+                status: active ? getBatteryStatusForValue(latestValue) : null,
+                latestValue
+            };
+
+            if (active) {
+                const numericValues = (values || []).map(Number).filter(Number.isFinite);
+                const minValue = Math.min(11.8, ...numericValues);
+                const maxValue = Math.max(12.2, ...numericValues);
+                chart.options.scales.y.suggestedMin = Math.min(11.6, minValue - 0.2);
+                chart.options.scales.y.suggestedMax = Math.max(12.6, maxValue + 0.2);
+            } else {
+                chart.options.scales.y.suggestedMin = undefined;
+                chart.options.scales.y.suggestedMax = undefined;
+            }
+        }
+
         function buildChart(isBar) {
             const type = isBar ? 'bar' : 'line';
             if (chart) {
@@ -2141,6 +2543,12 @@
                             display: true,
                             position: 'bottom',
                             labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8, padding: 16, font: { size: 12 } }
+                        },
+                        batteryThresholds: {
+                            enabled: false,
+                            thresholds: BATTERY_THRESHOLDS,
+                            status: null,
+                            latestValue: null
                         },
                         tooltip: {
                             mode: 'index',
@@ -2179,7 +2587,8 @@
                             border: { display: false }
                         }
                     }
-                }
+                },
+                plugins: [batteryThresholdPlugin]
             });
             currentChartType = type;
         }
@@ -2689,6 +3098,7 @@
                 chart.data.datasets[0].data = [];
                 chart.data.datasets[1].data = [];
                 chart.data.datasets[2].data = [];
+                applyBatteryThresholdOptions(isBar, []);
                 chart.update();
                 updateRainfallCard(data);
                 updatePhAirPanel(data);
@@ -2736,6 +3146,7 @@
                 chart.data.datasets[2].data    = filteredMax;
             }
 
+            applyBatteryThresholdOptions(isBar, isBar ? [] : filteredAvg);
             chart.update();
             updateRainfallCard(data);
             updatePhAirPanel(data);
