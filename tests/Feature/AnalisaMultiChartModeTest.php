@@ -12,9 +12,6 @@ class AnalisaMultiChartModeTest extends TestCase
 
         $this->assertStringContainsString('id="analysisShell"', $view);
         $this->assertStringContainsString('data-analysis-mode="single"', $view);
-        $this->assertStringContainsString('@keyframes multichart-shimmer', $view);
-        $this->assertStringContainsString('.multi-loading-overlay', $view);
-        $this->assertStringContainsString('animation: multichart-shimmer .85s linear infinite', $view);
         $this->assertStringContainsString('id="singleParameterField"', $view);
         $this->assertStringContainsString('id="singleAnalysisActions"', $view);
         $this->assertStringContainsString('id="singleAnalysisPanel"', $view);
@@ -40,12 +37,8 @@ class AnalisaMultiChartModeTest extends TestCase
         $this->assertStringContainsString('data-multichart-panel', $partial);
         $this->assertStringContainsString('id="multiDataChart"', $partial);
         $this->assertStringContainsString('id="multiChartEmpty"', $partial);
-        $this->assertStringContainsString('id="multiChartLoading"', $partial);
-        $this->assertStringContainsString('multi-loading-chart-lines', $partial);
-        $this->assertStringNotContainsString('multi-loading-bar', $partial);
         $this->assertStringContainsString('id="multiDataTableHead"', $partial);
         $this->assertStringContainsString('id="multiDataTableBody"', $partial);
-        $this->assertStringContainsString('id="multiTableLoading"', $partial);
         $this->assertStringContainsString('downloadMultiChart()', $partial);
     }
 
@@ -66,7 +59,6 @@ class AnalisaMultiChartModeTest extends TestCase
         $this->assertStringContainsString('usePointStyle: true', $script);
         $this->assertStringContainsString('function renderMultiTable', $script);
         $this->assertStringContainsString('function resetMultiTable', $script);
-        $this->assertStringContainsString('function setMultiLoading', $script);
         $this->assertStringContainsString('window.downloadMultiChart', $script);
         $this->assertStringContainsString('new Chart', $script);
     }

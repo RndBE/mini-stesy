@@ -2292,8 +2292,8 @@
                 titleText += `Pada Tahun ${yearInput}`;
                 tableTitleText += `Pada Tahun ${yearInput}`;
             } else if (range === 'custom') {
-                const startDateTime = document.getElementById('startDateTime').value;
-                const endDateTime = document.getElementById('endDateTime').value;
+                const startDateTime = formatChartDate(document.getElementById('startDateTime').value, true);
+                const endDateTime = formatChartDate(document.getElementById('endDateTime').value, true);
                 titleText += `Dari ${startDateTime} hingga ${endDateTime}`;
                 tableTitleText += `Dari ${startDateTime} hingga ${endDateTime}`;
             }
@@ -3630,6 +3630,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             function positionPanel(anchorWrap, panel) {
+                // Portal the panel to <body> so position:fixed resolves against the
+                // viewport (not a transformed ancestor like .control-deck) and it sits
+                // at the root stacking context instead of being trapped behind the chart card.
+                if (panel.parentElement !== document.body) document.body.appendChild(panel);
                 const rect = anchorWrap.getBoundingClientRect();
                 const wasHidden = panel.classList.contains('hidden');
                 if (wasHidden) {
@@ -3858,7 +3862,7 @@
                 })
 
                 document.addEventListener('click', (e) => {
-                    if (!wrap.contains(e.target)) closePanel()
+                    if (!wrap.contains(e.target) && !panel.contains(e.target)) closePanel()
                 })
 
                 input.addEventListener('change', () => {
@@ -3977,7 +3981,7 @@
                 })
 
                 document.addEventListener('click', (e) => {
-                    if (!wrap.contains(e.target)) {
+                    if (!wrap.contains(e.target) && !panel.contains(e.target)) {
                         panel.classList.add('hidden')
                         yearMenu.classList.add('hidden')
                     }
@@ -4066,7 +4070,7 @@
                 })
 
                 document.addEventListener('click', (e) => {
-                    if (!wrap.contains(e.target)) panel.classList.add('hidden')
+                    if (!wrap.contains(e.target) && !panel.contains(e.target)) panel.classList.add('hidden')
                 })
 
                 render()
