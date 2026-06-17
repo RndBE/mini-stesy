@@ -85,7 +85,7 @@
                                                         :style="`background-color: ${c.warna}`" :title="c.intensitas"></span>
                                                 </template>
                                             </div>
-                                            <div class="text-xs text-slate-500">Klasifikasi hujan BMKG · Per Jam &amp; Per Hari</div>
+                                            <div class="text-xs text-slate-500">Klasifikasi hujan · Per Jam &amp; Per Hari</div>
                                         </div>
                                     </template>
                                 </td>

@@ -58,6 +58,18 @@
 @section('content')
     @php
         $firstDevice = $devices->first();
+        $catIcon = [
+            'AWLR' => 'icons/awlr/ikon_awlr.svg',
+            'ARR'  => 'icons/arr/ikon_arr.svg',
+            'AFMR' => 'icons/afmr/ikon_afmr.svg',
+            'AWR'  => 'icons/awr/ikon_awr.svg',
+            'AWQR' => 'icons/awgr/ikon_awqr.svg',
+        ];
+        $deviceIcons = $devices->mapWithKeys(function ($d) use ($catIcon) {
+            $kat = strtoupper(trim((string) optional($d->kategori)->nama_kategori));
+            return [(string) $d->id_logger => asset($catIcon[$kat] ?? 'logo/logo-awlr.svg')];
+        });
+        $firstIcon = $deviceIcons[(string) optional($firstDevice)->id_logger] ?? asset('logo/logo-awlr.svg');
     @endphp
     <div x-data="realtimeHandler()" x-init="initData()" class="space-y-3">
 
@@ -66,7 +78,7 @@
             class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
             <div class="flex items-center gap-4">
                 <div class="p-2 bg-indigo-100 rounded-lg text-indigo-600">
-                    <img src="{{ asset('logo/logo-awlr.svg') }}" alt="Logo" class="w-6 h-6">
+                    <img :src="loggerIcon()" src="{{ $firstIcon }}" alt="Logo" class="w-6 h-6">
                 </div>
                 <div>
 @if ($devices->isNotEmpty())
@@ -75,7 +87,7 @@
                             class="appearance-none bg-transparent text-lg font-bold text-slate-800 border-none focus:ring-0 p-0 pr-8 cursor-pointer w-full md:w-auto">
                             @foreach ($devices as $d)
                                 <option value="{{ $d->id_logger }}">
-                                    {{ $d->id_logger }} - {{ $d->nama_logger ?? 'Logger' }}
+                                    {{ $d->nama_pos }}
                                 </option>
                             @endforeach
                         </select>
@@ -183,6 +195,7 @@
 
                 return {
                     selectedDeviceId: @json(optional($firstDevice)->id_logger ?? ''),
+                    deviceIcons: @json($deviceIcons),
                     selectedDeviceName: '',
                     lastUpdate: '-',
                     activeTab: null,
@@ -213,6 +226,10 @@
                         connected: false,
                         connecting: false,
                         currentTopic: null
+                    },
+
+                    loggerIcon() {
+                        return this.deviceIcons[String(this.selectedDeviceId)] || @json($firstIcon);
                     },
 
                     switchDevice() {
@@ -610,22 +627,31 @@
                                 this.chartInstance = null;
                             }
 
+                            const isRainfall = /hujan|curah/i.test(currentTab.label || '');
+                            const dataset = isRainfall ? {
+                                label: currentTab.label,
+                                data: chartData,
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                                borderWidth: 1
+                            } : {
+                                label: currentTab.label,
+                                data: chartData,
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                cubicInterpolationMode: 'monotone',
+                                fill: true,
+                                pointRadius: 2,
+                                pointHoverRadius: 4
+                            };
+
                             this.chartInstance = new Chart(ctx, {
-                                type: 'line',
+                                type: isRainfall ? 'bar' : 'line',
                                 data: {
                                     labels: chartLabels,
-                                    datasets: [{
-                                        label: currentTab.label,
-                                        data: chartData,
-                                        borderColor: '#3b82f6',
-                                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                        borderWidth: 2,
-                                        tension: 0.4,
-                                        cubicInterpolationMode: 'monotone',
-                                        fill: true,
-                                        pointRadius: 2,
-                                        pointHoverRadius: 4
-                                    }]
+                                    datasets: [dataset]
                                 },
                                 options: {
                                     responsive: true,
@@ -664,7 +690,7 @@
                                             }
                                         },
                                         y: {
-                                            beginAtZero: false
+                                            beginAtZero: isRainfall
                                         }
                                     }
                                 }

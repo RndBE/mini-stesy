@@ -763,14 +763,12 @@ background: rgba(0, 0, 0, 0.28);
                                             ->where('arr_state', $threshold->state_key)
                                             ->count();
                                     @endphp
-                                    @if($count > 0)
                                     <label class="flex items-center gap-2">
                                         <input type="checkbox" id="filterARR_{{ $threshold->state_key }}" checked>
                                         <img src="{{ asset('icons/arr/' . $threshold->state_key . '.svg') }}"
                                             class="h-7 w-7 inline-block" alt="{{ $threshold->state_label }}">
                                         {{ $threshold->state_label }} ({{ $count }})
                                     </label>
-                                    @endif
                                 @endforeach
                             </div>
                         </div>

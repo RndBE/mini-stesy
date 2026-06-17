@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\t_Logger;
 use App\Models\KlasifikasiThreshold;
+use App\Support\ArrRainStatus;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Services\MiniStesyApi;
@@ -187,7 +188,12 @@ class PetaController extends Controller
         $col   = $pRain?->kolom_sensor;
         $value = null;
 
-        if ($latest && $col && isset($latest->{$col})) {
+        if ($pRain && $col && $this->isArrLogger($logger)) {
+            // ARR: classify by running-hour accumulation (consistent with Beranda
+            // & notifications). The instantaneous reading is ~always 0 between
+            // tips, which would keep every ARR pin stuck on "tidak_hujan".
+            $value = ArrRainStatus::hourlyAccumulation((string) ($logger->tabel_main ?? ''), (string) $logger->id_logger, (string) $col);
+        } elseif ($latest && $col && isset($latest->{$col})) {
             $value = is_numeric($latest->{$col}) ? (float) $latest->{$col} : null;
         }
 
@@ -221,6 +227,15 @@ class PetaController extends Controller
         }
 
         return $thresholdCollection->sortBy('sort_order')->first()?->state_key ?? 'tidak_hujan';
+    }
+
+    private function isArrLogger($logger): bool
+    {
+        if ((int) ($logger->id_katlogger ?? 0) === 2) {
+            return true;
+        }
+
+        return str_contains(strtolower((string) optional($logger->kategori)->nama_kategori), 'arr');
     }
 
     /**
