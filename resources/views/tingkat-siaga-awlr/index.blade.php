@@ -24,6 +24,7 @@
                             <th class="px-6 py-4 text-center">No</th>
                             <th class="px-6 py-4 text-left">ID Logger</th>
                             <th class="px-6 py-4 text-left">Nama Pos</th>
+                            <th class="px-6 py-4 text-left">Tipe</th>
                             <th class="px-6 py-4 text-left">Status Notifikasi</th>
                             <th class="px-6 py-4 text-left">Level Siaga</th>
                             <th class="px-6 py-4 text-center">Jeda Notifikasi</th>
@@ -36,6 +37,11 @@
                                 <td class="px-6 py-4 text-center" x-text="idx + 1"></td>
                                 <td class="px-6 py-4 font-medium text-slate-900" x-text="row.id_logger"></td>
                                 <td class="px-6 py-4 text-slate-900" x-text="row.nama_lokasi || row.nama_pos"></td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold"
+                                        :class="row.tipe === 'ARR' ? 'bg-teal-100 text-teal-700' : 'bg-indigo-100 text-indigo-700'"
+                                        x-text="row.tipe"></span>
+                                </td>
                                 <td class="px-6 py-4">
                                     <template x-if="row.status_notifikasi_bool">
                                         <span
@@ -51,21 +57,36 @@
                                     </template>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <template x-if="row.levels && row.levels.length > 0">
-                                        <div class="space-y-1">
-                                            <template x-for="(level, levelIdx) in row.levels"
-                                                :key="`${row.id_logger}-${levelIdx}`">
-                                                <div class="flex items-center gap-2 text-sm">
-                                                    <span class="h-3 w-3 rounded-full"
-                                                        :style="`background-color: ${toHexColor(level.warna)}`"></span>
-                                                    <span class="min-w-16" x-text="level.nama"></span>
-                                                    <span class="font-semibold" x-text="`${level.nilai} m`"></span>
+                                    <template x-if="row.tipe === 'AWLR'">
+                                        <div>
+                                            <template x-if="row.levels && row.levels.length > 0">
+                                                <div class="space-y-1">
+                                                    <template x-for="(level, levelIdx) in row.levels"
+                                                        :key="`${row.id_logger}-${levelIdx}`">
+                                                        <div class="flex items-center gap-2 text-sm">
+                                                            <span class="h-3 w-3 rounded-full"
+                                                                :style="`background-color: ${toHexColor(level.warna)}`"></span>
+                                                            <span class="min-w-16" x-text="level.nama"></span>
+                                                            <span class="font-semibold" x-text="`${level.nilai} m`"></span>
+                                                        </div>
+                                                    </template>
                                                 </div>
+                                            </template>
+                                            <template x-if="!row.levels || row.levels.length === 0">
+                                                <span class="text-slate-400">-</span>
                                             </template>
                                         </div>
                                     </template>
-                                    <template x-if="!row.levels || row.levels.length === 0">
-                                        <span class="text-slate-400">-</span>
+                                    <template x-if="row.tipe === 'ARR'">
+                                        <div class="space-y-1.5">
+                                            <div class="flex items-center gap-1.5">
+                                                <template x-for="(c, ci) in (row.klasifikasi?.perjam || [])" :key="`pj-${ci}`">
+                                                    <span class="h-3.5 w-3.5 rounded-full ring-1 ring-black/5"
+                                                        :style="`background-color: ${c.warna}`" :title="c.intensitas"></span>
+                                                </template>
+                                            </div>
+                                            <div class="text-xs text-slate-500">Klasifikasi hujan BMKG · Per Jam &amp; Per Hari</div>
+                                        </div>
                                     </template>
                                 </td>
                                 <td class="px-6 py-4 text-center text-slate-900" x-text="row.jeda_notif"></td>
@@ -135,6 +156,7 @@
                             </div>
                             <template x-if="editForm.status_notifikasi">
                                 <div class="space-y-4">
+                                    <template x-if="editForm.tipe === 'AWLR'">
                                     <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden">
                                         <div
                                             class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900">
@@ -287,6 +309,42 @@
                                             </div>
                                         </div>
                                     </div>
+                                    </template>
+
+                                    <template x-if="editForm.tipe === 'ARR'">
+                                    <div class="space-y-4">
+                                        <template x-for="period in arrPeriods" :key="period.key">
+                                            <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+                                                <div class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900"
+                                                    x-text="period.label"></div>
+                                                <div class="space-y-3 p-3 sm:p-4">
+                                                    <template x-for="(item, idx) in editForm.klasifikasi[period.key]"
+                                                        :key="`${period.key}-${idx}`">
+                                                        <div class="flex items-center gap-3">
+                                                            <span class="h-9 w-9 flex-shrink-0 rounded-lg border border-slate-200 ring-1 ring-black/5"
+                                                                :style="`background-color:${item.warna}`"></span>
+                                                            <div class="min-w-0 flex-1">
+                                                                <div class="truncate text-sm font-semibold text-slate-800"
+                                                                    x-text="item.intensitas"></div>
+                                                            </div>
+                                                            <span class="w-5 text-center text-base font-bold text-slate-400"
+                                                                x-text="idx === 0 ? '=' : '≥'"></span>
+                                                            <div class="flex h-11 w-32 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
+                                                                <input type="number" step="0.1" min="0" x-model="item.nilai"
+                                                                    class="h-full w-full border-0 px-3 text-sm text-slate-900 focus:outline-none"
+                                                                    placeholder="0">
+                                                                <div class="flex h-full w-12 items-center justify-center border-l border-slate-200 text-sm text-slate-700">
+                                                                    mm
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    </template>
+
                                     <div>
                                         <label class="mb-2 block text-sm font-semibold text-slate-900">Jeda Notifikasi</label>
                                         <div class="flex w-full overflow-hidden rounded-xl border border-slate-50 bg-white">
@@ -338,12 +396,18 @@
                 showEditModal: false,
                 savingEdit: false,
                 editError: '',
+                arrPeriods: [
+                    { key: 'perjam', label: 'Tingkat Status Per Jam' },
+                    { key: 'perhari', label: 'Tingkat Status Per Hari' },
+                ],
                 editForm: {
                     id_logger: '',
+                    tipe: 'AWLR',
                     nama_pos: '',
                     status_notifikasi: false,
                     jeda_notif: 1,
-                    levels: []
+                    levels: [],
+                    klasifikasi: { perjam: [], perhari: [] }
                 },
 
                 init(rows = [], csrfToken = '') {
@@ -384,8 +448,10 @@
 
                 openEditModal(row) {
                     this.editError = ''
+                    const tipe = row.tipe === 'ARR' ? 'ARR' : 'AWLR'
                     this.editForm = {
                         id_logger: row.id_logger,
+                        tipe: tipe,
                         nama_pos: row.nama_pos || row.nama_lokasi || '',
                         status_notifikasi: !!row.status_notifikasi_bool,
                         jeda_notif: Number(row.jeda_notif_value || 1),
@@ -394,9 +460,17 @@
                             nilai: level.nilai || '',
                             warna: this.toHexColor(level.warna),
                         })),
+                        klasifikasi: {
+                            perjam: ((row.klasifikasi && row.klasifikasi.perjam) || []).map(c => ({
+                                intensitas: c.intensitas, warna: c.warna, nilai: c.nilai,
+                            })),
+                            perhari: ((row.klasifikasi && row.klasifikasi.perhari) || []).map(c => ({
+                                intensitas: c.intensitas, warna: c.warna, nilai: c.nilai,
+                            })),
+                        },
                     }
 
-                    if (this.editForm.status_notifikasi && this.editForm.levels.length === 0) {
+                    if (tipe === 'AWLR' && this.editForm.status_notifikasi && this.editForm.levels.length === 0) {
                         this.editForm.levels = this.defaultLevels()
                     }
 
@@ -410,7 +484,7 @@
 
                 toggleStatus() {
                     this.editForm.status_notifikasi = !this.editForm.status_notifikasi
-                    if (this.editForm.status_notifikasi && this.editForm.levels.length === 0) {
+                    if (this.editForm.tipe === 'AWLR' && this.editForm.status_notifikasi && this.editForm.levels.length === 0) {
                         this.editForm.levels = this.defaultLevels()
                     }
                 },
@@ -448,6 +522,22 @@
 
                 buildPayload() {
                     const statusActive = !!this.editForm.status_notifikasi
+
+                    if (this.editForm.tipe === 'ARR') {
+                        const mapPeriod = (rows) => (rows || []).map(c => ({
+                            intensitas: c.intensitas,
+                            debit_air: Number(c.nilai),
+                        }))
+                        return {
+                            status_notifikasi: statusActive ? 1 : 0,
+                            jeda_notif: statusActive ? Number(this.editForm.jeda_notif || 1) : null,
+                            klasifikasi: {
+                                perjam: mapPeriod(this.editForm.klasifikasi.perjam),
+                                perhari: mapPeriod(this.editForm.klasifikasi.perhari),
+                            },
+                        }
+                    }
+
                     const levels = statusActive ?
                         (this.editForm.levels || []).map(level => ({
                             nama: String(level.nama || '').trim(),
@@ -466,6 +556,17 @@
                     if (!payload.status_notifikasi) return null
                     if (!Number.isFinite(payload.jeda_notif) || payload.jeda_notif < 1)
                         return 'Jeda notifikasi harus lebih dari 0 menit.'
+
+                    if (this.editForm.tipe === 'ARR') {
+                        for (const period of ['perjam', 'perhari']) {
+                            for (const item of (payload.klasifikasi[period] || [])) {
+                                if (!Number.isFinite(item.debit_air) || item.debit_air < 0)
+                                    return 'Nilai curah hujan harus berupa angka ≥ 0.'
+                            }
+                        }
+                        return null
+                    }
+
                     if (!payload.levels.length)
                         return 'Minimal ada satu level alert ketika status notifikasi aktif.'
                     for (const level of payload.levels) {

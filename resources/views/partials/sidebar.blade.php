@@ -48,7 +48,7 @@
                     <a href="{{ route('tingkat-siaga-awlr.index') }}"
                         class="nav-link {{ request()->routeIs('tingkat-siaga-awlr.*') ? 'is-active' : '' }}">
                         <img src="{{ asset(request()->routeIs('tingkat-siaga-awlr.*') ? 'icons/pengaturan_fill.svg' : 'icons/pengaturan_line.svg') }}" class="nav-ico h-5 w-5 flex-shrink-0 {{ request()->routeIs('tingkat-siaga-awlr.*') ? 'brightness-0 invert' : '' }}" alt="Tingkat Siaga">
-                        <span class="sidebar-text truncate">Tingkat Siaga AWLR</span>
+                        <span class="sidebar-text truncate">Tingkat Siaga</span>
                     </a>
                 @endpermission
 
@@ -283,6 +283,12 @@
         background: linear-gradient(90deg, rgba(148, 163, 184, .35), transparent);
     }
     .nav-section:first-child { margin-top: 1rem; }
+
+    /* Tailwind `space-y-1` (.space-y-1 > :not([hidden]) ~ :not([hidden]), spec 0,3,0)
+       would otherwise clobber the section label's margin-top down to .25rem.
+       Scope to #mainSidebar (spec 1,1,0) so the intended breathing room actually applies. */
+    #mainSidebar .nav-section { margin-top: 1.1rem; margin-bottom: .4rem; }
+    #mainSidebar .nav-section:first-child { margin-top: .85rem; }
 
     /* ── Nav links ── */
     .nav-link {

@@ -302,7 +302,7 @@ class DataMasukController extends Controller
 
         // --- CEK DAN KIRIM NOTIFIKASI FCM ---
         try {
-            $this->checkAndSendNotification($logger, $merged);
+            $this->checkAndSendNotification($logger, $merged, $tableMain);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('FCM Notification Check Error: ' . $e->getMessage());
         }
@@ -416,7 +416,7 @@ class DataMasukController extends Controller
         return SensorFamily::mainTablePrefix(SensorFamily::familyFor($sensorCount)) . '01';
     }
 
-    private function checkAndSendNotification($logger, array $merged)
+    private function checkAndSendNotification($logger, array $merged, ?string $tableMain = null)
     {
         $kategori = strtolower($logger->kategori ?? '');
         $id_logger = $logger->id_logger;
@@ -467,7 +467,9 @@ class DataMasukController extends Controller
                 }
             }
         } 
-        // Deteksi ARR Intensitas Hujan (id_katlogger = 2)
+        // Deteksi ARR Hujan (id_katlogger = 2) — notif berbasis akumulasi 1 jam berjalan.
+        // Berbeda dari AWLR yang memakai pembacaan sesaat. Sumber akumulasi &
+        // klasifikasi disatukan dengan tampilan Beranda lewat ArrRainStatus.
         elseif (str_contains($kategori, 'arr') || (isset($logger->id_katlogger) && $logger->id_katlogger == 2)) {
             $pRain = \Illuminate\Support\Facades\DB::table('parameter_sensor')
                 ->where('logger_id', $id_logger)
@@ -476,23 +478,19 @@ class DataMasukController extends Controller
                       ->orWhere('parameter_utama', 'like', '%hujan%');
                 })->first();
 
-            if ($pRain && isset($merged[$pRain->kolom_sensor])) {
-                $rain = (float) $merged[$pRain->kolom_sensor];
-                
-                $thresholds = \Illuminate\Support\Facades\DB::table('klasifikasi_threshold')->orderBy('sort_order')->get();
-                foreach ($thresholds as $t) {
-                    if ($t->min_value === null && $t->max_value === null) continue;
-                    $matchMin = $t->min_value === null || $rain >= $t->min_value;
-                    $matchMax = $t->max_value === null || $rain < $t->max_value;
-                    
-                    if ($matchMin && $matchMax) {
-                        $s = strtolower($t->state_key);
-                        if (str_contains($s, 'lebat') || str_contains($s, 'sangat_lebat') || str_contains($s, 'sedang') || str_contains($s, 'sangat lebat')) {
-                            $stateKritis = str_replace('_', ' ', ucwords($t->state_key));
-                            $bodyMsg = "Intensitas hujan mencapai {$rain}mm/jam ({$stateKritis}).";
-                        }
-                        break;
-                    }
+            $rainTable  = (string) ($tableMain ?: ($logger->tabel_main ?? ''));
+            $rainColumn = $pRain->kolom_sensor ?? null;
+
+            // Hanya proses bila notifikasi diaktifkan (toggle ON) untuk logger ini.
+            if ($rainColumn && \App\Support\ArrRainStatus::notifEnabled($id_logger)) {
+                $akumulasi  = \App\Support\ArrRainStatus::hourlyAccumulation($rainTable, (string) $id_logger, (string) $rainColumn);
+                $intensitas = \App\Support\ArrRainStatus::classify((string) $id_logger, 'perjam', $akumulasi);
+
+                // Notif hanya untuk Hujan Sedang ke atas.
+                if (\App\Support\ArrRainStatus::isAlertIntensity($intensitas)) {
+                    $akumStr = rtrim(rtrim(number_format((float) $akumulasi, 2, '.', ''), '0'), '.');
+                    $stateKritis = $intensitas;
+                    $bodyMsg = "Akumulasi hujan 1 jam terakhir mencapai {$akumStr}mm ({$intensitas}).";
                 }
             }
         }
