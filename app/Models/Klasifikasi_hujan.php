@@ -14,6 +14,11 @@ class Klasifikasi_hujan extends Model
         'waktu',
         'debit_air',
         'intensitas',
+        'status',
+    ];
+
+    protected $casts = [
+        'status' => 'integer',
     ];
 
     public function logger()
