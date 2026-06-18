@@ -2,34 +2,73 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DownloadController extends Controller
 {
     /**
-     * Display the download application page
+     * Display the download application page.
+     * Nilai diambil dari pengaturan admin (app_settings.json).
      */
     public function index()
     {
-        // Download URLs for Android and iOS apps
+        $settings = SettingController::getSettings();
+
+        $androidMode = $settings['download_android_mode'] ?? 'apk';
+        $apkPath = $settings['download_android_apk_path'] ?? null;
+
+        if ($androidMode === 'playstore') {
+            $androidUrl = $settings['download_android_playstore_url'] ?? '';
+        } else {
+            $androidUrl = ($apkPath && Storage::disk('local')->exists($apkPath))
+                ? route('download.android.apk')
+                : '';
+        }
+
+        $iosUrl = $settings['download_ios_url'] ?? '';
+
         $downloads = [
             'android' => [
                 'name' => 'Aplikasi Android',
-                'url' => 'https://mini-stesy.beacontelemetry.com/unduh/mini_stesy_1.2.0.apk',
+                'mode' => $androidMode,
+                'url' => $androidUrl,
+                'available' => $androidUrl !== '',
                 'icon' => 'android',
-                'version' => '1.2.0',
+                'version' => $settings['download_android_version'] ?: '-',
+                'apk_name' => $settings['download_android_apk_name'] ?? null,
+                'apk_size' => $settings['download_android_apk_size'] ?? null,
             ],
             'ios' => [
                 'name' => 'Aplikasi iOS',
-                'url' => 'https://apps.apple.com/id/app/mini_stesy/id6480156441',
+                'url' => $iosUrl,
+                'available' => $iosUrl !== '',
                 'icon' => 'apple',
-                'version' => '1.3.6',
+                'version' => $settings['download_ios_version'] ?: '-',
             ],
         ];
 
         return view('download.index', [
             'title' => 'Unduh Aplikasi',
             'downloads' => $downloads,
+        ]);
+    }
+
+    /**
+     * Stream APK yang di-upload admin sebagai unduhan.
+     */
+    public function apk()
+    {
+        $settings = SettingController::getSettings();
+        $path = $settings['download_android_apk_path'] ?? null;
+
+        if (!$path || !Storage::disk('local')->exists($path)) {
+            abort(404, 'APK belum tersedia.');
+        }
+
+        $downloadName = $settings['download_android_apk_name'] ?: 'aplikasi.apk';
+
+        return Storage::disk('local')->download($path, $downloadName, [
+            'Content-Type' => 'application/vnd.android.package-archive',
         ]);
     }
 }

@@ -137,6 +137,7 @@ Route::middleware(['auth', 'permission:manage_user'])->resource('users', UserCon
 Route::middleware(['auth'])->group(function () {
     Route::get('/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('settings.update');
+    Route::post('/settings/download', [\App\Http\Controllers\SettingController::class, 'updateDownload'])->name('settings.download.update');
 });
 
 // Notifikasi Custom — hanya superadmin
@@ -151,6 +152,7 @@ Route::middleware(['auth', 'permission:manage_profile'])->patch('/profile', [Pro
 Route::middleware(['auth', 'permission:manage_profile'])->delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 Route::middleware(['auth'])->get('/download', [DownloadController::class, 'index'])->name('download.index');
+Route::middleware(['auth'])->get('/download/android/apk', [DownloadController::class, 'apk'])->name('download.android.apk');
 Route::middleware(['auth'])->post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
 
 require __DIR__ . '/auth.php';

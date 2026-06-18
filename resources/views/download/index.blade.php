@@ -24,6 +24,7 @@
                                     {{ $downloads['android']['version'] }}</span>
                             </div>
 
+                            @if ($downloads['android']['available'])
                             <div class="mt-3 flex items-center gap-3">
                                 <input type="text" value="{{ $downloads['android']['url'] }}"
                                     class="w-full h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
@@ -40,6 +41,11 @@
                                     Download
                                 </a>
                             </div>
+                            @else
+                            <div class="mt-3">
+                                <span class="inline-flex items-center h-11 rounded-xl bg-slate-100 px-4 text-sm font-medium text-slate-400">Belum tersedia</span>
+                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -63,6 +69,7 @@
                                     {{ $downloads['ios']['version'] }}</span>
                             </div>
 
+                            @if ($downloads['ios']['available'])
                             <div class="mt-3 flex items-center gap-3">
                                 <input type="text" value="{{ $downloads['ios']['url'] }}"
                                     class="w-full h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
@@ -79,6 +86,11 @@
                                     Download
                                 </a>
                             </div>
+                            @else
+                            <div class="mt-3">
+                                <span class="inline-flex items-center h-11 rounded-xl bg-slate-100 px-4 text-sm font-medium text-slate-400">Belum tersedia</span>
+                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>

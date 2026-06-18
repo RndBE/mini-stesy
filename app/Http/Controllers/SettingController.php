@@ -75,19 +75,106 @@ class SettingController extends Controller
         return redirect()->route('settings.index')->with('success', 'Pengaturan berhasil disimpan.');
     }
 
-    public static function getSettings()
+    public static function defaults(): array
     {
-        $file = 'app_settings.json';
-        if (Storage::disk('local')->exists($file)) {
-            return json_decode(Storage::disk('local')->get($file), true) ?? [];
-        }
         return [
             'maintenance_mode' => false,
             'maintenance_message' => 'Server sedang dalam perbaikan. Silakan coba lagi nanti.',
             'latest_app_version' => '1.0.0',
             'force_update' => false,
-            'update_url' => 'https://play.google.com/store/apps/details?id=com.ministesy.app'
+            'update_url' => 'https://play.google.com/store/apps/details?id=com.ministesy.app',
+
+            // Halaman unduh aplikasi (web)
+            'download_android_mode' => 'apk', // 'apk' | 'playstore'
+            'download_android_apk_path' => null,
+            'download_android_apk_name' => null,
+            'download_android_apk_size' => null,
+            'download_android_apk_uploaded_at' => null,
+            'download_android_playstore_url' => '',
+            'download_android_version' => '',
+            'download_ios_url' => '',
+            'download_ios_version' => '',
         ];
+    }
+
+    public static function getSettings()
+    {
+        $file = 'app_settings.json';
+        $stored = [];
+        if (Storage::disk('local')->exists($file)) {
+            $stored = json_decode(Storage::disk('local')->get($file), true) ?? [];
+        }
+        // Gabungkan dengan default agar key baru selalu tersedia walau file lama belum punya.
+        return array_merge(self::defaults(), $stored);
+    }
+
+    private function saveSettings(array $settings): void
+    {
+        Storage::disk('local')->put($this->settingsFile, json_encode($settings, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * Simpan pengaturan halaman unduh aplikasi (APK / link store).
+     * Dipisah dari update() agar tidak memicu broadcast notifikasi FCM.
+     */
+    public function updateDownload(Request $request)
+    {
+        if (!auth()->user()->isSuperAdmin() && !auth()->user()->hasPermission('manage_rbac')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'download_android_mode' => 'required|in:apk,playstore',
+            'download_android_apk' => 'nullable|file|max:204800', // maks 200 MB
+            'download_android_playstore_url' => 'nullable|url',
+            'download_android_version' => 'nullable|string|max:50',
+            'download_ios_url' => 'nullable|url',
+            'download_ios_version' => 'nullable|string|max:50',
+        ], [
+            'download_android_apk.max' => 'Ukuran APK maksimal 200 MB.',
+            'download_android_playstore_url.url' => 'Link Play Store tidak valid.',
+            'download_ios_url.url' => 'Link App Store tidak valid.',
+        ]);
+
+        // Deteksi MIME APK tidak konsisten (apk = arsip zip), jadi validasi via ekstensi.
+        if ($request->hasFile('download_android_apk')) {
+            $ext = strtolower($request->file('download_android_apk')->getClientOriginalExtension());
+            if ($ext !== 'apk') {
+                return redirect()->route('settings.index')
+                    ->withErrors(['download_android_apk' => 'File harus berekstensi .apk'])
+                    ->withInput();
+            }
+        }
+
+        $settings = $this->getSettings();
+
+        $settings['download_android_mode'] = $request->input('download_android_mode');
+        $settings['download_android_playstore_url'] = $request->input('download_android_playstore_url', '');
+        $settings['download_android_version'] = $request->input('download_android_version', '');
+        $settings['download_ios_url'] = $request->input('download_ios_url', '');
+        $settings['download_ios_version'] = $request->input('download_ios_version', '');
+
+        if ($request->hasFile('download_android_apk')) {
+            $file = $request->file('download_android_apk');
+
+            // Hapus APK lama agar tidak menumpuk di storage.
+            if (!empty($settings['download_android_apk_path'])
+                && Storage::disk('local')->exists($settings['download_android_apk_path'])) {
+                Storage::disk('local')->delete($settings['download_android_apk_path']);
+            }
+
+            $storedName = 'mini_stesy_' . now()->format('Ymd_His') . '_' . \Illuminate\Support\Str::random(8) . '.apk';
+            $path = $file->storeAs('apk', $storedName, 'local');
+
+            $settings['download_android_apk_path'] = $path;
+            $settings['download_android_apk_name'] = $file->getClientOriginalName();
+            $settings['download_android_apk_size'] = $file->getSize();
+            $settings['download_android_apk_uploaded_at'] = now()->toDateTimeString();
+        }
+
+        $this->saveSettings($settings);
+
+        return redirect()->route('settings.index')->with('success', 'Pengaturan unduhan aplikasi berhasil disimpan.');
     }
 
     private function broadcastMaintenanceNotification($title, $body)
