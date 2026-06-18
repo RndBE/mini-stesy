@@ -1957,9 +1957,9 @@
                                     class="pointer-events-none absolute right-[-0.5rem] top-6 h-24 w-24 object-contain opacity-90">
                             </div>
 <div class="flex-1 bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-sm">
-                                <div class="text-xl font-bold text-slate-700 mb-2">Keterangan Intensitas Hujan Per Jam:
+                                <div class="text-base font-bold text-slate-700 mb-3">Keterangan Intensitas Hujan Per Jam:
                                 </div>
-                                <div id="rainfallLegendItems" class="flex flex-wrap gap-x-5 gap-y-1">
+                                <div id="rainfallLegendItems" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-3">
 </div>
                             </div>
                         </div>
@@ -2848,10 +2848,10 @@
                     rangeLabel = `\u2265 ${row.debit_air} mm`;
                 }
                 html += `<div class="flex items-center gap-2">
-                    <span class="inline-block w-9 h-9 rounded-sm flex-shrink-0" style="background:${color}"></span>
-                    <div>
+                    <span class="inline-block w-7 h-7 rounded-md flex-shrink-0" style="background:${color}"></span>
+                    <div class="leading-tight">
                         <div class="text-sm font-semibold text-slate-700">${row.intensitas}</div>
-                        <div class="text-sm text-slate-400">${rangeLabel}</div>
+                        <div class="text-xs text-slate-400">${rangeLabel}</div>
                     </div>
                 </div>`;
             }
