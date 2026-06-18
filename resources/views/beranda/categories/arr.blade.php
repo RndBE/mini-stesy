@@ -34,10 +34,17 @@
                 }
 
                 $defaultIcon = asset('klasifikasi_hujan/tidak_hujan.png');
+
+                // Klik card → halaman Analisa dengan parameter hujan terpilih
+                $analisaUrl = route('analisa.index', [
+                    'id_logger' => $lg->id_logger,
+                    'parameter' => $pRain->nama_parameter,
+                ]);
             @endphp
 
             <div class="grid grid-cols-2 gap-4 lg:grid-cols-2 relative">
-                <div class="relative overflow-hidden rounded-xl border px-3 py-3 text-center">
+                <a href="{{ $analisaUrl }}" title="Lihat analisa curah hujan"
+                    class="group block relative overflow-hidden rounded-xl border px-3 py-3 text-center transition hover:border-blue-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <div class="text-[10px] sm:text-xs font-semibold tracking-wide text-slate-700">AKUMULASI
                         HUJAN PER JAM</div>
 
@@ -56,9 +63,10 @@
                         {{ $statusHujanPerJam ?? '-' }}
                     </div>
 
-                </div>
+                </a>
 
-                <div class="relative overflow-hidden rounded-xl border px-3 py-3 text-center">
+                <a href="{{ $analisaUrl }}" title="Lihat analisa curah hujan"
+                    class="group block relative overflow-hidden rounded-xl border px-3 py-3 text-center transition hover:border-blue-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <div class="text-[10px] sm:text-xs font-semibold tracking-wide text-slate-700">
                         AKUMULASI HUJAN HARIAN</div>
 
@@ -76,7 +84,7 @@
                     <div class="inline-flex text-[10px] sm:text-xs font-semibold uppercase {{ $muted ? 'opacity-60' : '' }}">
                         {{ $statusHujanHarian ?? '-' }}
                     </div>
-                </div>
+                </a>
             </div>
         </div>
         @endif
