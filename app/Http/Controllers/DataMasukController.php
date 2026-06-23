@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\t_Logger;
 use App\Models\Parameter_sensor;
 use App\Models\NotificationHistory;
+use App\Support\DataMasukStats;
 use App\Support\SensorFamily;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -84,28 +85,12 @@ class DataMasukController extends Controller
                 else $sensorCount = 16;
             }
 
-            $tableMain = $this->resolveMainTable($loggerRow?->tabel_main, $sensorCount);
+            $tableMain   = DataMasukStats::resolveTable($loggerRow);
+            $sensorCount = SensorFamily::maxSensorFor($tableMain);
             $query = DB::table($tableMain)
                 ->where('id_logger', $logger_id)
                 ->whereBetween('waktu', [$tanggalAwal, $tanggalAkhir])
                 ->orderBy('waktu', 'desc');
-            $sensorCount = SensorFamily::maxSensorFor($tableMain);
-
-            if ($query->count() === 0) {
-                $fallbackTable = $this->buildFallbackTableName($tableMain, $sensorCount);
-                if ($this->isSupportedTable($fallbackTable)) {
-                    $fallbackQuery = DB::table($fallbackTable)
-                        ->where('id_logger', $logger_id)
-                        ->whereBetween('waktu', [$tanggalAwal, $tanggalAkhir])
-                        ->orderBy('waktu', 'desc');
-
-                    if ($fallbackQuery->count() > 0) {
-                        $query = $fallbackQuery;
-                        $tableMain = $fallbackTable;
-                        $sensorCount = SensorFamily::maxSensorFor($tableMain);
-                    }
-                }
-            }
 
             $columns = [];
             $parameterMap = [];
@@ -135,17 +120,9 @@ class DataMasukController extends Controller
                 return $transformed;
             })->toArray();
 
-            // Calculate completeness: actual records / expected records per day (1440 minutes)
-            if ($tanggalParsed->isSameDay($now)) {
-                $expectedRecords = max(1, $tanggalAwal->diffInMinutes($now)); // Minutes passed since start of day
-            } else {
-                $expectedRecords = 1440; // 24 hours * 60 minutes per day
-            }
-            $actualRecords = count($data);
-            $completeness = round(($actualRecords / $expectedRecords) * 100, 2);
-            if ($completeness > 100) {
-                $completeness = 100;
-            }
+            // Completeness uses the canonical unique-minute metric so it matches
+            // Rekap Data and Analisa for the same logger/day.
+            $completeness = DataMasukStats::forDate($loggerRow, $tanggal, $now)['percentage'];
 
             return response()->json([
                 'success' => true,
@@ -402,18 +379,6 @@ class DataMasukController extends Controller
         }
 
         return Schema::hasTable($tableName);
-    }
-
-    private function buildFallbackTableName(string $tableMain, int $sensorCount): string
-    {
-        // Legacy 16↔19 pair: try the sibling family at the same shard suffix.
-        if (preg_match('/^t_s(16|19)_(\d{2,})$/', $tableMain, $m)) {
-            $otherFamily = ((int) $m[1] === 19) ? 16 : 19;
-            return 't_s' . $otherFamily . '_' . $m[2];
-        }
-
-        // No sibling (e.g. t_s50_*): fall back to the canonical table for the count.
-        return SensorFamily::mainTablePrefix(SensorFamily::familyFor($sensorCount)) . '01';
     }
 
     private function checkAndSendNotification($logger, array $merged, ?string $tableMain = null)
