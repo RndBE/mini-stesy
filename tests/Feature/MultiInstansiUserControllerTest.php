@@ -136,6 +136,26 @@ class MultiInstansiUserControllerTest extends TestCase
         $this->assertSame(['L3'], $granted);
     }
 
+    public function test_instansi_admin_target_with_empty_logger_access_saves_clean(): void
+    {
+        $this->actingAs($this->actor('superadmin', null));
+
+        $request = $this->storeRequest([
+            'level_user' => 'instansi_admin',
+            'instansi_id' => 1,
+            'logger_access' => [],
+        ]);
+
+        (new UserController())->store($request);
+
+        $user = t_User::query()->where('nama', 'RND')->firstOrFail();
+
+        $this->assertSame(
+            0,
+            DB::table('user_logger_access')->where('user_id', $user->id_user)->count()
+        );
+    }
+
     public function test_pegawai_without_logger_is_rejected(): void
     {
         $this->actingAs($this->actor('superadmin', null));

@@ -369,9 +369,6 @@ class UserController extends Controller
     /**
      * @param array<int, string>|null $loggerIds
      */
-    /**
-     * @param array<int, string>|null $loggerIds
-     */
     private function syncLoggerAccessForUser(t_User $user, ?array $loggerIds, t_User $actor): void
     {
         // Hanya pegawai (himpunan penuh) & instansi_admin (tambahan lintas
