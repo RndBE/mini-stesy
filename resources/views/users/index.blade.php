@@ -258,24 +258,38 @@
                                 </template>
                             </div>
 
-                            <div x-show="isPegawaiRole(createForm.level_user)" x-cloak>
+                            <div x-show="shouldShowLoggerPicker(createForm.level_user)" x-cloak>
                                 <div class="flex items-center justify-between mb-2">
                                     <label class="block text-sm font-semibold">Akses Logger / Pos</label>
                                     <span class="text-xs text-slate-500"
                                         x-text="`${createForm.logger_access.length} dipilih`"></span>
                                 </div>
-                                <div class="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 space-y-2">
-                                    <template x-for="logger in getLoggerOptions('create')"
-                                        :key="'create-log-' + logger.id_logger">
-                                        <label class="flex items-center gap-2 text-sm">
-                                            <input type="checkbox" class="rounded border-slate-300"
-                                                :checked="createForm.logger_access.includes(String(logger.id_logger))"
-                                                @change="toggleLoggerAccess('create', String(logger.id_logger), $event.target.checked)">
-                                            <span x-text="`${logger.nama_logger} (${logger.id_logger})`"></span>
-                                        </label>
+                                <p class="text-xs text-slate-500 mb-2" x-show="!isPegawaiRole(createForm.level_user)" x-cloak>
+                                    Logger tambahan (opsional) lintas instansi untuk admin ini.</p>
+                                <div class="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 space-y-3">
+                                    <template x-for="group in getLoggerGroups('create')" :key="'create-grp-' + group.instansi_id">
+                                        <div>
+                                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-600 mb-1"
+                                                x-show="isSuperAdminUser">
+                                                <input type="checkbox" class="rounded border-slate-300"
+                                                    :checked="isInstansiGroupAllChecked('create', group)"
+                                                    @change="toggleInstansiGroup('create', group, $event.target.checked)">
+                                                <span x-text="group.instansi_nama"></span>
+                                            </label>
+                                            <div class="space-y-2 pl-1">
+                                                <template x-for="logger in group.loggers" :key="'create-log-' + logger.id_logger">
+                                                    <label class="flex items-center gap-2 text-sm">
+                                                        <input type="checkbox" class="rounded border-slate-300"
+                                                            :checked="createForm.logger_access.includes(String(logger.id_logger))"
+                                                            @change="toggleLoggerAccess('create', String(logger.id_logger), $event.target.checked)">
+                                                        <span x-text="`${logger.nama_logger} (${logger.id_logger})`"></span>
+                                                    </label>
+                                                </template>
+                                            </div>
+                                        </div>
                                     </template>
-                                    <div x-show="getLoggerOptions('create').length === 0" class="text-xs text-slate-500">
-                                        Logger belum tersedia untuk instansi ini.</div>
+                                    <div x-show="getLoggerGroups('create').length === 0" class="text-xs text-slate-500">
+                                        Logger belum tersedia.</div>
                                 </div>
                             </div>
                         </div>
@@ -420,24 +434,38 @@
                                     </template>
                                 </div>
 
-                                <div x-show="isPegawaiRole(editForm.level_user)" x-cloak>
+                                <div x-show="shouldShowLoggerPicker(editForm.level_user)" x-cloak>
                                     <div class="flex items-center justify-between mb-2">
                                         <label class="block text-sm font-semibold">Akses Logger / Pos</label>
                                         <span class="text-xs text-slate-500"
                                             x-text="`${editForm.logger_access.length} dipilih`"></span>
                                     </div>
-                                    <div class="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 space-y-2">
-                                        <template x-for="logger in getLoggerOptions('edit')"
-                                            :key="'edit-log-' + logger.id_logger">
-                                            <label class="flex items-center gap-2 text-sm">
-                                                <input type="checkbox" class="rounded border-slate-300"
-                                                    :checked="editForm.logger_access.includes(String(logger.id_logger))"
-                                                    @change="toggleLoggerAccess('edit', String(logger.id_logger), $event.target.checked)">
-                                                <span x-text="`${logger.nama_logger} (${logger.id_logger})`"></span>
-                                            </label>
+                                    <p class="text-xs text-slate-500 mb-2" x-show="!isPegawaiRole(editForm.level_user)" x-cloak>
+                                        Logger tambahan (opsional) lintas instansi untuk admin ini.</p>
+                                    <div class="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 space-y-3">
+                                        <template x-for="group in getLoggerGroups('edit')" :key="'edit-grp-' + group.instansi_id">
+                                            <div>
+                                                <label class="flex items-center gap-2 text-xs font-semibold text-slate-600 mb-1"
+                                                    x-show="isSuperAdminUser">
+                                                    <input type="checkbox" class="rounded border-slate-300"
+                                                        :checked="isInstansiGroupAllChecked('edit', group)"
+                                                        @change="toggleInstansiGroup('edit', group, $event.target.checked)">
+                                                    <span x-text="group.instansi_nama"></span>
+                                                </label>
+                                                <div class="space-y-2 pl-1">
+                                                    <template x-for="logger in group.loggers" :key="'edit-log-' + logger.id_logger">
+                                                        <label class="flex items-center gap-2 text-sm">
+                                                            <input type="checkbox" class="rounded border-slate-300"
+                                                                :checked="editForm.logger_access.includes(String(logger.id_logger))"
+                                                                @change="toggleLoggerAccess('edit', String(logger.id_logger), $event.target.checked)">
+                                                            <span x-text="`${logger.nama_logger} (${logger.id_logger})`"></span>
+                                                        </label>
+                                                    </template>
+                                                </div>
+                                            </div>
                                         </template>
-                                        <div x-show="getLoggerOptions('edit').length === 0"
-                                            class="text-xs text-slate-500">Logger belum tersedia untuk instansi ini.</div>
+                                        <div x-show="getLoggerGroups('edit').length === 0" class="text-xs text-slate-500">
+                                            Logger belum tersedia.</div>
                                     </div>
                                 </div>
 <template x-if="isSuperAdminUser">
@@ -626,6 +654,18 @@
                     return normalized === 'pegawai' || normalized === 'user';
                 },
 
+                isInstansiAdminRole(role) {
+                    const normalized = this.normalizeRole(role);
+                    return normalized === 'instansi_admin' || normalized === 'admin';
+                },
+
+                shouldShowLoggerPicker(role) {
+                    if (this.isPegawaiRole(role)) return true;
+                    // Superadmin boleh memberi logger tambahan lintas instansi
+                    // ke seorang instansi_admin.
+                    return this.isSuperAdminUser && this.isInstansiAdminRole(role);
+                },
+
                 getForm(formType) {
                     return formType === 'edit' ? this.editForm : this.createForm;
                 },
@@ -640,10 +680,44 @@
                 },
 
                 getLoggerOptions(formType) {
+                    // Superadmin memilih dari semua instansi; user lain hanya
+                    // dari instansi (terpilih) miliknya.
+                    if (this.isSuperAdminUser) {
+                        return this.loggerOptions;
+                    }
+
                     const instansiId = this.getFormInstansiId(formType);
                     if (!instansiId) return [];
 
                     return this.loggerOptions.filter((l) => String(l.instansi_id) === instansiId);
+                },
+
+                getLoggerGroups(formType) {
+                    const groups = {};
+                    this.getLoggerOptions(formType).forEach((l) => {
+                        const key = String(l.instansi_id);
+                        if (!groups[key]) {
+                            const inst = this.instansiList.find((i) => String(i.id) === key);
+                            groups[key] = {
+                                instansi_id: key,
+                                instansi_nama: inst ? inst.nama : 'Tanpa Instansi',
+                                loggers: [],
+                            };
+                        }
+                        groups[key].loggers.push(l);
+                    });
+                    return Object.values(groups);
+                },
+
+                isInstansiGroupAllChecked(formType, group) {
+                    const form = this.getForm(formType);
+                    return group.loggers.length > 0
+                        && group.loggers.every((l) => form.logger_access.includes(String(l.id_logger)));
+                },
+
+                toggleInstansiGroup(formType, group, checked) {
+                    group.loggers.forEach((l) =>
+                        this.toggleLoggerAccess(formType, String(l.id_logger), checked));
                 },
 
                 toggleLoggerAccess(formType, loggerId, checked) {
@@ -670,7 +744,7 @@
                     const form = this.getForm(formType);
                     form.level_user = roleName;
 
-                    if (!this.isPegawaiRole(form.level_user)) {
+                    if (!this.shouldShowLoggerPicker(form.level_user)) {
                         form.logger_access = [];
                         return;
                     }
