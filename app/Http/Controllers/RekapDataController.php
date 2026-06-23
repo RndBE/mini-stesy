@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Models\t_Logger;
+use App\Support\DataMasukStats;
 use App\Support\SensorFamily;
 
 class RekapDataController extends Controller
@@ -55,61 +56,37 @@ class RekapDataController extends Controller
         $loggersData = [];
 
         foreach ($loggers as $logger) {
-            // Resolve main table (same pattern as DataMasukController)
-            $sensorCount = $this->resolveSensorCount($logger);
-            $tableMain   = $this->resolveMainTable($logger->tabel_main ?? null, $sensorCount);
+            $stats = DataMasukStats::forLogger($logger, $dates, $now);
 
-            // Get counts grouped by date in one query
-            $counts = DB::table($tableMain)
-                ->selectRaw('DATE(waktu) as tgl, COUNT(*) as cnt')
-                ->where('id_logger', $logger->id_logger)
-                ->whereBetween('waktu', [$start, $end])
-                ->groupByRaw('DATE(waktu)')
-                ->pluck('cnt', 'tgl');
-
-            // Build per-day breakdown
             $days        = [];
             $totalCount  = 0;
             $totalExpect = 0;
 
             foreach ($dates as $date) {
-                $dayCarbon = Carbon::parse($date, config('app.timezone'));
-                // Future days not counted
-                if ($dayCarbon->startOfDay()->gt($now->copy()->startOfDay())) {
-                    $expected = 0;
-                } elseif ($dayCarbon->isSameDay($now)) {
-                    $expected = (int) $now->copy()->startOfDay()->diffInMinutes($now);
-                } else {
-                    $expected = 1440;
-                }
-
-                $rawCount    = (int) ($counts[$date] ?? 0);
-                // Cap tampilan count agar tidak melebihi expected (misal 1471 → 1440)
-                $count       = $expected > 0 ? min($rawCount, $expected) : $rawCount;
-                $pct         = $expected > 0 ? round(($count / $expected) * 100, 1) : 0;
-                $totalCount  += $rawCount;
-                $totalExpect += $expected;
+                $s = $stats[$date];
+                $totalCount  += $s['count'];
+                $totalExpect += $s['expected'];
 
                 $days[] = [
                     'date'     => $date,
-                    'count'    => $count,
-                    'expected' => $expected,
-                    'pct'      => $pct,
+                    'count'    => $s['count'],
+                    'expected' => $s['expected'],
+                    'pct'      => $s['percentage'],
                 ];
             }
 
             $overallPct = $totalExpect > 0
-                ? round(min(100, ($totalCount / $totalExpect) * 100), 1)
+                ? round(min(100, ($totalCount / $totalExpect) * 100), 2)
                 : 0;
 
             $loggersData[] = [
-                'id'          => $logger->id_logger,
-                'name'        => $logger->nama_logger ?? $logger->id_logger,
-                'table'       => $tableMain,
-                'days'        => $days,
-                'total_count' => $totalCount,
+                'id'             => $logger->id_logger,
+                'name'           => $logger->nama_logger ?? $logger->id_logger,
+                'table'          => DataMasukStats::resolveTable($logger),
+                'days'           => $days,
+                'total_count'    => $totalCount,
                 'total_expected' => $totalExpect,
-                'overall_pct' => $overallPct,
+                'overall_pct'    => $overallPct,
             ];
         }
 
@@ -149,9 +126,8 @@ class RekapDataController extends Controller
         }
 
         // Resolusi tabel target
-        $sensorCount = $this->resolveSensorCount($logger);
-        $tableMain   = $this->resolveMainTable($logger->tabel_main ?? null, $sensorCount);
-        $maxSensor   = SensorFamily::maxSensorFor($tableMain);
+        $tableMain = DataMasukStats::resolveTable($logger);
+        $maxSensor = SensorFamily::maxSensorFor($tableMain);
 
         // Parse CSV
         $file   = $request->file('csv_file');
@@ -311,32 +287,4 @@ class RekapDataController extends Controller
         ]);
     }
 
-    // ---------------------------------------------------------------
-    // Helpers (mirrors DataMasukController)
-    // ---------------------------------------------------------------
-
-    private function resolveSensorCount($logger): int
-    {
-        if (isset($logger->jumlah_sensor) && is_numeric($logger->jumlah_sensor)) {
-            return (int) $logger->jumlah_sensor;
-        }
-        return 16;
-    }
-
-    private function resolveMainTable(?string $tableMain, int $sensorCount): string
-    {
-        $tableMain = trim((string) $tableMain);
-        if ($this->isSupportedTable($tableMain)) {
-            return $tableMain;
-        }
-        return SensorFamily::mainTablePrefix(SensorFamily::familyFor($sensorCount)) . '01';
-    }
-
-    private function isSupportedTable(string $tableName): bool
-    {
-        if (!SensorFamily::isFamilyTable($tableName)) {
-            return false;
-        }
-        return Schema::hasTable($tableName);
-    }
 }
