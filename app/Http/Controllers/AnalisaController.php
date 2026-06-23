@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\t_Logger;
+use App\Support\DataMasukStats;
 use App\Support\SensorFamily;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -455,27 +456,23 @@ class AnalisaController extends Controller
             abort(404);
         }
 
-        $today = now();
+        $today = now(config('app.timezone'));
         $start = $today->copy()->subDays(29)->startOfDay();
 
+        $dates  = [];
         $labels = [];
-        $counts = [];
-
         for ($i = 0; $i < 30; $i++) {
-            $date = $start->copy()->addDays($i);
-            $tableName = $logger->tabel_main ?: (SensorFamily::mainTablePrefix(SensorFamily::familyFor((int) $logger->sensor_count)) . '01');
-            $count = DB::table($tableName)
-                ->where('id_logger', $logger->id_logger)
-                ->whereDate('waktu', $date)
-                ->count();
-
+            $date     = $start->copy()->addDays($i);
+            $dates[]  = $date->toDateString();
             $labels[] = $date->format('d M');
-            $counts[] = $count;
         }
+
+        $stats  = DataMasukStats::forLogger($logger, $dates);
+        $counts = array_map(fn ($d) => $stats[$d]['count'], $dates);
 
         return response()->json([
             'labels' => $labels,
-            'counts' => $counts
+            'counts' => $counts,
         ]);
     }
 
@@ -490,66 +487,19 @@ class AnalisaController extends Controller
             abort(404);
         }
 
-        // Determine which relation to use based on table name or sensor count
-        $family = ($logger->tabel_main && SensorFamily::isFamilyTable($logger->tabel_main))
-            ? SensorFamily::familyOf($logger->tabel_main)
-            : SensorFamily::familyFor((int) ($logger->sensor_count ?? 0));
-        $query = match ($family) {
-            50 => $logger->s50data(),
-            19 => $logger->s19data(),
-            default => $logger->s16data(),
-        };
+        $start = Carbon::now(config('app.timezone'))->subDays(29)->startOfDay();
 
-        // Expected complete data per day is always 1440 (1 record per minute)
-        $expectedPerDay = 1440;
-
-        // Get data for last 30 days
-        $startDate = Carbon::now()->subDays(29)->format('Y-m-d');
-
-        $nowTs = Carbon::now();
-
-        $data = $query->select(
-            DB::raw('DATE(waktu) as date'),
-            DB::raw("COUNT(DISTINCT DATE_FORMAT(waktu, '%Y-%m-%d %H:%i')) as count")
-        )
-            ->where('waktu', '>=', $startDate . ' 00:00:00')
-            ->where('waktu', '<=', $nowTs)
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get();
-
-        // Fill missing dates with 0
-        $result = [];
-        $current = Carbon::parse($startDate);
-        $now = Carbon::now();
-
-        $dbData = $data->pluck('count', 'date')->toArray();
-        $todayStr = Carbon::now()->format('Y-m-d');
-
-        while ($current <= $now) {
-            $dateStr = $current->format('Y-m-d');
-            $count = (int)($dbData[$dateStr] ?? 0);
-
-            if ($dateStr === $todayStr) {
-                $minutesSoFar = Carbon::now()->diffInMinutes(Carbon::today());
-                if ($minutesSoFar < 1) $minutesSoFar = 1;
-
-                $percentage = round(($count / $minutesSoFar) * 100, 2);
-            } else {
-                $percentage = ($count > 0) ? round(($count / $expectedPerDay) * 100, 2) : 0;
-            }
-
-            if ($percentage > 100) $percentage = 100;
-
-            $result[] = [
-                'date' => $dateStr,
-                'count' => $count,
-                'percentage' => $percentage
-            ];
-
-            $current->addDay();
+        $dates = [];
+        for ($i = 0; $i < 30; $i++) {
+            $dates[] = $start->copy()->addDays($i)->toDateString();
         }
 
+        $stats  = DataMasukStats::forLogger($logger, $dates);
+        $result = array_map(fn ($d) => [
+            'date'       => $d,
+            'count'      => $stats[$d]['count'],
+            'percentage' => $stats[$d]['percentage'],
+        ], $dates);
 
         return response()->json($result);
     }
