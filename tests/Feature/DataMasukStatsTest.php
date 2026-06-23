@@ -77,17 +77,18 @@ class DataMasukStatsTest extends TestCase
 
     public function test_percentage_caps_at_100(): void
     {
+        // Today (frozen 10:30 → expected=630). 700 distinct minutes → 111% → capped to 100.
         $rows = [];
-        for ($m = 0; $m < 1500; $m++) {
+        for ($m = 0; $m < 700; $m++) {
             $h = str_pad((string) intdiv($m, 60), 2, '0', STR_PAD_LEFT);
             $i = str_pad((string) ($m % 60), 2, '0', STR_PAD_LEFT);
-            // 1440 unique minutes max in a day; extra rows reuse minute 00:00 → still capped by expected.
-            $rows[] = ['id_logger' => 'L1', 'waktu' => "2026-06-20 $h:$i:00", 'sensor1' => 1];
+            $rows[] = ['id_logger' => 'L1', 'waktu' => "2026-06-23 $h:$i:00", 'sensor1' => 1];
         }
         DB::table('t_s16_50')->insert($rows);
 
-        $stats = DataMasukStats::forDate($this->logger('L1', 't_s16_50', 16), '2026-06-20');
+        $stats = DataMasukStats::forDate($this->logger('L1', 't_s16_50', 16), '2026-06-23');
 
+        $this->assertSame(700, $stats['count']);
         $this->assertSame(100.0, $stats['percentage']);
     }
 

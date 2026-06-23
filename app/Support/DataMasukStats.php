@@ -2,7 +2,6 @@
 
 namespace App\Support;
 
-use App\Support\SensorFamily;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -25,6 +24,10 @@ class DataMasukStats
      */
     public static function forLogger($logger, array $dates, ?Carbon $now = null): array
     {
+        if (empty($dates)) {
+            return [];
+        }
+
         $now   = $now ?: Carbon::now(config('app.timezone'));
         $table = self::resolveTable($logger);
 
@@ -60,7 +63,7 @@ class DataMasukStats
     {
         $tz         = config('app.timezone');
         $day        = Carbon::parse($date, $tz)->startOfDay();
-        $todayStart = $now->copy()->startOfDay();
+        $todayStart = $now->copy()->setTimezone($tz)->startOfDay();
 
         if ($day->gt($todayStart)) {
             return 0; // future
