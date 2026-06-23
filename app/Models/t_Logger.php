@@ -42,17 +42,20 @@ class t_Logger extends Model
             return $query;
         }
 
-        $query->where('instansi_id', $user->instansi_id);
+        return $query->where(function ($q) use ($user) {
+            // instansi_admin melihat semua logger di instansinya sendiri.
+            if (method_exists($user, 'isInstansiAdmin') && $user->isInstansiAdmin()) {
+                $q->where('instansi_id', $user->instansi_id);
+            }
 
-        if (method_exists($user, 'isInstansiAdmin') && $user->isInstansiAdmin()) {
-            return $query;
-        }
-
-        return $query->whereExists(function ($sub) use ($user) {
-            $sub->selectRaw('1')
-                ->from('user_logger_access as ula')
-                ->whereColumn('ula.logger_id', 't_logger.id_logger')
-                ->where('ula.user_id', $user->id_user);
+            // Semua non-superadmin: tambah logger yang diberikan eksplisit
+            // lewat pivot (boleh lintas instansi).
+            $q->orWhereExists(function ($sub) use ($user) {
+                $sub->selectRaw('1')
+                    ->from('user_logger_access as ula')
+                    ->whereColumn('ula.logger_id', 't_logger.id_logger')
+                    ->where('ula.user_id', $user->id_user);
+            });
         });
     }
 
