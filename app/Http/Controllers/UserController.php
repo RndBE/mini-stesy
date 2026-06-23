@@ -369,9 +369,14 @@ class UserController extends Controller
     /**
      * @param array<int, string>|null $loggerIds
      */
+    /**
+     * @param array<int, string>|null $loggerIds
+     */
     private function syncLoggerAccessForUser(t_User $user, ?array $loggerIds, t_User $actor): void
     {
-        if (!$user->isPegawai()) {
+        // Hanya pegawai (himpunan penuh) & instansi_admin (tambahan lintas
+        // instansi) yang punya grant eksplisit. Role lain tidak.
+        if (!$user->isPegawai() && !$user->isInstansiAdmin()) {
             $user->accessibleLoggers()->sync([]);
             return;
         }
@@ -383,15 +388,26 @@ class UserController extends Controller
             ->unique()
             ->values();
 
-        if ($loggerIds->isEmpty()) {
+        // Pegawai wajib minimal 1 logger; instansi_admin boleh tanpa tambahan.
+        if ($user->isPegawai() && $loggerIds->isEmpty()) {
             throw ValidationException::withMessages([
                 'logger_access' => 'Minimal pilih 1 logger untuk akun pegawai.',
             ]);
         }
 
-        $allowedLoggers = t_Logger::query()
-            ->forUser($actor)
-            ->where('instansi_id', $user->instansi_id)
+        if ($loggerIds->isEmpty()) {
+            $user->accessibleLoggers()->sync([]);
+            return;
+        }
+
+        // Hanya superadmin yang boleh memberi logger lintas instansi.
+        // Actor lain dibatasi pada instansinya sendiri.
+        $assignable = t_Logger::query()->forUser($actor);
+        if (!$actor->isSuperAdmin()) {
+            $assignable->where('instansi_id', $actor->instansi_id);
+        }
+
+        $allowedLoggers = $assignable
             ->whereIn('id_logger', $loggerIds)
             ->pluck('id_logger')
             ->map(fn($id) => (string) $id)
@@ -399,7 +415,7 @@ class UserController extends Controller
 
         if ($allowedLoggers->count() !== $loggerIds->count()) {
             throw ValidationException::withMessages([
-                'logger_access' => 'Ada logger yang tidak valid atau di luar instansi user.',
+                'logger_access' => 'Ada logger yang tidak valid atau di luar wewenang Anda.',
             ]);
         }
 
