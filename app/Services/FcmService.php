@@ -239,7 +239,15 @@ class FcmService
                     ->orWhere(function ($adminQuery) use ($logger) {
                         $adminQuery
                             ->whereIn(DB::raw('LOWER(u.level_user)'), ['instansi_admin', 'admin'])
-                            ->where('u.instansi_id', $logger->instansi_id);
+                            ->where(function ($scope) use ($logger) {
+                                $scope->where('u.instansi_id', $logger->instansi_id)
+                                    ->orWhereExists(function ($accessQuery) use ($logger) {
+                                        $accessQuery->selectRaw('1')
+                                            ->from('user_logger_access as ula')
+                                            ->whereColumn('ula.user_id', 'u.id_user')
+                                            ->where('ula.logger_id', $logger->id_logger);
+                                    });
+                            });
                     })
                     ->orWhere(function ($pegawaiQuery) use ($logger) {
                         $pegawaiQuery
