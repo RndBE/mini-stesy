@@ -63,6 +63,7 @@ Route::get('/api/data-masuk', [DataMasukController::class, 'getData'])->name('da
 Route::middleware(['auth', 'permission:view_peta_lokasi'])->group(function () {
     Route::get('/rekap-data', [RekapDataController::class, 'index'])->name('rekap-data.index');
     Route::get('/api/rekap-data', [RekapDataController::class, 'getData'])->name('rekap-data.api');
+    Route::get('/api/rekap-data/missing-minutes', [RekapDataController::class, 'missingMinutes'])->name('rekap-data.missing-minutes');
     Route::post('/api/rekap-data/upload-csv', [RekapDataController::class, 'uploadCsv'])->name('rekap-data.upload-csv');
     Route::get('/skema-irigasi/peta', function() {
         return view('skema.leaflet', ['title' => 'Peta Aliran Leuwigoong']);

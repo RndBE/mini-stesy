@@ -100,6 +100,51 @@ class RekapDataController extends Controller
     }
 
     // ---------------------------------------------------------------
+    // Detail menit hilang untuk satu logger pada satu tanggal
+    // ---------------------------------------------------------------
+
+    public function missingMinutes(Request $request)
+    {
+        $loggerId = $request->query('logger_id');
+        $date     = $request->query('date');
+
+        if (!$loggerId || !$date) {
+            return response()->json(['success' => false, 'message' => 'Logger dan tanggal harus diisi.'], 400);
+        }
+
+        try {
+            $parsed = Carbon::createFromFormat('Y-m-d', $date, config('app.timezone'))->startOfDay();
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Format tanggal tidak valid.'], 400);
+        }
+
+        $logger = t_Logger::query()
+            ->forUser(auth()->user())
+            ->where('id_logger', $loggerId)
+            ->first();
+
+        if (!$logger) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Logger tidak ditemukan atau tidak memiliki akses.',
+            ], 404);
+        }
+
+        $stats = DataMasukStats::missingMinutesForDate($logger, $parsed->toDateString(), Carbon::now(config('app.timezone')));
+
+        return response()->json([
+            'success'       => true,
+            'logger_id'     => $logger->id_logger,
+            'logger_name'   => $logger->nama_logger ?? $logger->id_logger,
+            'date'          => $parsed->toDateString(),
+            'expected'      => $stats['expected'],
+            'present'       => $stats['present'],
+            'total_missing' => $stats['missing'],
+            'ranges'        => $stats['ranges'],
+        ]);
+    }
+
+    // ---------------------------------------------------------------
     // Upload CSV untuk melengkapi data yang hilang
     // ---------------------------------------------------------------
 

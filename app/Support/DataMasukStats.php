@@ -58,6 +58,82 @@ class DataMasukStats
         return self::forLogger($logger, [$date], $now)[$date];
     }
 
+    /**
+     * Which minutes of a day have no reading row, collapsed into ranges.
+     *
+     * The expected window mirrors expectedForDate(): a full 00:00..23:59 for a
+     * past day, 00:00..now for today, empty for a future day. Present minutes
+     * outside that window are ignored so "missing" stays consistent with the
+     * count/expected shown on the rekap-data grid.
+     *
+     * @return array{expected:int, present:int, missing:int, ranges:array<int, array{start:string, end:string, count:int}>}
+     */
+    public static function missingMinutesForDate($logger, string $date, ?Carbon $now = null): array
+    {
+        $now      = $now ?: Carbon::now(config('app.timezone'));
+        $expected = self::expectedForDate($date, $now);
+
+        if ($expected <= 0) {
+            return ['expected' => 0, 'present' => 0, 'missing' => 0, 'ranges' => []];
+        }
+
+        $table = self::resolveTable($logger);
+
+        // Distinct present minutes of the day as 'HH:MM' (SUBSTR keeps it portable).
+        $present = DB::table($table)
+            ->where('id_logger', $logger->id_logger)
+            ->whereBetween('waktu', [$date . ' 00:00:00', $date . ' 23:59:59'])
+            ->selectRaw('DISTINCT SUBSTR(waktu, 12, 5) as hm')
+            ->pluck('hm');
+
+        $presentSet = [];
+        foreach ($present as $hm) {
+            $idx = ((int) substr($hm, 0, 2)) * 60 + (int) substr($hm, 3, 2);
+            if ($idx >= 0 && $idx < $expected) {
+                $presentSet[$idx] = true;
+            }
+        }
+
+        $ranges   = [];
+        $runStart = null;
+        for ($i = 0; $i < $expected; $i++) {
+            if (!isset($presentSet[$i])) {
+                if ($runStart === null) {
+                    $runStart = $i;
+                }
+            } elseif ($runStart !== null) {
+                $ranges[] = self::minuteRange($runStart, $i - 1);
+                $runStart = null;
+            }
+        }
+        if ($runStart !== null) {
+            $ranges[] = self::minuteRange($runStart, $expected - 1);
+        }
+
+        $presentCount = count($presentSet);
+
+        return [
+            'expected' => $expected,
+            'present'  => $presentCount,
+            'missing'  => $expected - $presentCount,
+            'ranges'   => $ranges,
+        ];
+    }
+
+    private static function minuteRange(int $start, int $end): array
+    {
+        return [
+            'start' => self::minuteToHm($start),
+            'end'   => self::minuteToHm($end),
+            'count' => $end - $start + 1,
+        ];
+    }
+
+    private static function minuteToHm(int $idx): string
+    {
+        return sprintf('%02d:%02d', intdiv($idx, 60), $idx % 60);
+    }
+
     /** Expected record count for a date relative to $now. */
     public static function expectedForDate(string $date, Carbon $now): int
     {

@@ -244,8 +244,11 @@
                                             <span class="text-slate-400 text-xs">–</span>
                                         </template>
                                         <template x-if="day.expected > 0">
-                                            <div class="flex flex-col items-center gap-1">
-                                                <span class="text-sm font-bold"
+                                            <button type="button"
+                                                @click="openMissingModal(logger, day)"
+                                                class="group w-full flex flex-col items-center gap-1 rounded-lg px-1 py-1 -my-1 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors cursor-pointer"
+                                                :title="`Lihat menit hilang — ${day.date}`">
+                                                <span class="text-sm font-bold group-hover:underline"
                                                     :class="pctTextClass(day.pct)"
                                                     x-text="parseFloat(day.pct).toFixed(1) + '%'">
                                                 </span>
@@ -258,7 +261,7 @@
                                                 <span class="text-[10px] text-slate-500 leading-tight">
                                                     <span x-text="day.count.toLocaleString('id-ID')"></span>/<span x-text="day.expected.toLocaleString('id-ID')"></span>
                                                 </span>
-                                            </div>
+                                            </button>
                                         </template>
                                     </td>
                                 </template>
@@ -416,6 +419,92 @@
                 </div>
             </div>
         </div>
+
+        {{-- ===== MODAL MENIT HILANG ===== --}}
+        <div x-show="missingOpen" x-cloak
+            class="fixed inset-0 z-[99990] flex items-center justify-center p-4"
+            @keydown.escape.window="closeMissingModal()">
+            {{-- Backdrop --}}
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="closeMissingModal()"></div>
+            {{-- Panel --}}
+            <div class="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+                {{-- Header --}}
+                <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50 flex-shrink-0">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="h-9 w-9 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+                            <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <h3 class="text-base font-bold text-slate-900 truncate" x-text="missingTitle"></h3>
+                            <p class="text-xs text-slate-500" x-text="missingDateLabel"></p>
+                        </div>
+                    </div>
+                    <button @click="closeMissingModal()" class="h-8 w-8 rounded-lg hover:bg-slate-200 flex items-center justify-center text-slate-500 flex-shrink-0">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                {{-- Body --}}
+                <div class="px-6 py-5 overflow-y-auto">
+                    {{-- Loading --}}
+                    <div x-show="missingLoading" class="flex items-center justify-center py-10 text-slate-500">
+                        <svg class="animate-spin h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-sm">Memuat menit hilang...</span>
+                    </div>
+                    {{-- Error --}}
+                    <div x-show="!missingLoading && missingError" x-cloak class="rounded-lg bg-red-50 border border-red-200 px-4 py-3">
+                        <p class="text-sm font-semibold text-red-700" x-text="missingError"></p>
+                    </div>
+                    {{-- Content --}}
+                    <template x-if="!missingLoading && !missingError">
+                        <div>
+                            {{-- Summary --}}
+                            <div class="flex items-center justify-between rounded-lg bg-slate-50 border border-slate-200 px-4 py-3 mb-4">
+                                <div class="text-sm text-slate-600">
+                                    <span class="font-bold text-slate-900" x-text="missingPresent.toLocaleString('id-ID')"></span>/<span x-text="missingExpected.toLocaleString('id-ID')"></span> menit terisi
+                                </div>
+                                <div class="text-sm font-bold"
+                                    :class="missingTotal === 0 ? 'text-emerald-600' : 'text-amber-600'">
+                                    <span x-text="missingTotal.toLocaleString('id-ID')"></span> menit hilang
+                                </div>
+                            </div>
+                            {{-- All complete --}}
+                            <div x-show="missingTotal === 0" class="flex flex-col items-center justify-center py-8 text-emerald-600">
+                                <svg class="h-12 w-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <p class="text-sm font-semibold">Semua menit lengkap 🎉</p>
+                            </div>
+                            {{-- Ranges list --}}
+                            <div x-show="missingTotal > 0" class="space-y-1.5">
+                                <template x-for="(r, i) in missingRanges" :key="i">
+                                    <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50">
+                                        <span class="font-mono text-sm text-slate-800"
+                                            x-text="r.start === r.end ? r.start : (r.start + ' – ' + r.end)"></span>
+                                        <span class="text-xs font-medium text-amber-700 bg-amber-50 rounded-full px-2 py-0.5"
+                                            x-text="r.count.toLocaleString('id-ID') + ' menit'"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                {{-- Footer --}}
+                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end flex-shrink-0">
+                    <button type="button" @click="closeMissingModal()"
+                        class="h-10 px-5 rounded-lg border-2 border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-100 transition-all">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -436,6 +525,55 @@
                 errorMessage: '',
                 dates: [],
                 loggers: [],
+
+                // --- Modal menit hilang ---
+                missingOpen:     false,
+                missingLoading:  false,
+                missingError:    '',
+                missingTitle:    '',
+                missingDateLabel:'',
+                missingExpected: 0,
+                missingPresent:  0,
+                missingTotal:    0,
+                missingRanges:   [],
+
+                async openMissingModal(logger, day) {
+                    this.missingOpen      = true;
+                    this.missingLoading   = true;
+                    this.missingError     = '';
+                    this.missingRanges    = [];
+                    this.missingTotal     = 0;
+                    this.missingExpected  = 0;
+                    this.missingPresent   = 0;
+                    this.missingTitle     = logger.name;
+                    const d = new Date(day.date + 'T00:00:00');
+                    this.missingDateLabel = d.toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+
+                    try {
+                        const params = new URLSearchParams({ logger_id: logger.id, date: day.date });
+                        const resp = await fetch(`/api/rekap-data/missing-minutes?${params}`, {
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        const data = await resp.json();
+
+                        if (resp.ok && data.success) {
+                            this.missingExpected = data.expected;
+                            this.missingPresent  = data.present;
+                            this.missingTotal    = data.total_missing;
+                            this.missingRanges   = data.ranges;
+                        } else {
+                            this.missingError = data.message || 'Gagal memuat menit hilang.';
+                        }
+                    } catch (err) {
+                        this.missingError = 'Terjadi kesalahan saat menghubungi server.';
+                    } finally {
+                        this.missingLoading = false;
+                    }
+                },
+
+                closeMissingModal() {
+                    this.missingOpen = false;
+                },
 
                 get overallAvg() {
                     if (!this.loggers.length) return '0.0';

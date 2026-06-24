@@ -120,6 +120,83 @@ class DataMasukStatsTest extends TestCase
         $this->assertSame('t_s19_50', DataMasukStats::resolveTable($this->logger('L1', 't_s16_50', 16)));
     }
 
+    public function test_missing_minutes_collapses_consecutive_gaps_into_ranges(): void
+    {
+        // Past day. Present minutes: 00:00, 00:01, then a single 08:33.
+        // Everything else 00:02..23:59 (minus 08:33) is missing → collapsed ranges.
+        DB::table('t_s16_50')->insert([
+            ['id_logger' => 'L1', 'waktu' => '2026-06-20 00:00:30', 'sensor1' => 1],
+            ['id_logger' => 'L1', 'waktu' => '2026-06-20 00:01:10', 'sensor1' => 1],
+            ['id_logger' => 'L1', 'waktu' => '2026-06-20 08:33:00', 'sensor1' => 1],
+        ]);
+
+        $out = DataMasukStats::missingMinutesForDate($this->logger('L1', 't_s16_50', 16), '2026-06-20');
+
+        $this->assertSame(1440, $out['expected']);
+        $this->assertSame(3, $out['present']);
+        $this->assertSame(1437, $out['missing']);
+
+        // First gap: 00:02 .. 08:32, then 08:34 .. 23:59.
+        $this->assertSame(
+            [
+                ['start' => '00:02', 'end' => '08:32', 'count' => 511],
+                ['start' => '08:34', 'end' => '23:59', 'count' => 926],
+            ],
+            $out['ranges']
+        );
+    }
+
+    public function test_missing_minutes_for_fully_empty_past_day_is_single_full_range(): void
+    {
+        $out = DataMasukStats::missingMinutesForDate($this->logger('L1', 't_s16_50', 16), '2026-06-20');
+
+        $this->assertSame(1440, $out['missing']);
+        $this->assertSame([['start' => '00:00', 'end' => '23:59', 'count' => 1440]], $out['ranges']);
+    }
+
+    public function test_missing_minutes_for_complete_day_is_empty(): void
+    {
+        // Fill every minute of a past day.
+        $rows = [];
+        for ($m = 0; $m < 1440; $m++) {
+            $h = str_pad((string) intdiv($m, 60), 2, '0', STR_PAD_LEFT);
+            $i = str_pad((string) ($m % 60), 2, '0', STR_PAD_LEFT);
+            $rows[] = ['id_logger' => 'L1', 'waktu' => "2026-06-20 $h:$i:00", 'sensor1' => 1];
+        }
+        DB::table('t_s16_50')->insert($rows);
+
+        $out = DataMasukStats::missingMinutesForDate($this->logger('L1', 't_s16_50', 16), '2026-06-20');
+
+        $this->assertSame(0, $out['missing']);
+        $this->assertSame([], $out['ranges']);
+    }
+
+    public function test_missing_minutes_for_today_only_counts_window_up_to_now(): void
+    {
+        // Frozen at 10:30 → expected window = 00:00..10:29 (630 minutes).
+        // Present 00:00; data at 11:00 is AFTER the window and must be ignored.
+        DB::table('t_s16_50')->insert([
+            ['id_logger' => 'L1', 'waktu' => '2026-06-23 00:00:00', 'sensor1' => 1],
+            ['id_logger' => 'L1', 'waktu' => '2026-06-23 11:00:00', 'sensor1' => 1],
+        ]);
+
+        $out = DataMasukStats::missingMinutesForDate($this->logger('L1', 't_s16_50', 16), '2026-06-23');
+
+        $this->assertSame(630, $out['expected']);
+        $this->assertSame(1, $out['present']);
+        $this->assertSame(629, $out['missing']);
+        $this->assertSame([['start' => '00:01', 'end' => '10:29', 'count' => 629]], $out['ranges']);
+    }
+
+    public function test_missing_minutes_for_future_day_is_empty(): void
+    {
+        $out = DataMasukStats::missingMinutesForDate($this->logger('L1', 't_s16_50', 16), '2026-06-24');
+
+        $this->assertSame(0, $out['expected']);
+        $this->assertSame(0, $out['missing']);
+        $this->assertSame([], $out['ranges']);
+    }
+
     public function test_for_logger_handles_multiple_dates_including_empty(): void
     {
         DB::table('t_s16_50')->insert([
