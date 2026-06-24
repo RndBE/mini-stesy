@@ -1939,7 +1939,7 @@
 <div id="rainfallHeader" class="hidden mb-3">
                         <div class="flex flex-col md:flex-row gap-3">
 <div
-                                class="relative overflow-hidden flex items-start gap-4 bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-sm min-w-[240px]">
+                                class="relative overflow-hidden flex items-center gap-4 bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-sm min-w-[240px]">
                                 <div class="z-10">
                                     <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1"
                                         id="rainfallCardLabel">AKUMULASI CURAH HUJAN</div>
@@ -1954,7 +1954,7 @@
                                 <img id="rainfallCardIcon" src="{{ asset('klasifikasi_hujan/tidak_hujan.png') }}"
                                     onerror="this.onerror=null;this.src='{{ asset('klasifikasi_hujan/tidak_hujan.png') }}';"
                                     alt="Status Hujan"
-                                    class="pointer-events-none absolute right-[-0.5rem] top-6 h-24 w-24 object-contain opacity-90">
+                                    class="pointer-events-none absolute right-[-0.5rem] top-1/2 -translate-y-1/2 h-24 w-24 object-contain opacity-90">
                             </div>
 <div class="flex-1 bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-sm">
                                 <div class="text-base font-bold text-slate-700 mb-3">Keterangan Intensitas Hujan Per Jam:

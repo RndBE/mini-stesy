@@ -55,7 +55,7 @@
                     <div class="mt-20 sm:mt-24 xl:mt-28 2xl:mt-32"></div>
 
                     <div
-                        class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 whitespace-nowrap pt-1 {{ $muted ? 'opacity-60' : '' }}">
+                        class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 whitespace-nowrap pt-1 {{ $muted ? 'opacity-60' : '' }}">
                         {{ $displayPerJam }}
                         <span class="text-xs sm:text-sm font-semibold">mm</span>
                     </div>
@@ -77,7 +77,7 @@
                     <div class="mt-20 sm:mt-24 xl:mt-28 2xl:mt-32"></div>
 
                     <div
-                        class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 whitespace-nowrap pt-1 {{ $muted ? 'opacity-60' : '' }}">
+                        class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 whitespace-nowrap pt-1 {{ $muted ? 'opacity-60' : '' }}">
                         {{ $displayHarian }}
                         <span class="text-xs sm:text-sm font-semibold">mm</span>
                     </div>
