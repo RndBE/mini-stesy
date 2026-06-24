@@ -292,6 +292,7 @@
         </div>
 
         {{-- ===== MODAL UPLOAD CSV (di dalam main x-data agar share state) ===== --}}
+        <template x-teleport="body">
         <div x-show="uploadOpen" x-cloak
             class="fixed inset-0 z-[99990] flex items-center justify-center p-4"
             @keydown.escape.window="closeUploadModal()">
@@ -419,8 +420,12 @@
                 </div>
             </div>
         </div>
+        </template>
 
         {{-- ===== MODAL MENIT HILANG ===== --}}
+        {{-- Teleport ke body: #mainContent membuat containing block sehingga
+             fixed inset-0 tidak menutupi seluruh viewport bila tidak di-teleport. --}}
+        <template x-teleport="body">
         <div x-show="missingOpen" x-cloak
             class="fixed inset-0 z-[99990] flex items-center justify-center p-4"
             @keydown.escape.window="closeMissingModal()">
@@ -505,6 +510,7 @@
                 </div>
             </div>
         </div>
+        </template>
     </div>
 
     <script>
