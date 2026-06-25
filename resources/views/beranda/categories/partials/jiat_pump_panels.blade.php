@@ -62,16 +62,16 @@
                             <span class="text-sm font-bold tracking-wide text-slate-700">Fasa {{ $ph['label'] }}</span>
                         </div>
                         <div class="grid grid-cols-2 divide-x divide-slate-100 sm:block sm:divide-x-0 sm:divide-y">
-                            <div class="flex flex-col items-start gap-1 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex flex-col items-center gap-1 px-3 py-2.5 text-center sm:flex-row sm:justify-between sm:text-left">
                                 <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Voltage</span>
-                                <span class="flex min-w-0 flex-wrap items-baseline gap-x-1">
+                                <span class="flex min-w-0 flex-wrap items-baseline justify-center gap-x-1 sm:justify-start">
                                     <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($vBase) }}</span>
                                     <span class="text-[10px] font-bold text-slate-400">{{ $unitP($vBase) ?: 'V' }}</span>
                                 </span>
                             </div>
-                            <div class="flex flex-col items-end gap-1 px-3 py-2.5 text-right sm:flex-row sm:items-center sm:justify-between sm:text-left">
+                            <div class="flex flex-col items-center gap-1 px-3 py-2.5 text-center sm:flex-row sm:justify-between sm:text-left">
                                 <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Ampere</span>
-                                <span class="flex min-w-0 flex-wrap items-baseline gap-x-1">
+                                <span class="flex min-w-0 flex-wrap items-baseline justify-center gap-x-1 sm:justify-start">
                                     <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($aBase) }}</span>
                                     <span class="text-[10px] font-bold text-slate-400">{{ $unitP($aBase) ?: 'A' }}</span>
                                 </span>
