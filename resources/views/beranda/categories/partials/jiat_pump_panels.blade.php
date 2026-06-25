@@ -52,7 +52,7 @@
                 </span>
                 Pompa &amp; Kelistrikan
             </div>
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 @foreach ($phases as $ph)
                     @php
                         $vBase = 'voltage_' . $ph['key'];
@@ -65,16 +65,16 @@
                             <span class="text-sm font-bold tracking-wide text-slate-700">Fasa {{ $ph['label'] }}</span>
                         </div>
                         <div class="divide-y divide-slate-100">
-                            <div class="flex items-center justify-between px-3 py-2.5">
+                            <div class="flex flex-col gap-1 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
                                 <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Voltage</span>
-                                <span class="flex items-baseline gap-1">
+                                <span class="flex min-w-0 flex-wrap items-baseline gap-x-1">
                                     <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($vBase) }}</span>
                                     <span class="text-[10px] font-bold text-slate-400">{{ $unitP($vBase) ?: 'V' }}</span>
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between px-3 py-2.5">
+                            <div class="flex flex-col gap-1 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
                                 <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Ampere</span>
-                                <span class="flex items-baseline gap-1">
+                                <span class="flex min-w-0 flex-wrap items-baseline gap-x-1">
                                     <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($aBase) }}</span>
                                     <span class="text-[10px] font-bold text-slate-400">{{ $unitP($aBase) ?: 'A' }}</span>
                                 </span>
