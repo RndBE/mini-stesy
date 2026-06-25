@@ -29,9 +29,9 @@
     $hasElec = collect($phases)->contains(fn($p) => $hasP('voltage_' . $p['key']) || $hasP('ampere_' . $p['key']));
 
     $qual = [
-        ['base' => 'ph_air',   'label' => 'pH',       'unit' => '',     'accent' => 'hover:border-violet-300'],
-        ['base' => 'amonia',   'label' => 'Amonia',   'unit' => 'mg/L', 'accent' => 'hover:border-lime-300'],
-        ['base' => 'suhu_air', 'label' => 'Suhu Air', 'unit' => '°C',   'accent' => 'hover:border-emerald-300'],
+        ['base' => 'ph_air',   'label' => 'pH',       'unit' => '',     'icon' => 'icons/awgr/ph_air.svg',   'accent' => 'hover:border-violet-300',  'chip' => 'bg-violet-100 text-violet-600'],
+        ['base' => 'amonia',   'label' => 'Amonia',   'unit' => 'mg/L', 'icon' => null,                       'accent' => 'hover:border-lime-300',    'chip' => 'bg-lime-100 text-lime-600'],
+        ['base' => 'suhu_air', 'label' => 'Suhu Air', 'unit' => '°C',   'icon' => 'icons/awgr/suhu_air.svg', 'accent' => 'hover:border-emerald-300', 'chip' => 'bg-emerald-100 text-emerald-600'],
     ];
     $hasQual = collect($qual)->contains(fn($q) => $hasP($q['base']));
 
@@ -93,8 +93,15 @@
                 @foreach ($qual as $q)
                     @if ($hasP($q['base']))
                     <a href="{{ $linkP($q['base']) }}"
-                        class="block rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md {{ $q['accent'] }} {{ $muted ? 'grayscale' : '' }}">
-                        <div class="leading-tight">
+                        class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md {{ $q['accent'] }} {{ $muted ? 'grayscale' : '' }}">
+                        <span class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg {{ $q['chip'] }}">
+                            @if ($q['icon'])
+                                <img src="{{ asset($q['icon']) }}" alt="{{ $q['label'] }}" class="h-6 w-6 object-contain {{ $iconClass ?? '' }}">
+                            @else
+                                <span class="text-[11px] font-black">NH₃</span>
+                            @endif
+                        </span>
+                        <div class="min-w-0 leading-tight">
                             <div class="truncate text-[10px] font-semibold uppercase tracking-wider text-slate-400">{{ $q['label'] }}</div>
                             <div class="flex items-baseline gap-1">
                                 <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($q['base']) }}</span>

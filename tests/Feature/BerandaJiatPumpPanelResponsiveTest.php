@@ -20,15 +20,15 @@ class BerandaJiatPumpPanelResponsiveTest extends TestCase
         $this->assertStringContainsString('class="flex min-w-0 flex-wrap items-baseline justify-center gap-x-1 sm:justify-start"', $view);
     }
 
-    public function test_pump_and_quality_sections_use_text_only_headers_and_quality_rows(): void
+    public function test_pump_and_quality_section_headers_are_text_only_but_quality_rows_keep_icons(): void
     {
         $view = file_get_contents(resource_path('views/beranda/categories/partials/jiat_pump_panels.blade.php'));
 
         $this->assertStringContainsString('<div class="mb-2 text-md font-semibold text-slate-700">', $view);
         $this->assertStringNotContainsString('rounded-md bg-amber-100', $view);
         $this->assertStringNotContainsString('rounded-md bg-emerald-100', $view);
-        $this->assertStringNotContainsString('asset($q[\'icon\'])', $view);
-        $this->assertStringNotContainsString('{{ $q[\'chip\'] }}', $view);
-        $this->assertStringNotContainsString('text-[11px] font-black', $view);
+        $this->assertStringContainsString('asset($q[\'icon\'])', $view);
+        $this->assertStringContainsString('{{ $q[\'chip\'] }}', $view);
+        $this->assertStringContainsString('text-[11px] font-black', $view);
     }
 }
