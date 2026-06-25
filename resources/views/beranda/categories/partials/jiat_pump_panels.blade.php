@@ -29,9 +29,9 @@
     $hasElec = collect($phases)->contains(fn($p) => $hasP('voltage_' . $p['key']) || $hasP('ampere_' . $p['key']));
 
     $qual = [
-        ['base' => 'ph_air',   'label' => 'pH',       'unit' => '',     'icon' => 'icons/awgr/ph_air.svg',   'accent' => 'hover:border-violet-300',  'chip' => 'bg-violet-100 text-violet-600'],
-        ['base' => 'amonia',   'label' => 'Amonia',   'unit' => 'mg/L', 'icon' => null,                       'accent' => 'hover:border-lime-300',    'chip' => 'bg-lime-100 text-lime-600'],
-        ['base' => 'suhu_air', 'label' => 'Suhu Air', 'unit' => '°C',   'icon' => 'icons/awgr/suhu_air.svg', 'accent' => 'hover:border-emerald-300', 'chip' => 'bg-emerald-100 text-emerald-600'],
+        ['base' => 'ph_air',   'label' => 'pH',       'unit' => '',     'accent' => 'hover:border-violet-300'],
+        ['base' => 'amonia',   'label' => 'Amonia',   'unit' => 'mg/L', 'accent' => 'hover:border-lime-300'],
+        ['base' => 'suhu_air', 'label' => 'Suhu Air', 'unit' => '°C',   'accent' => 'hover:border-emerald-300'],
     ];
     $hasQual = collect($qual)->contains(fn($q) => $hasP($q['base']));
 
@@ -46,13 +46,10 @@
         {{-- Pompa & Kelistrikan --}}
         @if ($hasElec)
         <div class="col-span-12 {{ $elecSpan }}">
-            <div class="mb-2 flex items-center gap-2 text-md font-semibold text-slate-700">
-                <span class="inline-flex h-5 w-5 items-center justify-center rounded-md bg-amber-100 text-amber-600">
-                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5"><path d="M13 2 4.5 13.5H11l-1 8.5L19.5 10H13l0-8Z"/></svg>
-                </span>
+            <div class="mb-2 text-md font-semibold text-slate-700">
                 Pompa &amp; Kelistrikan
             </div>
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 @foreach ($phases as $ph)
                     @php
                         $vBase = 'voltage_' . $ph['key'];
@@ -64,17 +61,17 @@
                             <span class="h-2.5 w-2.5 rounded-full {{ $ph['dot'] }} ring-2 ring-white {{ $cellActive ? '' : 'opacity-40' }}"></span>
                             <span class="text-sm font-bold tracking-wide text-slate-700">Fasa {{ $ph['label'] }}</span>
                         </div>
-                        <div class="divide-y divide-slate-100">
-                            <div class="flex items-center justify-between px-3 py-2.5">
+                        <div class="grid grid-cols-2 divide-x divide-slate-100 sm:block sm:divide-x-0 sm:divide-y">
+                            <div class="flex flex-col items-start gap-1 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
                                 <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Voltage</span>
-                                <span class="flex items-baseline gap-1">
+                                <span class="flex min-w-0 flex-wrap items-baseline gap-x-1">
                                     <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($vBase) }}</span>
                                     <span class="text-[10px] font-bold text-slate-400">{{ $unitP($vBase) ?: 'V' }}</span>
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between px-3 py-2.5">
+                            <div class="flex flex-col items-end gap-1 px-3 py-2.5 text-right sm:flex-row sm:items-center sm:justify-between sm:text-left">
                                 <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Ampere</span>
-                                <span class="flex items-baseline gap-1">
+                                <span class="flex min-w-0 flex-wrap items-baseline gap-x-1">
                                     <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($aBase) }}</span>
                                     <span class="text-[10px] font-bold text-slate-400">{{ $unitP($aBase) ?: 'A' }}</span>
                                 </span>
@@ -89,25 +86,15 @@
         {{-- Kualitas Air --}}
         @if ($hasQual)
         <div class="col-span-12 {{ $qualSpan }}">
-            <div class="mb-2 flex items-center gap-2 text-md font-semibold text-slate-700">
-                <span class="inline-flex h-5 w-5 items-center justify-center rounded-md bg-emerald-100 text-emerald-600">
-                    <svg viewBox="0 0 24 24" fill="none" class="h-3.5 w-3.5"><path d="M12 21a6 6 0 0 1-6-5.9C6 10.8 12 4 12 4s6 6.8 6 11.1A6 6 0 0 1 12 21Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-                </span>
+            <div class="mb-2 text-md font-semibold text-slate-700">
                 Kualitas Air
             </div>
             <div class="grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-1">
                 @foreach ($qual as $q)
                     @if ($hasP($q['base']))
                     <a href="{{ $linkP($q['base']) }}"
-                        class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md {{ $q['accent'] }} {{ $muted ? 'grayscale' : '' }}">
-                        <span class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg {{ $q['chip'] }}">
-                            @if ($q['icon'])
-                                <img src="{{ asset($q['icon']) }}" alt="{{ $q['label'] }}" class="h-6 w-6 object-contain {{ $iconClass ?? '' }}">
-                            @else
-                                <span class="text-[11px] font-black">NH₃</span>
-                            @endif
-                        </span>
-                        <div class="min-w-0 leading-tight">
+                        class="block rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md {{ $q['accent'] }} {{ $muted ? 'grayscale' : '' }}">
+                        <div class="leading-tight">
                             <div class="truncate text-[10px] font-semibold uppercase tracking-wider text-slate-400">{{ $q['label'] }}</div>
                             <div class="flex items-baseline gap-1">
                                 <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($q['base']) }}</span>
