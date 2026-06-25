@@ -64,15 +64,15 @@
                             <span class="h-2.5 w-2.5 rounded-full {{ $ph['dot'] }} ring-2 ring-white {{ $cellActive ? '' : 'opacity-40' }}"></span>
                             <span class="text-sm font-bold tracking-wide text-slate-700">Fasa {{ $ph['label'] }}</span>
                         </div>
-                        <div class="divide-y divide-slate-100">
-                            <div class="flex flex-col gap-1 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="grid grid-cols-2 divide-x divide-slate-100 sm:block sm:divide-x-0 sm:divide-y">
+                            <div class="flex flex-col items-start gap-1 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
                                 <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Voltage</span>
                                 <span class="flex min-w-0 flex-wrap items-baseline gap-x-1">
                                     <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($vBase) }}</span>
                                     <span class="text-[10px] font-bold text-slate-400">{{ $unitP($vBase) ?: 'V' }}</span>
                                 </span>
                             </div>
-                            <div class="flex flex-col gap-1 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex flex-col items-end gap-1 px-3 py-2.5 text-right sm:flex-row sm:items-center sm:justify-between sm:text-left">
                                 <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Ampere</span>
                                 <span class="flex min-w-0 flex-wrap items-baseline gap-x-1">
                                     <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($aBase) }}</span>

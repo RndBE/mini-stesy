@@ -12,7 +12,10 @@ class BerandaJiatPumpPanelResponsiveTest extends TestCase
 
         $this->assertStringContainsString('class="grid grid-cols-1 gap-3 sm:grid-cols-3"', $view);
         $this->assertStringNotContainsString('class="grid grid-cols-3 gap-3"', $view);
-        $this->assertStringContainsString('class="flex flex-col gap-1 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"', $view);
+        $this->assertStringContainsString('class="grid grid-cols-2 divide-x divide-slate-100 sm:block sm:divide-x-0 sm:divide-y"', $view);
+        $this->assertStringNotContainsString('class="divide-y divide-slate-100"', $view);
+        $this->assertStringContainsString('class="flex flex-col items-start gap-1 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"', $view);
+        $this->assertStringContainsString('class="flex flex-col items-end gap-1 px-3 py-2.5 text-right sm:flex-row sm:items-center sm:justify-between sm:text-left"', $view);
         $this->assertStringContainsString('class="flex min-w-0 flex-wrap items-baseline gap-x-1"', $view);
     }
 }
