@@ -19,6 +19,18 @@
         $url = route('analisa.index', $lg->id_logger);
         return $p && $p->nama_parameter ? $url . '?parameter=' . urlencode($p->nama_parameter) : $url;
     };
+    // Link ke Analisa Data (mode multi parameter) untuk satu fasa: Voltage + Ampere.
+    $linkPhase = function ($key) use ($pp, $lg) {
+        $names = [];
+        foreach (['voltage_' . $key, 'ampere_' . $key] as $b) {
+            $p = $pp[$b] ?? null;
+            if ($p && $p->nama_parameter) {
+                $names[] = $p->nama_parameter;
+            }
+        }
+        $url = route('analisa.index', $lg->id_logger);
+        return empty($names) ? $url : $url . '?mode=multi&parameters=' . urlencode(implode(',', $names));
+    };
 
     // Fasa listrik: warna mengikuti konvensi PLN (R/S/T).
     $phases = [
@@ -56,10 +68,16 @@
                         $aBase = 'ampere_' . $ph['key'];
                         $cellActive = $hasP($vBase) || $hasP($aBase);
                     @endphp
-                    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md {{ $muted ? 'grayscale' : '' }}">
+                    <a href="{{ $linkPhase($ph['key']) }}"
+                        class="group block overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md {{ $muted ? 'grayscale' : '' }}"
+                        title="Lihat analisa Fasa {{ $ph['label'] }} (Voltage &amp; Ampere)">
                         <div class="flex items-center gap-2 border-b border-slate-100 {{ $ph['tint'] }} px-3 py-2">
                             <span class="h-2.5 w-2.5 rounded-full {{ $ph['dot'] }} ring-2 ring-white {{ $cellActive ? '' : 'opacity-40' }}"></span>
                             <span class="text-sm font-bold tracking-wide text-slate-700">Fasa {{ $ph['label'] }}</span>
+                            <svg class="ml-auto h-3.5 w-3.5 text-slate-300 transition-colors group-hover:text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M7 17 17 7" />
+                                <path d="M7 7h10v10" />
+                            </svg>
                         </div>
                         <div class="grid grid-cols-2 divide-x divide-slate-100 sm:block sm:divide-x-0 sm:divide-y">
                             <div class="flex flex-col items-center gap-1 px-3 py-2.5 text-center sm:flex-row sm:justify-between sm:text-left">
@@ -77,7 +95,7 @@
                                 </span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
         </div>

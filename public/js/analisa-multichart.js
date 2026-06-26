@@ -532,9 +532,27 @@
         });
     }
 
+    function applyUrlSelection() {
+        const params = new URLSearchParams(window.location.search);
+        if (String(params.get('mode') || '').trim().toLowerCase() !== 'multi') return false;
+
+        const raw = String(params.get('parameters') || params.get('parameter') || '').trim();
+        const wanted = raw.split(',').map((value) => value.trim()).filter(Boolean);
+        if (wanted.length === 0) return false;
+
+        let matched = 0;
+        qsa('[data-multi-parameter]').forEach((input) => {
+            const isWanted = wanted.includes(input.value);
+            input.checked = isWanted;
+            if (isWanted) matched += 1;
+        });
+
+        return matched > 0;
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         bindEvents();
-        setMode('single');
+        setMode(applyUrlSelection() ? 'multi' : 'single');
     });
 
     window.downloadMultiChart = downloadMultiChart;
