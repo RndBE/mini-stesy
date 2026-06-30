@@ -291,7 +291,7 @@
 
                             // AFMR contact (pipe flowmeter) parameters
                             $pFlowrate   = $findParamByBase(['flowrate', 'flow_rate']);
-                            $pTotalizer1 = $findParamByBase(['totalizer_1', 'totalizer1']);
+                            $pTotalizer1 = $findParamByBase(['totalizer', 'totalizer_1', 'totalizer1']);
                             $pTotalizer2 = $findParamByBase(['totalizer_2', 'totalizer2']);
                             $pPressure1  = $findParamByBase(['pressure_1', 'pressure1', 'tekanan_1']);
                             $pPressure2  = $findParamByBase(['pressure_2', 'pressure2', 'tekanan_2']);

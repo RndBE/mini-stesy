@@ -32,7 +32,7 @@
                     @if ($pTotalizer1)
                     <a href="{{ route('analisa.index', $lg->id_logger) }}?parameter={{ urlencode($pTotalizer1->nama_parameter) }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-sky-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
-                            <img src="{{ asset('icons/afmr/totalizer_debit.svg') }}" alt="Totalizer 1" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
+                            <img src="{{ asset('icons/afmr/totalizer_debit.svg') }}" alt="Totalizer" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pTotalizer1->nama_parameter }}</div>
