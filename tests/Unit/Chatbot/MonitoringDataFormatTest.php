@@ -102,6 +102,7 @@ class MonitoringDataFormatTest extends TestCase
         // No table exists → should return a "belum ada data" / descriptive message
         $this->assertIsString($text);
         $this->assertNotEmpty($text);
+        $this->assertStringContainsString('Belum ada data', $text);
     }
 
     public function test_chart_returns_null_when_no_table(): void
