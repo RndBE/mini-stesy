@@ -10,7 +10,10 @@ use Illuminate\Support\Str;
 
 class ChatbotController extends Controller
 {
-    public function __construct(private \App\Services\Chatbot\MonitoringData $data) {}
+    public function __construct(
+        private \App\Services\Chatbot\MonitoringData $data,
+        private \App\Services\Chatbot\ChatbotAgent $agent,
+    ) {}
 
     public function ask(Request $request): JsonResponse
     {
@@ -21,91 +24,14 @@ class ChatbotController extends Controller
             'messages.*.text' => ['required_with:messages', 'string', 'max:700'],
         ]);
 
-        $message = trim($validated['message']);
-        $configured = (bool) config('services.ai_chatbot.key')
-            && (bool) config('services.ai_chatbot.model')
-            && (bool) config('services.ai_chatbot.endpoint');
+        $out = $this->agent->ask($request->user(), trim($validated['message']), $validated['messages'] ?? []);
 
-        // Jalur cepat: sapaan murni dijawab instan tanpa panggilan API.
-        if ($this->data->isGreetingMessage($message)) {
-            $user = $request->user();
-            $userName = $user?->nama ?? $user?->username ?? 'Pengguna';
-
-            return $this->reply(
-                "Selamat datang, {$userName}. Saya STESY Assistant, siap membantu pemantauan logger Anda. Ada yang bisa dibantu?",
-                'local',
-                $configured
-            );
-        }
-
-        $context = $this->buildMonitoringContext($request, $message);
-        $dateRange = $this->requestedDateRangeFromMessage($message);
-
-        // Komparasi antar pos dijawab deterministik (akurasi tabular kritikal).
-        if ($this->data->isComparisonQuestion($message)) {
-            $multi = $this->resolveLoggerMentionsMulti($request, $message);
-            if (count($multi) >= 2) {
-                return $this->reply(
-                    $this->formatLoggerComparison($multi, $dateRange),
-                    'local',
-                    $configured
-                );
-            }
-        }
-
-        // Permintaan grafik/visualisasi satu pos → kirim data deret waktu
-        // (deterministik, ter-scope per user) + penjelasan singkat.
-        if ($this->data->isChartQuestion($message) && !empty($context['matched_logger'])) {
-            $range = $dateRange ?: $this->defaultWeekRange();
-            $chart = $this->buildLoggerChart(
-                $context['matched_logger'],
-                $range,
-                $message,
-                $this->requestedGranularity($message)
-            );
-
-            if ($chart) {
-                return $this->reply($chart['explanation'], 'local', $configured, $chart['chart']);
-            }
-        }
-
-        // Data historis/agregat satu pos pada rentang tanggal dijawab
-        // deterministik — akurasi angka/record bersifat kritikal.
-        if (!empty($context['matched_logger']) && $dateRange) {
-            return $this->reply(
-                $this->formatLoggerHistoricalData(
-                    $context['matched_logger'],
-                    $dateRange,
-                    $this->requestedGranularity($message)
-                ),
-                'local',
-                $configured
-            );
-        }
-
-        // Jalur utama: pemahaman bahasa & intent diserahkan ke AI, dengan
-        // FAKTA SISTEM yang sudah di-ground dari basis data sebagai sumber data.
-        if ($configured) {
-            $facts = $this->groundedFacts($context);
-
-            if ($this->data->isRainQuestion($message)) {
-                $facts['rain_overview'] = $this->rainOverview($request);
-            }
-
-            $aiReply = $this->aiReply($message, $validated['messages'] ?? [], $facts);
-
-            if ($aiReply !== null) {
-                return $this->reply($aiReply, 'ai', true);
-            }
-        }
-
-        // Fallback deterministik (AI mati / belum dikonfigurasi) — tetap
-        // formal, ringkas, dan ter-ground; tidak menampilkan galat teknis.
-        return $this->reply(
-            $this->composeGroundedFallback($request, $message, $context),
-            'local',
-            $configured
-        );
+        return response()->json([
+            'reply' => Str::limit($out['reply'], 1600, '...'),
+            'source' => $out['source'],
+            'configured' => $out['configured'],
+            'chart' => $out['chart'],
+        ]);
     }
 
     private function reply(string $text, string $source, bool $configured, ?array $chart = null): JsonResponse
