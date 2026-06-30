@@ -447,7 +447,6 @@
                 ask(value) {
                     const text = (value || '').trim();
                     if (!text || this.loading) return;
-                    const startedAt = Date.now();
 
                     this.error = '';
                     this.input = '';
@@ -459,54 +458,131 @@
                     this.loading = true;
                     this.scrollDown();
 
-                    fetch('{{ route('chatbot.ask') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: JSON.stringify({
-                            message: text,
-                            messages: this.messages
-                                .filter((message) => message.id !== 'welcome')
-                                .slice(-10)
-                                .map((message) => ({
-                                    role: message.role,
-                                    text: String(message.text || '').slice(0, 650)
-                                }))
-                        })
-                    })
-                    .then(async (response) => {
-                        if (!response.ok) {
-                            const payload = await response.json().catch(() => ({}));
-                            throw new Error(payload.message || 'Chatbot belum bisa merespons.');
-                        }
-                        return response.json();
-                    })
-                    .then((payload) => this.waitForMinimumLoading(startedAt).then(() => payload))
-                    .then((payload) => {
-                        this.pushAssistantReply(payload.reply || this.resolveReply(text), payload.chart || null);
-                    })
-                    .catch(async (error) => {
-                        await this.waitForMinimumLoading(startedAt);
-                        this.error = error.message || 'Koneksi chatbot terganggu.';
-                        this.pushAssistantReply(this.resolveReply(text));
-                    })
-                    .finally(() => {
+                    const history = this.messages
+                        .filter((m) => m.id !== 'welcome')
+                        .slice(-10)
+                        .map((m) => ({
+                            role: m.role,
+                            text: String(m.text || '').slice(0, 650)
+                        }));
+
+                    this.sendMessage(text, history).finally(() => {
                         this.loading = false;
                         this.scrollDown();
                     });
                 },
-                pushAssistantReply(reply, chart = null) {
+                async sendMessage(text, history) {
+                    let res;
+                    try {
+                        res = await fetch('{{ route('chatbot.stream') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'text/event-stream',
+                            },
+                            body: JSON.stringify({ message: text, messages: history }),
+                        });
+                    } catch (_) {
+                        return this.fallbackAsk(text, history);
+                    }
+
+                    if (!res.ok || !res.body) {
+                        return this.fallbackAsk(text, history);
+                    }
+
+                    const message = this.pushAssistantReply('', null, true);
+                    this.loading = false;
+                    const reader = res.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buf = '';
+                    let streamCompleted = false;
+
+                    try {
+                        while (true) {
+                            const { value, done } = await reader.read();
+                            if (done) break;
+                            buf += decoder.decode(value, { stream: true });
+                            let idx;
+                            while ((idx = buf.indexOf('\n\n')) !== -1) {
+                                const raw = buf.slice(0, idx);
+                                buf = buf.slice(idx + 2);
+                                const ev = (raw.match(/^event: (.*)$/m) || [])[1];
+                                const dataLine = (raw.match(/^data: (.*)$/m) || [])[1];
+                                if (!dataLine) continue;
+                                let payload;
+                                try { payload = JSON.parse(dataLine); } catch (_) { continue; }
+
+                                if (ev === 'token') {
+                                    message.text += payload.text;
+                                    message.displayText += payload.text;
+                                    this.updateMessage(message.id, { text: message.text, displayText: message.displayText, isTyping: true });
+                                    this.scrollDown();
+                                } else if (ev === 'chart') {
+                                    message.chart = payload.chart;
+                                    this.updateMessage(message.id, { chart: payload.chart });
+                                    this.$nextTick(() => {
+                                        this.renderChart(message.id, payload.chart);
+                                        this.scrollDown();
+                                    });
+                                } else if (ev === 'done') {
+                                    // payload.source is available but not yet consumed by the UI — skipping for now.
+                                    streamCompleted = true;
+                                    this.updateMessage(message.id, { isTyping: false });
+                                } else if (ev === 'error') {
+                                    streamCompleted = true;
+                                    this.updateMessage(message.id, { text: payload.message, displayText: payload.message, isTyping: false });
+                                }
+                            }
+                        }
+                    } catch (_) {
+                        this.updateMessage(message.id, { isTyping: false });
+                        streamCompleted = true;
+                    }
+
+                    // Guard: stream closed without a done/error event and no text was received.
+                    // Remove the stuck empty typing bubble and fall back to the non-streaming endpoint.
+                    if (!streamCompleted && !message.text) {
+                        const idx = this.messages.findIndex((m) => m.id === message.id);
+                        if (idx !== -1) this.messages.splice(idx, 1);
+                        this.loading = true;
+                        return this.fallbackAsk(text, history);
+                    }
+                },
+                async fallbackAsk(text, history) {
+                    const startedAt = Date.now();
+                    try {
+                        const response = await fetch('{{ route('chatbot.ask') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: JSON.stringify({ message: text, messages: history }),
+                        });
+                        if (!response.ok) {
+                            const err = await response.json().catch(() => ({}));
+                            throw new Error(err.message || 'Chatbot belum bisa merespons.');
+                        }
+                        const payload = await response.json();
+                        await this.waitForMinimumLoading(startedAt);
+                        this.pushAssistantReply(payload.reply || this.resolveReply(text), payload.chart || null);
+                    } catch (error) {
+                        await this.waitForMinimumLoading(startedAt);
+                        this.error = error.message || 'Koneksi chatbot terganggu.';
+                        this.pushAssistantReply(this.resolveReply(text));
+                    }
+                },
+                pushAssistantReply(reply, chart = null, streaming = false) {
                     const fullText = String(reply || '').trim();
                     const message = {
                         id: `assistant-${Date.now()}`,
                         role: 'assistant',
                         text: fullText,
                         displayText: chart ? fullText : '',
-                        isTyping: !chart,
+                        isTyping: streaming || (!chart && fullText.length > 0),
                         copied: false,
                         chart: chart
                     };
@@ -514,16 +590,24 @@
                     this.messages.push(message);
                     this.scrollDown();
 
-                    if (chart) {
-                        // Pesan grafik: tampilkan penjelasan langsung lalu render kanvas.
-                        this.$nextTick(() => {
-                            this.renderChart(message.id, chart);
-                            this.scrollDown();
-                        });
-                        return;
+                    if (!streaming) {
+                        if (chart) {
+                            // Pesan grafik: tampilkan penjelasan langsung lalu render kanvas.
+                            this.$nextTick(() => {
+                                this.renderChart(message.id, chart);
+                                this.scrollDown();
+                            });
+                            return message;
+                        }
+
+                        if (fullText) {
+                            this.revealAssistantMessage(message.id, fullText);
+                        } else {
+                            this.updateMessage(message.id, { isTyping: false });
+                        }
                     }
 
-                    this.revealAssistantMessage(message.id, fullText);
+                    return message;
                 },
                 ensureChartJs() {
                     if (window.Chart) return Promise.resolve(window.Chart);

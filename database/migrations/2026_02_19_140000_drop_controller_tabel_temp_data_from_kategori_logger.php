@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -17,6 +18,13 @@ return new class extends Migration
 
         if (!empty($columns)) {
             Schema::table('kategori_logger', function (Blueprint $table) use ($columns) {
+                // Drop unique index on 'tabel' before dropping the column (required by SQLite).
+                if (DB::getDriverName() === 'sqlite' && in_array('tabel', $columns)) {
+                    $indexes = collect(DB::select("PRAGMA index_list('kategori_logger')"))->pluck('name');
+                    if ($indexes->contains('uq_kategori_tabel')) {
+                        $table->dropUnique('uq_kategori_tabel');
+                    }
+                }
                 $table->dropColumn($columns);
             });
         }

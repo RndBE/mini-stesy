@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->bigIncrements('id');
             $table->unsignedInteger('user_id');
-            $table->string('logger_id', 15)->collation('utf8_general_ci');
+            $table->string('logger_id', 15);
             $table->timestamps();
 
             $table->unique(['user_id', 'logger_id'], 'uq_user_logger_access');

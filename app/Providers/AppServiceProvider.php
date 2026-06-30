@@ -13,7 +13,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(\App\Services\Chatbot\ToolRegistry::class, function ($app) {
+            $r = new \App\Services\Chatbot\ToolRegistry();
+            foreach ([
+                \App\Services\Chatbot\Tools\ListLoggersTool::class,
+                \App\Services\Chatbot\Tools\LoggerDetailTool::class,
+                \App\Services\Chatbot\Tools\CompareLoggersTool::class,
+                \App\Services\Chatbot\Tools\LoggerHistoryTool::class,
+                \App\Services\Chatbot\Tools\LoggerChartTool::class,
+                \App\Services\Chatbot\Tools\RainOverviewTool::class,
+            ] as $tool) {
+                $r->register($app->make($tool));
+            }
+            return $r;
+        });
     }
 
     /**

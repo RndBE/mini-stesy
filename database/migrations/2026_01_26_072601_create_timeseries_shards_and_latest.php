@@ -114,6 +114,11 @@ return new class extends Migration
             ['table_name' => 't_s19_01', 'sensor_count' => 19, 'max_logger' => 5, 'is_active' => 1, 'created_at' => now()],
         ]);
 
+        // Triggers and view are MySQL-specific (ON DUPLICATE KEY UPDATE / CREATE VIEW).
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         DB::unprepared("
             DROP TRIGGER IF EXISTS trg_t_s16_01_to_temp;
             CREATE TRIGGER trg_t_s16_01_to_temp
@@ -230,9 +235,11 @@ return new class extends Migration
 
     public function down(): void
     {
-        DB::unprepared("DROP VIEW IF EXISTS v_temp_latest;");
-        DB::unprepared("DROP TRIGGER IF EXISTS trg_t_s19_01_to_temp;");
-        DB::unprepared("DROP TRIGGER IF EXISTS trg_t_s16_01_to_temp;");
+        if (DB::getDriverName() === 'mysql') {
+            DB::unprepared("DROP VIEW IF EXISTS v_temp_latest;");
+            DB::unprepared("DROP TRIGGER IF EXISTS trg_t_s19_01_to_temp;");
+            DB::unprepared("DROP TRIGGER IF EXISTS trg_t_s16_01_to_temp;");
+        }
 
         Schema::dropIfExists('t_s19_01');
         Schema::dropIfExists('t_s16_01');

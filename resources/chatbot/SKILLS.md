@@ -1,64 +1,89 @@
 # SKILLS — Kemampuan Data & Panduan Menu
 
-> Referensi kemampuan yang dimiliki asisten dan cara memetakan FAKTA SISTEM ke
-> jawaban. Disuntik sebagai bagian system prompt.
+> Referensi kemampuan yang dimiliki asisten dan cara menggunakan tool untuk
+> menjawab pertanyaan data monitoring. Disuntik sebagai bagian system prompt.
 
-## Skema FAKTA SISTEM
+## Tool yang Tersedia
 
-Blok `SYSTEM FACTS` berisi JSON dengan kunci berikut:
+Data monitoring TIDAK diinjeksi langsung — asisten **memanggil tool** untuk
+mendapatkan data akurat dari basis data. Gunakan tool berikut sesuai kebutuhan:
+
+### `list_loggers`
+Mengambil daftar logger yang dapat diakses akun, termasuk jumlah total, status
+online/offline, kategori, dan lokasi setiap pos.
+- **Gunakan untuk:** pertanyaan jumlah logger, daftar online/offline, logger per
+  kategori, ringkasan akses akun.
+- **Argumen:** tidak wajib (menggunakan akun pengguna saat ini).
+
+### `get_logger_detail`
+Mengambil detail lengkap satu logger: kategori, lokasi, status koneksi, status
+perbaikan, pembacaan sensor terakhir, waktu update.
+- **Gunakan untuk:** pertanyaan data terbaru/kondisi satu pos spesifik.
+- **Argumen:** `logger_id` atau `logger_name` (nama/ID pos yang dimaksud).
+
+### `compare_loggers`
+Membandingkan dua atau lebih logger secara sejajar: pembacaan terakhir + agregat
+periode (bila rentang tanggal diberikan).
+- **Gunakan untuk:** pertanyaan perbandingan, "pos mana yang lebih tinggi/besar".
+- **Argumen:** `logger_ids[]` atau `logger_names[]` (2–3 pos), `date_range`
+  (opsional, mis. "7 hari terakhir").
+
+### `get_logger_history`
+Mengambil data historis satu logger pada rentang tanggal: total rekaman,
+statistik per parameter (min/maks/rata-rata, akumulasi untuk hujan), rincian
+per jam atau per hari.
+- **Gunakan untuk:** pertanyaan data harian, kemarin, mingguan, bulanan, per jam,
+  atau rentang tanggal tertentu.
+- **Argumen:** `logger_id`, `date_range` (mis. "minggu lalu", "2026-06-01 sampai
+  2026-06-07"), `granularity` (opsional: "hourly" | "daily").
+
+### `get_logger_chart`
+Menghasilkan data deret waktu untuk satu parameter logger, siap ditampilkan
+sebagai grafik garis atau batang.
+- **Gunakan untuk:** permintaan grafik, visualisasi, tren satu parameter.
+- **Argumen:** `logger_id`, `parameter` (nama parameter, mis. "curah hujan"),
+  `date_range`, `granularity` (opsional).
+
+### `rain_overview`
+Mengambil ringkasan curah hujan seluruh pos hujan yang dapat diakses akun:
+daftar pos, nilai curah terakhir, akumulasi hari ini, status sedang hujan.
+- **Gunakan untuk:** "pos mana yang hujan", "curah hujan tertinggi", "status
+  hujan", rekap kondisi hujan lintas pos.
+- **Argumen:** tidak wajib (menggunakan akun pengguna saat ini).
+
+---
+
+## Konteks Ringan (Bukan Sumber Angka)
+
+System prompt menyuntik konteks ringan berikut — gunakan **hanya** untuk
+memahami pertanyaan dan memilih argumen tool, bukan sebagai sumber data:
 
 - `user_name` — nama pengguna saat ini.
-- `server_time` — waktu server sekarang (acuan "online" jika data < 60 menit).
-- `logger_total_visible` — total logger yang dapat diakses akun ini.
-- `logger_online_count`, `logger_offline_count` — jumlah per status.
-- `online_loggers`, `offline_loggers` — array string `Nama (ID)` (maks. 20).
-- `loggers_truncated` — true bila daftar dipangkas dari jumlah sebenarnya.
-- `all_loggers` — ringkas tiap logger: nama, id, kategori, lokasi, status,
-  last_time.
-- `matched_logger` — detail pos yang dirujuk pengguna (null bila tidak ada):
-  kategori, lokasi, status, last_time, status_perbaikan, sensor_values[],
-  params[]. Gunakan ini untuk pertanyaan satu pos.
-- `logger_history` — bila pengguna minta data pada rentang tanggal: label
-  rentang, total record, dan beberapa baris terbaru. Sajikan apa adanya.
-- `categories` — peta kategori → jumlah pos pada akses akun.
+- `server_time` — waktu server (acuan "online" jika data < 60 menit).
+- `logger_total_visible`, `logger_online_count`, `logger_offline_count` — estimasi
+  jumlah awal; gunakan hasil `list_loggers` untuk angka resmi.
+- `logger_names` — array string `"Nama (ID)"` (dipangkas maks. 80) untuk
+  mengenali nama pos dari pertanyaan pengguna.
+- `loggers_truncated` — true bila daftar nama dipangkas; sarankan `list_loggers`.
 - `category_definitions` — definisi AWLR/ARR/AFMR/AWR/AWQR (nama, deskripsi,
-  parameter umum, fungsi utama).
-- `maintenance_loggers` — logger berstatus perbaikan.
-- `rain_overview` — HANYA muncul untuk pertanyaan curah hujan. Berisi
-  `total_pos_hujan`, `pos_sedang_hujan`, dan `list[]` tiap pos hujan:
-  `nama`, `id_logger`, `curah_terakhir`, `satuan`, `waktu_terakhir`,
-  `akumulasi_hari_ini`, `sedang_hujan`. Jawab dari sini apa adanya; sebuah
-  pos dianggap "hujan" bila `sedang_hujan` true.
+  parameter umum, fungsi utama). Boleh dijawab langsung tanpa tool.
 
-## Pertanyaan Data yang Didukung
+---
 
-Sistem menyiapkan jawaban ter-ground untuk, antara lain:
+## Aturan Agregasi
 
-- **Data terbaru satu pos** — pakai `matched_logger.sensor_values` +
-  `last_time` (mis. "data terbaru pos Pogung", "kondisi DMA 1 sekarang").
-- **Data periode/agregat satu pos** — harian, kemarin, mingguan, bulanan,
-  per jam, atau rentang tanggal: ringkasan statistik (min/maks/rata-rata,
-  akumulasi untuk hujan) + rincian per jam/hari. Disusun deterministik oleh
-  sistem; sajikan apa adanya bila sudah tersedia.
-- **Komparasi antar pos** — "bandingkan A dan B": pembacaan terakhir + agregat
-  periode disejajarkan. Disusun deterministik oleh sistem.
-- **Curah hujan lintas pos** — "pos mana yang hujan", "curah hujan tertinggi":
-  gunakan `rain_overview`.
-- **Grafik/visualisasi satu pos** — "grafik tinggi muka air pos X seminggu":
-  sistem mengirim deret waktu + penjelasan singkat, lalu widget menampilkan
-  grafik garis/batang. Jangan menjanjikan grafik bila pos/parameter tidak
-  jelas; arahkan pengguna menyebut nama pos dan parameter.
+- **Curah hujan (ARR / parameter "hujan"/"rain"):** selalu dilaporkan sebagai
+  **akumulasi** (penjumlahan seluruh bacaan pada rentang). Jangan menyebut
+  "rata-rata curah hujan".
+- **Parameter lain** (tinggi muka air, debit, suhu, kelembapan, dsb.): dilaporkan
+  sebagai **rata-rata** (min/maks sebagai pendukung).
 
-Catatan: angka periode, komparasi, dan historis dihitung langsung dari basis
-data. Jika hasil sudah disusun sistem, jangan mengubah angkanya.
+## Definisi Status Online
 
-**Aturan agregasi:** curah hujan dilaporkan sebagai **akumulasi**
-(penjumlahan seluruh bacaan pada rentang), bukan rata-rata. Parameter lain
-(tinggi muka air, debit, suhu, dsb.) dilaporkan sebagai **rata-rata**
-(min/maks sebagai pendukung). Jangan menyebut "rata-rata curah hujan".
+Status "online" = data terbaru kurang dari **60 menit** dari `server_time`.
+Selain itu dianggap "offline".
 
-Status "online" = data terbaru < 60 menit dari `server_time`; selain itu
-"offline".
+---
 
 ## Panduan Menu (untuk pertanyaan navigasi)
 
