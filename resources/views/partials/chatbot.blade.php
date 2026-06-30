@@ -492,6 +492,7 @@
                     }
 
                     const message = this.pushAssistantReply('', null, true);
+                    this.loading = false;
                     const reader = res.body.getReader();
                     const decoder = new TextDecoder();
                     let buf = '';
@@ -524,6 +525,7 @@
                                         this.scrollDown();
                                     });
                                 } else if (ev === 'done') {
+                                    // payload.source is available but not yet consumed by the UI — skipping for now.
                                     this.updateMessage(message.id, { isTyping: false });
                                 } else if (ev === 'error') {
                                     this.updateMessage(message.id, { text: payload.message, displayText: payload.message, isTyping: false });
@@ -566,7 +568,7 @@
                         id: `assistant-${Date.now()}`,
                         role: 'assistant',
                         text: fullText,
-                        displayText: chart ? fullText : (streaming ? '' : ''),
+                        displayText: chart ? fullText : '',
                         isTyping: streaming || (!chart && fullText.length > 0),
                         copied: false,
                         chart: chart
