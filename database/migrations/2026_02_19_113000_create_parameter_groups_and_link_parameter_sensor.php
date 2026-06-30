@@ -95,8 +95,10 @@ return new class extends Migration
         if (Schema::hasColumn('parameter_sensor', 'parameter_group')) {
             Schema::table('parameter_sensor', function (Blueprint $table) {
                 // Drop the index before the column so SQLite doesn't object.
-                if (collect(\Illuminate\Support\Facades\DB::select("PRAGMA index_list('parameter_sensor')"))->pluck('name')->contains('idx_param_group')) {
-                    $table->dropIndex('idx_param_group');
+                if (DB::getDriverName() === 'sqlite') {
+                    if (collect(DB::select("PRAGMA index_list('parameter_sensor')"))->pluck('name')->contains('idx_param_group')) {
+                        $table->dropIndex('idx_param_group');
+                    }
                 }
                 $table->dropColumn('parameter_group');
             });
