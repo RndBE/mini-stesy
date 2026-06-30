@@ -21,11 +21,11 @@ return new class extends Migration
             }
         });
 
-        if (Schema::hasColumn('t_logger', 'user_id')) {
+        if (DB::getDriverName() === 'mysql' && Schema::hasColumn('t_logger', 'user_id')) {
             DB::statement('UPDATE t_logger tl JOIN t_user tu ON tu.id_user = tl.user_id SET tl.instansi_id = tu.instansi_id');
         }
 
-        if (Schema::hasColumn('t_logger', 'user_id')) {
+        if (Schema::hasColumn('t_logger', 'user_id') && DB::getDriverName() === 'mysql') {
             DB::statement('ALTER TABLE t_logger DROP FOREIGN KEY fk_logger_user');
             DB::statement('ALTER TABLE t_logger DROP INDEX idx_logger_user');
             Schema::table('t_logger', function (Blueprint $table) {

@@ -2,15 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class t_User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    /** @use HasFactory<\Database\Factories\TUserFactory> */
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 't_user';
+
+    protected static function newFactory(): \Database\Factories\TUserFactory
+    {
+        return \Database\Factories\TUserFactory::new();
+    }
     protected $primaryKey = 'id_user';
     public $timestamps = false;
 

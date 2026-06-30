@@ -17,6 +17,13 @@ return new class extends Migration
 
         if (!empty($columns)) {
             Schema::table('kategori_logger', function (Blueprint $table) use ($columns) {
+                // Drop unique index on 'tabel' before dropping the column (required by SQLite).
+                if (in_array('tabel', $columns)) {
+                    $indexes = collect(\Illuminate\Support\Facades\DB::select("PRAGMA index_list('kategori_logger')"))->pluck('name');
+                    if ($indexes->contains('uq_kategori_tabel')) {
+                        $table->dropUnique('uq_kategori_tabel');
+                    }
+                }
                 $table->dropColumn($columns);
             });
         }
