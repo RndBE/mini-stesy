@@ -57,5 +57,6 @@ Route::prefix('v1/mobile')->group(function () {
 
         // Chatbot
         Route::post('/chatbot/ask', [\App\Http\Controllers\ChatbotController::class, 'ask']);
+        Route::post('/chatbot/stream', [\App\Http\Controllers\ChatbotController::class, 'stream']);
     });
 });

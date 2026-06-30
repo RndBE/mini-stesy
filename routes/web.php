@@ -155,5 +155,6 @@ Route::middleware(['auth', 'permission:manage_profile'])->delete('/profile', [Pr
 Route::middleware(['auth'])->get('/download', [DownloadController::class, 'index'])->name('download.index');
 Route::middleware(['auth'])->get('/download/android/apk', [DownloadController::class, 'apk'])->name('download.android.apk');
 Route::middleware(['auth'])->post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
+Route::middleware(['auth'])->post('/chatbot/stream', [ChatbotController::class, 'stream'])->name('chatbot.stream');
 
 require __DIR__ . '/auth.php';
