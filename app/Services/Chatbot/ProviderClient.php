@@ -34,7 +34,7 @@ class ProviderClient
         try {
             $res = $this->request()->withOptions(['stream'=>true])->post(
                 config('services.ai_chatbot.endpoint'),
-                ['model'=>config('services.ai_chatbot.model'),'max_completion_tokens'=>600,'messages'=>$messages,'stream'=>true]
+                ['model'=>config('services.ai_chatbot.model'),'max_completion_tokens'=>2000,'messages'=>$messages,'stream'=>true]
             );
             if (! $res->successful()) { report(new \RuntimeException('Chatbot stream error: '.$res->status())); return null; }
 
