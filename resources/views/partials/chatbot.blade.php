@@ -496,6 +496,7 @@
                     const reader = res.body.getReader();
                     const decoder = new TextDecoder();
                     let buf = '';
+                    let streamCompleted = false;
 
                     try {
                         while (true) {
@@ -526,14 +527,26 @@
                                     });
                                 } else if (ev === 'done') {
                                     // payload.source is available but not yet consumed by the UI — skipping for now.
+                                    streamCompleted = true;
                                     this.updateMessage(message.id, { isTyping: false });
                                 } else if (ev === 'error') {
+                                    streamCompleted = true;
                                     this.updateMessage(message.id, { text: payload.message, displayText: payload.message, isTyping: false });
                                 }
                             }
                         }
                     } catch (_) {
                         this.updateMessage(message.id, { isTyping: false });
+                        streamCompleted = true;
+                    }
+
+                    // Guard: stream closed without a done/error event and no text was received.
+                    // Remove the stuck empty typing bubble and fall back to the non-streaming endpoint.
+                    if (!streamCompleted && !message.text) {
+                        const idx = this.messages.findIndex((m) => m.id === message.id);
+                        if (idx !== -1) this.messages.splice(idx, 1);
+                        this.loading = true;
+                        return this.fallbackAsk(text, history);
                     }
                 },
                 async fallbackAsk(text, history) {
