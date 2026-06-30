@@ -459,12 +459,9 @@
                     this.scrollDown();
 
                     const history = this.messages
-                        .filter((m) => m.id !== 'welcome')
+                        .filter((m) => m.id !== 'welcome' && String(m.text || '').trim() !== '')
                         .slice(-10)
-                        .map((m) => ({
-                            role: m.role,
-                            text: String(m.text || '').slice(0, 650)
-                        }));
+                        .map((m) => ({ role: m.role, text: String(m.text || '').slice(0, 650) }));
 
                     this.sendMessage(text, history).finally(() => {
                         this.loading = false;
@@ -497,6 +494,7 @@
                     const decoder = new TextDecoder();
                     let buf = '';
                     let streamCompleted = false;
+                    let errorSetText = false;
 
                     try {
                         while (true) {
@@ -531,6 +529,7 @@
                                     this.updateMessage(message.id, { isTyping: false });
                                 } else if (ev === 'error') {
                                     streamCompleted = true;
+                                    errorSetText = true;
                                     this.updateMessage(message.id, { text: payload.message, displayText: payload.message, isTyping: false });
                                 }
                             }
@@ -540,9 +539,10 @@
                         streamCompleted = true;
                     }
 
-                    // Guard: stream closed without a done/error event and no text was received.
-                    // Remove the stuck empty typing bubble and fall back to the non-streaming endpoint.
-                    if (!streamCompleted && !message.text) {
+                    // Guard: if stream ended (with or without 'done') but the message has no text
+                    // and no chart, remove the stuck empty bubble and fall back — UNLESS an error
+                    // event already populated the text.
+                    if (!errorSetText && !message.text && !message.chart) {
                         const idx = this.messages.findIndex((m) => m.id === message.id);
                         if (idx !== -1) this.messages.splice(idx, 1);
                         this.loading = true;

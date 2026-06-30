@@ -71,8 +71,13 @@ class ChatbotAgent
                 return $this->fallback($user, $message);
             }
 
+            $reply = trim((string) ($second['content'] ?? ''));
+            if ($reply === '' && $chart === null) {
+                return $this->fallback($user, $message);
+            }
+
             return [
-                'reply' => trim((string) ($second['content'] ?? '')),
+                'reply' => $reply,
                 'source' => 'ai',
                 'configured' => true,
                 'chart' => $chart,
@@ -80,8 +85,13 @@ class ChatbotAgent
         }
 
         // No tool_calls — direct answer from pass-1
+        $reply = trim((string) ($first['content'] ?? ''));
+        if ($reply === '') {
+            return $this->fallback($user, $message);
+        }
+
         return [
-            'reply' => trim((string) ($first['content'] ?? '')),
+            'reply' => $reply,
             'source' => 'ai',
             'configured' => true,
             'chart' => null,
@@ -131,7 +141,12 @@ class ChatbotAgent
             }
 
             // Pass-2: stream final answer
-            $this->provider->stream($messages, $onToken);
+            $streamedText = $this->provider->stream($messages, $onToken);
+            if (($streamedText === null || trim($streamedText) === '') && $chart === null) {
+                $fb = $this->fallback($user, $message);
+                $onToken($fb['reply']);
+                return ['source' => 'local', 'chart' => null];
+            }
             return ['source' => 'ai', 'chart' => $chart];
         }
 
@@ -146,7 +161,12 @@ class ChatbotAgent
             $onToken($content);
         } else {
             // No content in pass-1 (shouldn't happen for no-tool replies, but defensive)
-            $this->provider->stream($seedMessages, $onToken);
+            $streamedText = $this->provider->stream($seedMessages, $onToken);
+            if ($streamedText === null || trim($streamedText) === '') {
+                $fb = $this->fallback($user, $message);
+                $onToken($fb['reply']);
+                return ['source' => 'local', 'chart' => null];
+            }
         }
 
         return ['source' => 'ai', 'chart' => null];

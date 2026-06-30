@@ -19,7 +19,7 @@ class ChatbotController extends Controller
             'message' => ['required', 'string', 'min:2', 'max:700'],
             'messages' => ['sometimes', 'array', 'max:12'],
             'messages.*.role' => ['required_with:messages', 'in:user,assistant'],
-            'messages.*.text' => ['required_with:messages', 'string', 'max:700'],
+            'messages.*.text' => ['nullable', 'string', 'max:700'],
         ]);
 
         $out = $this->agent->ask($request->user(), trim($validated['message']), $validated['messages'] ?? []);
@@ -38,7 +38,7 @@ class ChatbotController extends Controller
             'message' => ['required', 'string', 'min:2', 'max:700'],
             'messages' => ['sometimes', 'array', 'max:12'],
             'messages.*.role' => ['required_with:messages', 'in:user,assistant'],
-            'messages.*.text' => ['required_with:messages', 'string', 'max:700'],
+            'messages.*.text' => ['nullable', 'string', 'max:700'],
         ]);
 
         $user = $request->user();

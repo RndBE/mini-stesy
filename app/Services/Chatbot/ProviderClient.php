@@ -17,7 +17,7 @@ class ProviderClient
         try {
             $payload = [
                 'model' => config('services.ai_chatbot.model'),
-                'max_completion_tokens' => 600,
+                'max_completion_tokens' => 2000,
                 'messages' => $messages,
             ];
             if ($tools) { $payload['tools'] = $tools; $payload['tool_choice'] = 'auto'; }

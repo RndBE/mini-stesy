@@ -147,4 +147,33 @@ class ChatbotAskTest extends TestCase
 
         $res->assertUnauthorized();
     }
+
+    public function test_ask_accepts_history_with_empty_text_turn(): void
+    {
+        config([
+            'services.ai_chatbot.endpoint' => 'https://api.test/v1/chat/completions',
+            'services.ai_chatbot.key' => 'k',
+            'services.ai_chatbot.model' => 'gpt-5',
+        ]);
+
+        Http::fake([
+            '*' => Http::response([
+                'choices' => [
+                    ['message' => ['content' => 'Baik.']],
+                ],
+            ], 200),
+        ]);
+
+        $user = t_User::factory()->create();
+
+        $res = $this->actingAs($user)->postJson(route('chatbot.ask'), [
+            'message' => 'pertanyaan lagi',
+            'messages' => [
+                ['role' => 'user',      'text' => 'halo'],
+                ['role' => 'assistant', 'text' => ''],   // empty bubble — must NOT cause 422
+            ],
+        ]);
+
+        $res->assertOk()->assertJsonStructure(['reply', 'source', 'configured', 'chart']);
+    }
 }

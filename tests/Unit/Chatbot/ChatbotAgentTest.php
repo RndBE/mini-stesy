@@ -50,6 +50,30 @@ class ChatbotAgentTest extends TestCase
         $this->assertStringContainsString('3 logger offline', $out['reply']);
     }
 
+    public function test_ask_falls_back_when_ai_returns_empty_content(): void
+    {
+        $provider = Mockery::mock(ProviderClient::class);
+        $provider->shouldReceive('configured')->andReturnTrue();
+        // Pass-1 returns empty content, no tool_calls
+        $provider->shouldReceive('chat')->once()->andReturn(['content' => '']);
+
+        $fallbackText = 'Maaf, data tidak tersedia saat ini.';
+
+        $data = Mockery::mock(MonitoringData::class);
+        $data->shouldReceive('context')->once()->andReturn([]);
+        $data->shouldReceive('groundedFallback')->once()->andReturn($fallbackText);
+
+        $context = Mockery::mock(ContextEngine::class);
+        $context->shouldReceive('lightContext')->andReturn(['user_name' => 'T']);
+        $context->shouldReceive('history')->andReturn([]);
+
+        $agent = new ChatbotAgent($provider, new ToolRegistry(), $context, $data, app(ChatbotPersona::class));
+        $out = $agent->ask(t_User::factory()->make(), 'berapa logger aktif?');
+
+        $this->assertSame('local', $out['source']);
+        $this->assertSame($fallbackText, $out['reply']);
+    }
+
     private function makeAgent(ProviderClient $provider, ToolRegistry $registry): ChatbotAgent
     {
         $data = Mockery::mock(MonitoringData::class);
