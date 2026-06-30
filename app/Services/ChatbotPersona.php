@@ -63,8 +63,9 @@ class ChatbotPersona
         return $persona
             ."\n\n---\n\n"
             ."# SYSTEM FACTS\n\n"
-            ."Data berikut di-ground langsung dari basis data untuk akun ini. "
-            ."Gunakan HANYA data ini untuk angka, nama, ID, status, dan nilai sensor.\n\n"
+            ."Konteks ringan berikut disuntik untuk membantu memahami pertanyaan "
+            ."dan memilih argumen tool. Untuk angka, nama, ID, status, dan nilai "
+            ."sensor yang akurat, PANGGIL tool yang sesuai — jangan mengarang data.\n\n"
             ."```json\n".$json."\n```";
     }
 }
