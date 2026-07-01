@@ -53,8 +53,18 @@ class FaultStatusTest extends TestCase
     public function test_summary(): void
     {
         $this->assertSame('Normal', FaultStatus::summary(0));
-        $this->assertSame('Fault (1)', FaultStatus::summary(1024));
-        $this->assertSame('Fault (2)', FaultStatus::summary(1026));
+        $this->assertSame('Fault · 1 aktif', FaultStatus::summary(1024));
+        $this->assertSame('Fault · 2 aktif', FaultStatus::summary(1026));
+    }
+
+    public function test_decode_labeled_prefixes_bit_number(): void
+    {
+        $this->assertSame([], FaultStatus::decodeLabeled(0));
+        $this->assertSame(['Bit 11 · Empty pipe warning'], FaultStatus::decodeLabeled(1024));
+        $this->assertSame(
+            ['Bit 2 · Coil current error', 'Bit 11 · Empty pipe warning'],
+            FaultStatus::decodeLabeled(1026)
+        );
     }
 
     public function test_combine_bitwise_ors_all_values(): void

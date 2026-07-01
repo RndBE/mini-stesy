@@ -40,17 +40,33 @@ class FaultStatus
         return $labels;
     }
 
+    /** Active warnings prefixed with their bit number, e.g. "Bit 11 · Empty pipe warning". */
+    public static function decodeLabeled(int $value): array
+    {
+        $out = [];
+        foreach (self::BITS as $bit => $label) {
+            if (($value & (1 << ($bit - 1))) !== 0) {
+                $out[] = "Bit {$bit} · {$label}";
+            }
+        }
+        return $out;
+    }
+
     /** True when any known bit (1..14) is set. */
     public static function isFault(int $value): bool
     {
         return self::decode($value) !== [];
     }
 
-    /** Compact card text: "Normal" | "Fault (N)". */
+    /**
+     * Compact card text: "Normal" | "Fault · N aktif".
+     * The trailing "aktif" makes N unambiguously a count of active warnings,
+     * not a bit number or the raw bitmask code.
+     */
     public static function summary(int $value): string
     {
         $count = count(self::decode($value));
-        return $count === 0 ? 'Normal' : "Fault ($count)";
+        return $count === 0 ? 'Normal' : "Fault · {$count} aktif";
     }
 
     /** Bitwise-OR of all values (analisa aggregation). */

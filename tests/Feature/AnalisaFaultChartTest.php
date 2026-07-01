@@ -33,6 +33,10 @@ class AnalisaFaultChartTest extends TestCase
         $this->assertStringContainsString('setFaultLegendVisible(currentIsFault)', $view);
         $this->assertStringContainsString('Legenda Bit', $view);
 
+        // Warnings are labeled with their bit number so the count in the summary
+        // ("Fault · N aktif") isn't mistaken for a bit number.
+        $this->assertStringContainsString('function faultDecodeLabeled', $view);
+
         // Tooltip collapses the rerata/min/max index rows for fault so warnings
         // are not repeated once per dataset.
         $this->assertStringContainsString('return currentIsFault ? item.datasetIndex === 0 : true;', $view);
