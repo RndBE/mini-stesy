@@ -29,6 +29,11 @@ class t_User extends Authenticatable
         'instansi_id',
         'status',
         'suspend_reason',
+        'decimal_places',
+    ];
+
+    protected $casts = [
+        'decimal_places' => 'integer',
     ];
 
     protected $hidden = [
