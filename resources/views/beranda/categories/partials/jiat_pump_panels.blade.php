@@ -10,7 +10,7 @@
     $fmtP = function ($v) {
         if ($v === null || $v === '') return '-';
         if (!is_numeric($v)) return e($v);
-        return rtrim(rtrim(\App\Support\DisplayFormat::ukur($v, 2), '0'), '.');
+        return rtrim(rtrim(str_replace(',', '', \App\Support\DisplayFormat::ukur($v, 2)), '0'), '.');
     };
     $valP = fn($b) => $fmtP($pv[$b] ?? null);
     $unitP = fn($b) => trim((string) optional($pp[$b])->satuan);
