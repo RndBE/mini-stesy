@@ -263,6 +263,9 @@ class PetaController extends Controller
                     'satuan' => trim((string) $p->satuan),
                     'nilai' => is_numeric($value) ? round((float) $value, 3) : null,
                     'display_value' => $this->displayParameterValue($p, $value),
+                    'fault_detail' => (\App\Support\FaultStatus::isFaultParam($p) && is_numeric($value))
+                        ? \App\Support\FaultStatus::decode((int) $value)
+                        : null,
                     'icon_app' => $p->icon_app,
                     'group_code' => $groupCode,
                     'group_name' => $p->parameterGroup?->nama_group,
@@ -295,8 +298,8 @@ class PetaController extends Controller
             (string) $param->kolom_sensor
         );
 
-        if (str_contains($key, 'fault') && is_numeric($value)) {
-            return ((int) $value === 0) ? 'Normal' : 'Fault';
+        if (\App\Support\FaultStatus::isFaultParam($param) && is_numeric($value)) {
+            return \App\Support\FaultStatus::summary((int) $value);
         }
 
         if (!is_numeric($value)) {
