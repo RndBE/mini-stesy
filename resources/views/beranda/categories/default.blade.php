@@ -57,7 +57,7 @@
                             <div class="text-[11px] font-semibold tracking-wide text-slate-500">
                                 {{ strtoupper($metric['label']) }}</div>
                             <div class="mt-1 text-2xl font-bold text-slate-900">
-                                {{ $metric['value'] ?? '-' }}
+                                {{ \App\Support\DisplayFormat::ukur($metric['value'] ?? '-') }}
                                 <span class="text-xs font-semibold text-slate-500">{{ $metric['unit'] }}</span>
                             </div>
                         </a>

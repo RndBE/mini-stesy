@@ -7,10 +7,10 @@
             <div class="text-md font-semibold text-slate-700">Data Curah Hujan</div>
             @php
                 $displayPerJam = is_numeric($curahHujanPerJam ?? null)
-                    ? number_format((float) $curahHujanPerJam, 2)
+                    ? \App\Support\DisplayFormat::ukur($curahHujanPerJam, 2)
                     : '-';
                 $displayHarian = is_numeric($curahHujanHarian ?? null)
-                    ? number_format((float) $curahHujanHarian, 2)
+                    ? \App\Support\DisplayFormat::ukur($curahHujanHarian, 2)
                     : '-';
                 $jamRange = now()->format('H:00') . ' - ' . now()->format('H:59');
                 $tanggalHarian = now()->format('d M Y');

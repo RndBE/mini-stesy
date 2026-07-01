@@ -13,7 +13,7 @@
                     <image href="{{ asset('pipa/afmr_contact.svg') }}" x="0" y="0" width="231" height="250" />
 
                     <text x="115" y="120" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="34" font-weight="900" fill="#0f172a">
-                        {{ is_numeric($flowrate) ? number_format((float) $flowrate, 2) : '-' }}
+                        {{ is_numeric($flowrate) ? \App\Support\DisplayFormat::ukur($flowrate, 2) : '-' }}
                     </text>
 
                     <rect x="70" y="135" width="90" height="20" rx="10" fill="#cbd5e1" opacity="0.8"/>
@@ -37,7 +37,7 @@
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pTotalizer1->nama_parameter }}</div>
                             <div class="flex items-baseline gap-1 mt-0.5">
-                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($totalizer1) ? number_format((float) $totalizer1, 2) : '-' }}</span>
+                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($totalizer1) ? \App\Support\DisplayFormat::ukur($totalizer1, 2) : '-' }}</span>
                                 <span class="text-xs font-semibold text-slate-500">{{ $pTotalizer1->satuan }}</span>
                             </div>
                         </div>
@@ -52,7 +52,7 @@
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pTotalizer2->nama_parameter }}</div>
                             <div class="flex items-baseline gap-1 mt-0.5">
-                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($totalizer2) ? number_format((float) $totalizer2, 2) : '-' }}</span>
+                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($totalizer2) ? \App\Support\DisplayFormat::ukur($totalizer2, 2) : '-' }}</span>
                                 <span class="text-xs font-semibold text-slate-500">{{ $pTotalizer2->satuan }}</span>
                             </div>
                         </div>
@@ -67,7 +67,7 @@
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pPressure1->nama_parameter }}</div>
                             <div class="flex items-baseline gap-1 mt-0.5">
-                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($pressure1) ? number_format((float) $pressure1, 2) : '-' }}</span>
+                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($pressure1) ? \App\Support\DisplayFormat::ukur($pressure1, 2) : '-' }}</span>
                                 <span class="text-xs font-semibold text-slate-500">{{ $pPressure1->satuan }}</span>
                             </div>
                         </div>
@@ -82,7 +82,7 @@
                         <div>
                             <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pPressure2->nama_parameter }}</div>
                             <div class="flex items-baseline gap-1 mt-0.5">
-                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($pressure2) ? number_format((float) $pressure2, 2) : '-' }}</span>
+                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($pressure2) ? \App\Support\DisplayFormat::ukur($pressure2, 2) : '-' }}</span>
                                 <span class="text-xs font-semibold text-slate-500">{{ $pPressure2->satuan }}</span>
                             </div>
                         </div>
@@ -104,7 +104,7 @@
                         </div>
                         <div>
                             <div class="text-[8px] font-bold uppercase tracking-widest text-slate-500">{{ $pFmBattery->nama_parameter }}</div>
-                            <div class="text-base font-extrabold text-slate-900">{{ $fmBattery ?? '-' }}<span class="text-[9px] font-bold text-slate-500 ml-1">{{ $pFmBattery->satuan }}</span></div>
+                            <div class="text-base font-extrabold text-slate-900">{{ \App\Support\DisplayFormat::ukur($fmBattery ?? '-') }}<span class="text-[9px] font-bold text-slate-500 ml-1">{{ $pFmBattery->satuan }}</span></div>
                         </div>
                     </a>
                     @endif
@@ -153,7 +153,7 @@
                     <div class="leading-tight min-w-0">
                         <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Humidity</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $humidity ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">{{ $pHumidity->satuan }}</span>
+                            {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">{{ $pHumidity->satuan }}</span>
                         </div>
                     </div>
                 </div>
@@ -170,7 +170,7 @@
                     <div class="leading-tight min-w-0">
                         <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Battery</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $battery ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">{{ $pBattery->satuan }}</span>
+                            {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">{{ $pBattery->satuan }}</span>
                         </div>
                     </div>
                 </div>
@@ -187,7 +187,7 @@
                     <div class="leading-tight min-w-0">
                         <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">{{ $pTemp->satuan }}</span>
+                            {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">{{ $pTemp->satuan }}</span>
                         </div>
                     </div>
                 </div>
@@ -338,7 +338,7 @@
                         <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400">Luas Penampang Basah</div>
                         <div class="flex items-baseline gap-1">
                             <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
-                                {{ is_numeric($luasPenampang) ? number_format((float) $luasPenampang, 2) : '-' }}
+                                {{ is_numeric($luasPenampang) ? \App\Support\DisplayFormat::ukur($luasPenampang, 2) : '-' }}
                             </span>
                             <span class="text-xs font-semibold text-slate-400">m²</span>
                         </div>
@@ -362,7 +362,7 @@
                         <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400">Debit</div>
                         <div class="flex items-baseline gap-1">
                             <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
-                                {{ is_numeric($afmrDebit) ? number_format((float) $afmrDebit, 2) : '-' }}
+                                {{ is_numeric($afmrDebit) ? \App\Support\DisplayFormat::ukur($afmrDebit, 2) : '-' }}
                             </span>
                             <span class="text-xs font-semibold text-slate-400">m³/s</span>
                         </div>
@@ -391,7 +391,7 @@
                         </div>
                         <div class="flex items-baseline gap-1">
                             <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
-                                {{ is_numeric($flowVelocity) ? number_format((float) $flowVelocity, 2) : '-' }}
+                                {{ is_numeric($flowVelocity) ? \App\Support\DisplayFormat::ukur($flowVelocity, 2) : '-' }}
                             </span>
                             <span class="text-xs font-semibold text-slate-400">m/s</span>
                         </div>
@@ -421,7 +421,7 @@
                     <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400 truncate">Elevasi Muka Air</div>
                     <div class="flex items-baseline gap-1">
                         <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
-                            {{ is_numeric($elevMukaAir) ? number_format((float) $elevMukaAir, 3) : '-' }}
+                            {{ is_numeric($elevMukaAir) ? \App\Support\DisplayFormat::ukur($elevMukaAir, 3) : '-' }}
                         </span>
                         <span class="text-xs font-semibold text-slate-400">m</span>
                     </div>
@@ -446,7 +446,7 @@
                     <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400 truncate">Elevasi Sensor</div>
                     <div class="flex items-baseline gap-1">
                         <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
-                            {{ is_numeric($elevSensor) ? number_format((float) $elevSensor, 3) : '-' }}
+                            {{ is_numeric($elevSensor) ? \App\Support\DisplayFormat::ukur($elevSensor, 3) : '-' }}
                         </span>
                         <span class="text-xs font-semibold text-slate-400">m</span>
                     </div>
@@ -471,7 +471,7 @@
                     <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400 truncate">Jarak Sensor</div>
                     <div class="flex items-baseline gap-1">
                         <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
-                            {{ is_numeric($jarakSensor) ? number_format((float) $jarakSensor, 2) : '-' }}
+                            {{ is_numeric($jarakSensor) ? \App\Support\DisplayFormat::ukur($jarakSensor, 2) : '-' }}
                         </span>
                         <span class="text-xs font-semibold text-slate-400">m</span>
                     </div>
@@ -495,7 +495,7 @@
                         <div class="leading-tight min-w-0">
                             <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Humidity</div>
                             <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                {{ $humidity ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">%</span>
+                                {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">%</span>
                             </div>
                         </div>
                     </div>
@@ -512,7 +512,7 @@
                         <div class="leading-tight min-w-0">
                             <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Battery</div>
                             <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                {{ $battery ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">Volt</span>
+                                {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">Volt</span>
                             </div>
                         </div>
                     </div>
@@ -529,7 +529,7 @@
                         <div class="leading-tight min-w-0">
                             <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
                             <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
+                                {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
                             </div>
                         </div>
                     </div>

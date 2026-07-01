@@ -76,8 +76,8 @@
         $suhuParam = $findAwqrParam(['suhu_air', 'temperature_air', 'water_temperature']);
         $phVal = $readAwqrValue($phParam);
         $suhuVal = $readAwqrValue($suhuParam);
-        $phDisplay = is_numeric($phVal) ? number_format((float) $phVal, 2) : '-';
-        $suhuDisplay = is_numeric($suhuVal) ? number_format((float) $suhuVal, 1) : '-';
+        $phDisplay = is_numeric($phVal) ? \App\Support\DisplayFormat::ukur($phVal, 2) : '-';
+        $suhuDisplay = is_numeric($suhuVal) ? \App\Support\DisplayFormat::ukur($suhuVal, 1) : '-';
     @endphp
 
     <div class="flex flex-col lg:flex-row gap-4 p-5">
@@ -113,7 +113,7 @@
                     <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         @foreach ($measurementSensors as $s)
                             @php
-                                $dispV = is_numeric($s['value']) ? $s['value'] : '-';
+                                $dispV = is_numeric($s['value']) ? \App\Support\DisplayFormat::ukur($s['value']) : '-';
                                 $href = $s['param']
                                     ? route('analisa.index', $lg->id_logger) . '?parameter=' . urlencode($s['param']->nama_parameter)
                                     : route('analisa.index', $lg->id_logger);
@@ -156,7 +156,7 @@
                                 <div class="leading-tight min-w-0">
                                     <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">HUMIDITY</div>
                                     <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                        {{ $humidity ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">%</span>
+                                        {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">%</span>
                                     </div>
                                 </div>
                             </a>
@@ -172,7 +172,7 @@
                                 <div class="leading-tight min-w-0">
                                     <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">BATTERY</div>
                                     <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                        {{ $battery ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">V</span>
+                                        {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">V</span>
                                     </div>
                                 </div>
                             </a>
@@ -188,7 +188,7 @@
                                 <div class="leading-tight min-w-0">
                                     <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">TEMPERATURE</div>
                                     <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                        {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">&deg;C</span>
+                                        {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">&deg;C</span>
                                     </div>
                                 </div>
                             </a>

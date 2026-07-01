@@ -390,7 +390,7 @@
                                     DATA AIR TANAH</div>
                                 <div class="flex items-baseline gap-1">
                                     <span
-                                        class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-500' }}">{{ $dataAir ?? '-' }}</span>
+                                        class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-500' }}">{{ \App\Support\DisplayFormat::ukur($dataAir ?? '-') }}</span>
                                     <span class="text-xs font-semibold text-slate-400">m</span>
                                 </div>
                             </div>
@@ -413,7 +413,7 @@
                                     MUKA AIR TANAH</div>
                                 <div class="flex items-baseline gap-1">
                                     <span
-                                        class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-500' }}">{{ $mukaAir ?? '-' }}</span>
+                                        class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-500' }}">{{ \App\Support\DisplayFormat::ukur($mukaAir ?? '-') }}</span>
                                     <span class="text-xs font-semibold text-slate-400">m</span>
                                 </div>
                             </a>
@@ -668,7 +668,7 @@
                             <div class="flex items-baseline gap-1">
                                 <span
                                     class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
-                                    {{ is_numeric($tma) ? number_format((float) $tma, 3) : '-' }}
+                                    {{ is_numeric($tma) ? \App\Support\DisplayFormat::ukur($tma, 3) : '-' }}
                                 </span>
                                 <span class="text-xs font-semibold text-slate-400">m</span>
                             </div>
@@ -697,7 +697,7 @@
                             <div class="flex items-baseline gap-1">
                                 <span
                                     class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
-                                    {{ is_numeric($debit) ? number_format((float) $debit, 3) : '-' }}
+                                    {{ is_numeric($debit) ? \App\Support\DisplayFormat::ukur($debit, 3) : '-' }}
                                 </span>
                                 <span class="text-xs font-semibold text-slate-400">m³/s</span>
                             </div>
@@ -725,7 +725,7 @@
                                     Humidity</div>
                                 <div
                                     class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                    {{ $humidity ?? '-' }}<span
+                                    {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span
                                         class="text-[10px] font-bold text-slate-400 ml-0.5">%</span>
                                 </div>
                             </div>
@@ -746,7 +746,7 @@
                                     Battery</div>
                                 <div
                                     class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                    {{ $battery ?? '-' }}<span
+                                    {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span
                                         class="text-[10px] font-bold text-slate-400 ml-0.5">Volt</span>
                                 </div>
                             </div>
@@ -767,7 +767,7 @@
                                     Temperature</div>
                                 <div
                                     class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                    {{ $temp ?? '-' }}<span
+                                    {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span
                                         class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
                                 </div>
                             </div>

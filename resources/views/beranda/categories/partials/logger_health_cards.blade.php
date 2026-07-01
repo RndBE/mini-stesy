@@ -10,7 +10,7 @@
             <div class="leading-tight text-center md:text-left">
                 <div class="text-[8px] sm:text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate overflow-hidden">Humidity</div>
                 <div class="text-sm sm:text-base md:text-xl font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                    {{ $humidity ?? '-' }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">%</span>
+                    {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">%</span>
                 </div>
             </div>
         </div>
@@ -27,7 +27,7 @@
             <div class="leading-tight text-center md:text-left min-w-0 w-full">
                 <div class="text-[8px] sm:text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate overflow-hidden">Battery</div>
                 <div class="text-sm sm:text-base md:text-xl font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                    {{ $battery ?? '-' }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">V</span>
+                    {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">V</span>
                 </div>
             </div>
         </div>
@@ -44,7 +44,7 @@
             <div class="leading-tight text-center md:text-left min-w-0 w-full overflow-hidden">
                 <div class="text-[8px] sm:text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
                 <div class="text-sm sm:text-base md:text-xl font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                    {{ $temp ?? '-' }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">°C</span>
+                    {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">°C</span>
                 </div>
             </div>
         </div>
