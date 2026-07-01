@@ -3,6 +3,15 @@
 @include('partials.head')
 
 <body class="bg-slate-50" x-data="{ pageTitle: '{{ $title ?? 'Beranda' }}' }">
+    <script>
+        window.__decimalUkur = @json(\App\Support\DisplayFormat::decimalsForUser());
+        window.fmtUkur = function (val, def) {
+            var d = (window.__decimalUkur === null || window.__decimalUkur === undefined) ? def : window.__decimalUkur;
+            if (d === null || d === undefined) return val;
+            var n = Number(val);
+            return isNaN(n) ? val : n.toFixed(d);
+        };
+    </script>
     <style>
         @media (max-width: 1023px) {
             #mainContent {
