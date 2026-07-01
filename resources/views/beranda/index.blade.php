@@ -293,7 +293,8 @@
                             $pFlowrate   = $findParamByBase(['flowrate', 'flow_rate']);
                             $pTotalizer1 = $findParamByBase(['totalizer', 'totalizer_1', 'totalizer1']);
                             $pTotalizer2 = $findParamByBase(['totalizer_2', 'totalizer2']);
-                            $pPressure1  = $findParamByBase(['pressure_1', 'pressure1', 'tekanan_1']);
+                            $pPressure1  = $findParamByBase(['pressure_1', 'pressure1', 'tekanan_1'])
+                                ?: $findParamByBase(['pressure', 'tekanan']);
                             $pPressure2  = $findParamByBase(['pressure_2', 'pressure2', 'tekanan_2']);
                             $pFmBattery  = $findParamByBase(['flowmeter_battery']);
                             $pFault      = $findParamByBase(['fault']);
