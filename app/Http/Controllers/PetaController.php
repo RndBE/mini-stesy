@@ -292,12 +292,6 @@ class PetaController extends Controller
             return '-';
         }
 
-        $key = $this->normalizeSensorKey(
-            (string) $param->nama_parameter . ' ' .
-            (string) $param->parameter_utama . ' ' .
-            (string) $param->kolom_sensor
-        );
-
         if (\App\Support\FaultStatus::isFaultParam($param) && is_numeric($value)) {
             return \App\Support\FaultStatus::summary((int) $value);
         }
