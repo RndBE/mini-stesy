@@ -194,7 +194,10 @@ class AnalisaController extends Controller
             ->where('nama_parameter', $parameter)
             ->first();
 
-        $klasifikasi = $this->rainfallClassificationsFor($logger);
+        // 'day'/'custom' bars aggregate per hour -> hourly thresholds ('perjam').
+        // 'month'/'year' bars aggregate per day or more -> daily thresholds ('perhari').
+        $klasifikasiWaktu = in_array($range, ['day', 'custom'], true) ? 'perjam' : 'perhari';
+        $klasifikasi = $this->rainfallClassificationsFor($logger, $klasifikasiWaktu);
 
         if (!$param || !$logger->tabel_main) {
             return [
@@ -563,11 +566,11 @@ class AnalisaController extends Controller
             ->first();
     }
 
-    private function rainfallClassificationsFor(t_Logger $logger): array
+    private function rainfallClassificationsFor(t_Logger $logger, string $waktu = 'perjam'): array
     {
-        $fromLogger = function ($query) {
+        $fromLogger = function ($query) use ($waktu) {
             return $query
-                ->where('klasifikasi_hujan.waktu', 'perjam')
+                ->where('klasifikasi_hujan.waktu', $waktu)
                 ->distinct()
                 ->orderByRaw('CAST(klasifikasi_hujan.debit_air AS DECIMAL(10, 2))')
                 ->get(['klasifikasi_hujan.debit_air', 'klasifikasi_hujan.intensitas'])
