@@ -2421,7 +2421,16 @@
 
         function faultSummary(value) {
             const n = faultDecode(value).length;
-            return n === 0 ? 'Normal' : `Fault (${n})`;
+            return n === 0 ? 'Normal' : `Fault · ${n} aktif`;
+        }
+
+        function faultDecodeLabeled(value) {
+            const v = Number(value) | 0;
+            const out = [];
+            for (const [bit, label] of Object.entries(window.FAULT_BITS)) {
+                if ((v & (1 << (Number(bit) - 1))) !== 0) out.push(`Bit ${bit} · ${label}`);
+            }
+            return out;
         }
 
         function buildFaultLegend() {
@@ -2736,7 +2745,7 @@
                                     const v = ctx.parsed.y;
                                     if (v === null || v === undefined) return null;
                                     if (currentIsFault) {
-                                        const labels = faultDecode(v);
+                                        const labels = faultDecodeLabeled(v);
                                         return labels.length
                                             ? labels.map(l => '⚠  ' + l)
                                             : ['✓  Normal'];
@@ -3419,7 +3428,7 @@
                 let html = '';
                 for (const r of filtered) {
                     if (data.is_fault) {
-                        const labels = faultDecode(r.rerata);
+                        const labels = faultDecodeLabeled(r.rerata);
                         const cell = labels.length
                             ? `<span title="${labels.join(', ')}">${faultSummary(r.rerata)}</span>`
                             : 'Normal';
@@ -3458,7 +3467,7 @@
             let html = '';
             for (const r of filtered) {
                 if (data.is_fault) {
-                    const labels = faultDecode(r.rerata);
+                    const labels = faultDecodeLabeled(r.rerata);
                     const cell = labels.length
                         ? `<span title="${labels.join(', ')}">${faultSummary(r.rerata)}</span>`
                         : 'Normal';

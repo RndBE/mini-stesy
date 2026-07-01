@@ -21,8 +21,8 @@ class PetaFaultDecodeTest extends TestCase
         ];
 
         $this->assertSame('Normal', $method->invoke($controller, $param, 0));
-        $this->assertSame('Fault (1)', $method->invoke($controller, $param, 1024));
-        $this->assertSame('Fault (2)', $method->invoke($controller, $param, 1026));
+        $this->assertSame('Fault · 1 aktif', $method->invoke($controller, $param, 1024));
+        $this->assertSame('Fault · 2 aktif', $method->invoke($controller, $param, 1026));
     }
 
     public function test_peta_blade_renders_fault_detail_tooltip(): void

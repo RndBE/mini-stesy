@@ -116,7 +116,7 @@
                             : ($fault ?? '-');
                         $faultOk = is_numeric($fault) && !\App\Support\FaultStatus::isFault((int) $fault);
                         $faultDetail = is_numeric($fault)
-                            ? \App\Support\FaultStatus::decode((int) $fault)
+                            ? \App\Support\FaultStatus::decodeLabeled((int) $fault)
                             : [];
                     @endphp
                     <a href="{{ route('analisa.index', $lg->id_logger) }}?parameter={{ urlencode($pFault->nama_parameter) }}" class="flex items-center gap-3 rounded-xl border px-3 py-2 bg-white shadow-sm hover:shadow-md transition-all {{ $faultOk ? 'border-emerald-200' : 'border-rose-200' }} {{ $isOnline ? '' : 'grayscale opacity-70' }}">
