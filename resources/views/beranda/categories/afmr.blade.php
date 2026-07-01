@@ -123,10 +123,18 @@
                         <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-slate-100 bg-slate-50">
                             <img src="{{ asset('icons/afmr/fault_wm.svg') }}" alt="Fault" class="h-5 w-5 object-contain" onerror="this.style.display='none'">
                         </div>
-                        <div>
+                        <div class="relative group">
                             <div class="text-[8px] font-bold uppercase tracking-widest text-slate-500">{{ $pFault->nama_parameter }}</div>
-                            <div class="text-base font-extrabold {{ $faultOk ? 'text-emerald-700' : 'text-rose-700' }}"
-                                @if(!empty($faultDetail)) title="{{ implode(', ', $faultDetail) }}" @endif>{{ $faultLabel }}</div>
+                            <div class="text-base font-extrabold {{ $faultOk ? 'text-emerald-700' : 'text-rose-700' }}">{{ $faultLabel }}</div>
+                            @if(!empty($faultDetail))
+                            <div class="pointer-events-none absolute left-0 bottom-full z-50 mb-2 hidden w-max max-w-[220px] rounded-lg bg-slate-800 px-3 py-2 text-left text-[11px] font-medium leading-snug text-white shadow-xl group-hover:block">
+                                <div class="mb-1 text-[9px] font-bold uppercase tracking-widest text-rose-300">{{ $faultLabel }}</div>
+                                @foreach($faultDetail as $w)
+                                <div class="flex items-start gap-1.5"><span class="text-rose-300">&#9888;</span><span>{{ $w }}</span></div>
+                                @endforeach
+                                <div class="absolute left-4 top-full h-2 w-2 -translate-y-1 rotate-45 bg-slate-800"></div>
+                            </div>
+                            @endif
                         </div>
                     </a>
                     @endif

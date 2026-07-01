@@ -21,4 +21,20 @@ class AnalisaFaultChartTest extends TestCase
         $this->assertStringContainsString('function faultSummary', $view);
         $this->assertStringContainsString('currentIsFault', $view);
     }
+
+    public function test_analisa_view_has_fault_legend_and_deduped_tooltip(): void
+    {
+        $view = file_get_contents(resource_path('views/analisadata/analisa.blade.php'));
+
+        // Bit legend beside Download Chart
+        $this->assertStringContainsString('id="faultLegendWrap"', $view);
+        $this->assertStringContainsString('function toggleFaultLegend', $view);
+        $this->assertStringContainsString('function buildFaultLegend', $view);
+        $this->assertStringContainsString('setFaultLegendVisible(currentIsFault)', $view);
+        $this->assertStringContainsString('Legenda Bit', $view);
+
+        // Tooltip collapses the rerata/min/max index rows for fault so warnings
+        // are not repeated once per dataset.
+        $this->assertStringContainsString('return currentIsFault ? item.datasetIndex === 0 : true;', $view);
+    }
 }

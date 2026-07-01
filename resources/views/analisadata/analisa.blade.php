@@ -718,6 +718,88 @@
             flex: 0 0 auto;
         }
 
+        .chart-head-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .fault-legend-wrap {
+            position: relative;
+        }
+
+        .fault-legend-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            z-index: 40;
+            width: 288px;
+            max-width: min(88vw, 320px);
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #e3e6f5;
+            background: #ffffff;
+            box-shadow: 0 14px 38px rgba(20, 22, 63, .16);
+            animation: faultLegendIn .14s ease;
+        }
+
+        @keyframes faultLegendIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .fault-legend-head {
+            font-size: 12px;
+            font-weight: 800;
+            color: #303481;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            margin-bottom: 8px;
+        }
+
+        .fault-legend-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        .fault-legend-list li {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 12px;
+            color: #334155;
+            border-top: 1px solid #f1f3fb;
+        }
+
+        .fault-legend-list li:first-child {
+            border-top: 0;
+        }
+
+        .fault-legend-list li .bit-no {
+            flex: 0 0 auto;
+            min-width: 42px;
+            font-weight: 700;
+            color: #64748b;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .fault-legend-foot {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f1f3fb;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        #faultLegendBtn[aria-expanded="true"] {
+            background: #eef1fb;
+            border-color: #bfc6e8;
+        }
+
         .panel-eyebrow {
             display: flex;
             align-items: center;
@@ -2031,15 +2113,33 @@
                             <span id="chartPostName" class="hidden">{{ $logger->nama_pos ?? $logger->nama_logger ?? 'Logger' }}</span>
                             <div class="chart-title" id="chartTitle">{{ date('F Y') }} - {{ $logger->nama_pos ?? $logger->nama_logger ?? 'Logger' }}</div>
                         </div>
-                        <button type="button" class="chart-export-btn" onclick="downloadChart()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M12 3v12" />
-                                <path d="m7 10 5 5 5-5" />
-                                <path d="M5 21h14" />
-                            </svg>
-                            <span>Download Chart</span>
-                        </button>
+                        <div class="chart-head-actions">
+                            <div class="fault-legend-wrap" id="faultLegendWrap" style="display:none;">
+                                <button type="button" class="chart-export-btn" id="faultLegendBtn" onclick="toggleFaultLegend()" aria-expanded="false">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <circle cx="12" cy="12" r="9" />
+                                        <path d="M12 8h.01" />
+                                        <path d="M11 12h1v4h1" />
+                                    </svg>
+                                    <span>Legenda Bit</span>
+                                </button>
+                                <div class="fault-legend-panel" id="faultLegendPanel" hidden>
+                                    <div class="fault-legend-head">Fault Status &mdash; arti bit</div>
+                                    <ul class="fault-legend-list" id="faultLegendList"></ul>
+                                    <div class="fault-legend-foot">Nilai = jumlah bit aktif. Bit 15&ndash;16 tidak dipakai.</div>
+                                </div>
+                            </div>
+                            <button type="button" class="chart-export-btn" onclick="downloadChart()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M12 3v12" />
+                                    <path d="m7 10 5 5 5-5" />
+                                    <path d="M5 21h14" />
+                                </svg>
+                                <span>Download Chart</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="chart-wrapper mb-3 mt-3">
                         <canvas id="dataChart" height="400"></canvas>
@@ -2324,6 +2424,44 @@
             return n === 0 ? 'Normal' : `Fault (${n})`;
         }
 
+        function buildFaultLegend() {
+            const list = document.getElementById('faultLegendList');
+            if (!list || list.dataset.built === '1') return;
+            let html = '';
+            for (const [bit, label] of Object.entries(window.FAULT_BITS)) {
+                const dec = 1 << (Number(bit) - 1);
+                html += `<li><span class="bit-no">Bit ${bit}</span><span>${label}<span style="color:#cbd5e1"> · ${dec}</span></span></li>`;
+            }
+            list.innerHTML = html;
+            list.dataset.built = '1';
+        }
+
+        function toggleFaultLegend(force) {
+            const panel = document.getElementById('faultLegendPanel');
+            const btn = document.getElementById('faultLegendBtn');
+            if (!panel || !btn) return;
+            buildFaultLegend();
+            const open = typeof force === 'boolean' ? force : panel.hidden;
+            panel.hidden = !open;
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        // Close the legend popover on outside click / Escape.
+        document.addEventListener('click', function(e) {
+            const wrap = document.getElementById('faultLegendWrap');
+            if (wrap && !wrap.contains(e.target)) toggleFaultLegend(false);
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') toggleFaultLegend(false);
+        });
+
+        function setFaultLegendVisible(visible) {
+            const wrap = document.getElementById('faultLegendWrap');
+            if (!wrap) return;
+            wrap.style.display = visible ? 'inline-flex' : 'none';
+            if (!visible) toggleFaultLegend(false);
+        }
+
         const BATTERY_THRESHOLDS = [
             {
                 value: 12.2,
@@ -2570,13 +2708,38 @@
                         tooltip: {
                             mode: 'index',
                             intersect: false,
+                            padding: 12,
+                            cornerRadius: 10,
+                            boxPadding: 6,
+                            titleMarginBottom: 8,
+                            titleFont: { size: 12, weight: '700' },
+                            bodyFont: { size: 12 },
+                            bodySpacing: 6,
+                            caretSize: 6,
+                            backgroundColor: 'rgba(17, 20, 45, 0.94)',
+                            // Fault is one logical status series; collapse the rerata/min/max
+                            // index rows to a single entry so warnings aren't repeated.
+                            filter: function(item) {
+                                return currentIsFault ? item.datasetIndex === 0 : true;
+                            },
                             callbacks: {
+                                title: function(items) {
+                                    if (!items.length) return '';
+                                    const t = items[0].label || '';
+                                    if (currentIsFault) {
+                                        const v = items[0].parsed.y;
+                                        return `${t}  •  ${faultSummary(v)}`;
+                                    }
+                                    return t;
+                                },
                                 label: function(ctx) {
                                     const v = ctx.parsed.y;
                                     if (v === null || v === undefined) return null;
                                     if (currentIsFault) {
                                         const labels = faultDecode(v);
-                                        return labels.length ? labels : 'Normal';
+                                        return labels.length
+                                            ? labels.map(l => '⚠  ' + l)
+                                            : ['✓  Normal'];
                                     }
                                     const formattedVal = Number.isInteger(v) ? v : window.fmtUkur(v, 2);
                                     return isBar ? `${ctx.dataset.label}: ${formattedVal} mm` : `${ctx.dataset.label}: ${formattedVal}`;
@@ -3103,6 +3266,7 @@
         function updateChart(data) {
             if (!chart) return;
             currentIsFault = !!data.is_fault;
+            setFaultLegendVisible(currentIsFault);
             const labelsRaw = data.labels || [];
             const avgRaw = data.chartData || [];
             const minRaw = data.minData || [];
