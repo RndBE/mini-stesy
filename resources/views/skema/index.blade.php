@@ -584,7 +584,7 @@
                     const endVal = parseFloat(newValue);
                     
                     if (startVal === endVal) {
-                        const valStr = isFloat ? endVal.toFixed(2) : endVal;
+                        const valStr = isFloat ? window.fmtUkur(endVal, 2) : endVal;
                         el.textContent = formatFn ? formatFn(valStr) : valStr;
                         el.dataset.val = endVal;
                         return;
@@ -601,13 +601,13 @@
                         const easeOut = 1 - Math.pow(1 - progress, 4);
                         const currentVal = startVal + (easeOut * (endVal - startVal));
                         
-                        const strVal = isFloat ? currentVal.toFixed(2) : Math.round(currentVal);
+                        const strVal = isFloat ? window.fmtUkur(currentVal, 2) : Math.round(currentVal);
                         el.textContent = formatFn ? formatFn(strVal) : strVal;
-                        
+
                         if (progress < 1) {
                             el.animFrame = requestAnimationFrame(step);
                         } else {
-                            const finalStr = isFloat ? endVal.toFixed(2) : endVal;
+                            const finalStr = isFloat ? window.fmtUkur(endVal, 2) : endVal;
                             el.textContent = formatFn ? formatFn(finalStr) : finalStr;
                             el.dataset.val = endVal;
                         }
@@ -1544,7 +1544,7 @@
                                 tmaText.setAttribute("font-weight", "bold");
                                 tmaText.setAttribute("fill", sensorColor);
                                 tmaText.style.textRendering = "geometricPrecision";
-                                tmaText.textContent = parseFloat(node.tma).toFixed(1) + ' cm';
+                                tmaText.textContent = window.fmtUkur(parseFloat(node.tma), 1) + ' cm';
                                 group.appendChild(tmaText);
                             }
                         }

@@ -245,7 +245,7 @@
                                     $lblX = $depthLineX - $lblPadX;
                                     $lblY1 = $depthY2 - 22;
                                     $lblY2 = $depthY2 - 8;
-                                    $depthVal = rtrim(rtrim(number_format((float) $kdlSumur, 2, '.', ''), '0'), '.');
+                                    $depthVal = rtrim(rtrim(str_replace(',', '', \App\Support\DisplayFormat::ukur($kdlSumur, 2)), '0'), '.');
                                 @endphp
 
                                 <line x1="{{ $depthLineX }}" y1="{{ $depthY1 }}" x2="{{ $depthLineX }}"

@@ -303,7 +303,7 @@ class PetaController extends Controller
             return (string) $value;
         }
 
-        $formatted = rtrim(rtrim(number_format((float) $value, 3, '.', ','), '0'), '.');
+        $formatted = rtrim(rtrim(\App\Support\DisplayFormat::ukur($value, 3), '0'), '.');
         $unit = trim((string) $param->satuan);
 
         return $formatted . ($unit !== '' ? ' ' . $unit : '');

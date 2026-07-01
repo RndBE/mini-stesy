@@ -708,7 +708,7 @@
                             const num = Number(row[column]);
                             return {
                                 waktu: row.waktu_label || this.extractLoggerTime(row.waktu, true),
-                                value: Number.isFinite(num) ? num.toFixed(2) : '-'
+                                value: Number.isFinite(num) ? window.fmtUkur(num, 2) : '-'
                             };
                         });
                     },

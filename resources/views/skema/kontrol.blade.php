@@ -56,7 +56,7 @@
                     <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-wide">Saluran</p>
                     <p class="text-sm font-semibold text-indigo-900 leading-tight mt-0.5">{{ $node['saluran'] }}</p>
                     @if(isset($node['elevasi_m']))
-                    <p class="text-[10px] text-indigo-400 mt-1">Elevasi: {{ $node['elevasi_m'] }} m dpl</p>
+                    <p class="text-[10px] text-indigo-400 mt-1">Elevasi: {{ \App\Support\DisplayFormat::ukur($node['elevasi_m'] ?? '-') }} m dpl</p>
                     @endif
                 </div>
                 @endif
@@ -65,28 +65,28 @@
                     @if(isset($node['tma_hulu_cm']))
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
                         <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wide">TMA Hulu</p>
-                        <p class="text-xl font-bold text-blue-800 leading-none mt-1">{{ $node['tma_hulu_cm'] }}</p>
+                        <p class="text-xl font-bold text-blue-800 leading-none mt-1">{{ \App\Support\DisplayFormat::ukur($node['tma_hulu_cm'] ?? '-') }}</p>
                         <p class="text-[10px] text-blue-400 mt-0.5">cm</p>
                     </div>
                     @endif
                     @if(isset($node['tma_hilir_cm']))
                     <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-3 text-center">
                         <p class="text-[10px] font-bold text-cyan-500 uppercase tracking-wide">TMA Hilir</p>
-                        <p class="text-xl font-bold text-cyan-800 leading-none mt-1">{{ $node['tma_hilir_cm'] }}</p>
+                        <p class="text-xl font-bold text-cyan-800 leading-none mt-1">{{ \App\Support\DisplayFormat::ukur($node['tma_hilir_cm'] ?? '-') }}</p>
                         <p class="text-[10px] text-cyan-400 mt-0.5">cm</p>
                     </div>
                     @endif
                     @if(isset($node['debit_m3s']))
                     <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-center col-span-1">
                         <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-wide">Debit</p>
-                        <p class="text-xl font-bold text-emerald-800 leading-none mt-1">{{ number_format($node['debit_m3s'], 2) }}</p>
+                        <p class="text-xl font-bold text-emerald-800 leading-none mt-1">{{ \App\Support\DisplayFormat::ukur($node['debit_m3s'], 2) }}</p>
                         <p class="text-[10px] text-emerald-400 mt-0.5">m³/dtk</p>
                     </div>
                     @endif
                     @if(isset($node['kapasitas_m3s']))
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center col-span-1">
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Kapasitas</p>
-                        <p class="text-xl font-bold text-slate-700 leading-none mt-1">{{ number_format($node['kapasitas_m3s'], 2) }}</p>
+                        <p class="text-xl font-bold text-slate-700 leading-none mt-1">{{ \App\Support\DisplayFormat::ukur($node['kapasitas_m3s'], 2) }}</p>
                         <p class="text-[10px] text-slate-400 mt-0.5">m³/dtk</p>
                     </div>
                     @endif
