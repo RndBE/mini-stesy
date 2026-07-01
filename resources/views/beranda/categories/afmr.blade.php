@@ -112,9 +112,12 @@
                     @if ($pFault)
                     @php
                         $faultLabel = is_numeric($fault)
-                            ? ((int) $fault === 0 ? 'Normal' : 'Fault')
+                            ? \App\Support\FaultStatus::summary((int) $fault)
                             : ($fault ?? '-');
-                        $faultOk = is_numeric($fault) && (int) $fault === 0;
+                        $faultOk = is_numeric($fault) && !\App\Support\FaultStatus::isFault((int) $fault);
+                        $faultDetail = is_numeric($fault)
+                            ? \App\Support\FaultStatus::decode((int) $fault)
+                            : [];
                     @endphp
                     <a href="{{ route('analisa.index', $lg->id_logger) }}?parameter={{ urlencode($pFault->nama_parameter) }}" class="flex items-center gap-3 rounded-xl border px-3 py-2 bg-white shadow-sm hover:shadow-md transition-all {{ $faultOk ? 'border-emerald-200' : 'border-rose-200' }} {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-slate-100 bg-slate-50">
@@ -122,7 +125,8 @@
                         </div>
                         <div>
                             <div class="text-[8px] font-bold uppercase tracking-widest text-slate-500">{{ $pFault->nama_parameter }}</div>
-                            <div class="text-base font-extrabold {{ $faultOk ? 'text-emerald-700' : 'text-rose-700' }}">{{ $faultLabel }}</div>
+                            <div class="text-base font-extrabold {{ $faultOk ? 'text-emerald-700' : 'text-rose-700' }}"
+                                @if(!empty($faultDetail)) title="{{ implode(', ', $faultDetail) }}" @endif>{{ $faultLabel }}</div>
                         </div>
                     </a>
                     @endif

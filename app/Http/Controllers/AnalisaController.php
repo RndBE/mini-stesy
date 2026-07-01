@@ -209,11 +209,13 @@ class AnalisaController extends Controller
                 'tipe_graf'    => $this->chartTypeFor($param),
                 'akumulasi'    => 0,
                 'klasifikasi'  => $klasifikasi,
+                'is_fault'     => false,
             ];
         }
 
         $tipeGraf = $this->chartTypeFor($param);
         $column = $param->kolom_sensor;
+        $isFault = \App\Support\FaultStatus::isFaultParam($param);
 
         // 3. Determine time column
         $pTempS19 = DB::table('parameter_sensor')
@@ -276,7 +278,7 @@ class AnalisaController extends Controller
                 $hourData = $grouped->get($hour, collect());
 
                 if ($hourData->isNotEmpty()) {
-                    $value = $this->aggregateValueFor($hourData, $column, $tipeGraf);
+                    $value = $this->aggregateValueFor($hourData, $column, $tipeGraf, $isFault);
                     $min = $hourData->min($column);
                     $max = $hourData->max($column);
 
@@ -317,7 +319,7 @@ class AnalisaController extends Controller
                 $dayData = $grouped->get((string)$i, collect());
 
                 if ($dayData->isNotEmpty()) {
-                    $value = $this->aggregateValueFor($dayData, $column, $tipeGraf);
+                    $value = $this->aggregateValueFor($dayData, $column, $tipeGraf, $isFault);
                     $min = $dayData->min($column);
                     $max = $dayData->max($column);
 
@@ -357,7 +359,7 @@ class AnalisaController extends Controller
                 $labels[] = date('d M Y, H:i', strtotime($dateKey));
 
                 if ($dateData->isNotEmpty()) {
-                    $value = $this->aggregateValueFor($dateData, $column, $tipeGraf);
+                    $value = $this->aggregateValueFor($dateData, $column, $tipeGraf, $isFault);
                     $min = $dateData->min($column);
                     $max = $dateData->max($column);
 
@@ -399,7 +401,7 @@ class AnalisaController extends Controller
                 $monthData = $grouped->get($monthNum, collect());
 
                 if ($monthData->isNotEmpty()) {
-                    $value = $this->aggregateValueFor($monthData, $column, $tipeGraf);
+                    $value = $this->aggregateValueFor($monthData, $column, $tipeGraf, $isFault);
                     $min = $monthData->min($column);
                     $max = $monthData->max($column);
 
@@ -446,6 +448,7 @@ class AnalisaController extends Controller
             'tipe_graf'    => $tipeGraf,
             'akumulasi'    => $akumulasi,
             'klasifikasi'  => $klasifikasi,
+            'is_fault'     => $isFault,
         ];
     }
 
@@ -632,8 +635,12 @@ class AnalisaController extends Controller
         return $name === 'curah hujan';
     }
 
-    private function aggregateValueFor($rows, string $column, string $tipeGraf): float
+    private function aggregateValueFor($rows, string $column, string $tipeGraf, bool $isFault = false): float
     {
+        if ($isFault) {
+            return (float) \App\Support\FaultStatus::combine($rows->pluck($column));
+        }
+
         if ($tipeGraf === 'bar') {
             return (float) $rows->sum($column);
         }

@@ -665,7 +665,8 @@ background: rgba(0, 0, 0, 0.28);
                                     @if (count($measurementParams) === 1)
                                         @php $param = $measurementParams[0]; @endphp
                                         <div class="text-center my-2">
-                                            <div class="text-xl font-bold text-slate-900">{{ $param['display_value'] ?? '-' }}</div>
+                                            <div class="text-xl font-bold text-slate-900"
+                                                @if(!empty($param['fault_detail'])) title="{{ implode(', ', $param['fault_detail']) }}" @endif>{{ $param['display_value'] ?? '-' }}</div>
                                             <div class="text-xs text-slate-500">{{ $param['nama'] ?? '-' }}</div>
                                         </div>
                                     @else
@@ -673,7 +674,8 @@ background: rgba(0, 0, 0, 0.28);
                                         <div class="grid grid-cols-2 gap-x-2 gap-y-1">
                                             @foreach ($measurementParams as $param)
                                                 <div class="text-center py-0.5">
-                                                    <div class="text-sm font-bold text-slate-900">{{ $param['display_value'] ?? '-' }}</div>
+                                                    <div class="text-sm font-bold text-slate-900"
+                                                        @if(!empty($param['fault_detail'])) title="{{ implode(', ', $param['fault_detail']) }}" @endif>{{ $param['display_value'] ?? '-' }}</div>
                                                     <div class="text-[10px] text-slate-500">{{ $param['nama'] ?? '-' }}</div>
                                                 </div>
                                             @endforeach
@@ -696,7 +698,8 @@ background: rgba(0, 0, 0, 0.28);
                                                 $loggerLabel = trim((string) preg_replace('/[_\s-]*logger$/i', '', $loggerLabel));
                                             @endphp
                                             <div class="flex flex-col items-center py-2 text-center {{ $loop->index % 3 !== 0 ? 'border-l' : '' }}">
-                                                    <span class="{{ $valueClass }} font-semibold">{{ $param['display_value'] ?? '-' }}</span>
+                                                    <span class="{{ $valueClass }} font-semibold"
+                                                        @if(!empty($param['fault_detail'])) title="{{ implode(', ', $param['fault_detail']) }}" @endif>{{ $param['display_value'] ?? '-' }}</span>
                                                     <span>{{ $loggerLabel !== '' ? $loggerLabel : ($param['nama'] ?? '-') }}</span>
                                             </div>
                                         @endforeach

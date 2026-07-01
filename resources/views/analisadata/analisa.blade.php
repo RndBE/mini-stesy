@@ -2307,6 +2307,23 @@
 
         let currentChartType = 'line';
 
+        window.FAULT_BITS = @json(\App\Support\FaultStatus::bits());
+        let currentIsFault = false;
+
+        function faultDecode(value) {
+            const v = Number(value) | 0;
+            const labels = [];
+            for (const [bit, label] of Object.entries(window.FAULT_BITS)) {
+                if ((v & (1 << (Number(bit) - 1))) !== 0) labels.push(label);
+            }
+            return labels;
+        }
+
+        function faultSummary(value) {
+            const n = faultDecode(value).length;
+            return n === 0 ? 'Normal' : `Fault (${n})`;
+        }
+
         const BATTERY_THRESHOLDS = [
             {
                 value: 12.2,
@@ -2557,6 +2574,10 @@
                                 label: function(ctx) {
                                     const v = ctx.parsed.y;
                                     if (v === null || v === undefined) return null;
+                                    if (currentIsFault) {
+                                        const labels = faultDecode(v);
+                                        return labels.length ? labels : 'Normal';
+                                    }
                                     const formattedVal = Number.isInteger(v) ? v : window.fmtUkur(v, 2);
                                     return isBar ? `${ctx.dataset.label}: ${formattedVal} mm` : `${ctx.dataset.label}: ${formattedVal}`;
                                 }
@@ -3081,6 +3102,7 @@
 
         function updateChart(data) {
             if (!chart) return;
+            currentIsFault = !!data.is_fault;
             const labelsRaw = data.labels || [];
             const avgRaw = data.chartData || [];
             const minRaw = data.minData || [];
@@ -3232,12 +3254,23 @@
                 }
                 let html = '';
                 for (const r of filtered) {
-                    html += `<tr>
+                    if (data.is_fault) {
+                        const labels = faultDecode(r.rerata);
+                        const cell = labels.length
+                            ? `<span title="${labels.join(', ')}">${faultSummary(r.rerata)}</span>`
+                            : 'Normal';
+                        html += `<tr>
+                <td>${r.waktu ?? '-'}</td>
+                <td colspan="3">${cell}</td>
+            </tr>`;
+                    } else {
+                        html += `<tr>
                 <td>${r.waktu ?? '-'}</td>
                 <td>${fmtWithUnit(r.rerata, unit, tableDecimals)}</td>
                 <td>${fmtWithUnit(r.minimum, unit, tableDecimals)}</td>
                 <td>${fmtWithUnit(r.maksimum, unit, tableDecimals)}</td>
             </tr>`;
+                    }
                 }
                 tbody.innerHTML = html;
                 return;
@@ -3260,12 +3293,23 @@
             }
             let html = '';
             for (const r of filtered) {
-                html += `<tr>
+                if (data.is_fault) {
+                    const labels = faultDecode(r.rerata);
+                    const cell = labels.length
+                        ? `<span title="${labels.join(', ')}">${faultSummary(r.rerata)}</span>`
+                        : 'Normal';
+                    html += `<tr>
+            <td>${r.waktu ?? '-'}</td>
+            <td colspan="3">${cell}</td>
+        </tr>`;
+                } else {
+                    html += `<tr>
             <td>${r.waktu ?? '-'}</td>
             <td>${fmtWithUnit(r.rerata, unit, tableDecimals)}</td>
             <td>${fmtWithUnit(r.minimum, unit, tableDecimals)}</td>
             <td>${fmtWithUnit(r.maksimum, unit, tableDecimals)}</td>
         </tr>`;
+                }
             }
             tbody.innerHTML = html;
         }
