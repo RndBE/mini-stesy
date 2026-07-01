@@ -2307,7 +2307,6 @@
 
         let currentChartType = 'line';
 
-        // Bit map sourced from App\Support\FaultStatus::bits(), e.g. bit 14 => 'Reverse flow warning'.
         window.FAULT_BITS = @json(\App\Support\FaultStatus::bits());
         let currentIsFault = false;
 
