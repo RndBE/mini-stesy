@@ -1983,7 +1983,7 @@
                         $phKolomAwgr = $phParamAwgr?->kolom_sensor;
                         $latestPhAwgr = $latestAwgrRow && $phKolomAwgr ? ($latestAwgrRow->{$phKolomAwgr} ?? null) : null;
                         $latestPhTimeAwgr = $latestAwgrRow?->waktu ?? null;
-                        $phDisplayAwgr = is_numeric($latestPhAwgr) ? number_format((float)$latestPhAwgr, 2) : '-';
+                        $phDisplayAwgr = is_numeric($latestPhAwgr) ? \App\Support\DisplayFormat::ukur($latestPhAwgr, 2) : '-';
                         $phTimeDisplayAwgr = $latestPhTimeAwgr ? date('d-m-Y H:i:s', strtotime($latestPhTimeAwgr)) : '-';
                         $phVal = is_numeric($latestPhAwgr) ? (float)$latestPhAwgr : null;
                         $phClassLabel = $phVal !== null ? ($phVal >= 6 && $phVal <= 9 ? 'Kelas I – III' : ($phVal >= 5 ? 'Kelas IV' : 'Di Luar Baku Mutu')) : '';
@@ -2424,7 +2424,7 @@
                     const statusText = `Status: ${options.status.label}`;
                     const description = options.status.description;
                     const latestText = Number.isFinite(options.latestValue)
-                        ? `${Number(options.latestValue).toFixed(2)} V`
+                        ? `${window.fmtUkur(options.latestValue, 2)} V`
                         : '';
                     const maxPillWidth = Math.max(220, area.right - area.left - 20);
                     const pillWidth = Math.min(maxPillWidth, 320);
@@ -2557,7 +2557,7 @@
                                 label: function(ctx) {
                                     const v = ctx.parsed.y;
                                     if (v === null || v === undefined) return null;
-                                    const formattedVal = Number.isInteger(v) ? v : Number(v).toFixed(2);
+                                    const formattedVal = Number.isInteger(v) ? v : window.fmtUkur(v, 2);
                                     return isBar ? `${ctx.dataset.label}: ${formattedVal} mm` : `${ctx.dataset.label}: ${formattedVal}`;
                                 }
                             }
@@ -2579,9 +2579,9 @@
                             ticks: {
                                 font: { size: 11 },
                                 color: '#94a3b8',
-                                callback: function(value) { 
-                                    const formatted = Number.isInteger(value) ? value : Number(value).toFixed(2);
-                                    return isBar ? formatted + ' mm' : formatted; 
+                                callback: function(value) {
+                                    const formatted = Number.isInteger(value) ? value : window.fmtUkur(value, 2);
+                                    return isBar ? formatted + ' mm' : formatted;
                                 }
                             },
                             border: { display: false }
@@ -2759,9 +2759,9 @@
             return u ? ` ${u}` : '';
         }
 
-        function fmtWithUnit(v, unit) {
+        function fmtWithUnit(v, unit, def) {
             if (v === null || v === undefined || v === '') return '-';
-            return `${v}${unit}`;
+            return `${window.fmtUkur(v, def)}${unit}`;
         }
         function getRainfallColor(val) {
             if (val === null || val === undefined) return 'rgba(200,200,200,0.3)';
@@ -2870,7 +2870,7 @@
             renderRainfallLegend(data.klasifikasi ?? []);
 
             const total = data.akumulasi ?? 0;
-            document.getElementById('rainfallCardTotal').textContent = total.toFixed(3);
+            document.getElementById('rainfallCardTotal').textContent = window.fmtUkur(total, 3);
             const iconEl = document.getElementById('rainfallCardIcon');
             const iconState = getRainfallIconState(total, data.klasifikasi ?? []);
             if (iconEl) {
@@ -3066,7 +3066,7 @@
             if (lblEl)  lblEl.textContent  = def.label;
             if (unitEl) unitEl.textContent = def.unit;
             if (timeEl) timeEl.textContent = _getTimeLbl();
-            if (valEl)  valEl.textContent  = avg !== null ? avg.toFixed(2) : '\u2014';
+            if (valEl)  valEl.textContent  = avg !== null ? window.fmtUkur(avg, 2) : '\u2014';
             if (ktEl)   ktEl.innerHTML     = _buildKeteranganHtml(def.keterangan);
             const cls = avg !== null ? def.classify(avg) : null;
             if (badgeEl) badgeEl.style.display = cls ? '' : 'none';
@@ -3165,6 +3165,7 @@
             const rows = Array.isArray(data.tableData) ? data.tableData : [];
             const labelsRaw = Array.isArray(data.labels) ? data.labels : [];
             const unit = getSelectedUnit();
+            const tableDecimals = (range === 'day') ? 3 : 4;
             const isAllEmpty = !hasAnyDataPayload(data);
 
             if (isBar) {
@@ -3202,7 +3203,7 @@
                     const val = r.rerata;
                     html += `<tr>
                         <td class="px-4 py-2">${r.waktu ?? '-'}</td>
-                        <td class="px-4 py-2">${fmtWithUnit(val, unit)}</td>
+                        <td class="px-4 py-2">${fmtWithUnit(val, unit, tableDecimals)}</td>
                     </tr>`;
                 }
                 rbody.innerHTML = html;
@@ -3233,9 +3234,9 @@
                 for (const r of filtered) {
                     html += `<tr>
                 <td>${r.waktu ?? '-'}</td>
-                <td>${fmtWithUnit(r.rerata, unit)}</td>
-                <td>${fmtWithUnit(r.minimum, unit)}</td>
-                <td>${fmtWithUnit(r.maksimum, unit)}</td>
+                <td>${fmtWithUnit(r.rerata, unit, tableDecimals)}</td>
+                <td>${fmtWithUnit(r.minimum, unit, tableDecimals)}</td>
+                <td>${fmtWithUnit(r.maksimum, unit, tableDecimals)}</td>
             </tr>`;
                 }
                 tbody.innerHTML = html;
@@ -3261,9 +3262,9 @@
             for (const r of filtered) {
                 html += `<tr>
             <td>${r.waktu ?? '-'}</td>
-            <td>${fmtWithUnit(r.rerata, unit)}</td>
-            <td>${fmtWithUnit(r.minimum, unit)}</td>
-            <td>${fmtWithUnit(r.maksimum, unit)}</td>
+            <td>${fmtWithUnit(r.rerata, unit, tableDecimals)}</td>
+            <td>${fmtWithUnit(r.minimum, unit, tableDecimals)}</td>
+            <td>${fmtWithUnit(r.maksimum, unit, tableDecimals)}</td>
         </tr>`;
             }
             tbody.innerHTML = html;

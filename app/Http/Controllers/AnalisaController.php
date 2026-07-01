@@ -150,6 +150,7 @@ class AnalisaController extends Controller
             fputcsv($file, ['WAKTU', 'RERATA', 'MINIMUM', 'MAKSIMUM']);
 
             // Table Data
+            $csvDecimals = $range === 'day' ? 3 : 4;
             foreach ($result['tableData'] as $row) {
                 // Ensure row is array-accessible or object
                 $waktu = is_array($row) ? $row['waktu'] : $row->waktu;
@@ -161,9 +162,9 @@ class AnalisaController extends Controller
 
                 fputcsv($file, [
                     $waktu,
-                    $rerata,
-                    $min,
-                    $max
+                    \App\Support\DisplayFormat::ukur($rerata, $csvDecimals),
+                    \App\Support\DisplayFormat::ukur($min, $csvDecimals),
+                    \App\Support\DisplayFormat::ukur($max, $csvDecimals)
                 ]);
             }
             fclose($file);
