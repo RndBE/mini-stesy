@@ -871,7 +871,7 @@
                             currentTopologyData = data;
                             const currentHash = data.nodes.map(n => {
                                 const gatePct = (n.gates && n.gates.length > 0) ? n.gates[0].bukaan_persen : 0;
-                                const tmaVal  = n.tma !== undefined ? parseFloat(n.tma).toFixed(1) : '0';
+                                const tmaVal  = n.tma !== undefined ? window.fmtUkur(parseFloat(n.tma), 1) : '0';
                                 return `${n.id}_${n.status}_${gatePct}_${tmaVal}`;
                             }).join('|');
 

@@ -624,7 +624,7 @@ background: rgba(0, 0, 0, 0.28);
                                 $statusLabel = $isOnline ? 'Koneksi Terhubung' : 'Koneksi Terputus';
                                 $fmt = function($v, $dec = 3) {
                                     if (!is_numeric($v)) return '-';
-                                    $s = number_format((float)$v, $dec, '.', ',');
+                                    $s = \App\Support\DisplayFormat::ukur($v, $dec);
                                     if (str_contains($s, '.')) {
                                         [$int, $dec] = explode('.', $s);
                                         $dec = rtrim($dec, '0');

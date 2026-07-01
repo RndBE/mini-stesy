@@ -190,7 +190,7 @@
                                         :class="row[getColumnKey(col)] === 0 ? 'bg-red-50 text-red-700 font-semibold' :
                                             'text-slate-600'">
                                         <span
-                                            x-text="row[getColumnKey(col)] !== null && row[getColumnKey(col)] !== undefined ? parseFloat(row[getColumnKey(col)]).toFixed(2) : '-'"></span>
+                                            x-text="row[getColumnKey(col)] !== null && row[getColumnKey(col)] !== undefined ? window.fmtUkur(parseFloat(row[getColumnKey(col)]), 2) : '-'"></span>
                                     </td>
                                 </template>
                             </tr>
