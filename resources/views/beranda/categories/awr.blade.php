@@ -138,15 +138,15 @@
             $statePerJam .= $waktuSuffix;
         }
         $defaultRainIcon = asset('klasifikasi_hujan/tidak_hujan.png');
-        $dispKecepatan = is_numeric($kecepatanAngin) ? number_format($kecepatanAngin, 3) : '-';
-        $dispArahAngin = is_numeric($arahAngin) ? number_format($arahAngin, 2) : '-';
-        $dispAkuHarian = is_numeric($akuHarian) ? number_format($akuHarian, 3) : '-';
-        $dispAkuPerJam = is_numeric($akuPerJam) ? number_format($akuPerJam, 3) : '-';
-        $dispKecerahan = is_numeric($kecerahan) ? number_format($kecerahan, 3) : '-';
-        $dispArahCahaya = is_numeric($arahCahaya) ? number_format($arahCahaya, 1) : '-';
-        $dispTemperatur = is_numeric($temperatur) ? number_format($temperatur, 2) : '-';
-        $dispTekanan = is_numeric($tekananUdara) ? number_format($tekananUdara, 1) : '-';
-        $dispKelembaban = is_numeric($kelembaban) ? number_format($kelembaban, 2) : '-';
+        $dispKecepatan = is_numeric($kecepatanAngin) ? \App\Support\DisplayFormat::ukur($kecepatanAngin, 3) : '-';
+        $dispArahAngin = is_numeric($arahAngin) ? \App\Support\DisplayFormat::ukur($arahAngin, 2) : '-';
+        $dispAkuHarian = is_numeric($akuHarian) ? \App\Support\DisplayFormat::ukur($akuHarian, 3) : '-';
+        $dispAkuPerJam = is_numeric($akuPerJam) ? \App\Support\DisplayFormat::ukur($akuPerJam, 3) : '-';
+        $dispKecerahan = is_numeric($kecerahan) ? \App\Support\DisplayFormat::ukur($kecerahan, 3) : '-';
+        $dispArahCahaya = is_numeric($arahCahaya) ? \App\Support\DisplayFormat::ukur($arahCahaya, 1) : '-';
+        $dispTemperatur = is_numeric($temperatur) ? \App\Support\DisplayFormat::ukur($temperatur, 2) : '-';
+        $dispTekanan = is_numeric($tekananUdara) ? \App\Support\DisplayFormat::ukur($tekananUdara, 1) : '-';
+        $dispKelembaban = is_numeric($kelembaban) ? \App\Support\DisplayFormat::ukur($kelembaban, 2) : '-';
 
         $statusHarian = $statusHujanHarian ?? ($stateHujanHarian ?? '-');
         $statusPerJam = $statusHujanPerJam ?? ($stateHujanPerJam ?? '-');
@@ -351,7 +351,7 @@
                         <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             HUMIDITY</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $humidity ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">%</span>
+                            {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">%</span>
                         </div>
                     </div>
                 </a>
@@ -368,7 +368,7 @@
                         <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             BATTERY</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $battery ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">V</span>
+                            {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">V</span>
                         </div>
                     </div>
                 </a>
@@ -385,7 +385,7 @@
                         <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             TEMPERATURE</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $temp ?? '-' }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
+                            {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
                         </div>
                     </div>
                 </a>
