@@ -134,17 +134,22 @@ class RealtimeApiController extends Controller
 
     /**
      * GET /api/v1/mobile/realtime/mqtt-config
-     * Config MQTT broker untuk koneksi WebSocket dari mobile.
+     * Config broker untuk kontrol pompa dari mobile (via WebSocket).
+     *
+     * PENTING: mobile pakai MQTT HANYA untuk kontrol pompa, jadi harus mengarah
+     * ke broker pompa (mqtt.beacontelemetry.com), sama seperti web pump control.
+     * JANGAN pakai var MQTT_WS_* — itu milik broker realtime data (72.x) yang
+     * sengaja dipisah agar tidak tercampur.
      */
     public function mqttConfig()
     {
         return [
-            'broker'  => env('MQTT_WS_HOST', '72.60.78.159'),
-            'port'    => (int) env('MQTT_WS_PORT', 8383),
-            'path'    => env('MQTT_WS_PATH', '/mqtt'),
-            'user'    => env('MQTT_WS_USER', env('MQTT_USER', 'beacon')),
-            'pass'    => env('MQTT_WS_PASS', env('MQTT_PASS', 'be_jogja')),
-            'use_ssl' => filter_var(env('MQTT_WS_SSL', false), FILTER_VALIDATE_BOOLEAN),
+            'broker'  => env('MQTT_HOST', 'mqtt.beacontelemetry.com'),
+            'port'    => (int) env('MQTT_PUMP_WS_PORT', 8083),
+            'path'    => env('MQTT_PUMP_WS_PATH', '/mqtt'),
+            'user'    => env('MQTT_AUTH_USERNAME', env('MQTT_USER', 'userlog')),
+            'pass'    => env('MQTT_AUTH_PASSWORD', env('MQTT_PASS', 'b34c0n')),
+            'use_ssl' => filter_var(env('MQTT_PUMP_WS_SSL', true), FILTER_VALIDATE_BOOLEAN),
         ];
     }
 
