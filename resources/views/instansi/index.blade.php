@@ -17,6 +17,9 @@
                 'zoom' => $ownInstansi->zoom,
                 'logo' => $ownInstansi->logo,
                 'logo_mobile' => $ownInstansi->logo_mobile,
+                'has_control_pin' => $ownInstansi->has_control_pin,
+                'control_pin_enabled' => $ownInstansi->control_pin_enabled,
+                'controllable_loggers_count' => $ownInstansi->controllable_loggers_count ?? 0,
             ]
             : null;
     @endphp
@@ -64,6 +67,8 @@
                                 <th scope="col" class="px-6 py-4">Longitude</th>
                                 <th scope="col" class="px-6 py-4">Zoom</th>
                                 <th scope="col" class="px-6 py-4">Jumlah User</th>
+                                <th scope="col" class="px-6 py-4">Logger Kontrol</th>
+                                <th scope="col" class="px-6 py-4">PIN Kontrol</th>
                                 <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -80,6 +85,13 @@
                                     <td class="whitespace-nowrap px-6 py-4" x-text="row.longitude || '-'"></td>
                                     <td class="whitespace-nowrap px-6 py-4" x-text="row.zoom || '-'"></td>
                                     <td class="whitespace-nowrap px-6 py-4" x-text="row.users_count"></td>
+                                    <td class="whitespace-nowrap px-6 py-4" x-text="row.controllable_loggers_count || 0"></td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <span
+                                            class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
+                                            :class="row.has_control_pin ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'"
+                                            x-text="row.has_control_pin ? 'Aktif' : 'Belum diatur'"></span>
+                                    </td>
                                     <td class="whitespace-nowrap px-6 py-4 text-center">
                                         <div class="flex items-center justify-center gap-2">
                                             <button @click="openEditModal(row)"
@@ -107,7 +119,7 @@
                         </tbody>
                         <tbody class="divide-y divide-slate-200 bg-white" x-show="filteredInstansi().length === 0">
                             <tr>
-                                <td colspan="9" class="px-6 py-8 text-center text-sm text-slate-500">
+                                <td colspan="11" class="px-6 py-8 text-center text-sm text-slate-500">
                                     Belum ada data instansi.
                                 </td>
                             </tr>
@@ -151,6 +163,16 @@
                         <div class="rounded-lg border border-slate-200 p-4">
                             <p class="text-xs font-semibold uppercase text-slate-500">Jumlah User</p>
                             <p class="mt-1 text-sm text-slate-800">{{ $ownInstansi->users_count }}</p>
+                        </div>
+                        <div class="rounded-lg border border-slate-200 p-4">
+                            <p class="text-xs font-semibold uppercase text-slate-500">Logger Kontrol</p>
+                            <p class="mt-1 text-sm text-slate-800">{{ $ownInstansi->controllable_loggers_count ?? 0 }}</p>
+                        </div>
+                        <div class="rounded-lg border border-slate-200 p-4">
+                            <p class="text-xs font-semibold uppercase text-slate-500">PIN Kontrol</p>
+                            <p class="mt-1 text-sm font-semibold {{ $ownInstansi->has_control_pin ? 'text-emerald-700' : 'text-slate-800' }}">
+                                {{ $ownInstansi->has_control_pin ? 'Aktif' : 'Belum diatur' }}
+                            </p>
                         </div>
                         <div class="rounded-lg border border-slate-200 p-4">
                             <p class="text-xs font-semibold uppercase text-slate-500">Logo</p>
@@ -251,6 +273,18 @@
                                                 class="w-full rounded-lg border border-gray-200 pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                         </div>
                                         @error('telp')
+                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-900 mb-2">PIN Kontrol Pompa</label>
+                                        <input type="password" name="control_pin"
+                                            inputmode="numeric" pattern="[0-9]*" autocomplete="new-password"
+                                            placeholder="Opsional"
+                                            class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <p class="mt-2 text-xs text-slate-500">Isi 4-12 digit hanya untuk instansi yang punya logger kontrol.</p>
+                                        @error('control_pin')
                                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -435,6 +469,7 @@
                         class="flex flex-col min-h-0">
                         @csrf
                         @method('PUT')
+                        <input type="hidden" name="id" x-model="editData.id">
                         <div class="px-8 pb-3 pt-4 space-y-3 overflow-y-auto flex-1 min-h-0">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -472,6 +507,26 @@
                                             class="w-full rounded-lg border border-gray-200 pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                     </div>
                                     @error('telp')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between gap-3">
+                                        <label class="block text-sm font-semibold text-gray-900 mb-2">PIN Kontrol Pompa</label>
+                                        <span class="mb-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
+                                            :class="editData.has_control_pin ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'"
+                                            x-text="editData.has_control_pin ? 'Aktif' : 'Belum diatur'"></span>
+                                    </div>
+                                    <input type="password" name="control_pin" inputmode="numeric" pattern="[0-9]*"
+                                        autocomplete="new-password" placeholder="Kosongkan jika tidak diubah"
+                                        class="w-full rounded-lg border border-gray-200 px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <label class="mt-3 flex items-center gap-2 text-sm text-slate-700"
+                                        x-show="editData.has_control_pin">
+                                        <input type="checkbox" name="clear_control_pin" value="1"
+                                            class="rounded border-slate-300 text-indigo-700 focus:ring-indigo-500">
+                                        <span>Hapus PIN kontrol</span>
+                                    </label>
+                                    @error('control_pin')
                                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
@@ -600,7 +655,10 @@
                     longitude: '',
                     zoom: '',
                     logo: '',
-                    logo_mobile: ''
+                    logo_mobile: '',
+                    has_control_pin: false,
+                    control_pin_enabled: false,
+                    controllable_loggers_count: 0
                 },
                 deleteData: {
                     id: null,
@@ -750,7 +808,10 @@
                         longitude: instansi.longitude || '',
                         zoom: instansi.zoom || '',
                         logo: instansi.logo || '',
-                        logo_mobile: instansi.logo_mobile || ''
+                        logo_mobile: instansi.logo_mobile || '',
+                        has_control_pin: Boolean(instansi.has_control_pin),
+                        control_pin_enabled: Boolean(instansi.control_pin_enabled),
+                        controllable_loggers_count: instansi.controllable_loggers_count || 0
                     };
                     this.showEditModal = true;
                     this.initEditMap();
@@ -773,7 +834,10 @@
                         longitude: '',
                         zoom: '',
                         logo: '',
-                        logo_mobile: ''
+                        logo_mobile: '',
+                        has_control_pin: false,
+                        control_pin_enabled: false,
+                        controllable_loggers_count: 0
                     };
                 },
 
@@ -924,7 +988,10 @@
                         longitude: '{{ old('longitude', '') }}',
                         zoom: '{{ old('zoom', '') }}',
                         logo: '',
-                        logo_mobile: ''
+                        logo_mobile: '',
+                        has_control_pin: false,
+                        control_pin_enabled: false,
+                        controllable_loggers_count: 0
                     };
                     alpineEl.__x.$data.openEditModal(alpineEl.__x.$data.editData);
                 }

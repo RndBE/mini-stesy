@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\DataPerangkatApiController;
 use App\Http\Controllers\Api\AnalisaApiController;
 use App\Http\Controllers\Api\BerandaApiController;
 use App\Http\Controllers\Api\FcmApiController;
+use App\Http\Controllers\Api\MobilePumpCommandController;
 
 // ─── Existing routes ───────────────────────────────────────────────────────────
 Route::post('/datamasuk', [DataMasukController::class, 'datamasuk']);
@@ -44,6 +45,7 @@ Route::prefix('v1/mobile')->group(function () {
         Route::get('/realtime/devices',      [RealtimeApiController::class, 'devices']);
         Route::get('/realtime/data/{id}',    [RealtimeApiController::class, 'data']);
         Route::get('/realtime/mqtt-config',  [RealtimeApiController::class, 'mqttConfigEndpoint']);
+        Route::post('/pump/command',         [MobilePumpCommandController::class, 'command']);
 
         // Data Perangkat
         Route::get('/data-perangkat',       [DataPerangkatApiController::class, 'index']);

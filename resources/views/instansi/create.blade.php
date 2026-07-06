@@ -48,6 +48,17 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">PIN Kontrol Pompa</label>
+                    <input type="password" name="control_pin" inputmode="numeric" pattern="[0-9]*"
+                        autocomplete="new-password" placeholder="Opsional"
+                        class="mt-1 w-full rounded-md border-slate-300 shadow-sm p-2 text-sm">
+                    <p class="mt-1 text-xs text-slate-500">Isi 4-12 digit hanya untuk instansi yang punya logger kontrol.</p>
+                    @error('control_pin')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700">Latitude</label>

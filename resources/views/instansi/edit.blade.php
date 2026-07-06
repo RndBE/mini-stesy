@@ -50,6 +50,28 @@
                     @enderror
                 </div>
 
+                <div>
+                    <div class="flex items-center justify-between gap-3">
+                        <label class="block text-sm font-medium text-slate-700">PIN Kontrol Pompa</label>
+                        <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $instansi->has_control_pin ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">
+                            {{ $instansi->has_control_pin ? 'Aktif' : 'Belum diatur' }}
+                        </span>
+                    </div>
+                    <input type="password" name="control_pin" inputmode="numeric" pattern="[0-9]*"
+                        autocomplete="new-password" placeholder="Kosongkan jika tidak diubah"
+                        class="mt-1 w-full rounded-md border-slate-300 shadow-sm p-2 text-sm">
+                    @if ($instansi->has_control_pin)
+                        <label class="mt-3 flex items-center gap-2 text-sm text-slate-700">
+                            <input type="checkbox" name="clear_control_pin" value="1"
+                                class="rounded border-slate-300 text-slate-900 focus:ring-slate-500">
+                            <span>Hapus PIN kontrol</span>
+                        </label>
+                    @endif
+                    @error('control_pin')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700">Latitude</label>

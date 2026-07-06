@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Instansi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class InstansiController extends Controller
@@ -25,6 +26,11 @@ class InstansiController extends Controller
 
         $instansi = $query
             ->withCount('users')
+            ->withCount([
+                'loggers as controllable_loggers_count' => function ($query) {
+                    $query->whereHas('jiat', fn ($jiat) => $jiat->where('has_pump', true));
+                },
+            ])
             ->orderBy('nama')
             ->get();
 
@@ -62,7 +68,10 @@ class InstansiController extends Controller
             'zoom' => 'nullable|integer|min:1|max:20',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'logo_mobile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'control_pin' => ['nullable', 'string', 'min:4', 'max:12', 'regex:/^[0-9]+$/'],
         ]);
+
+        $this->applyControlPinForStore($validated);
 
         if ($request->hasFile('logo')) {
             $validated['logo'] = $request->file('logo')->store('logo_instansi', 'public');
@@ -102,7 +111,11 @@ class InstansiController extends Controller
             'zoom' => 'nullable|integer|min:1|max:20',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'logo_mobile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'control_pin' => ['nullable', 'string', 'min:4', 'max:12', 'regex:/^[0-9]+$/'],
+            'clear_control_pin' => 'nullable|boolean',
         ]);
+
+        $this->applyControlPinForUpdate($request, $validated);
 
         if ($request->hasFile('logo')) {
             if (!empty($instansi->logo)) {
@@ -175,5 +188,41 @@ class InstansiController extends Controller
         }
 
         abort(403);
+    }
+
+    private function applyControlPinForStore(array &$validated): void
+    {
+        $pin = $validated['control_pin'] ?? null;
+        unset($validated['control_pin']);
+
+        if (filled($pin)) {
+            $validated['control_pin_hash'] = Hash::make((string) $pin);
+            $validated['control_pin_enabled'] = true;
+            $validated['control_pin_updated_at'] = now();
+        } else {
+            $validated['control_pin_hash'] = null;
+            $validated['control_pin_enabled'] = false;
+            $validated['control_pin_updated_at'] = null;
+        }
+    }
+
+    private function applyControlPinForUpdate(Request $request, array &$validated): void
+    {
+        $pin = $validated['control_pin'] ?? null;
+        unset($validated['control_pin'], $validated['clear_control_pin']);
+
+        if (filled($pin)) {
+            $validated['control_pin_hash'] = Hash::make((string) $pin);
+            $validated['control_pin_enabled'] = true;
+            $validated['control_pin_updated_at'] = now();
+
+            return;
+        }
+
+        if ($request->boolean('clear_control_pin')) {
+            $validated['control_pin_hash'] = null;
+            $validated['control_pin_enabled'] = false;
+            $validated['control_pin_updated_at'] = null;
+        }
     }
 }
