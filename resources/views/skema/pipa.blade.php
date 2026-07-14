@@ -77,6 +77,24 @@
         #pipa-viewport.managing { cursor: crosshair; }
         #pipa-viewport.managing .pipa-pin { cursor: pointer; outline: 2px dashed #303481; outline-offset: 3px; }
 
+        /* ===== Tombol zoom in/out (kanan bawah) ===== */
+        .pipa-zoom-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: #303481;
+            cursor: pointer;
+            transition: background .15s ease, color .15s ease;
+        }
+        .pipa-zoom-btn:hover { background: #eef0f9; color: #10134B; }
+        .pipa-zoom-btn:active { background: #e2e5f4; }
+        .pipa-zoom-btn svg { display: block; }
+        .pipa-zoom-sep { height: 1px; background: rgba(48, 52, 129, .18); }
+
         /* ===== Callout popup (kotak data tanpa card putih, dekat pin) ===== */
         /* Posisi (left/top/transform) diatur sepenuhnya oleh JS positionCallout()
            supaya kotak selalu utuh di dalam viewport. */
@@ -573,6 +591,21 @@
             @endif
         </div>
 
+        {{-- ===== Tombol zoom in/out (kiri bawah, hindari tombol Assistant di kanan bawah) ===== --}}
+        <div class="absolute bottom-10 left-4 z-40 flex flex-col rounded-xl bg-white/90 backdrop-blur border border-slate-200 shadow-lg overflow-hidden">
+            <button type="button" id="btn-zoom-in" class="pipa-zoom-btn" title="Perbesar" aria-label="Perbesar">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+            </button>
+            <div class="pipa-zoom-sep"></div>
+            <button type="button" id="btn-zoom-out" class="pipa-zoom-btn" title="Perkecil" aria-label="Perkecil">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                    <path d="M5 12h14"/>
+                </svg>
+            </button>
+        </div>
+
 
         {{-- ===== Viewport panzoom ===== --}}
         <div id="pipa-viewport" class="absolute inset-0 overflow-hidden cursor-grab active:cursor-grabbing">
@@ -651,7 +684,7 @@
                 </div>
                 <div class="pc-footer">
                     <span id="pc-updated" class="pc-updated">Updated -</span>
-                    <a id="pc-detail" class="pc-detail" title="Buka detail logger" aria-label="Buka detail logger" target="_blank" rel="noopener">
+                    <a id="pc-detail" class="pc-detail" title="Buka detail logger" aria-label="Buka detail logger">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
                             <path d="M7 17L17 7"/>
                             <path d="M9 7h8v8"/>
@@ -808,6 +841,18 @@
             fitView();
             window.addEventListener('resize', fitView);
             document.getElementById('btn-reset').addEventListener('click', fitView);
+
+            // Tombol zoom in/out (memusat ke tengah viewport). Butuh panzoom aktif.
+            function zoomBy(ratio) {
+                if (!pz || !pz.smoothZoom) return;
+                const r = viewport.getBoundingClientRect();
+                pz.smoothZoom(r.left + r.width / 2, r.top + r.height / 2, ratio);
+                hideCallout();
+            }
+            const zoomInBtn = document.getElementById('btn-zoom-in');
+            const zoomOutBtn = document.getElementById('btn-zoom-out');
+            zoomInBtn && zoomInBtn.addEventListener('click', () => zoomBy(1.4));
+            zoomOutBtn && zoomOutBtn.addEventListener('click', () => zoomBy(1 / 1.4));
 
             // Reveal halus: tunggu SEMUA gambar layer termuat, fit ulang, lalu fade-in.
             const loadingEl = document.getElementById('pipa-loading');
