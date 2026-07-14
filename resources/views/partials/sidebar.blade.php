@@ -27,7 +27,7 @@
                 @if (auth()->check() && auth()->user()->canViewSkemaPipa())
                     <a href="{{ route('skema-pipa') }}"
                         class="nav-link {{ request()->routeIs('skema-pipa') ? 'is-active' : '' }}">
-                        <img src="{{ asset(request()->routeIs('skema-pipa') ? 'icons/peta_fill.svg' : 'icons/peta_line.svg') }}" class="nav-ico h-5 w-5 flex-shrink-0 {{ request()->routeIs('skema-pipa') ? 'brightness-0 invert' : '' }}" alt="Skema Pipa">
+                        <img src="{{ asset(request()->routeIs('skema-pipa') ? 'icons/skema_pipa_fill.svg' : 'icons/skema_pipa.svg') }}" class="nav-ico h-5 w-5 flex-shrink-0 {{ request()->routeIs('skema-pipa') ? 'brightness-0 invert' : '' }}" alt="Skema Pipa">
                         <span class="sidebar-text truncate">Skema Pipa</span>
                     </a>
                 @endif
@@ -55,7 +55,7 @@
 
                     <a href="{{ route('tingkat-siaga-awlr.index') }}"
                         class="nav-link {{ request()->routeIs('tingkat-siaga-awlr.*') ? 'is-active' : '' }}">
-                        <img src="{{ asset(request()->routeIs('tingkat-siaga-awlr.*') ? 'icons/pengaturan_fill.svg' : 'icons/pengaturan_line.svg') }}" class="nav-ico h-5 w-5 flex-shrink-0 {{ request()->routeIs('tingkat-siaga-awlr.*') ? 'brightness-0 invert' : '' }}" alt="Tingkat Siaga">
+                        <img src="{{ asset(request()->routeIs('tingkat-siaga-awlr.*') ? 'icons/tingkat_siaga_fill.svg' : 'icons/tingkat_siaga.svg') }}" class="nav-ico h-5 w-5 flex-shrink-0 {{ request()->routeIs('tingkat-siaga-awlr.*') ? 'brightness-0 invert' : '' }}" alt="Tingkat Siaga">
                         <span class="sidebar-text truncate">Tingkat Siaga</span>
                     </a>
                 @endpermission
