@@ -24,6 +24,14 @@
                     </a>
                 @endpermission
 
+                @if (auth()->check() && auth()->user()->canViewSkemaPipa())
+                    <a href="{{ route('skema-pipa') }}"
+                        class="nav-link {{ request()->routeIs('skema-pipa') ? 'is-active' : '' }}">
+                        <img src="{{ asset(request()->routeIs('skema-pipa') ? 'icons/peta_fill.svg' : 'icons/peta_line.svg') }}" class="nav-ico h-5 w-5 flex-shrink-0 {{ request()->routeIs('skema-pipa') ? 'brightness-0 invert' : '' }}" alt="Skema Pipa">
+                        <span class="sidebar-text truncate">Skema Pipa</span>
+                    </a>
+                @endif
+
                 @permission('view_peta_lokasi')
                     <a href="{{ route('peta.lokasi') }}"
                         class="nav-link {{ request()->routeIs('peta.lokasi') ? 'is-active' : '' }}">

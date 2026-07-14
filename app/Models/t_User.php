@@ -105,6 +105,30 @@ class t_User extends Authenticatable
         return in_array(strtolower((string) $this->level_user), ['pegawai', 'user'], true);
     }
 
+    /**
+     * Apakah user tergabung di instansi SPAM Wosusokas. Dicocokkan dari nama
+     * instansi (toleran terhadap "SPAM WOSUSOKAS" / "SPAM Wosusokas").
+     */
+    public function isWosusokas(): bool
+    {
+        return str_contains(
+            strtolower((string) optional($this->instansi)->nama),
+            'wosusokas'
+        );
+    }
+
+    /** Skema pipa hanya untuk instansi Wosusokas (superadmin tetap bisa lihat). */
+    public function canViewSkemaPipa(): bool
+    {
+        return $this->isSuperAdmin() || $this->isWosusokas();
+    }
+
+    /** Mengelola titik pin butuh admin dari instansi Wosusokas. */
+    public function canManageSkemaPipa(): bool
+    {
+        return $this->isSuperAdmin() || ($this->isWosusokas() && $this->isInstansiAdmin());
+    }
+
     public function isActive(): bool
     {
         return strtolower((string) ($this->status ?? 'aktif')) === 'aktif';

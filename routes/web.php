@@ -22,6 +22,7 @@ use App\Http\Controllers\TemplateKategoriParameterController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\SettingLoggerController;
 use App\Http\Controllers\SkemaIrigasiController;
+use App\Http\Controllers\SkemaPipaController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\Api\AwgcCommandController;
@@ -78,6 +79,15 @@ Route::middleware(['auth'])->group(function () {
 
     // Historis sensor node (untuk chart TMA di panel AWLR)
     Route::get('/api/skema/node/{nodeId}/history', [SkemaIrigasiController::class, 'getNodeHistory'])->name('skema-irigasi.node-history');
+
+    // Skema pipa isometrik SPAM Wosusokas (Plesungan / Mojolaban)
+    Route::get('/skema-pipa/{scheme?}', [SkemaPipaController::class, 'index'])->name('skema-pipa');
+
+    // Kelola titik pin skema pipa (dinamis via DB)
+    Route::get('/api/skema-pipa/loggers', [SkemaPipaController::class, 'loggersList'])->name('skema-pipa.loggers');
+    Route::post('/api/skema-pipa/points', [SkemaPipaController::class, 'storePoint'])->name('skema-pipa.points.store');
+    Route::put('/api/skema-pipa/points/{point}', [SkemaPipaController::class, 'updatePoint'])->name('skema-pipa.points.update');
+    Route::delete('/api/skema-pipa/points/{point}', [SkemaPipaController::class, 'destroyPoint'])->name('skema-pipa.points.destroy');
 
     // Perintah kontrol pintu air AWGC
     Route::post('/api/awgc/command', [AwgcCommandController::class, 'store'])->name('awgc.command.store');
