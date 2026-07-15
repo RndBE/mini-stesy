@@ -142,7 +142,7 @@ overflow: hidden;
         .map-settings-btn {
             position: absolute;
             bottom: 12px;
-            right: 12px;
+            left: 12px;
             z-index: 1000;
             background: #303481;
             color: white;
@@ -164,6 +164,7 @@ overflow: hidden;
             .map-settings-btn {
                 bottom: auto;
                 top: 12px;
+                left: auto;
                 right: 12px;
                 padding: 11px;
                 z-index: 100;
