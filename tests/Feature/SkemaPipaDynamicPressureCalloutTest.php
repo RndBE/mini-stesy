@@ -250,6 +250,36 @@ class SkemaPipaDynamicPressureCalloutTest extends TestCase
         }
     }
 
+    public function test_pipe_labels_use_blue_rounded_card_style(): void
+    {
+        $user = t_User::create([
+            'nama' => 'Super Admin',
+            'username' => 'super-label-style',
+            'password' => 'secret',
+            'level_user' => 'superadmin',
+        ]);
+
+        $html = $this->actingAs($user)
+            ->get(route('skema-pipa', 'plesungan'))
+            ->assertOk()
+            ->getContent();
+
+        preg_match('/\.pipa-pin__label\s*\{(?<css>[^}]*)\}/s', $html, $matches);
+
+        $this->assertArrayHasKey('css', $matches);
+        $this->assertStringContainsString('top: calc(100% + 3px);', $matches['css']);
+        $this->assertStringContainsString('left: 50%;', $matches['css']);
+        $this->assertStringContainsString('transform: translateX(-50%);', $matches['css']);
+        $this->assertStringContainsString('font-size: 12px;', $matches['css']);
+        $this->assertStringContainsString('line-height: 1.2;', $matches['css']);
+        $this->assertStringContainsString('color: #3f3f46;', $matches['css']);
+        $this->assertStringContainsString('background: #ffffff;', $matches['css']);
+        $this->assertStringContainsString('border: 2px solid #0f5aa6;', $matches['css']);
+        $this->assertStringContainsString('border-radius: 10px;', $matches['css']);
+        $this->assertStringContainsString('padding: 5px 10px;', $matches['css']);
+        $this->assertStringContainsString('box-shadow: none;', $matches['css']);
+    }
+
     public function test_skema_pipa_is_forbidden_for_non_wosusokas_user(): void
     {
         $otherId = DB::table('instansi')->insertGetId(['nama' => 'PDAM Lain']);

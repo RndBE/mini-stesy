@@ -58,15 +58,15 @@
             left: 50%;
             transform: translateX(-50%);
             white-space: nowrap;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
-            line-height: 1;
-            color: #1e293b;
-            background: rgba(255, 255, 255, .92);
-            border: 1px solid rgba(148, 163, 184, .6);
-            border-radius: 6px;
-            padding: 2px 6px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+            line-height: 1.2;
+            color: #3f3f46;
+            background: #ffffff;
+            border: 2px solid #0f5aa6;
+            border-radius: 10px;
+            padding: 5px 10px;
+            box-shadow: none;
             pointer-events: none;
         }
         #pipa-stage.hide-labels .pipa-pin__label { display: none; }
