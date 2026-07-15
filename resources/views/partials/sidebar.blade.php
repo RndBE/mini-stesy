@@ -41,7 +41,7 @@
 
                     <a href="{{ route('rekap-data.index') }}"
                         class="nav-link {{ request()->routeIs('rekap-data.*') ? 'is-active' : '' }}">
-                        <img src="{{ asset(request()->routeIs('rekap-data.*') ? 'icons/data_perangkat_fill.svg' : 'icons/data_perangkat_line.svg') }}" class="nav-ico h-5 w-5 flex-shrink-0 {{ request()->routeIs('rekap-data.*') ? 'brightness-0 invert' : '' }}" alt="Rekap Data">
+                        <img src="{{ asset(request()->routeIs('rekap-data.*') ? 'icons/rekap_data_fill.svg' : 'icons/rekap_data.svg') }}" class="nav-ico h-5 w-5 flex-shrink-0 {{ request()->routeIs('rekap-data.*') ? 'brightness-0 invert' : '' }}" alt="Rekap Data">
                         <span class="sidebar-text truncate">Rekap Data</span>
                     </a>
                 @endpermission

@@ -307,8 +307,8 @@ class SkemaPipaController extends Controller
                 // Punya inlet & outlet -> marker dibedakan warnanya (inlet hijau, outlet merah).
                 'marker_by_kind' => true,
                 'layers' => [
-                    'base'   => 'Pipa_Plesungan5.webp',
-                    'detail' => 'Detail_Pipa_Plesungan_5.webp',
+                    'base'   => 'Pipa_Plesungan_6.webp',
+                    'detail' => 'Detail_Pipa_Plesungan_6.webp',
                 ],
                 'detail_offset' => ['x' => 0, 'y' => 0],
                 'art_width'  => 3911,
@@ -322,8 +322,8 @@ class SkemaPipaController extends Controller
                 'marker_by_kind' => false,
                 'layers' => [
                     'under'  => 'Pipa_Mojolaban_line.webp',     // garis/jalan (paling bawah)
-                    'base'   => 'Pipa_Mojolaban.webp',          // pipa (tengah)
-                    'detail' => 'Detail_Pipa_Mojolaban1.webp',  // bangunan (paling depan)
+                    'base'   => 'Pipa_Mojolaban_2.webp',        // pipa (tengah)
+                    'detail' => 'Detail_Pipa_Mojolaban_2.webp', // bangunan (paling depan)
                 ],
                 'detail_offset' => ['x' => 0, 'y' => 0],
                 'art_width'  => 3911,

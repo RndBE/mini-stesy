@@ -284,6 +284,42 @@ class SkemaPipaDynamicPressureCalloutTest extends TestCase
             ->assertOk();
     }
 
+    public function test_plesungan_uses_v6_webp_layers(): void
+    {
+        $user = t_User::create([
+            'nama' => 'Super Admin',
+            'username' => 'super-plesungan-v6',
+            'password' => 'secret',
+            'level_user' => 'superadmin',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('skema-pipa', 'plesungan'))
+            ->assertOk()
+            ->assertSee('Pipa_Plesungan_6.webp', false)
+            ->assertSee('Detail_Pipa_Plesungan_6.webp', false)
+            ->assertDontSee('Pipa_Plesungan5.webp', false)
+            ->assertDontSee('Detail_Pipa_Plesungan_5.webp', false);
+    }
+
+    public function test_mojolaban_uses_v2_webp_layers(): void
+    {
+        $user = t_User::create([
+            'nama' => 'Super Admin',
+            'username' => 'super-mojolaban-v2',
+            'password' => 'secret',
+            'level_user' => 'superadmin',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('skema-pipa', 'mojolaban'))
+            ->assertOk()
+            ->assertSee('Pipa_Mojolaban_2.webp', false)
+            ->assertSee('Detail_Pipa_Mojolaban_2.webp', false)
+            ->assertDontSee('Pipa_Mojolaban.webp', false)
+            ->assertDontSee('Detail_Pipa_Mojolaban1.webp', false);
+    }
+
     public function test_manage_endpoints_reject_non_admin_wosusokas_user(): void
     {
         $wosusokasId = DB::table('instansi')->insertGetId(['nama' => 'SPAM WOSUSOKAS']);
