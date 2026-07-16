@@ -37,15 +37,25 @@ return new class extends Migration
 
         $parameters = [
             ['name' => 'Muka Air Tanah', 'base' => 'muka_air_tanah', 'unit' => 'm', 'column' => 'sensor1', 'icon' => 'icons/awlr/elevasi_muka_air.svg', 'group' => $sumurGroupId],
-            ['name' => 'pH Tanah', 'base' => 'ph_tanah', 'unit' => null, 'column' => 'sensor2', 'icon' => 'icons/awgr/ph_air.svg', 'group' => $sumurGroupId],
-            ['name' => 'Electrical Conductivity', 'base' => 'electrical_conductivity', 'unit' => 'uS/cm', 'column' => 'sensor3', 'icon' => 'icons/awgr/conductivity.svg', 'group' => $sumurGroupId],
-            ['name' => 'Kelembaban Tanah', 'base' => 'kelembaban_tanah', 'unit' => '%', 'column' => 'sensor4', 'icon' => 'icons/beranda/humidity_online.svg', 'group' => $sumurGroupId],
-            ['name' => 'Temperature Tanah', 'base' => 'temperature_tanah', 'unit' => 'C', 'column' => 'sensor5', 'icon' => 'icons/beranda/temper_online.svg', 'group' => $sumurGroupId],
-            ['name' => 'Salinity', 'base' => 'salinity', 'unit' => 'PSU', 'column' => 'sensor7', 'icon' => 'icons/awgr/salinity.svg', 'group' => $sumurGroupId],
-            ['name' => 'Curah Hujan', 'base' => 'hujan', 'unit' => 'mm', 'column' => 'sensor6', 'icon' => 'icons/afmr/curah_hujan.svg', 'group' => $sumurGroupId],
+            ['name' => 'pH Tanah', 'base' => 'ph_tanah', 'unit' => null, 'column' => 'sensor2', 'icon' => 'icons/apms/ph_tanah.svg', 'group' => $sumurGroupId],
+            ['name' => 'Electrical Conductivity', 'base' => 'electrical_conductivity', 'unit' => 'uS/cm', 'column' => 'sensor3', 'icon' => 'icons/apms/electrical_conductivity.svg', 'group' => $sumurGroupId],
+            ['name' => 'Kelembaban Tanah', 'base' => 'kelembaban_tanah', 'unit' => '%', 'column' => 'sensor4', 'icon' => 'icons/apms/soil_moisture.svg', 'group' => $sumurGroupId],
+            ['name' => 'Temperature Tanah', 'base' => 'temperature_tanah', 'unit' => 'C', 'column' => 'sensor5', 'icon' => 'icons/apms/soil_temperature.svg', 'group' => $sumurGroupId],
+            ['name' => 'Salinity', 'base' => 'salinity', 'unit' => 'PSU', 'column' => 'sensor7', 'icon' => 'icons/apms/soil_salinity.svg', 'group' => $sumurGroupId],
+            ['name' => 'Curah Hujan', 'base' => 'hujan', 'unit' => 'mm', 'column' => 'sensor6', 'icon' => 'icons/apms/rainfall.svg', 'group' => $sumurGroupId],
             ['name' => 'Humidity Logger', 'base' => 'humidity_logger', 'unit' => '%', 'column' => 'sensor14', 'icon' => 'icons/beranda/humidity_online.svg', 'group' => $loggerGroupId],
-            ['name' => 'Battery Logger', 'base' => 'battery_logger', 'unit' => 'Volt', 'column' => 'sensor15', 'icon' => 'icons/beranda/battery_online.svg', 'group' => $loggerGroupId],
-            ['name' => 'Temperature Logger', 'base' => 'temperature_logger', 'unit' => 'C', 'column' => 'sensor16', 'icon' => 'icons/beranda/temper_online.svg', 'group' => $loggerGroupId],
+            ['name' => 'Battery Logger', 'base' => 'battery_logger', 'unit' => 'Volt', 'column' => 'sensor15',('base') . '.svg';
+            }
+
+            $parameterIds[$parameter['base']] = DB::table('list_parameter')->insertGetId([
+                'nama_parameter' => $parameter['name'],
+                'parameter_utama' => $parameter['base'],
+                'default_satuan' => $parameter['unit'],
+                'default_kolom_sensor' => $parameter['column'],
+                'icon_app' => $parameter['icon'],
+                'default_parameter_group_id' => $parameter['group'],
+               ('is_active') . true,
+               ('created_at') . $now,
         ];
 
         $parameterIds = [];

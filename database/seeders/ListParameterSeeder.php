@@ -79,15 +79,6 @@ class ListParameterSeeder extends Seeder
             $this->upsertListParameter($payload);
         }
 
-        if (!Schema::hasTable('template_kategori_parameter')) {
-            return;
-        }
-
-        $listParameterIds = DB::table('list_parameter')
-            ->whereIn('parameter_utama', collect($parameters)->pluck('base')->all())
-            ->pluck('id', 'parameter_utama')
-            ->all();
-
         if (
             Schema::hasTable('parameter_sensor')
             && Schema::hasColumn('parameter_sensor', 'parameter_utama')
@@ -103,6 +94,11 @@ class ListParameterSeeder extends Seeder
                 ->each(function ($parameter) {
                     DB::table('parameter_sensor')
                         ->where('parameter_utama', $parameter->parameter_utama)
+                        ->where(function ($query) {
+                            $query->whereNull('icon_app')
+                                ->orWhere('icon_app', '')
+                                ->orWhere('icon_app', 'not like', '%/%');
+                        })
                         ->update(['icon_app' => $parameter->icon_app]);
                 });
         }
@@ -110,6 +106,46 @@ class ListParameterSeeder extends Seeder
         $categoryIds = Schema::hasTable('kategori_logger')
             ? DB::table('kategori_logger')->pluck('id_katlogger', 'nama_kategori')->all()
             : [];
+
+        if (
+            Schema::hasTable('t_logger')
+            && Schema::hasTable('parameter_sensor')
+            && Schema::hasColumn('t_logger', 'id_katlogger')
+            && Schema::hasColumn('parameter_sensor', 'parameter_utama')
+            && Schema::hasColumn('parameter_sensor', 'icon_app')
+        ) {
+            $apmsCategoryId = $categoryIds['APMS'] ?? null;
+            $apmsLoggerIds = $apmsCategoryId
+                ? DB::table('t_logger')
+                    ->where('id_katlogger', $apmsCategoryId)
+                    ->pluck('id_logger')
+                    ->all()
+                : [];
+
+            $apmsIcons = [
+                'ph_tanah' => 'icons/apms/ph_tanah.svg',
+                'electrical_conductivity' => 'icons/apms/electrical_conductivity.svg',
+                'kelembaban_tanah' => 'icons/apms/soil_moisture.svg',
+                'temperature_tanah' => 'icons/apms/soil_temperature.svg',
+                'salinity' => 'icons/apms/soil_salinity.svg',
+            ];
+
+            foreach ($apmsIcons as $parameterUtama => $iconPath) {
+                DB::table('parameter_sensor')
+                    ->whereIn('logger_id', $apmsLoggerIds)
+                    ->where('parameter_utama', $parameterUtama)
+                    ->update(['icon_app' => $iconPath]);
+            }
+        }
+
+        if (!Schema::hasTable('template_kategori_parameter')) {
+            return;
+        }
+
+        $listParameterIds = DB::table('list_parameter')
+            ->whereIn('parameter_utama', collect($parameters)->pluck('base')->all())
+            ->pluck('id', 'parameter_utama')
+            ->all();
 
         $templates = [
             'AWLR' => [

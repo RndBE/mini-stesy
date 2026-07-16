@@ -267,7 +267,8 @@ class SkemaPipaDynamicPressureCalloutTest extends TestCase
         preg_match('/\.pipa-pin__label\s*\{(?<css>[^}]*)\}/s', $html, $matches);
 
         $this->assertArrayHasKey('css', $matches);
-        $this->assertStringContainsString('top: calc(100% + 3px);', $matches['css']);
+        $this->assertStringContainsString('--pipa-label-gap: 6px;', $matches['css']);
+        $this->assertStringContainsString('top: calc(100% + var(--pipa-label-gap));', $matches['css']);
         $this->assertStringContainsString('left: 50%;', $matches['css']);
         $this->assertStringContainsString('transform: translateX(-50%);', $matches['css']);
         $this->assertStringContainsString('font-size: 12px;', $matches['css']);
@@ -278,6 +279,130 @@ class SkemaPipaDynamicPressureCalloutTest extends TestCase
         $this->assertStringContainsString('border-radius: 10px;', $matches['css']);
         $this->assertStringContainsString('padding: 5px 10px;', $matches['css']);
         $this->assertStringContainsString('box-shadow: none;', $matches['css']);
+    }
+
+    public function test_skema_pipa_has_mobile_first_view_contract(): void
+    {
+        $user = t_User::create([
+            'nama' => 'Super Admin',
+            'username' => 'super-mobile-pipe',
+            'password' => 'secret',
+            'level_user' => 'superadmin',
+        ]);
+
+        $html = $this->actingAs($user)
+            ->get(route('skema-pipa', 'plesungan'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringContainsString('id="pipa-shell"', $html);
+        $this->assertStringContainsString('id="pipa-left-controls"', $html);
+        $this->assertStringContainsString('id="pipa-scheme-switcher"', $html);
+        $this->assertStringContainsString('id="btn-legend-toggle"', $html);
+        $this->assertStringContainsString('id="pipa-toolbar-actions"', $html);
+        $this->assertStringContainsString('@media (max-width: 639px)', $html);
+        $this->assertStringContainsString('height: calc(100dvh - 4rem);', $html);
+        $this->assertStringContainsString('--pipa-marker-compensation', $html);
+        $this->assertStringContainsString('function computeInitialScale()', $html);
+        $this->assertStringContainsString('function syncMobileMarkerScale', $html);
+        $this->assertStringContainsString('function handleViewportResize()', $html);
+        $this->assertStringContainsString('pipa-mobile-sheet-handle', $html);
+        $this->assertStringNotContainsString("window.addEventListener('resize', fitView);", $html);
+    }
+
+    public function test_mobile_marker_taps_are_not_cancelled_by_panzoom(): void
+    {
+        $user = t_User::create([
+            'nama' => 'Super Admin',
+            'username' => 'super-mobile-marker-tap',
+            'password' => 'secret',
+            'level_user' => 'superadmin',
+        ]);
+
+        $html = $this->actingAs($user)
+            ->get(route('skema-pipa', 'plesungan'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringContainsString(
+            "onTouch: (event) => !event.target.closest('.pipa-pin')",
+            $html
+        );
+    }
+
+    public function test_mobile_marker_uses_compact_visual_with_accessible_touch_target(): void
+    {
+        $user = t_User::create([
+            'nama' => 'Super Admin',
+            'username' => 'super-mobile-marker-size',
+            'password' => 'secret',
+            'level_user' => 'superadmin',
+        ]);
+
+        $html = $this->actingAs($user)
+            ->get(route('skema-pipa', 'plesungan'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/@media \(max-width: 639px\).*?\.pipa-pin \{\s*width: 32px;\s*height: 38\.8px;/s',
+            $html
+        );
+        $this->assertMatchesRegularExpression(
+            '/\.pipa-pin::before \{.*?width: 44px;.*?height: 44px;/s',
+            $html
+        );
+    }
+
+    public function test_mobile_marker_labels_are_visible_without_selection(): void
+    {
+        $user = t_User::create([
+            'nama' => 'Super Admin',
+            'username' => 'super-mobile-marker-label',
+            'password' => 'secret',
+            'level_user' => 'superadmin',
+        ]);
+
+        $html = $this->actingAs($user)
+            ->get(route('skema-pipa', 'plesungan'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringNotContainsString(
+            ".pipa-pin__label {\n                display: none;",
+            $html
+        );
+        $this->assertStringNotContainsString(
+            '.pipa-pin.is-selected .pipa-pin__label',
+            $html
+        );
+    }
+
+    public function test_pipe_labels_use_collision_aware_placement_with_leader_lines(): void
+    {
+        $user = t_User::create([
+            'nama' => 'Super Admin',
+            'username' => 'super-pipe-label-layout',
+            'password' => 'secret',
+            'level_user' => 'superadmin',
+        ]);
+
+        $html = $this->actingAs($user)
+            ->get(route('skema-pipa', 'plesungan'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringContainsString('const LABEL_PLACEMENTS = [', $html);
+        $this->assertStringContainsString("name: 'bottom-right'", $html);
+        $this->assertStringContainsString("name: 'top-left'", $html);
+        $this->assertStringContainsString('function rectangleOverlapArea', $html);
+        $this->assertStringContainsString('function layoutPipeLabels()', $html);
+        $this->assertStringContainsString('function scheduleLabelLayout()', $html);
+        $this->assertStringContainsString("pin.dataset.labelPlacement = candidate.name;", $html);
+        $this->assertStringContainsString("pin.dataset.labelShifted = shifted ? 'true' : 'false';", $html);
+        $this->assertStringContainsString('.pipa-pin[data-label-shifted="true"] .pipa-pin__label::before', $html);
+        $this->assertStringContainsString("pz.on('panend', scheduleLabelLayout)", $html);
+        $this->assertStringContainsString("pz.on('zoomend', scheduleLabelLayout)", $html);
     }
 
     public function test_skema_pipa_is_forbidden_for_non_wosusokas_user(): void

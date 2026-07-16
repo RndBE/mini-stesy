@@ -34,31 +34,31 @@
                 'keys' => ['ph_tanah', 'soil_ph'],
                 'label' => 'pH Tanah',
                 'unit' => '',
-                'icon' => 'icons/awgr/ph_air.svg',
+                'icon' => 'icons/apms/ph_tanah.svg',
             ],
             [
                 'keys' => ['electrical_conductivity', 'conductivity_tanah', 'soil_conductivity'],
                 'label' => 'Electrical Conductivity',
                 'unit' => 'uS/cm',
-                'icon' => 'icons/awgr/conductivity.svg',
+                'icon' => 'icons/apms/electrical_conductivity.svg',
             ],
             [
                 'keys' => ['kelembaban_tanah', 'soil_moisture'],
                 'label' => 'Kelembaban Tanah',
                 'unit' => '%',
-                'icon' => 'icons/beranda/humidity_online.svg',
+                'icon' => 'icons/apms/soil_moisture.svg',
             ],
             [
                 'keys' => ['temperature_tanah', 'temperatur_tanah', 'soil_temperature'],
                 'label' => 'Temperature Tanah',
                 'unit' => '°C',
-                'icon' => 'icons/beranda/temper_online.svg',
+                'icon' => 'icons/apms/soil_temperature.svg',
             ],
             [
                 'keys' => ['salinity'],
                 'label' => 'Salinity',
                 'unit' => 'PSU',
-                'icon' => 'icons/awgr/salinity.svg',
+                'icon' => 'icons/apms/soil_salinity.svg',
             ],
         ];
 

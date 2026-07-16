@@ -6,6 +6,8 @@ use App\Models\ListParameter;
 use App\Models\ParameterGroup;
 use App\Support\SensorFamily;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 
 class ListParameterController extends Controller
@@ -75,6 +77,9 @@ class ListParameterController extends Controller
 
     public function update(Request $request, ListParameter $list_parameter)
     {
+        $oldParameterUtama = $this->normalizeBaseKey($list_parameter->parameter_utama);
+        $oldIcon = trim((string) $list_parameter->icon_app);
+
         $validated = $request->validate([
             'nama_parameter' => 'required|string|max:100|unique:list_parameter,nama_parameter,' . $list_parameter->id,
             'parameter_utama' => 'nullable|string|max:50',
@@ -94,7 +99,15 @@ class ListParameterController extends Controller
         $validated['icon_app'] = isset($validated['icon_app']) ? trim((string) $validated['icon_app']) : null;
         $validated['is_active'] = (bool) ($validated['is_active'] ?? false);
 
-        $list_parameter->update($validated);
+        DB::transaction(function () use ($list_parameter, $validated, $oldParameterUtama, $oldIcon) {
+            $list_parameter->update($validated);
+
+            $this->syncDefaultIconToDeviceParameters(
+                $oldParameterUtama,
+                $oldIcon,
+                $validated['icon_app']
+            );
+        });
 
         return redirect()->route('list-parameter.index')
             ->with('success', 'List parameter berhasil diperbarui.');
@@ -131,6 +144,32 @@ class ListParameterController extends Controller
     private function sensorColumnOptions(): array
     {
         return array_map(fn($number) => 'sensor' . $number, range(1, max(SensorFamily::FAMILIES)));
+    }
+
+    private function syncDefaultIconToDeviceParameters(?string $parameterUtama, string $oldIcon, ?string $newIcon): void
+    {
+        if (
+            !$parameterUtama
+            || !Schema::hasTable('parameter_sensor')
+            || !Schema::hasColumn('parameter_sensor', 'parameter_utama')
+            || !Schema::hasColumn('parameter_sensor', 'icon_app')
+        ) {
+            return;
+        }
+
+        DB::table('parameter_sensor')
+            ->whereRaw('LOWER(TRIM(parameter_utama)) = ?', [$parameterUtama])
+            ->where(function ($query) use ($oldIcon) {
+                $query->whereNull('icon_app')
+                    ->orWhere('icon_app', '');
+
+                if ($oldIcon !== '') {
+                    $query->orWhere('icon_app', $oldIcon);
+                }
+            })
+            ->update([
+                'icon_app' => trim((string) $newIcon) ?: null,
+            ]);
     }
 
     private function iconOptions(): array

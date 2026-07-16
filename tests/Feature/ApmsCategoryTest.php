@@ -17,6 +17,13 @@ class ApmsCategoryTest extends TestCase
         $sharedWellPath = resource_path('views/beranda/categories/partials/monitoring_well.blade.php');
         $sharedRainPath = resource_path('views/beranda/categories/partials/rainfall_cards.blade.php');
         $categoryIcon = public_path('kategori/apms.svg');
+        $apmsMeasurementIcons = [
+            'icons/apms/ph_tanah.svg',
+            'icons/apms/electrical_conductivity.svg',
+            'icons/apms/soil_moisture.svg',
+            'icons/apms/soil_temperature.svg',
+            'icons/apms/soil_salinity.svg',
+        ];
 
         $this->assertStringContainsString("'APMS'", $migration);
         $this->assertFileExists($categoryIcon);
@@ -65,6 +72,10 @@ class ApmsCategoryTest extends TestCase
         $this->assertStringContainsString('Curah Hujan', $view);
         $this->assertStringContainsString('Electrical Conductivity', $view);
         $this->assertStringContainsString("'label' => 'Salinity'", $view);
+        foreach ($apmsMeasurementIcons as $icon) {
+            $this->assertFileExists(public_path($icon));
+            $this->assertStringContainsString("'icon' => '{$icon}'", $view);
+        }
         $this->assertStringNotContainsString('klasifikasi_hujan/', $view);
         $this->assertStringNotContainsString('apms-water-', $view);
         $this->assertStringNotContainsString('pompa', strtolower($view));

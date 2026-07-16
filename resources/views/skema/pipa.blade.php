@@ -53,8 +53,12 @@
         }
 
         .pipa-pin__label {
+            --pipa-label-gap: 6px;
+            --pipa-label-diagonal-gap: 8.5px;
             position: absolute;
-            top: calc(100% + 3px);
+            top: calc(100% + var(--pipa-label-gap));
+            right: auto;
+            bottom: auto;
             left: 50%;
             transform: translateX(-50%);
             white-space: nowrap;
@@ -68,6 +72,112 @@
             padding: 5px 10px;
             box-shadow: none;
             pointer-events: none;
+            z-index: 2;
+        }
+        .pipa-pin__label::before {
+            content: '';
+            display: none;
+            position: absolute;
+            background: rgba(15, 90, 166, .72);
+            pointer-events: none;
+        }
+        .pipa-pin[data-label-shifted="true"] .pipa-pin__label::before {
+            display: block;
+        }
+        .pipa-pin[data-label-placement="top"] .pipa-pin__label {
+            top: auto;
+            bottom: calc(100% + var(--pipa-label-gap));
+        }
+        .pipa-pin[data-label-placement="right"] .pipa-pin__label {
+            top: 50%;
+            left: calc(100% + var(--pipa-label-gap));
+            transform: translateY(-50%);
+        }
+        .pipa-pin[data-label-placement="left"] .pipa-pin__label {
+            top: 50%;
+            right: calc(100% + var(--pipa-label-gap));
+            left: auto;
+            transform: translateY(-50%);
+        }
+        .pipa-pin[data-label-placement="bottom-right"] .pipa-pin__label {
+            top: calc(100% + var(--pipa-label-gap));
+            left: calc(50% + var(--pipa-label-gap));
+            transform: none;
+        }
+        .pipa-pin[data-label-placement="bottom-left"] .pipa-pin__label {
+            top: calc(100% + var(--pipa-label-gap));
+            right: calc(50% + var(--pipa-label-gap));
+            left: auto;
+            transform: none;
+        }
+        .pipa-pin[data-label-placement="top-right"] .pipa-pin__label {
+            top: auto;
+            bottom: calc(100% + var(--pipa-label-gap));
+            left: calc(50% + var(--pipa-label-gap));
+            transform: none;
+        }
+        .pipa-pin[data-label-placement="top-left"] .pipa-pin__label {
+            top: auto;
+            right: calc(50% + var(--pipa-label-gap));
+            bottom: calc(100% + var(--pipa-label-gap));
+            left: auto;
+            transform: none;
+        }
+        .pipa-pin[data-label-placement="bottom"] .pipa-pin__label::before {
+            bottom: 100%;
+            left: 50%;
+            width: 1px;
+            height: var(--pipa-label-gap);
+        }
+        .pipa-pin[data-label-placement="top"] .pipa-pin__label::before {
+            top: 100%;
+            left: 50%;
+            width: 1px;
+            height: var(--pipa-label-gap);
+        }
+        .pipa-pin[data-label-placement="right"] .pipa-pin__label::before {
+            top: 50%;
+            right: 100%;
+            width: var(--pipa-label-gap);
+            height: 1px;
+        }
+        .pipa-pin[data-label-placement="left"] .pipa-pin__label::before {
+            top: 50%;
+            left: 100%;
+            width: var(--pipa-label-gap);
+            height: 1px;
+        }
+        .pipa-pin[data-label-placement="bottom-right"] .pipa-pin__label::before {
+            right: 100%;
+            bottom: 100%;
+            width: var(--pipa-label-diagonal-gap);
+            height: 1px;
+            transform: rotate(45deg);
+            transform-origin: 100% 50%;
+        }
+        .pipa-pin[data-label-placement="bottom-left"] .pipa-pin__label::before {
+            bottom: 100%;
+            left: 100%;
+            width: var(--pipa-label-diagonal-gap);
+            height: 1px;
+            transform: rotate(-45deg);
+            transform-origin: 0 50%;
+        }
+        .pipa-pin[data-label-placement="top-right"] .pipa-pin__label::before {
+            top: 100%;
+            right: 100%;
+            width: var(--pipa-label-diagonal-gap);
+            height: 1px;
+            transform: rotate(-45deg);
+            transform-origin: 100% 50%;
+        }
+        .pipa-pin[data-label-placement="top-left"] .pipa-pin__label::before {
+            top: 100%;
+            left: 100%;
+            width: var(--pipa-label-diagonal-gap);
+            height: 1px;
+            transform: rotate(45deg);
+            transform-origin: 0 50%;
         }
         #pipa-stage.hide-labels .pipa-pin__label { display: none; }
 
@@ -516,9 +626,198 @@
         }
         .pl-bar-label { flex: 0 0 auto; font-size: 11px; font-weight: 600; color: #64748b; white-space: nowrap; }
         .pl-bar-label b { color: #303481; font-weight: 800; font-size: 12px; }
+
+        #btn-legend-toggle,
+        .pipa-mobile-sheet-handle,
+        .reset-mobile-label {
+            display: none;
+        }
+
+        @media (max-width: 639px) {
+            #pipa-shell {
+                height: calc(100dvh - 4rem);
+                min-height: 30rem;
+                overscroll-behavior: contain;
+            }
+
+            #pipa-viewport {
+                touch-action: none;
+            }
+
+            #pipa-left-controls {
+                top: .5rem;
+                left: .75rem;
+                max-width: calc(100vw - 7.25rem);
+                gap: .5rem;
+            }
+
+            #pipa-scheme-switcher {
+                max-width: 100%;
+                overflow-x: auto;
+                overscroll-behavior-x: contain;
+                scrollbar-width: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            #pipa-scheme-switcher::-webkit-scrollbar {
+                display: none;
+            }
+
+            #pipa-scheme-switcher a,
+            #pipa-scheme-switcher > span {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                flex: 0 0 auto;
+            }
+
+            #btn-legend-toggle {
+                min-height: 44px;
+                max-width: max-content;
+                align-items: center;
+                gap: .5rem;
+                padding: 0 .8rem;
+                border: 1px solid #e2e8f0;
+                border-radius: .75rem;
+                background: rgba(255, 255, 255, .95);
+                color: #334155;
+                box-shadow: 0 8px 22px rgba(15, 23, 42, .12);
+                font-size: .75rem;
+                font-weight: 800;
+                backdrop-filter: blur(10px);
+            }
+
+            #btn-legend-toggle[aria-expanded="true"] {
+                border-color: rgba(48, 52, 129, .35);
+                color: #303481;
+            }
+
+            #pipa-legend {
+                display: none;
+                width: min(15rem, calc(100vw - 1.5rem));
+                min-width: 0;
+                max-height: calc(100dvh - 10rem);
+                overflow-y: auto;
+            }
+
+            #pipa-legend.mobile-open {
+                display: block;
+            }
+
+            #pipa-toolbar-actions {
+                top: .5rem;
+                right: .75rem;
+                gap: .375rem;
+            }
+
+            #pipa-toolbar-actions > button {
+                min-width: 44px;
+                min-height: 44px;
+                padding: 0 .65rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .reset-desktop-label {
+                display: none;
+            }
+
+            .reset-mobile-label {
+                display: inline;
+            }
+
+            #pipa-zoom-controls {
+                bottom: max(1rem, env(safe-area-inset-bottom));
+                left: .75rem;
+            }
+
+            .pipa-zoom-btn {
+                width: 44px;
+                height: 44px;
+            }
+
+            .pipa-pin {
+                width: 32px;
+                height: 38.8px;
+                transform: translate(-50%, -100%) scale(var(--pipa-marker-compensation, 1));
+                transform-origin: 50% 100%;
+                touch-action: manipulation;
+            }
+
+            .pipa-pin::before {
+                content: '';
+                position: absolute;
+                left: 50%;
+                bottom: 0;
+                width: 44px;
+                height: 44px;
+                transform: translateX(-50%);
+            }
+
+            .pipa-pin:hover,
+            .pipa-pin--reservoir:hover {
+                transform: translate(-50%, -100%) scale(var(--pipa-marker-compensation, 1));
+            }
+
+            .pipa-pin__label {
+                min-width: max-content;
+                font-size: 12px;
+            }
+
+            #pin-callout {
+                position: absolute;
+                z-index: 270;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                top: auto;
+                width: 100%;
+                padding: 0 .75rem max(.75rem, env(safe-area-inset-bottom));
+                transform: none;
+            }
+
+            #pin-callout .pc-box {
+                width: 100%;
+                min-width: 0;
+                max-width: none;
+                max-height: min(58dvh, 30rem);
+                overflow-y: auto;
+                border-radius: 1.25rem 1.25rem .9rem .9rem;
+                box-shadow: 0 -20px 50px rgba(15, 23, 42, .2);
+            }
+
+            .pipa-mobile-sheet-handle {
+                display: block;
+                width: 2.75rem;
+                height: .3rem;
+                margin: .55rem auto .1rem;
+                border-radius: 999px;
+                background: #cbd5e1;
+            }
+
+            #point-editor {
+                position: fixed;
+                top: auto;
+                right: .75rem;
+                bottom: max(.75rem, env(safe-area-inset-bottom));
+                left: .75rem;
+                width: auto;
+                max-width: none;
+                max-height: calc(100dvh - 5.5rem);
+                overflow-y: auto;
+            }
+
+            #manage-hint {
+                bottom: max(1rem, env(safe-area-inset-bottom));
+                width: calc(100vw - 7rem);
+                border-radius: .85rem;
+                text-align: center;
+            }
+        }
     </style>
 
-    <div class="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-white select-none">
+    <div id="pipa-shell" class="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-white select-none">
 
         {{-- ===== Header kiri-atas: pemilih skema + ringkasan status ===== --}}
         @php
@@ -530,8 +829,8 @@
             $__debit = (float) $__loggers->sum('flowrate');
             $__pct = $__total > 0 ? (int) round($__online / $__total * 100) : 0;
         @endphp
-        <div class="absolute top-2 left-4 z-40 flex flex-col items-start gap-6">
-            <div class="inline-flex rounded-xl bg-white/90 backdrop-blur border border-slate-200 shadow-lg p-1">
+        <div id="pipa-left-controls" class="absolute top-2 left-4 z-40 flex flex-col items-start gap-6">
+            <div id="pipa-scheme-switcher" class="inline-flex rounded-xl bg-white/90 backdrop-blur border border-slate-200 shadow-lg p-1">
                 @foreach ($schemeList as $s)
                     @if ($s['available'])
                         <a href="{{ route('skema-pipa', $s['key']) }}"
@@ -548,6 +847,15 @@
                     @endif
                 @endforeach
             </div>
+
+            <button type="button" id="btn-legend-toggle" aria-expanded="false" aria-controls="pipa-legend">
+                <span class="pl-live" aria-hidden="true"></span>
+                <span>Status</span>
+                <span id="pl-mobile-summary">{{ $__online }}/{{ $__total }}</span>
+                <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 7.5L10 12.5L15 7.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
 
             <div id="pipa-legend"
                 class="rounded-xl bg-white/95 backdrop-blur border border-slate-200 shadow-lg overflow-hidden">
@@ -578,10 +886,14 @@
         </div>
 
         {{-- ===== Kontrol kanan atas ===== --}}
-        <div class="absolute top-2 right-4 z-40 flex items-center gap-2">
+        <div id="pipa-toolbar-actions" class="absolute top-2 right-4 z-40 flex items-center gap-2">
             <button type="button" id="btn-reset"
-                class="rounded-lg bg-white/90 backdrop-blur border border-slate-200 shadow px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
-                Reset Tampilan
+                class="rounded-lg bg-white/90 backdrop-blur border border-slate-200 shadow px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
+                aria-label="Lihat seluruh skema">
+                <svg class="reset-mobile-label" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 9V4h5M20 15v5h-5M5.6 18.4A8 8 0 0 0 18.4 5.6M18.4 5.6H14M5.6 18.4H10" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="reset-desktop-label">Reset Tampilan</span>
             </button>
             @if (!empty($canManage))
                 <button type="button" id="btn-manage"
@@ -592,7 +904,7 @@
         </div>
 
         {{-- ===== Tombol zoom in/out (kiri bawah, hindari tombol Assistant di kanan bawah) ===== --}}
-        <div class="absolute bottom-10 left-4 z-40 flex flex-col rounded-xl bg-white/90 backdrop-blur border border-slate-200 shadow-lg overflow-hidden">
+        <div id="pipa-zoom-controls" class="absolute bottom-10 left-4 z-40 flex flex-col rounded-xl bg-white/90 backdrop-blur border border-slate-200 shadow-lg overflow-hidden">
             <button type="button" id="btn-zoom-in" class="pipa-zoom-btn" title="Perbesar" aria-label="Perbesar">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
                     <path d="M12 5v14M5 12h14"/>
@@ -657,6 +969,7 @@
         {{-- ===== Callout popup (muncul dekat pin saat diklik) ===== --}}
         <div id="pin-callout" class="hidden">
             <div class="pc-box">
+                <span class="pipa-mobile-sheet-handle" aria-hidden="true"></span>
                 <div class="pc-header">
                     <div>
                         <div class="pc-eyebrow">Telemetry Point</div>
@@ -797,6 +1110,14 @@
                 return Math.min(cw / sw, ch / sh) * 0.95;
             }
 
+            const mobileViewportQuery = window.matchMedia('(max-width: 639px)');
+            const isMobileViewport = () => mobileViewportQuery.matches;
+
+            function computeInitialScale() {
+                const nextFitScale = computeFitScale();
+                return isMobileViewport() ? Math.max(nextFitScale, 0.5) : nextFitScale;
+            }
+
             // ===== panzoom =====
             // minZoom = skala fit -> Reset Tampilan = posisi paling zoom-out,
             // tidak bisa mengecil lebih jauh dari itu.
@@ -813,6 +1134,9 @@
                         minZoom: fitScale,
                         zoomDoubleClickSpeed: 1,
                         smoothScroll: false,
+                        // Panzoom mencegah default touchstart. Biarkan default pada
+                        // marker supaya browser HP tetap membangkitkan event click.
+                        onTouch: (event) => !event.target.closest('.pipa-pin'),
                     });
                 } catch (err) {
                     console.error('panzoom gagal inisialisasi, peta ditampilkan statis.', err);
@@ -821,30 +1145,207 @@
                 console.warn('panzoom tidak tersedia — peta ditampilkan statis (pin tetap aktif).');
             }
 
-            function fitView() {
+            let programmaticView = false;
+            let userHasNavigated = false;
+            let lastViewportWidth = viewport.clientWidth;
+            let lastMobileState = isMobileViewport();
+            let resizeFrame = null;
+
+            function currentViewScale(fallback = fitScale) {
+                const transform = pz && pz.getTransform ? pz.getTransform() : null;
+                return Number(transform?.scale) || fallback;
+            }
+
+            function syncMobileMarkerScale(scale = currentViewScale()) {
+                const safeScale = Math.max(Number(scale) || fitScale || 1, 0.01);
+                stage.style.setProperty(
+                    '--pipa-marker-compensation',
+                    isMobileViewport() ? String(1 / safeScale) : '1'
+                );
+            }
+
+            // ===== Penempatan label adaptif =====
+            // Kandidat terdekat dicoba lebih dulu. Kalau semuanya bertabrakan,
+            // kandidat dengan luas overlap paling kecil tetap dipakai.
+            const LABEL_PLACEMENTS = [
+                { name: 'bottom' },
+                { name: 'top' },
+                { name: 'right' },
+                { name: 'left' },
+                { name: 'bottom-right' },
+                { name: 'bottom-left' },
+                { name: 'top-right' },
+                { name: 'top-left' },
+            ];
+            const LABEL_GAPS = [6, 18, 32];
+            let labelLayoutFrame = null;
+
+            function rectangleOverlapArea(a, b, padding = 0) {
+                const left = Math.max(a.left, b.left - padding);
+                const top = Math.max(a.top, b.top - padding);
+                const right = Math.min(a.right, b.right + padding);
+                const bottom = Math.min(a.bottom, b.bottom + padding);
+                return Math.max(0, right - left) * Math.max(0, bottom - top);
+            }
+
+            function rectangleOutsideArea(rect, bounds, margin = 8) {
+                const left = Math.max(rect.left, bounds.left + margin);
+                const top = Math.max(rect.top, bounds.top + margin);
+                const right = Math.min(rect.right, bounds.right - margin);
+                const bottom = Math.min(rect.bottom, bounds.bottom - margin);
+                const insideArea = Math.max(0, right - left) * Math.max(0, bottom - top);
+                return Math.max(0, rect.width * rect.height - insideArea);
+            }
+
+            function applyLabelCandidate(pin, label, candidate) {
+                pin.dataset.labelPlacement = candidate.name;
+                label.style.setProperty('--pipa-label-gap', `${candidate.gap}px`);
+                label.style.setProperty(
+                    '--pipa-label-diagonal-gap',
+                    `${(candidate.gap * Math.SQRT2).toFixed(2)}px`
+                );
+                const shifted = candidate.name !== 'bottom' || candidate.gap > LABEL_GAPS[0];
+                pin.dataset.labelShifted = shifted ? 'true' : 'false';
+            }
+
+            function layoutPipeLabels() {
+                const pins = Array.from(stage.querySelectorAll('.pipa-pin'))
+                    .filter(pin => pin.querySelector('.pipa-pin__label'));
+                if (!pins.length) return;
+
+                const viewportRect = viewport.getBoundingClientRect();
+                const markerRects = pins
+                    .filter(pin => !pin.classList.contains('pipa-pin--reservoir')
+                        || viewport.classList.contains('managing'))
+                    .map(pin => ({ pin, rect: pin.getBoundingClientRect() }));
+                const occupiedLabelRects = [];
+
+                // Label yang lebih lebar ditempatkan lebih dulu karena pilihan
+                // ruang kosongnya lebih terbatas.
+                pins.sort((a, b) => {
+                    const selectedDelta = Number(b.classList.contains('is-selected'))
+                        - Number(a.classList.contains('is-selected'));
+                    if (selectedDelta) return selectedDelta;
+                    return b.querySelector('.pipa-pin__label').getBoundingClientRect().width
+                        - a.querySelector('.pipa-pin__label').getBoundingClientRect().width;
+                });
+
+                pins.forEach(pin => {
+                    const label = pin.querySelector('.pipa-pin__label');
+                    let bestCandidate = null;
+                    let bestScore = Number.POSITIVE_INFINITY;
+
+                    candidateLoop:
+                    for (const gap of LABEL_GAPS) {
+                        for (let index = 0; index < LABEL_PLACEMENTS.length; index++) {
+                            const candidate = { ...LABEL_PLACEMENTS[index], gap };
+                            applyLabelCandidate(pin, label, candidate);
+                            const rect = label.getBoundingClientRect();
+
+                            let score = rectangleOutsideArea(rect, viewportRect) * 60;
+                            occupiedLabelRects.forEach(occupied => {
+                                score += rectangleOverlapArea(rect, occupied, 4) * 18;
+                            });
+                            markerRects.forEach(marker => {
+                                if (marker.pin !== pin) {
+                                    score += rectangleOverlapArea(rect, marker.rect, 5) * 28;
+                                }
+                            });
+
+                            // Jika nilainya sama, utamakan posisi dekat dan urutan
+                            // kandidat awal agar hasil stabil antarrender.
+                            score += gap * .02 + index * .001;
+                            if (score < bestScore) {
+                                bestScore = score;
+                                bestCandidate = candidate;
+                            }
+                            if (score < 1) break candidateLoop;
+                        }
+                    }
+
+                    applyLabelCandidate(
+                        pin,
+                        label,
+                        bestCandidate || { name: 'bottom', gap: LABEL_GAPS[0] }
+                    );
+                    occupiedLabelRects.push(label.getBoundingClientRect());
+                });
+            }
+
+            function scheduleLabelLayout() {
+                if (labelLayoutFrame) window.cancelAnimationFrame(labelLayoutFrame);
+                labelLayoutFrame = window.requestAnimationFrame(() => {
+                    labelLayoutFrame = null;
+                    layoutPipeLabels();
+                });
+            }
+
+            function applyViewScale(scale) {
                 const cw = viewport.clientWidth, ch = viewport.clientHeight;
                 const sw = stage.offsetWidth, sh = stage.offsetHeight;
                 if (!sw || !sh) return;
-                fitScale = computeFitScale();
-                const x = (cw - sw * fitScale) / 2;
-                const y = (ch - sh * fitScale) / 2;
+
+                const x = (cw - sw * scale) / 2;
+                const y = (ch - sh * scale) / 2;
+                programmaticView = true;
                 if (pz) {
-                    if (pz.setMinZoom) pz.setMinZoom(fitScale); // ikuti perubahan ukuran layar
-                    pz.zoomAbs(0, 0, fitScale);
+                    pz.zoomAbs(0, 0, scale);
                     pz.moveTo(x, y);
                 } else {
-                    // Fallback statis: fit lewat CSS (origin sudah top-left via class).
-                    stage.style.transform = `translate(${x}px, ${y}px) scale(${fitScale})`;
+                    stage.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
                 }
+                syncMobileMarkerScale(scale);
+                scheduleLabelLayout();
+                window.requestAnimationFrame(() => { programmaticView = false; });
+            }
+
+            function fitView() {
+                fitScale = computeFitScale();
+                if (pz?.setMinZoom) pz.setMinZoom(fitScale);
+                applyViewScale(fitScale);
+            }
+
+            function initialView() {
+                fitScale = computeFitScale();
+                if (pz?.setMinZoom) pz.setMinZoom(fitScale);
+                applyViewScale(computeInitialScale());
+            }
+
+            function handleViewportResize() {
+                if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
+                resizeFrame = window.requestAnimationFrame(() => {
+                    const nextWidth = viewport.clientWidth;
+                    const nextMobileState = isMobileViewport();
+                    const meaningfulWidthChange = Math.abs(nextWidth - lastViewportWidth) > 48;
+                    const crossedMobileBreakpoint = nextMobileState !== lastMobileState;
+
+                    fitScale = computeFitScale();
+                    if (pz?.setMinZoom) pz.setMinZoom(fitScale);
+                    syncMobileMarkerScale();
+                    scheduleLabelLayout();
+
+                    if (!userHasNavigated && (meaningfulWidthChange || crossedMobileBreakpoint)) {
+                        initialView();
+                    }
+
+                    lastViewportWidth = nextWidth;
+                    lastMobileState = nextMobileState;
+                    resizeFrame = null;
+                });
             }
             // Hitung posisi awal langsung (stage masih tersembunyi via CSS opacity:0)
-            fitView();
-            window.addEventListener('resize', fitView);
-            document.getElementById('btn-reset').addEventListener('click', fitView);
+            initialView();
+            window.addEventListener('resize', handleViewportResize);
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                userHasNavigated = false;
+                hideCallout();
+                fitView();
+            });
 
             // Tombol zoom in/out (memusat ke tengah viewport). Butuh panzoom aktif.
             function zoomBy(ratio) {
                 if (!pz || !pz.smoothZoom) return;
+                userHasNavigated = true;
                 const r = viewport.getBoundingClientRect();
                 pz.smoothZoom(r.left + r.width / 2, r.top + r.height / 2, ratio);
                 hideCallout();
@@ -867,9 +1368,11 @@
             const reveal = () => {
                 if (revealed) return;
                 revealed = true;
-                fitView();
+                if (!userHasNavigated) initialView();
+                else syncMobileMarkerScale();
                 stage.classList.add('ready');
                 loadingEl && loadingEl.classList.add('hide');
+                scheduleLabelLayout();
             };
             Promise.all(layerImgs.map(waitImg)).then(reveal);
             // Pengaman: kalau ada gambar yang gagal/lama, tetap tampilkan setelah 4 dtk
@@ -879,11 +1382,35 @@
             const byId = id => document.getElementById(id);
             const fmt = n => Number(n).toLocaleString('id-ID');
             const callout = byId('pin-callout');
+            const legendToggle = byId('btn-legend-toggle');
+            const legend = byId('pipa-legend');
             // Penanda "tidak ada data" -> dibedakan dari pembacaan asli bernilai 0.
             const NODATA = '–'; // en dash
             const num = v => (v == null ? NODATA : Number(v).toFixed(2));
 
-            function hideCallout() { callout.classList.add('hidden'); }
+            let selectedPinEl = null;
+
+            function setLegendOpen(open) {
+                legend?.classList.toggle('mobile-open', open);
+                legendToggle?.setAttribute('aria-expanded', open ? 'true' : 'false');
+            }
+
+            legendToggle?.addEventListener('click', (event) => {
+                event.stopPropagation();
+                setLegendOpen(legendToggle.getAttribute('aria-expanded') !== 'true');
+            });
+
+            document.addEventListener('pointerdown', (event) => {
+                if (!isMobileViewport() || legendToggle?.getAttribute('aria-expanded') !== 'true') return;
+                if (event.target.closest('#pipa-legend') || event.target.closest('#btn-legend-toggle')) return;
+                setLegendOpen(false);
+            });
+
+            function hideCallout() {
+                callout.classList.add('hidden');
+                selectedPinEl?.classList.remove('is-selected');
+                selectedPinEl = null;
+            }
 
             function addMetricRow(parent, label, value, unit) {
                 const row = document.createElement('div');
@@ -973,6 +1500,10 @@
                 else det.style.display = 'none';
 
                 // Tampilkan dulu supaya ukuran kotak bisa diukur, baru diposisikan.
+                selectedPinEl?.classList.remove('is-selected');
+                selectedPinEl = pinEl;
+                selectedPinEl.classList.add('is-selected');
+                setLegendOpen(false);
                 callout.classList.remove('hidden', 'below');
                 positionCallout(pinEl);
             }
@@ -982,6 +1513,17 @@
             // di-klamp agar tidak terpotong tepi. Mengukur tinggi kotak yang
             // sebenarnya (jumlah baris pressure bisa 1 atau 2).
             function positionCallout(pinEl) {
+                if (isMobileViewport()) {
+                    callout.style.left = '0';
+                    callout.style.right = '0';
+                    callout.style.top = 'auto';
+                    callout.style.bottom = '0';
+                    callout.style.transform = 'none';
+                    return;
+                }
+
+                callout.style.right = 'auto';
+                callout.style.bottom = 'auto';
                 const vr = viewport.getBoundingClientRect();
                 const pr = pinEl.getBoundingClientRect();
                 const cw = callout.offsetWidth;
@@ -1028,6 +1570,7 @@
                 set('pl-total', total);
                 set('pl-debit', debit.toFixed(1));
                 set('pl-pct', pct);
+                set('pl-mobile-summary', `${online}/${total}`);
                 const bar = byId('pl-bar-fill');
                 if (bar) bar.style.width = pct + '%';
             }
@@ -1071,6 +1614,7 @@
                 btn.setAttribute('aria-label', p.label || '');
                 btn.querySelector('.pipa-pin__label').textContent = p.label || '';
                 updateLegend();
+                scheduleLabelLayout();
             }
 
             function removePin(id) {
@@ -1078,6 +1622,7 @@
                 delete pinEls[id];
                 delete pointById[id];
                 updateLegend();
+                scheduleLabelLayout();
             }
 
             // Wire pin yang sudah dirender server
@@ -1085,10 +1630,22 @@
                 pinEls[btn.dataset.id] = btn;
                 wirePin(btn);
             });
+            scheduleLabelLayout();
 
             // Tutup callout saat geser/zoom atau klik area kosong
-            pz && pz.on && pz.on('panstart', hideCallout);
-            pz && pz.on && pz.on('zoom', hideCallout);
+            pz && pz.on && pz.on('panstart', () => {
+                if (!programmaticView) userHasNavigated = true;
+                hideCallout();
+            });
+            pz && pz.on && pz.on('zoom', () => {
+                syncMobileMarkerScale();
+                if (!programmaticView) userHasNavigated = true;
+                hideCallout();
+            });
+            if (pz?.on) {
+                pz.on('panend', scheduleLabelLayout);
+                pz.on('zoomend', scheduleLabelLayout);
+            }
             viewport.addEventListener('pointerdown', (e) => {
                 if (!e.target.closest('#pin-callout') && !e.target.closest('.pipa-pin')) hideCallout();
             });
@@ -1162,6 +1719,7 @@
                 manageState.textContent = on ? 'On' : 'Off';
                 manageHint.classList.toggle('hidden', !on);
                 if (on) { hideCallout(); loadLoggers(); } else closeEditor();
+                scheduleLabelLayout();
             }
             // Tombol hanya dirender untuk admin Wosusokas; kalau tidak ada, mode
             // kelola tidak pernah aktif (endpoint CRUD juga sudah ditolak server).
