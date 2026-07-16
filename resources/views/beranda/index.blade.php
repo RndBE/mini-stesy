@@ -335,6 +335,7 @@
                                 'AWQR' => 'beranda.categories.awqr',
                                 'AWR'  => 'beranda.categories.awr',
                                 'AFMR' => 'beranda.categories.afmr',
+                                'APMS' => 'beranda.categories.apms',
                                 default => 'beranda.categories.default',
                             };
                         @endphp

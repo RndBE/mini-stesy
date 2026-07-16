@@ -285,6 +285,24 @@
                                 </template>
                             </div>
                         </template>
+                        <template x-if="isApmsKategori(detailData.id_katlogger)">
+                            <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+                                <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
+                                    <img src="{{ asset('icons/sub_kategori_icon.svg') }}" class="h-5 w-5">
+                                    <p class="text-base font-bold text-slate-900">Data Sumur Pantau</p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:gap-6">
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Sumur</p>
+                                        <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_sumur || '-'"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-slate-400">Kedalaman Sensor</p>
+                                        <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.kedalaman_sensor || '-'"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
 <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                             <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
                                 <img src="{{ asset('icons/param_icon.svg') }}" class="h-5 w-5">
@@ -544,6 +562,34 @@
                                         </div>
                                     </template>
 
+                                </div>
+                            </template>
+
+                            <template x-if="isAddApms()">
+                                <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                                    <h4 class="mb-3 text-sm font-semibold text-gray-900">Data Sumur Pantau APMS</h4>
+                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                        <div>
+                                            <label class="mb-2 block text-xs font-medium text-gray-700">Kedalaman Sumur</label>
+                                            <div class="flex overflow-hidden rounded-lg border border-gray-300 bg-white">
+                                                <input type="number" step="0.01" name="kedalaman_sumur"
+                                                    x-model="addData.kedalaman_sumur"
+                                                    class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                    placeholder="10">
+                                                <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700">m</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="mb-2 block text-xs font-medium text-gray-700">Kedalaman Sensor</label>
+                                            <div class="flex overflow-hidden rounded-lg border border-gray-300 bg-white">
+                                                <input type="number" step="0.01" name="kedalaman_sensor"
+                                                    x-model="addData.kedalaman_sensor"
+                                                    class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                    placeholder="5">
+                                                <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700">m</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </template>
 
@@ -870,6 +916,32 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                             </div>
                                         </div>
                                     </template>
+                                </div>
+                            </template>
+
+                            <template x-if="isEditApms()">
+                                <div class="rounded-lg border border-slate-100 bg-slate-50 p-4">
+                                    <h4 class="mb-4 text-sm font-semibold text-gray-900">Data Sumur Pantau APMS</h4>
+                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-700">Kedalaman Sumur</label>
+                                            <div class="mt-1 flex overflow-hidden rounded-md border border-gray-300 bg-white">
+                                                <input type="number" step="0.01" name="kedalaman_sumur"
+                                                    x-model="editData.kedalaman_sumur"
+                                                    class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700">m</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-700">Kedalaman Sensor</label>
+                                            <div class="mt-1 flex overflow-hidden rounded-md border border-gray-300 bg-white">
+                                                <input type="number" step="0.01" name="kedalaman_sensor"
+                                                    x-model="editData.kedalaman_sensor"
+                                                    class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700">m</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </template>
 
@@ -1321,6 +1393,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                 templateMap: @json($templateMap ?? []),
                 listParameterOptions: @json($listParameters ?? []),
                 awlrCategoryIds: @json($awlrCategoryIds ?? []),
+                apmsCategoryIds: @json($apmsCategoryIds ?? []),
                 afmrCategoryIds: @json($afmrCategoryIds ?? []),
                 addDeviceMap: null,
                 addDeviceMarker: null,
@@ -1656,6 +1729,12 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                 'non_jiat') {
                                 this.addData.subKategori = 'non_jiat'
                             }
+                        } else if (this.isApmsKategori(this.addData.id_katlogger)) {
+                            this.addData.subKategori = ''
+                            this.addData.has_pump = false
+                            this.addData.kedalaman_pompa = ''
+                            this.addData.jarak_sensor_ke_air = ''
+                            this.addData.tinggi_sensor = ''
                         } else {
                             this.addData.subKategori = ''
                             this.addData.has_pump = false
@@ -1679,6 +1758,12 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     return (this.awlrCategoryIds || []).map(id => Number(id)).includes(parsedId)
                 },
 
+                isApmsKategori(kategoriId) {
+                    const parsedId = Number(kategoriId)
+                    if (Number.isNaN(parsedId) || !parsedId) return false
+                    return (this.apmsCategoryIds || []).map(id => Number(id)).includes(parsedId)
+                },
+
                 isAfmrKategori(kategoriId) {
                     const parsedId = Number(kategoriId)
                     if (Number.isNaN(parsedId) || !parsedId) return false
@@ -1689,8 +1774,16 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     return this.isAwlrKategori(this.addData.id_katlogger)
                 },
 
+                isAddApms() {
+                    return this.isApmsKategori(this.addData.id_katlogger)
+                },
+
                 isEditAwlr() {
                     return this.isAwlrKategori(this.editData.id_katlogger)
+                },
+
+                isEditApms() {
+                    return this.isApmsKategori(this.editData.id_katlogger)
                 },
 
                 isEditAfmr() {

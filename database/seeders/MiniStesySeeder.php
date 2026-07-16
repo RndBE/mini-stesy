@@ -292,6 +292,7 @@ class MiniStesySeeder extends Seeder
             ['id_katlogger' => 3, 'nama_kategori' => 'AFMR', 'kepanjangan' => 'Automatic Flow Measurement Recorder','icon_app' => 'afmr.png', 'view' => 1],
             ['id_katlogger' => 4, 'nama_kategori' => 'AWR',  'kepanjangan' => 'Automatic Weather Recorder',         'icon_app' => 'awr.png',  'view' => 1],
             ['id_katlogger' => 5, 'nama_kategori' => 'AWQR', 'kepanjangan' => 'Automatic Water Quality Recorder',   'icon_app' => 'awqr.png', 'view' => 1],
+            ['id_katlogger' => 6, 'nama_kategori' => 'APMS', 'kepanjangan' => 'Automatic Peatland Monitoring System','icon_app' => 'apms.svg', 'view' => 1],
         ]);
 
         if (Schema::hasTable('parameter_groups')) {

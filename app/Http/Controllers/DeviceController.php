@@ -135,6 +135,7 @@ class DeviceController extends Controller
             'templateMap' => $templateMap,
             'listParameters' => $listParameters,
             'awlrCategoryIds' => $this->awlrCategoryIds(),
+            'apmsCategoryIds' => $this->apmsCategoryIds(),
             'afmrCategoryIds' => $this->afmrCategoryIds(),
         ]);
     }
@@ -225,7 +226,7 @@ class DeviceController extends Controller
                 $logger->idlokasi = $lokasi->idlokasi;
                 $logger->save();
 
-                // 3. JIAT data hanya dipakai untuk kategori AWLR
+                // 3. Metadata sumur AWLR dan APMS.
                 if ($this->isAwlrCategoryId($logger->id_katlogger)) {
                     $subKategori = $validated['sub_kategori'] ?? 'non_jiat';
 
@@ -252,6 +253,17 @@ class DeviceController extends Controller
                         );
                         Jiat_data::where('id_logger', $logger->id_logger)->delete();
                     }
+                } elseif ($this->isApmsCategoryId($logger->id_katlogger)) {
+                    Jiat_data::updateOrCreate(
+                        ['id_logger' => $logger->id_logger],
+                        [
+                            'kedalaman_sumur' => (float) ($validated['kedalaman_sumur'] ?? 0),
+                            'kedalaman_sensor' => (float) ($validated['kedalaman_sensor'] ?? 0),
+                            'kedalaman_pompa' => 0,
+                            'has_pump' => false,
+                        ]
+                    );
+                    NonJiatData::where('id_logger', $logger->id_logger)->delete();
                 }
 
                 // 3b. AFMR data: contact atau non-contact
@@ -385,6 +397,17 @@ class DeviceController extends Controller
                 );
                 Jiat_data::where('id_logger', $logger->id_logger)->delete();
             }
+        } elseif ($this->isApmsCategoryId($logger->id_katlogger)) {
+            Jiat_data::updateOrCreate(
+                ['id_logger' => $logger->id_logger],
+                [
+                    'kedalaman_sumur' => (float) ($request->kedalaman_sumur ?? 0),
+                    'kedalaman_sensor' => (float) ($request->kedalaman_sensor ?? 0),
+                    'kedalaman_pompa' => 0,
+                    'has_pump' => false,
+                ]
+            );
+            NonJiatData::where('id_logger', $logger->id_logger)->delete();
         }
 
         // AFMR: contact atau non-contact
@@ -944,6 +967,31 @@ class DeviceController extends Controller
         if ($cache === null) {
             $cache = Kategori_logger::query()
                 ->whereRaw('UPPER(nama_kategori) = ?', ['AWLR'])
+                ->pluck('id_katlogger')
+                ->map(fn($id) => (int) $id)
+                ->values()
+                ->all();
+        }
+
+        return $cache;
+    }
+
+    private function isApmsCategoryId($idKatlogger): bool
+    {
+        if ($idKatlogger === null || $idKatlogger === '') {
+            return false;
+        }
+
+        return in_array((int) $idKatlogger, $this->apmsCategoryIds(), true);
+    }
+
+    private function apmsCategoryIds(): array
+    {
+        static $cache = null;
+
+        if ($cache === null) {
+            $cache = Kategori_logger::query()
+                ->whereRaw('UPPER(nama_kategori) = ?', ['APMS'])
                 ->pluck('id_katlogger')
                 ->map(fn($id) => (int) $id)
                 ->values()

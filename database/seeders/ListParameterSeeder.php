@@ -51,6 +51,11 @@ class ListParameterSeeder extends Seeder
             ['name' => 'Turbidity', 'base' => 'turbidity', 'unit' => 'NTU', 'column' => 'sensor8', 'group' => 'SUMUR', 'icon' => 'icons/awgr/turbidity.svg'],
             ['name' => 'Tinggi Sensor', 'base' => 'tinggi_sensor', 'unit' => 'm', 'column' => 'sensor9', 'group' => 'SUMUR', 'icon' => 'icons/awgr/tinggi_sensor.svg'],
 
+            ['name' => 'pH Tanah', 'base' => 'ph_tanah', 'unit' => null, 'column' => 'sensor2', 'group' => 'SUMUR', 'icon' => 'icons/awgr/ph_air.svg'],
+            ['name' => 'Electrical Conductivity', 'base' => 'electrical_conductivity', 'unit' => 'uS/cm', 'column' => 'sensor3', 'group' => 'SUMUR', 'icon' => 'icons/awgr/conductivity.svg'],
+            ['name' => 'Kelembaban Tanah', 'base' => 'kelembaban_tanah', 'unit' => '%', 'column' => 'sensor4', 'group' => 'SUMUR', 'icon' => 'icons/beranda/humidity_online.svg'],
+            ['name' => 'Temperature Tanah', 'base' => 'temperature_tanah', 'unit' => 'C', 'column' => 'sensor5', 'group' => 'SUMUR', 'icon' => 'icons/beranda/temper_online.svg'],
+
             ['name' => 'Humidity Logger', 'base' => 'humidity_logger', 'unit' => '%', 'column' => 'sensor4', 'group' => 'LOGGER', 'icon' => 'icons/beranda/humidity_online.svg'],
             ['name' => 'Battery Logger', 'base' => 'battery_logger', 'unit' => 'Volt', 'column' => 'sensor6', 'group' => 'LOGGER', 'icon' => 'icons/beranda/battery_online.svg'],
             ['name' => 'Temperature Logger', 'base' => 'temperature_logger', 'unit' => 'C', 'column' => 'sensor5', 'group' => 'LOGGER', 'icon' => 'icons/beranda/temper_online.svg'],
@@ -159,6 +164,18 @@ class ListParameterSeeder extends Seeder
                 ['base' => 'humidity_logger', 'order' => 10, 'column' => 'sensor12', 'unit' => '%', 'group' => 'LOGGER'],
                 ['base' => 'battery_logger', 'order' => 11, 'column' => 'sensor13', 'unit' => 'Volt', 'group' => 'LOGGER'],
                 ['base' => 'temperature_logger', 'order' => 12, 'column' => 'sensor14', 'unit' => 'C', 'group' => 'LOGGER'],
+            ],
+            'APMS' => [
+                ['base' => 'muka_air_tanah', 'order' => 1, 'column' => 'sensor1', 'unit' => 'm', 'group' => 'SUMUR'],
+                ['base' => 'ph_tanah', 'order' => 2, 'column' => 'sensor2', 'unit' => null, 'group' => 'SUMUR'],
+                ['base' => 'electrical_conductivity', 'order' => 3, 'column' => 'sensor3', 'unit' => 'uS/cm', 'group' => 'SUMUR'],
+                ['base' => 'kelembaban_tanah', 'order' => 4, 'column' => 'sensor4', 'unit' => '%', 'group' => 'SUMUR'],
+                ['base' => 'temperature_tanah', 'order' => 5, 'column' => 'sensor5', 'unit' => 'C', 'group' => 'SUMUR'],
+                ['base' => 'salinity', 'order' => 6, 'column' => 'sensor7', 'unit' => 'PSU', 'group' => 'SUMUR'],
+                ['base' => 'hujan', 'order' => 7, 'column' => 'sensor6', 'unit' => 'mm', 'group' => 'SUMUR'],
+                ['base' => 'humidity_logger', 'order' => 8, 'column' => 'sensor14', 'unit' => '%', 'group' => 'LOGGER'],
+                ['base' => 'battery_logger', 'order' => 9, 'column' => 'sensor15', 'unit' => 'Volt', 'group' => 'LOGGER'],
+                ['base' => 'temperature_logger', 'order' => 10, 'column' => 'sensor16', 'unit' => 'C', 'group' => 'LOGGER'],
             ],
         ];
 
