@@ -51,16 +51,16 @@
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         @foreach ($rainCards as $rainCard)
             <a href="{{ $rainAnalysisUrl }}" title="Lihat analisa curah hujan"
-                class="group flex min-h-56 flex-col items-center overflow-hidden rounded-xl border border-slate-200 bg-white px-4 py-4 text-center shadow-sm hover:border-slate-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 {{ $muted ? 'grayscale opacity-70' : '' }}">
+                class="group flex min-h-56 flex-col items-center overflow-hidden rounded-xl border border-slate-200 bg-white px-4 py-4 text-center shadow-sm hover:border-slate-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 {{ $desktopCardClass ?? '' }} {{ $muted ? 'grayscale opacity-70' : '' }}">
                 <span class="text-balance text-[10px] font-semibold uppercase text-slate-600 sm:text-xs">
                     {{ $rainCard['label'] }}
                 </span>
 
-                <span class="flex flex-1 items-center justify-center py-2">
+                <span class="flex flex-1 items-center justify-center py-2 {{ $desktopIconWrapClass ?? '' }}">
                     <img src="{{ asset('klasifikasi_hujan/' . $rainCard['icon_state'] . '.png') }}"
                         onerror="this.onerror=null;this.src='{{ $defaultRainIcon }}';"
                         alt="{{ $rainCard['status'] }}"
-                        class="h-28 w-36 object-contain sm:h-32 sm:w-40">
+                        class="h-28 w-36 object-contain sm:h-32 sm:w-40 {{ $desktopIconClass ?? '' }}">
                 </span>
 
                 <span class="whitespace-nowrap text-2xl font-extrabold tabular-nums text-slate-950 sm:text-3xl">

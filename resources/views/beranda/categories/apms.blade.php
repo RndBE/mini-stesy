@@ -132,7 +132,11 @@
             @if ($pRain)
                 <section>
                     <h3 class="mb-3 text-balance text-base font-semibold text-slate-800">Curah Hujan</h3>
-                    @include('beranda.categories.partials.rainfall_cards')
+                    @include('beranda.categories.partials.rainfall_cards', [
+                        'desktopCardClass' => 'lg:h-[202px] lg:min-h-0 lg:py-2',
+                        'desktopIconClass' => 'lg:h-24 lg:w-32',
+                        'desktopIconWrapClass' => 'lg:py-1',
+                    ])
                 </section>
             @endif
         </div>

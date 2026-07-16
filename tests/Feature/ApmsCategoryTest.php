@@ -63,9 +63,14 @@ class ApmsCategoryTest extends TestCase
             $arr
         );
         $this->assertStringContainsString(
-            "@include('beranda.categories.partials.rainfall_cards')",
+            "@include('beranda.categories.partials.rainfall_cards', [",
             $view
         );
+        $this->assertStringContainsString("'desktopCardClass' => 'lg:h-[202px] lg:min-h-0 lg:py-2'", $view);
+        $this->assertStringContainsString("'desktopIconClass' => 'lg:h-24 lg:w-32'", $view);
+        $sharedRain = file_get_contents($sharedRainPath);
+        $this->assertStringContainsString("{{ \$desktopCardClass ?? '' }}", $sharedRain);
+        $this->assertStringContainsString("{{ \$desktopIconClass ?? '' }}", $sharedRain);
         $this->assertStringContainsString("asset('sumur/badan_sumur.svg')", $sharedWell);
         $this->assertStringContainsString('Data Pengukuran', $view);
         $this->assertStringContainsString('Data Logger', $view);
