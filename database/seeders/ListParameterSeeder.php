@@ -51,10 +51,10 @@ class ListParameterSeeder extends Seeder
             ['name' => 'Turbidity', 'base' => 'turbidity', 'unit' => 'NTU', 'column' => 'sensor8', 'group' => 'SUMUR', 'icon' => 'icons/awgr/turbidity.svg'],
             ['name' => 'Tinggi Sensor', 'base' => 'tinggi_sensor', 'unit' => 'm', 'column' => 'sensor9', 'group' => 'SUMUR', 'icon' => 'icons/awgr/tinggi_sensor.svg'],
 
-            ['name' => 'pH Tanah', 'base' => 'ph_tanah', 'unit' => null, 'column' => 'sensor2', 'group' => 'SUMUR', 'icon' => 'icons/awgr/ph_air.svg'],
-            ['name' => 'Electrical Conductivity', 'base' => 'electrical_conductivity', 'unit' => 'uS/cm', 'column' => 'sensor3', 'group' => 'SUMUR', 'icon' => 'icons/awgr/conductivity.svg'],
-            ['name' => 'Kelembaban Tanah', 'base' => 'kelembaban_tanah', 'unit' => '%', 'column' => 'sensor4', 'group' => 'SUMUR', 'icon' => 'icons/beranda/humidity_online.svg'],
-            ['name' => 'Temperature Tanah', 'base' => 'temperature_tanah', 'unit' => 'C', 'column' => 'sensor5', 'group' => 'SUMUR', 'icon' => 'icons/beranda/temper_online.svg'],
+            ['name' => 'pH Tanah', 'base' => 'ph_tanah', 'unit' => null, 'column' => 'sensor2', 'group' => 'SUMUR', 'icon' => 'icons/apms/ph_tanah.svg'],
+            ['name' => 'Electrical Conductivity', 'base' => 'electrical_conductivity', 'unit' => 'uS/cm', 'column' => 'sensor3', 'group' => 'SUMUR', 'icon' => 'icons/apms/electrical_conductivity.svg'],
+            ['name' => 'Kelembaban Tanah', 'base' => 'kelembaban_tanah', 'unit' => '%', 'column' => 'sensor4', 'group' => 'SUMUR', 'icon' => 'icons/apms/soil_moisture.svg'],
+            ['name' => 'Temperature Tanah', 'base' => 'temperature_tanah', 'unit' => 'C', 'column' => 'sensor5', 'group' => 'SUMUR', 'icon' => 'icons/apms/soil_temperature.svg'],
 
             ['name' => 'Humidity Logger', 'base' => 'humidity_logger', 'unit' => '%', 'column' => 'sensor4', 'group' => 'LOGGER', 'icon' => 'icons/beranda/humidity_online.svg'],
             ['name' => 'Battery Logger', 'base' => 'battery_logger', 'unit' => 'Volt', 'column' => 'sensor6', 'group' => 'LOGGER', 'icon' => 'icons/beranda/battery_online.svg'],
