@@ -120,15 +120,18 @@
                                 ['from' => 0,  'to' => 15, 'fill' => '#bbf7d0'], // hijau
                             ];
                         @endphp
+@php
+                            $scaleRange  = $scaleMax - $scaleMin;
+                            $tickStep    = $scaleRange > 100 ? 10 : ($scaleRange > 20 ? 5 : ($scaleRange > 10 ? 2 : 0.5));
+                            $majorStep   = $scaleRange > 100 ? 50 : ($scaleRange > 20 ? 10 : ($scaleRange > 10 ? 5 : 1));
+                            $scaleLabel = fn ($value) => fmod((float) $value, 1.0) === 0.0
+                                ? (string) (int) $value
+                                : rtrim(rtrim(number_format((float) $value, 2, '.', ''), '0'), '.');
+                        @endphp
 <image href="{{ asset('sumur/peil.svg') }}"
                                x="{{ $scaleX }}" y="{{ $scaleY }}"
                                width="{{ $scaleW }}" height="{{ $scaleH }}"
                                preserveAspectRatio="xMidYMid meet" />
-@php
-                            $scaleRange  = $scaleMax - $scaleMin;
-                            $tickStep    = $scaleRange > 100 ? 10 : ($scaleRange > 20 ? 5 : 2);
-                            $majorStep   = $scaleRange > 100 ? 50 : ($scaleRange > 20 ? 10 : 5);
-                        @endphp
                         @for ($v = $scaleMin; $v <= $scaleMax + 0.001; $v += $tickStep)
                             @php
                                 $vRound  = round($v, 4);
@@ -145,14 +148,15 @@
                                 <text x="{{ $scaleX + $scaleW * 0.3 }}" y="{{ $ty + 3 }}"
                                       font-size="7.5" text-anchor="middle"
                                       font-family="ui-sans-serif, system-ui, sans-serif"
-                                      fill="#78350f" font-weight="600">{{ $vRound }}</text>
+                                      fill="#78350f" font-weight="600">{{ $scaleLabel($vRound) }}</text>
                             @endif
                         @endfor
 @php
-                            $lastMajorV   = floor(($scaleMax - $scaleMin) / $majorStep) * $majorStep + $scaleMin;
-                            $lastMajorY   = $scaleBotY - ($lastMajorV - $scaleMin) * $pxPerUnit;
-                            $maxPixGap    = $lastMajorY - $scaleTopY; // jarak vertikal SVG unit
-                            $maxNotOnTick = fmod(round(($scaleMax - $scaleMin) * 1000), round($tickStep * 1000)) > 1;
+                            $rangeUnits = $scaleMax - $scaleMin;
+                            $lastTickV  = floor($rangeUnits / $tickStep) * $tickStep + $scaleMin;
+                            $lastTickY  = $scaleBotY - ($lastTickV - $scaleMin) * $pxPerUnit;
+                            $maxPixGap  = $lastTickY - $scaleTopY; // jarak vertikal SVG unit
+                            $maxNotOnTick = fmod(round($rangeUnits * 1000), round($tickStep * 1000)) > 1;
                             $showMaxLbl   = $maxNotOnTick && $maxPixGap > 10;
                         @endphp
                         @if($showMaxLbl)
@@ -163,7 +167,7 @@
                             <text x="{{ $scaleX + $scaleW * 0.3 }}" y="{{ $ty + 9 }}"
                                   font-size="7.5" text-anchor="middle"
                                   font-family="ui-sans-serif, system-ui, sans-serif"
-                                  fill="#78350f" font-weight="600">{{ $scaleMax }}</text>
+                                  fill="#78350f" font-weight="600">{{ $scaleLabel($scaleMax) }}</text>
                         @endif
 <line x1="{{ $scaleX - 8 }}" y1="{{ $tmaLineY }}"
                             x2="{{ $scaleX + $scaleW + 2 }}" y2="{{ $tmaLineY }}"
