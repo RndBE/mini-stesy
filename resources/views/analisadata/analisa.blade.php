@@ -4002,11 +4002,11 @@
                     const first = new Date(y, m, 1)
                     const last = new Date(y, m + 1, 0)
                     const daysInMonth = last.getDate()
-                    const dowMon0 = (first.getDay() + 6) % 7
+                    const dowSun0 = first.getDay()
 
                     grid.innerHTML = ''
 
-                    for (let i = 0; i < dowMon0; i++) {
+                    for (let i = 0; i < dowSun0; i++) {
                         const empty = document.createElement('div')
                         empty.className = 'h-9'
                         grid.appendChild(empty)
@@ -4432,11 +4432,11 @@
                     const m = viewMonth.getMonth()
                     const first = new Date(y, m, 1)
                     const daysInMonth = new Date(y, m + 1, 0).getDate()
-                    const dowMon0 = (first.getDay() + 6) % 7
+                    const dowSun0 = first.getDay()
 
                     targetGrid.innerHTML = ''
 
-                    for (let i = 0; i < dowMon0; i++) {
+                    for (let i = 0; i < dowSun0; i++) {
                         const e = document.createElement('div')
                         e.className = 'h-9'
                         targetGrid.appendChild(e)
