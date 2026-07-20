@@ -159,7 +159,7 @@ class DataPerangkatApiController extends Controller
                 'kedalaman_sensor' => $d->jiat->kedalaman_sensor,
                 'has_pump' => (bool) $d->jiat->has_pump,
             ] : null;
-            $base['nonjiat'] = $d->nonjiat ? (array) $d->nonjiat->only(['id', 'jarak_sensor_ke_air', 'tinggi_sensor']) : null;
+            $base['nonjiat'] = $d->nonjiat ? (array) $d->nonjiat->only(['id', 'jenis_sensor', 'jarak_sensor_ke_air', 'tinggi_sensor']) : null;
         }
 
         return $base;

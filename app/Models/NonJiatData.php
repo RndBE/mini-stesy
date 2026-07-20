@@ -12,6 +12,7 @@ class NonJiatData extends Model
 
     protected $fillable = [
         'id_logger',
+        'jenis_sensor',
         'jarak_sensor_ke_air',
         'tinggi_sensor',
         'elevasi_max',

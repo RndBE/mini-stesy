@@ -345,10 +345,14 @@
                                     </div>
                                 </template>
 <template x-if="detailData.sub_kategori === 'NON JIAT'">
-                                    <div class="grid grid-cols-3 gap-3 px-4 py-4 sm:gap-6">
+                                    <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-4 sm:gap-6">
                                         <div>
                                             <p class="text-xs uppercase tracking-wide text-slate-400">Sub Kategori</p>
                                             <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.sub_kategori"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs uppercase tracking-wide text-slate-400">Jenis Sensor</p>
+                                            <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.jenis_sensor_label || '-'"></p>
                                         </div>
                                         <div>
                                             <p class="text-xs uppercase tracking-wide text-slate-400">Jarak Sensor dengan Air</p>
@@ -591,6 +595,25 @@
 
                                     <template x-if="addData.subKategori === 'non_jiat'">
                                         <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div class="md:col-span-2">
+                                                <label class="block text-xs font-medium text-gray-700 mb-2">Jenis Sensor</label>
+                                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                        :class="addData.jenis_sensor === 'ultrasonic' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                        <input type="radio" name="jenis_sensor" value="ultrasonic"
+                                                            x-model="addData.jenis_sensor"
+                                                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                        <span class="text-sm font-semibold">Ultrasonic</span>
+                                                    </label>
+                                                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                        :class="addData.jenis_sensor === 'radar' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                        <input type="radio" name="jenis_sensor" value="radar"
+                                                            x-model="addData.jenis_sensor"
+                                                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                        <span class="text-sm font-semibold">Radar</span>
+                                                    </label>
+                                                </div>
+                                            </div>
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700 mb-2">Jarak Sensor
                                                     dengan Air</label>
@@ -960,6 +983,25 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
 
                                     <template x-if="editData.subKategori === 'non_jiat'">
                                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                            <div class="sm:col-span-2">
+                                                <label class="block text-xs font-medium text-gray-700">Jenis Sensor</label>
+                                                <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                        :class="editData.jenis_sensor === 'ultrasonic' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                        <input type="radio" name="jenis_sensor" value="ultrasonic"
+                                                            x-model="editData.jenis_sensor"
+                                                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                        <span class="text-sm font-semibold">Ultrasonic</span>
+                                                    </label>
+                                                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                        :class="editData.jenis_sensor === 'radar' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                        <input type="radio" name="jenis_sensor" value="radar"
+                                                            x-model="editData.jenis_sensor"
+                                                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                        <span class="text-sm font-semibold">Radar</span>
+                                                    </label>
+                                                </div>
+                                            </div>
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700">Jarak Sensor dengan Air</label>
                                                 <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
@@ -1499,6 +1541,8 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     kedalaman_sumur: '-',
                     kedalaman_sensor: '-',
                     kedalaman_pompa: '-',
+                    jenis_sensor: '',
+                    jenis_sensor_label: '-',
                     params: []
                 },
                 editData: {
@@ -1514,6 +1558,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     kedalaman_sumur: '',
                     kedalaman_sensor: '',
                     kedalaman_pompa: '',
+                    jenis_sensor: 'ultrasonic',
                     jarak_sensor_ke_air: '',
                     tinggi_sensor: '',
                     elevasi_max: '',
@@ -1534,6 +1579,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     kedalaman_sumur: '',
                     kedalaman_sensor: '',
                     kedalaman_pompa: '',
+                    jenis_sensor: 'ultrasonic',
                     jarak_sensor_ke_air: '',
                     tinggi_sensor: '',
                     elevasi_max: '',
@@ -1702,6 +1748,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         kedalaman_sumur: '',
                         kedalaman_sensor: '',
                         kedalaman_pompa: '',
+                        jenis_sensor: 'ultrasonic',
                         jarak_sensor_ke_air: '',
                         tinggi_sensor: '',
                         elevasi_max: '',
@@ -1874,6 +1921,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                             this.addData.subKategori = ''
                             this.addData.has_pump = false
                             this.addData.kedalaman_pompa = ''
+                            this.addData.jenis_sensor = 'ultrasonic'
                             this.addData.jarak_sensor_ke_air = ''
                             this.addData.tinggi_sensor = ''
                         } else {
@@ -1882,6 +1930,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                             this.addData.kedalaman_sumur = ''
                             this.addData.kedalaman_sensor = ''
                             this.addData.kedalaman_pompa = ''
+                            this.addData.jenis_sensor = 'ultrasonic'
                         }
                     } else {
                         this.addData.subKategori = ''
@@ -1889,6 +1938,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         this.addData.kedalaman_sumur = ''
                         this.addData.kedalaman_sensor = ''
                         this.addData.kedalaman_pompa = ''
+                        this.addData.jenis_sensor = 'ultrasonic'
                         this.addData.id_katlogger = ''
                     }
                 },
@@ -1999,6 +2049,8 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                             `${jiat.kedalaman_sensor} m` : '-',
                         kedalaman_pompa: hasJiat && jiat.kedalaman_pompa !== null ?
                             `${jiat.kedalaman_pompa} m` : '-',
+                        jenis_sensor: device?.nonjiat?.jenis_sensor ?? '',
+                        jenis_sensor_label: device?.nonjiat?.jenis_sensor === 'radar' ? 'Radar' : (isNonJiat ? 'Ultrasonic' : '-'),
                         jarak_sensor_ke_air: device?.nonjiat?.jarak_sensor_ke_air != null ? parseFloat(device.nonjiat.jarak_sensor_ke_air) : null,
                         tinggi_sensor: device?.nonjiat?.tinggi_sensor != null ? parseFloat(device.nonjiat.tinggi_sensor) : null,
                         params: Array.isArray(device?.params) ? device.params : []
@@ -2236,6 +2288,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         kedalaman_sumur: device.jiat?.kedalaman_sumur ?? '',
                         kedalaman_sensor: device.jiat?.kedalaman_sensor ?? '',
                         kedalaman_pompa: device.jiat?.kedalaman_pompa ?? '',
+                        jenis_sensor: device.nonjiat?.jenis_sensor === 'radar' ? 'radar' : 'ultrasonic',
                         jarak_sensor_ke_air: device.nonjiat?.jarak_sensor_ke_air != null ? parseFloat(device.nonjiat.jarak_sensor_ke_air) : (device.afmr_noncontact?.jarak_sensor_ke_air != null ? parseFloat(device.afmr_noncontact.jarak_sensor_ke_air) : ''),
                         tinggi_sensor: device.nonjiat?.tinggi_sensor != null ? parseFloat(device.nonjiat.tinggi_sensor) : (device.afmr_noncontact?.tinggi_sensor != null ? parseFloat(device.afmr_noncontact.tinggi_sensor) : ''),
                         elevasi_max: device.nonjiat?.elevasi_max != null ? parseFloat(device.nonjiat.elevasi_max) : (device.afmr_noncontact?.elevasi_max != null ? parseFloat(device.afmr_noncontact.elevasi_max) : ''),

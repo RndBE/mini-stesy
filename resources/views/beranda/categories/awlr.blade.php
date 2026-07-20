@@ -68,6 +68,9 @@
                         $riverFill = 'url(#riverGrad-' . $lg->id_logger . ')';
                         $lineClr   = '#0284c7';
                         $tiangOpac = '1';
+                        $tiangNonJiatAsset = $lg->nonjiat?->jenis_sensor === 'radar'
+                            ? 'sungai/tiang-nonjiat-radar.svg'
+                            : 'sungai/tiang-nonjiat-ultra.svg';
                         $peilOpac  = $isOnline ? '1' : '1'; // peil sedikit redup saat offline
                     @endphp
 
@@ -107,7 +110,7 @@
                                 Q{{ $wx2 }},{{ $waterTopY - 5 }} {{ round(($wx1 + $wx2) / 2 + 20) }},{{ $waterTopY }}
                                 Q{{ $wx3 }},{{ $waterTopY + 4 }} {{ $wx4 }},{{ $waterTopY - 2 }}"
                             fill="none" stroke="#bae6fd" stroke-width="1.8" opacity="{{ $waveOpac }}" />
-<image href="{{ asset('sungai/tiang_tanah.svg') }}" x="{{ $tiangX }}"
+<image href="{{ asset($tiangNonJiatAsset) }}" x="{{ $tiangX }}"
                             y="{{ $tiangY }}" width="{{ $tiangW }}" height="{{ $tiangH }}"
                             preserveAspectRatio="xMinYMax meet" opacity="{{ $tiangOpac }}" />
 @php

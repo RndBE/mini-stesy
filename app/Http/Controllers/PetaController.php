@@ -92,6 +92,7 @@ class PetaController extends Controller
 
                     // ── AWLR Non-JIAT ──────────────────────────────────────────────
                     'sub_kategori' => $subKategori,
+                    'jenis_sensor'  => $l->nonjiat?->jenis_sensor,
                     'tma'          => $this->sensorVal($l->params, $latest, ['tma', 'muka_air', 'tinggi_muka', 'water_level']),
                     'debit'        => $this->sensorVal($l->params, $latest, ['debit']),
 

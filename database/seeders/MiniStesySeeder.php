@@ -754,6 +754,7 @@ class MiniStesySeeder extends Seeder
             DB::table('nonjiat_data')->insert([
                 [
                     'id_logger'           => '10008',
+                    'jenis_sensor'        => 'ultrasonic',
                     'jarak_sensor_ke_air' => 2.50,   // jarak sensor ke permukaan air (m)
                     'tinggi_sensor'       => 5.00,   // tinggi sensor dari dasar sungai (m)
                     'elevasi_max'         => 5.00,   // batas skala atas peil (m)

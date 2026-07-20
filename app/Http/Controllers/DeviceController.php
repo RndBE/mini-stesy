@@ -179,6 +179,7 @@ class DeviceController extends Controller
             'latitude'          => 'required|numeric',
             'longitude'         => 'required|numeric',
             'sub_kategori'      => 'nullable|in:jiat,non_jiat,contact,non_contact',
+            'jenis_sensor'      => 'nullable|in:ultrasonic,radar',
             'has_pump'          => 'nullable|boolean',
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
@@ -245,6 +246,7 @@ class DeviceController extends Controller
                         NonJiatData::updateOrCreate(
                             ['id_logger' => $logger->id_logger],
                             [
+                                'jenis_sensor'        => $validated['jenis_sensor'] ?? 'ultrasonic',
                                 'jarak_sensor_ke_air' => (float) ($validated['jarak_sensor_ke_air'] ?? 0),
                                 'tinggi_sensor'       => (float) ($validated['tinggi_sensor'] ?? 0),
                                 'elevasi_max'         => isset($validated['elevasi_max']) ? (float) $validated['elevasi_max'] : null,
@@ -334,6 +336,7 @@ class DeviceController extends Controller
             'latitude'          => 'nullable|numeric',
             'longitude'         => 'nullable|numeric',
             'sub_kategori'      => 'nullable|in:jiat,non_jiat,contact,non_contact',
+            'jenis_sensor'      => 'nullable|in:ultrasonic,radar',
             'has_pump'          => 'nullable|boolean',
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
@@ -389,6 +392,7 @@ class DeviceController extends Controller
                 NonJiatData::updateOrCreate(
                     ['id_logger' => $logger->id_logger],
                     [
+                        'jenis_sensor'        => $request->input('jenis_sensor', 'ultrasonic'),
                         'jarak_sensor_ke_air' => (float) ($request->jarak_sensor_ke_air ?? 0),
                         'tinggi_sensor'       => (float) ($request->tinggi_sensor ?? 0),
                         'elevasi_max'         => $request->elevasi_max !== null ? (float) $request->elevasi_max : null,

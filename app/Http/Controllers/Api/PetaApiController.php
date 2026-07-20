@@ -161,6 +161,7 @@ class PetaApiController extends Controller
                         'has_pump'         => (bool) ($l->jiat->has_pump ?? false),
                     ] : null,
                     'nonjiat_data' => $nonContactData ? [
+                        'jenis_sensor'         => $nonContactData->jenis_sensor ?? null,
                         'elevasi_min'          => is_numeric($nonContactData->elevasi_min)          ? (float) $nonContactData->elevasi_min          : null,
                         'elevasi_max'          => is_numeric($nonContactData->elevasi_max)          ? (float) $nonContactData->elevasi_max          : null,
                         'tinggi_sensor'        => is_numeric($nonContactData->tinggi_sensor)        ? (float) $nonContactData->tinggi_sensor        : null,
