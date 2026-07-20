@@ -500,20 +500,46 @@
 
                             <template x-if="isAddAwlr()">
                                 <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                    <h4 class="text-sm font-semibold text-gray-900 mb-3">Sub Kategori</h4>
-                                    <div class="flex gap-6">
-                                        <label class="inline-flex items-center">
-                                            <input type="radio" name="sub_kategori" value="jiat"
-                                                x-model="addData.subKategori"
-                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                            <span class="ml-2 text-sm">JIAT</span>
-                                        </label>
-                                        <label class="inline-flex items-center">
-                                            <input type="radio" name="sub_kategori" value="non_jiat"
-                                                x-model="addData.subKategori"
-                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                            <span class="ml-2 text-sm">Non JIAT</span>
-                                        </label>
+                                    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                                        <div>
+                                            <h4 class="text-sm font-semibold text-gray-900 mb-3">Sub Kategori</h4>
+                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="addData.subKategori === 'jiat' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="sub_kategori" value="jiat"
+                                                        x-model="addData.subKategori"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">JIAT</span>
+                                                </label>
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="addData.subKategori === 'non_jiat' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="sub_kategori" value="non_jiat"
+                                                        x-model="addData.subKategori"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Non JIAT</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div x-show="addData.subKategori === 'non_jiat'">
+                                            <h4 class="text-sm font-semibold text-gray-900 mb-3">Jenis Sensor</h4>
+                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="addData.jenis_sensor === 'ultrasonic' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="jenis_sensor" value="ultrasonic"
+                                                        x-model="addData.jenis_sensor"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Ultrasonic</span>
+                                                </label>
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="addData.jenis_sensor === 'radar' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="jenis_sensor" value="radar"
+                                                        x-model="addData.jenis_sensor"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Radar</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <template x-if="addData.subKategori === 'jiat'">
@@ -595,25 +621,6 @@
 
                                     <template x-if="addData.subKategori === 'non_jiat'">
                                         <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div class="md:col-span-2">
-                                                <label class="block text-xs font-medium text-gray-700 mb-2">Jenis Sensor</label>
-                                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
-                                                        :class="addData.jenis_sensor === 'ultrasonic' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
-                                                        <input type="radio" name="jenis_sensor" value="ultrasonic"
-                                                            x-model="addData.jenis_sensor"
-                                                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                                        <span class="text-sm font-semibold">Ultrasonic</span>
-                                                    </label>
-                                                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
-                                                        :class="addData.jenis_sensor === 'radar' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
-                                                        <input type="radio" name="jenis_sensor" value="radar"
-                                                            x-model="addData.jenis_sensor"
-                                                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                                        <span class="text-sm font-semibold">Radar</span>
-                                                    </label>
-                                                </div>
-                                            </div>
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700 mb-2">Jarak Sensor
                                                     dengan Air</label>
@@ -900,20 +907,46 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                             </div>
 <template x-if="isEditAwlr()">
                                 <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                                    <h4 class="text-sm font-semibold text-gray-900 mb-4">Sub Kategori</h4>
-                                    <div class="flex items-center gap-8 mb-4">
-                                        <label class="inline-flex items-center gap-2 text-sm text-gray-800">
-                                            <input type="radio" name="sub_kategori" value="jiat"
-                                                x-model="editData.subKategori"
-                                                class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
-                                            JIAT
-                                        </label>
-                                        <label class="inline-flex items-center gap-2 text-sm text-gray-800">
-                                            <input type="radio" name="sub_kategori" value="non_jiat"
-                                                x-model="editData.subKategori"
-                                                class="border-gray-400 text-indigo-700 focus:ring-indigo-500">
-                                            Non JIAT
-                                        </label>
+                                    <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                                        <div>
+                                            <h4 class="text-sm font-semibold text-gray-900 mb-3">Sub Kategori</h4>
+                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="editData.subKategori === 'jiat' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="sub_kategori" value="jiat"
+                                                        x-model="editData.subKategori"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">JIAT</span>
+                                                </label>
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="editData.subKategori === 'non_jiat' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="sub_kategori" value="non_jiat"
+                                                        x-model="editData.subKategori"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Non JIAT</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div x-show="editData.subKategori === 'non_jiat'">
+                                            <h4 class="text-sm font-semibold text-gray-900 mb-3">Jenis Sensor</h4>
+                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="editData.jenis_sensor === 'ultrasonic' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="jenis_sensor" value="ultrasonic"
+                                                        x-model="editData.jenis_sensor"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Ultrasonic</span>
+                                                </label>
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="editData.jenis_sensor === 'radar' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="jenis_sensor" value="radar"
+                                                        x-model="editData.jenis_sensor"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Radar</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <template x-if="editData.subKategori === 'jiat'">
@@ -983,25 +1016,6 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
 
                                     <template x-if="editData.subKategori === 'non_jiat'">
                                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                            <div class="sm:col-span-2">
-                                                <label class="block text-xs font-medium text-gray-700">Jenis Sensor</label>
-                                                <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
-                                                        :class="editData.jenis_sensor === 'ultrasonic' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
-                                                        <input type="radio" name="jenis_sensor" value="ultrasonic"
-                                                            x-model="editData.jenis_sensor"
-                                                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                                        <span class="text-sm font-semibold">Ultrasonic</span>
-                                                    </label>
-                                                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
-                                                        :class="editData.jenis_sensor === 'radar' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
-                                                        <input type="radio" name="jenis_sensor" value="radar"
-                                                            x-model="editData.jenis_sensor"
-                                                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                                        <span class="text-sm font-semibold">Radar</span>
-                                                    </label>
-                                                </div>
-                                            </div>
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700">Jarak Sensor dengan Air</label>
                                                 <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
