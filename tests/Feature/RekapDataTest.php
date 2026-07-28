@@ -127,6 +127,16 @@ class RekapDataTest extends TestCase
         $this->assertStringContainsString('$el.indeterminate', $source);
         $this->assertStringContainsString('toggleProjectGroup(group, $event.target.checked)', $source);
         $this->assertStringContainsString('toggleLoggerOption(logger.id, $event.target.checked)', $source);
+        $this->assertStringContainsString('projectGroupOpenIds', $source);
+        $this->assertStringContainsString('projectGroupAccordionInitialized', $source);
+        $this->assertStringContainsString('ensureProjectGroupAccordionState()', $source);
+        $this->assertStringContainsString('isProjectGroupOpen(group)', $source);
+        $this->assertStringContainsString('toggleProjectGroupOpen(group)', $source);
+        $this->assertStringContainsString('x-collapse', $source);
+        $this->assertStringContainsString(':aria-expanded="isProjectGroupOpen(group).toString()"', $source);
+        $this->assertStringContainsString(':aria-controls="\'project-locations-\' + group.instansi_id"', $source);
+        $this->assertStringContainsString(':id="\'project-locations-\' + group.instansi_id"', $source);
+        $this->assertStringContainsString(":class=\"isProjectGroupOpen(group) ? 'rotate-180' : ''\"", $source);
         $this->assertStringNotContainsString('Pilih Logger', $source);
         $this->assertStringNotContainsString('Nama Logger', $source);
     }

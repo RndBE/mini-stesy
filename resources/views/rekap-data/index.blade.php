@@ -352,21 +352,36 @@
                     <div class="space-y-4">
                         <template x-for="group in getLoggerGroups()" :key="'project-' + group.instansi_id">
                             <section class="overflow-hidden rounded-xl border border-slate-200">
-                                <label class="flex cursor-pointer items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 hover:bg-slate-100">
+                                <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 hover:bg-slate-100">
                                     <input type="checkbox"
-                                        class="h-4 w-4 rounded border-slate-300 text-indigo-700 focus:ring-indigo-500"
+                                        :id="'project-checkbox-' + group.instansi_id"
+                                        class="h-4 w-4 flex-shrink-0 rounded border-slate-300 text-indigo-700 focus:ring-indigo-500"
                                         :checked="isProjectGroupAllChecked(group)"
                                         x-effect="$el.indeterminate = isProjectGroupIndeterminate(group)"
                                         @change="toggleProjectGroup(group, $event.target.checked)">
-                                    <span class="min-w-0 flex-1">
-                                        <span class="block truncate text-sm font-bold text-slate-900" x-text="group.instansi_name"></span>
-                                        <span class="block text-xs text-slate-500"
-                                            x-text="`${selectedProjectLoggerCount(group)}/${group.loggers.length} lokasi dipilih`"></span>
-                                    </span>
-                                    <span class="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-500 ring-1 ring-slate-200">Project</span>
-                                </label>
+                                    <button type="button"
+                                        class="flex min-w-0 flex-1 items-center gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                                        @click="toggleProjectGroupOpen(group)"
+                                        :aria-expanded="isProjectGroupOpen(group).toString()"
+                                        :aria-controls="'project-locations-' + group.instansi_id"
+                                        :aria-label="`${isProjectGroupOpen(group) ? 'Tutup' : 'Buka'} project ${group.instansi_name}`">
+                                        <span class="min-w-0 flex-1">
+                                            <span class="block truncate text-sm font-bold text-slate-900" x-text="group.instansi_name"></span>
+                                            <span class="block text-xs text-slate-500"
+                                                x-text="`${selectedProjectLoggerCount(group)}/${group.loggers.length} lokasi dipilih`"></span>
+                                        </span>
+                                        <span class="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-500 ring-1 ring-slate-200">Project</span>
+                                        <svg class="h-4 w-4 flex-shrink-0 text-slate-400 transition-transform"
+                                            :class="isProjectGroupOpen(group) ? 'rotate-180' : ''"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9l6 6 6-6"/>
+                                        </svg>
+                                    </button>
+                                </div>
 
-                                <div class="divide-y divide-slate-100 px-2">
+                                <div x-show="isProjectGroupOpen(group)" x-collapse x-cloak
+                                    :id="'project-locations-' + group.instansi_id"
+                                    class="divide-y divide-slate-100 px-2">
                                     <template x-for="logger in group.loggers" :key="'project-location-' + logger.id">
                                         <label class="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-indigo-50/60">
                                             <input type="checkbox"
@@ -654,6 +669,8 @@
                 loggerFilterOpen: false,
                 selectedLoggerIds: loggerOptions.map((logger) => String(logger.id)),
                 loggerFilterDraft: [],
+                projectGroupOpenIds: [],
+                projectGroupAccordionInitialized: false,
 
                 displayedLoggers() {
                     const selected = new Set(this.selectedLoggerIds.map(String));
@@ -662,6 +679,7 @@
 
                 openLoggerFilter() {
                     this.loggerFilterDraft = [...this.selectedLoggerIds];
+                    this.ensureProjectGroupAccordionState();
                     this.loggerFilterOpen = true;
                 },
 
@@ -683,6 +701,31 @@
                         groups[key].loggers.push(logger);
                     });
                     return Object.values(groups);
+                },
+
+                ensureProjectGroupAccordionState() {
+                    const available = this.getLoggerGroups().map((group) => String(group.instansi_id));
+                    if (!this.projectGroupAccordionInitialized) {
+                        this.projectGroupOpenIds = [...available];
+                        this.projectGroupAccordionInitialized = true;
+                        return;
+                    }
+                    this.projectGroupOpenIds = this.projectGroupOpenIds
+                        .map(String)
+                        .filter((id) => available.includes(id));
+                },
+
+                isProjectGroupOpen(group) {
+                    return this.projectGroupOpenIds.includes(String(group.instansi_id));
+                },
+
+                toggleProjectGroupOpen(group) {
+                    const id = String(group.instansi_id);
+                    if (this.projectGroupOpenIds.includes(id)) {
+                        this.projectGroupOpenIds = this.projectGroupOpenIds.filter((value) => value !== id);
+                        return;
+                    }
+                    this.projectGroupOpenIds.push(id);
                 },
 
                 selectedProjectLoggerCount(group) {
