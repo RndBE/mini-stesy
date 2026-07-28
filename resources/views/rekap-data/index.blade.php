@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div x-data="{...rekapData(), ...csvUpload()}" class="space-y-4">
+    <div x-data="{...rekapData(@js($loggerOptions->map(fn ($logger) => ['id' => (string) $logger->id_logger, 'name' => $logger->nama_pos ?: $logger->id_logger])->values())), ...csvUpload()}" class="space-y-4">
 <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 px-6 py-4">
             <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
                 <div class="flex-1 min-w-0">
@@ -133,7 +133,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 flex-shrink-0 sm:flex-shrink w-full sm:w-auto">
+                <div class="flex flex-wrap items-center gap-3 flex-shrink-0 sm:flex-shrink w-full sm:w-auto">
                     <button @click="fetchData()"
                         class="flex-1 sm:flex-none h-11 px-6 rounded-lg bg-gradient-to-r from-blue-900 to-blue-800 text-white font-semibold hover:shadow-lg hover:shadow-blue-900/30 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2">
                         <svg x-show="!loading" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,6 +150,16 @@
                     <button @click="resetFilter()"
                         class="flex-1 sm:flex-none h-11 px-4 rounded-lg border-2 border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 active:scale-95">
                         Reset
+                    </button>
+                    <button type="button" @click="openLoggerFilter()"
+                        class="flex-1 sm:flex-none h-11 px-4 rounded-lg border-2 border-indigo-600 text-indigo-700 font-semibold hover:bg-indigo-50 hover:border-indigo-700 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 4a1 1 0 011-1h16a1 1 0 01.8 1.6l-6.2 8.27V19a1 1 0 01-.55.9l-4 2A1 1 0 019 21v-8.13L2.2 4.6A1 1 0 013 4z"/>
+                        </svg>
+                        <span>Filter Lokasi</span>
+                        <span class="rounded-full bg-indigo-100 px-2 py-0.5 text-xs text-indigo-800"
+                            x-text="`${selectedLoggerIds.length}/${loggerOptions.length}`"></span>
                     </button>
                     <button type="button" @click="openUploadModal()"
                         class="flex-1 sm:flex-none h-11 px-4 rounded-lg border-2 border-emerald-600 text-emerald-700 font-semibold hover:bg-emerald-50 hover:border-emerald-700 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap">
@@ -172,8 +182,8 @@
         </div>
 <div x-show="dataLoaded" x-cloak class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div class="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 ring-1 ring-blue-200 px-5 py-4">
-                <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide">Total Logger</p>
-                <p class="text-2xl font-bold text-blue-900 mt-1" x-text="loggers.length"></p>
+                <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide">Total Lokasi</p>
+                <p class="text-2xl font-bold text-blue-900 mt-1" x-text="displayedLoggers().length"></p>
             </div>
             <div class="rounded-lg bg-gradient-to-br from-emerald-50 to-emerald-100 ring-1 ring-emerald-200 px-5 py-4">
                 <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wide">Rata-rata Kelengkapan</p>
@@ -184,8 +194,8 @@
                 <p class="text-2xl font-bold text-purple-900 mt-1" x-text="dates.length + ' hari'"></p>
             </div>
             <div class="rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 ring-1 ring-orange-200 px-5 py-4">
-                <p class="text-xs font-semibold text-orange-600 uppercase tracking-wide">Logger Kurang Lengkap</p>
-                <p class="text-2xl font-bold text-orange-900 mt-1" x-text="loggers.filter(l => l.overall_pct < 95).length"></p>
+                <p class="text-xs font-semibold text-orange-600 uppercase tracking-wide">Lokasi Kurang Lengkap</p>
+                <p class="text-2xl font-bold text-orange-900 mt-1" x-text="displayedLoggers().filter(l => l.overall_pct < 95).length"></p>
             </div>
         </div>
 <div x-show="dataLoaded" x-cloak class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
@@ -216,7 +226,7 @@
 <th class="hidden sm:table-cell sticky left-0 z-30 bg-neutral-300 px-3 py-2 min-w-[2.5rem] text-center" rowspan="2">No</th>
 <th class="hidden sm:table-cell sticky sm:left-[2.5rem] z-30 bg-neutral-300 px-4 py-2 min-w-[7rem]" rowspan="2">ID Logger</th>
 <th class="sticky left-0 sm:left-[9.5rem] z-30 bg-neutral-300 px-4 py-2 min-w-[8rem] sm:min-w-[11rem]" rowspan="2"
-                                style="box-shadow: 4px 0 6px rgba(0,0,0,0.12)">Nama Logger</th>
+                                style="box-shadow: 4px 0 6px rgba(0,0,0,0.12)">Nama Lokasi</th>
                             <template x-for="group in monthGroups" :key="group.label">
                                 <th class="px-4 py-2 text-center border-l-2 border-neutral-400"
                                     :colspan="group.count"
@@ -232,7 +242,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200 bg-white">
-                        <template x-for="(logger, idx) in loggers" :key="logger.id">
+                        <template x-for="(logger, idx) in displayedLoggers()" :key="logger.id">
                             <tr class="hover:bg-slate-50 transition-colors">
 <td class="hidden sm:table-cell sticky left-0 z-10 bg-white px-3 py-3 text-center font-medium text-slate-500 min-w-[2.5rem] border-r border-slate-100" x-text="idx + 1"></td>
 <td class="hidden sm:table-cell sticky sm:left-[2.5rem] z-10 bg-white px-4 py-3 font-mono text-xs text-slate-800 min-w-[7rem] border-r border-slate-100" x-text="logger.id"></td>
@@ -267,10 +277,12 @@
                                 </template>
                             </tr>
                         </template>
-<template x-if="loggers.length === 0 && dataLoaded">
+<template x-if="displayedLoggers().length === 0 && dataLoaded">
                             <tr>
-                                <td :colspan="5 + dates.length" class="px-6 py-12 text-center text-sm text-slate-500">
-                                    Tidak ada data untuk rentang tanggal yang dipilih.
+                                <td :colspan="5 + dates.length" class="px-6 py-12 text-center text-sm text-slate-500"
+                                    x-text="loggers.length === 0
+                                        ? 'Tidak ada data untuk rentang tanggal yang dipilih.'
+                                        : 'Tidak ada lokasi yang dipilih. Buka Filter Lokasi untuk menampilkan data.'">
                                 </td>
                             </tr>
                         </template>
@@ -288,8 +300,83 @@
                 </div>
             </div>
             <h3 class="text-xl font-bold text-slate-900 mb-2">Rekap Data Kelengkapan</h3>
-            <p class="text-slate-500 max-w-md mx-auto">Pilih rentang tanggal, kemudian klik <strong>Cari</strong> untuk menampilkan rekap kelengkapan data seluruh logger.</p>
+            <p class="text-slate-500 max-w-md mx-auto">Pilih rentang tanggal, kemudian klik <strong>Cari</strong> untuk menampilkan rekap kelengkapan data seluruh lokasi.</p>
         </div>
+
+        {{-- ===== MODAL FILTER LOKASI ===== --}}
+        <template x-teleport="body">
+        <div x-show="loggerFilterOpen" x-cloak
+            class="fixed inset-0 z-[99990] flex items-center justify-center p-4"
+            role="dialog" aria-modal="true" aria-labelledby="logger-filter-title"
+            @keydown.escape.window="closeLoggerFilter()">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="closeLoggerFilter()"></div>
+            <div class="relative z-10 flex max-h-[85vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+                <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-6 py-4">
+                    <div class="flex min-w-0 items-center gap-3">
+                        <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-indigo-100">
+                            <svg class="h-5 w-5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 4a1 1 0 011-1h16a1 1 0 01.8 1.6l-6.2 8.27V19a1 1 0 01-.55.9l-4 2A1 1 0 019 21v-8.13L2.2 4.6A1 1 0 013 4z"/>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <h3 id="logger-filter-title" class="text-base font-bold text-slate-900">Pilih Lokasi yang Ditampilkan</h3>
+                            <p class="text-xs text-slate-500">
+                                <span x-text="loggerFilterDraft.length"></span> dari
+                                <span x-text="loggerOptions.length"></span> lokasi dipilih
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" @click="closeLoggerFilter()" aria-label="Tutup filter lokasi"
+                        class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between border-b border-slate-200 px-6 py-3">
+                    <p class="text-xs text-slate-500">Centang lokasi yang ingin terlihat pada rekap.</p>
+                    <div class="flex items-center gap-3 text-xs font-semibold">
+                        <button type="button" @click="selectAllLoggerOptions()" class="text-indigo-700 hover:text-indigo-900">Pilih semua</button>
+                        <button type="button" @click="clearLoggerOptions()" class="text-slate-500 hover:text-slate-800">Hapus semua</button>
+                    </div>
+                </div>
+
+                <div class="min-h-0 flex-1 overflow-y-auto px-6 py-4">
+                    @forelse($loggerOptions as $logger)
+                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 transition-colors hover:border-indigo-300 hover:bg-indigo-50/60">
+                            <input type="checkbox" value="{{ (string) $logger->id_logger }}" x-model="loggerFilterDraft"
+                                class="h-4 w-4 rounded border-slate-300 text-indigo-700 focus:ring-indigo-500">
+                            <span class="min-w-0 flex-1">
+                                <span class="block truncate text-sm font-semibold text-slate-900">{{ $logger->nama_pos ?: $logger->id_logger }}</span>
+                                <span class="block text-xs text-slate-500">ID {{ $logger->id_logger }}</span>
+                            </span>
+                            <svg class="h-4 w-4 flex-shrink-0 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </label>
+                    @empty
+                        <div class="rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
+                            Belum ada lokasi yang dapat diakses.
+                        </div>
+                    @endforelse
+                </div>
+
+                <div class="flex justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4">
+                    <button type="button" @click="closeLoggerFilter()"
+                        class="h-10 rounded-lg border-2 border-slate-200 px-5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-100">
+                        Batal
+                    </button>
+                    <button type="button" @click="applyLoggerFilter()"
+                        class="h-10 rounded-lg bg-indigo-700 px-6 text-sm font-semibold text-white transition-all hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-200">
+                        Terapkan
+                    </button>
+                </div>
+            </div>
+        </div>
+        </template>
 
         {{-- ===== MODAL UPLOAD CSV (di dalam main x-data agar share state) ===== --}}
         <template x-teleport="body">
@@ -322,14 +409,14 @@
                 </div>
                 {{-- Body --}}
                 <div class="px-6 py-5 space-y-4">
-                    {{-- Logger Dropdown --}}
+                    {{-- Location Dropdown --}}
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Pilih Logger</label>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Pilih Lokasi</label>
                         <select x-model="uploadLoggerId"
                             class="w-full h-10 rounded-lg border border-slate-300 px-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-500 bg-white">
-                            <option value="">-- Pilih Logger --</option>
-                            @foreach(\App\Models\t_Logger::query()->forUser(auth()->user())->orderBy('nama_logger')->get() as $lgr)
-                                <option value="{{ $lgr->id_logger }}">{{ $lgr->nama_logger ?? $lgr->id_logger }} &mdash; {{ $lgr->id_logger }}</option>
+                            <option value="">-- Pilih Lokasi --</option>
+                            @foreach($loggerOptions as $logger)
+                                <option value="{{ $logger->id_logger }}">{{ $logger->nama_pos ?: $logger->id_logger }} &mdash; {{ $logger->id_logger }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -514,7 +601,7 @@
     </div>
 
     <script>
-        function rekapData() {
+        function rekapData(loggerOptions = []) {
             const today = new Date();
             const sevenDaysAgo = new Date(today);
             sevenDaysAgo.setDate(today.getDate() - 6);
@@ -531,6 +618,42 @@
                 errorMessage: '',
                 dates: [],
                 loggers: [],
+
+                // --- Filter lokasi ---
+                loggerOptions,
+                loggerFilterOpen: false,
+                selectedLoggerIds: loggerOptions.map((logger) => String(logger.id)),
+                loggerFilterDraft: [],
+
+                displayedLoggers() {
+                    const selected = new Set(this.selectedLoggerIds.map(String));
+                    return this.loggers.filter((logger) => selected.has(String(logger.id)));
+                },
+
+                openLoggerFilter() {
+                    this.loggerFilterDraft = [...this.selectedLoggerIds];
+                    this.loggerFilterOpen = true;
+                },
+
+                closeLoggerFilter() {
+                    this.loggerFilterOpen = false;
+                },
+
+                selectAllLoggerOptions() {
+                    this.loggerFilterDraft = this.loggerOptions.map((logger) => String(logger.id));
+                },
+
+                clearLoggerOptions() {
+                    this.loggerFilterDraft = [];
+                },
+
+                applyLoggerFilter() {
+                    const available = new Set(this.loggerOptions.map((logger) => String(logger.id)));
+                    this.selectedLoggerIds = this.loggerFilterDraft
+                        .map(String)
+                        .filter((id) => available.has(id));
+                    this.loggerFilterOpen = false;
+                },
 
                 // --- Modal menit hilang ---
                 missingOpen:     false,
@@ -582,9 +705,10 @@
                 },
 
                 get overallAvg() {
-                    if (!this.loggers.length) return '0.0';
-                    const sum = this.loggers.reduce((a, l) => a + l.overall_pct, 0);
-                    return (sum / this.loggers.length).toFixed(1);
+                    const visibleLoggers = this.displayedLoggers();
+                    if (!visibleLoggers.length) return '0.0';
+                    const sum = visibleLoggers.reduce((a, logger) => a + logger.overall_pct, 0);
+                    return (sum / visibleLoggers.length).toFixed(1);
                 },
 
                 async fetchData() {
@@ -647,10 +771,13 @@
                     const fmt = (d) => d.toISOString().split('T')[0];
                     const sd = fmt(sevenDaysAgo), ed = fmt(today);
                     this.filters = { start_date: sd, end_date: ed };
-                    this.dataLoaded   = false;
-                    this.dates        = [];
-                    this.loggers      = [];
-                    this.errorMessage = '';
+                    this.dataLoaded        = false;
+                    this.dates             = [];
+                    this.loggers           = [];
+                    this.selectedLoggerIds = this.loggerOptions.map((logger) => String(logger.id));
+                    this.loggerFilterDraft = [];
+                    this.loggerFilterOpen  = false;
+                    this.errorMessage      = '';
                     if (typeof window.rkpSetRange === 'function') {
                         window.rkpSetRange(sd, ed);
                     }

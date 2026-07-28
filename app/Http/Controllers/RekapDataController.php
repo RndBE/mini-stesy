@@ -15,7 +15,10 @@ class RekapDataController extends Controller
 {
     public function index()
     {
-        return view('rekap-data.index', ['title' => 'Rekap Data']);
+        return view('rekap-data.index', [
+            'title' => 'Rekap Data',
+            'loggerOptions' => $this->accessibleLoggers(),
+        ]);
     }
 
     public function getData(Request $request)
@@ -47,10 +50,7 @@ class RekapDataController extends Controller
         $dates  = collect($period)->map(fn($d) => $d->toDateString())->toArray();
 
         // Load all loggers accessible by user
-        $loggers = t_Logger::query()
-            ->forUser(auth()->user())
-            ->orderBy('nama_logger')
-            ->get();
+        $loggers = $this->accessibleLoggers();
 
         $now = Carbon::now(config('app.timezone'));
         $loggersData = [];
@@ -81,7 +81,7 @@ class RekapDataController extends Controller
 
             $loggersData[] = [
                 'id'             => $logger->id_logger,
-                'name'           => $logger->nama_logger ?? $logger->id_logger,
+                'name'           => $logger->nama_pos ?: $logger->id_logger,
                 'table'          => DataMasukStats::resolveTable($logger),
                 'days'           => $days,
                 'total_count'    => $totalCount,
@@ -119,6 +119,7 @@ class RekapDataController extends Controller
         }
 
         $logger = t_Logger::query()
+            ->with('lokasi')
             ->forUser(auth()->user())
             ->where('id_logger', $loggerId)
             ->first();
@@ -135,7 +136,7 @@ class RekapDataController extends Controller
         return response()->json([
             'success'       => true,
             'logger_id'     => $logger->id_logger,
-            'logger_name'   => $logger->nama_logger ?? $logger->id_logger,
+            'logger_name'   => $logger->nama_pos ?: $logger->id_logger,
             'date'          => $parsed->toDateString(),
             'expected'      => $stats['expected'],
             'present'       => $stats['present'],
@@ -159,6 +160,7 @@ class RekapDataController extends Controller
 
         // Pastikan logger ada & user punya akses
         $logger = t_Logger::query()
+            ->with('lokasi')
             ->forUser(auth()->user())
             ->where('id_logger', $loggerId)
             ->first();
@@ -330,6 +332,16 @@ class RekapDataController extends Controller
             'errors'   => $errors,
             'message'  => "{$inserted} baris ditambahkan, {$skipped} baris dilewati.",
         ]);
+    }
+
+    private function accessibleLoggers()
+    {
+        return t_Logger::query()
+            ->with('lokasi')
+            ->forUser(auth()->user())
+            ->get()
+            ->sortBy(fn (t_Logger $logger) => mb_strtolower($logger->nama_pos ?: $logger->id_logger))
+            ->values();
     }
 
 }
