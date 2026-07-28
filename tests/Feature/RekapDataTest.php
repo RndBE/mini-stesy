@@ -17,9 +17,15 @@ class RekapDataTest extends TestCase
 
         Carbon::setTestNow(Carbon::parse('2026-06-23 10:30:00', config('app.timezone')));
 
-        foreach (['t_s16_01', 't_lokasi', 't_logger', 't_user'] as $table) {
+        foreach (['t_s16_01', 't_lokasi', 't_logger', 't_user', 'instansi'] as $table) {
             Schema::dropIfExists($table);
         }
+
+        Schema::create('instansi', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('nama')->unique();
+            $table->timestamps();
+        });
 
         Schema::create('t_user', function (Blueprint $table) {
             $table->increments('id_user');
@@ -110,19 +116,54 @@ class RekapDataTest extends TestCase
 
         $this->assertStringContainsString('Filter Lokasi', $source);
         $this->assertStringContainsString('Pilih Lokasi yang Ditampilkan', $source);
-        $this->assertStringContainsString('x-model="loggerFilterDraft"', $source);
+        $this->assertStringContainsString('loggerFilterDraft', $source);
         $this->assertStringContainsString('x-teleport="body"', $source);
         $this->assertStringContainsString('displayedLoggers', $source);
         $this->assertStringContainsString('Pilih Lokasi', $source);
         $this->assertStringContainsString('$logger->nama_pos', $source);
+        $this->assertStringContainsString('getLoggerGroups()', $source);
+        $this->assertStringContainsString('isProjectGroupAllChecked(group)', $source);
+        $this->assertStringContainsString('isProjectGroupIndeterminate(group)', $source);
+        $this->assertStringContainsString('$el.indeterminate', $source);
+        $this->assertStringContainsString('toggleProjectGroup(group, $event.target.checked)', $source);
+        $this->assertStringContainsString('toggleLoggerOption(logger.id, $event.target.checked)', $source);
         $this->assertStringNotContainsString('Pilih Logger', $source);
         $this->assertStringNotContainsString('Nama Logger', $source);
     }
 
-    private function insertLogger(string $id, string $name, ?int $locationId = null): void
+    public function test_rekap_view_groups_distinct_logger_ids_by_project_without_merging_location(): void
+    {
+        $projectId = DB::table('instansi')->insertGetId([
+            'nama' => 'Project Bengawan Solo',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $locationId = DB::table('t_lokasi')->insertGetId([
+            'nama_lokasi' => 'Bendung Mojolaban',
+        ]);
+
+        $this->insertLogger('L-101', 'Logger Satu', $locationId, $projectId);
+        $this->insertLogger('L-102', 'Logger Dua', $locationId, $projectId);
+
+        $html = $this->actingAs($this->superadmin())
+            ->get('/rekap-data')
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringContainsString('Project Bengawan Solo', $html);
+        $this->assertStringContainsString('Bendung Mojolaban', $html);
+        $this->assertStringContainsString('L-101', $html);
+        $this->assertStringContainsString('L-102', $html);
+        $this->assertStringContainsString("'instansi_id' =>", file_get_contents(
+            resource_path('views/rekap-data/index.blade.php')
+        ));
+    }
+
+    private function insertLogger(string $id, string $name, ?int $locationId = null, ?int $projectId = null): void
     {
         DB::table('t_logger')->insert([
             'id_logger' => $id,
+            'instansi_id' => $projectId,
             'nama_logger' => $name,
             'tabel_main' => 't_s16_01',
             'idlokasi' => $locationId,

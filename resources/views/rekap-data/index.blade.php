@@ -1,7 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-    <div x-data="{...rekapData(@js($loggerOptions->map(fn ($logger) => ['id' => (string) $logger->id_logger, 'name' => $logger->nama_pos ?: $logger->id_logger])->values())), ...csvUpload()}" class="space-y-4">
+    <div x-data="{...rekapData(@js($loggerOptions->map(fn ($logger) => [
+        'id' => (string) $logger->id_logger,
+        'name' => $logger->nama_pos ?: $logger->id_logger,
+        'instansi_id' => $logger->instansi_id === null ? null : (string) $logger->instansi_id,
+        'instansi_name' => $logger->instansi?->nama ?: 'Tanpa Project',
+    ])->values())), ...csvUpload()}" class="space-y-4">
 <div class="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200 px-6 py-4">
             <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
                 <div class="flex-1 min-w-0">
@@ -344,24 +349,49 @@
                 </div>
 
                 <div class="min-h-0 flex-1 overflow-y-auto px-6 py-4">
-                    @forelse($loggerOptions as $logger)
-                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 transition-colors hover:border-indigo-300 hover:bg-indigo-50/60">
-                            <input type="checkbox" value="{{ (string) $logger->id_logger }}" x-model="loggerFilterDraft"
-                                class="h-4 w-4 rounded border-slate-300 text-indigo-700 focus:ring-indigo-500">
-                            <span class="min-w-0 flex-1">
-                                <span class="block truncate text-sm font-semibold text-slate-900">{{ $logger->nama_pos ?: $logger->id_logger }}</span>
-                                <span class="block text-xs text-slate-500">ID {{ $logger->id_logger }}</span>
-                            </span>
-                            <svg class="h-4 w-4 flex-shrink-0 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                        </label>
-                    @empty
-                        <div class="rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
+                    <div class="space-y-4">
+                        <template x-for="group in getLoggerGroups()" :key="'project-' + group.instansi_id">
+                            <section class="overflow-hidden rounded-xl border border-slate-200">
+                                <label class="flex cursor-pointer items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 hover:bg-slate-100">
+                                    <input type="checkbox"
+                                        class="h-4 w-4 rounded border-slate-300 text-indigo-700 focus:ring-indigo-500"
+                                        :checked="isProjectGroupAllChecked(group)"
+                                        x-effect="$el.indeterminate = isProjectGroupIndeterminate(group)"
+                                        @change="toggleProjectGroup(group, $event.target.checked)">
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block truncate text-sm font-bold text-slate-900" x-text="group.instansi_name"></span>
+                                        <span class="block text-xs text-slate-500"
+                                            x-text="`${selectedProjectLoggerCount(group)}/${group.loggers.length} lokasi dipilih`"></span>
+                                    </span>
+                                    <span class="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-500 ring-1 ring-slate-200">Project</span>
+                                </label>
+
+                                <div class="divide-y divide-slate-100 px-2">
+                                    <template x-for="logger in group.loggers" :key="'project-location-' + logger.id">
+                                        <label class="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-indigo-50/60">
+                                            <input type="checkbox"
+                                                class="h-4 w-4 rounded border-slate-300 text-indigo-700 focus:ring-indigo-500"
+                                                :checked="loggerFilterDraft.includes(String(logger.id))"
+                                                @change="toggleLoggerOption(logger.id, $event.target.checked)">
+                                            <span class="min-w-0 flex-1">
+                                                <span class="block truncate text-sm font-semibold text-slate-900" x-text="logger.name"></span>
+                                                <span class="block text-xs text-slate-500" x-text="`ID ${logger.id}`"></span>
+                                            </span>
+                                            <svg class="h-4 w-4 flex-shrink-0 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                        </label>
+                                    </template>
+                                </div>
+                            </section>
+                        </template>
+
+                        <div x-show="getLoggerGroups().length === 0"
+                            class="rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
                             Belum ada lokasi yang dapat diakses.
                         </div>
-                    @endforelse
+                    </div>
                 </div>
 
                 <div class="flex justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4">
@@ -637,6 +667,54 @@
 
                 closeLoggerFilter() {
                     this.loggerFilterOpen = false;
+                },
+
+                getLoggerGroups() {
+                    const groups = {};
+                    this.loggerOptions.forEach((logger) => {
+                        const key = logger.instansi_id === null ? 'none' : String(logger.instansi_id);
+                        if (!groups[key]) {
+                            groups[key] = {
+                                instansi_id: key,
+                                instansi_name: logger.instansi_name || 'Tanpa Project',
+                                loggers: [],
+                            };
+                        }
+                        groups[key].loggers.push(logger);
+                    });
+                    return Object.values(groups);
+                },
+
+                selectedProjectLoggerCount(group) {
+                    return group.loggers.filter((logger) =>
+                        this.loggerFilterDraft.includes(String(logger.id))).length;
+                },
+
+                isProjectGroupAllChecked(group) {
+                    return group.loggers.length > 0
+                        && group.loggers.every((logger) =>
+                            this.loggerFilterDraft.includes(String(logger.id)));
+                },
+
+                isProjectGroupIndeterminate(group) {
+                    const selected = this.selectedProjectLoggerCount(group);
+                    return selected > 0 && selected < group.loggers.length;
+                },
+
+                toggleProjectGroup(group, checked) {
+                    group.loggers.forEach((logger) =>
+                        this.toggleLoggerOption(logger.id, checked));
+                },
+
+                toggleLoggerOption(loggerId, checked) {
+                    const id = String(loggerId);
+                    if (checked) {
+                        if (!this.loggerFilterDraft.includes(id)) {
+                            this.loggerFilterDraft.push(id);
+                        }
+                        return;
+                    }
+                    this.loggerFilterDraft = this.loggerFilterDraft.filter((value) => value !== id);
                 },
 
                 selectAllLoggerOptions() {

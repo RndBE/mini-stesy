@@ -337,7 +337,7 @@ class RekapDataController extends Controller
     private function accessibleLoggers()
     {
         return t_Logger::query()
-            ->with('lokasi')
+            ->with(['lokasi', 'instansi'])
             ->forUser(auth()->user())
             ->get()
             ->sortBy(fn (t_Logger $logger) => mb_strtolower($logger->nama_pos ?: $logger->id_logger))
