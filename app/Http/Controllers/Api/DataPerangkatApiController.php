@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\t_Logger;
 use App\Models\Parameter;
+use App\Support\LoggerDisplayOrder;
 use App\Support\SensorFamily;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +35,8 @@ class DataPerangkatApiController extends Controller
             $query->where('id_katlogger', $request->id_katlogger);
         }
 
-        $devices = $query->get()->map(fn($d) => $this->formatDevice($d));
+        $devices = LoggerDisplayOrder::sort($query->get())
+            ->map(fn($d) => $this->formatDevice($d));
 
         return response()->json([
             'success' => true,

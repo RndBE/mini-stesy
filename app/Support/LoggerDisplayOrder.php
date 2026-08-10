@@ -2,10 +2,11 @@
 
 namespace App\Support;
 
-class BerandaLoggerOrder
+class LoggerDisplayOrder
 {
     /**
-     * Urutan tampil logger di beranda, mengikuti daftar Data Logger:
+     * Urutan tampil logger di beranda web maupun API mobile, mengikuti
+     * daftar Data Logger:
      * Sukoharjo (Reservoir Mojolaban) lalu Surakarta (Reservoir Plesungan).
      * Dipakai id_logger karena nama_logger tidak konsisten ("DMA 12 OUTLET"
      * vs "INLET DMA 12"). Logger di luar daftar tampil setelahnya, urut nama.

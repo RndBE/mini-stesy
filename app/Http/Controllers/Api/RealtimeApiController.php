@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\t_Logger;
+use App\Support\LoggerDisplayOrder;
 use App\Support\SensorFamily;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +36,7 @@ class RealtimeApiController extends Controller
             ->with(['lokasi', 'kategori', 'jiat', 'params', 'temp16', 'temp19', 'temp50'])
             ->orderBy('nama_logger')
             ->get()
+            ->pipe(fn($items) => LoggerDisplayOrder::sort($items))
             ->map(function ($lg) {
                 $waktu16 = optional($lg->temp16)->waktu;
                 $waktu19 = optional($lg->temp19)->waktu;

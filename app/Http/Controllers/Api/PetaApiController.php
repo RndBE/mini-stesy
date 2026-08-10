@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\t_Logger;
 use App\Models\KlasifikasiThreshold;
 use App\Services\ParameterIconResolver;
+use App\Support\LoggerDisplayOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -28,6 +29,7 @@ class PetaApiController extends Controller
             ->with(['lokasi', 'params', 'temp16', 'temp19', 'temp50', 'jiat', 'nonjiat', 'afmrContact', 'afmrNonContact', 'kategori', 'informasi', 'fotos'])
             ->whereNotNull('idlokasi')
             ->get()
+            ->pipe(fn($items) => LoggerDisplayOrder::sort($items))
             ->map(function ($l) use ($thresholds) {
                 $lat = $l->lokasi?->latitude;
                 $lng = $l->lokasi?->longitude;
