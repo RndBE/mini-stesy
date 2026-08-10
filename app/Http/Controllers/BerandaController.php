@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\t_Logger;
 use App\Support\ArrRainStatus;
+use App\Support\BerandaLoggerOrder;
 use Carbon\Carbon;
 use App\Services\MiniStesyApi;
 use Illuminate\Support\Facades\DB;
@@ -87,13 +88,15 @@ class BerandaController extends Controller
                 return $lg;
             });
 
+        $loggers = BerandaLoggerOrder::sort($loggers);
+
         $groupedLoggers = $loggers
             ->groupBy(function ($lg) {
                 $kategori = $lg->kategori?->nama_kategori ?? $lg->kategori?->kode ?? null;
                 return $kategori ? strtoupper(trim($kategori)) : 'TANPA KATEGORI';
             })
             ->sortKeys()
-            ->map(fn($categoryLoggers) => $categoryLoggers->sortBy('nama_logger')->values());
+            ->map(fn($categoryLoggers) => BerandaLoggerOrder::sort($categoryLoggers));
 
         return view('beranda.index', [
             'title' => 'Beranda',
