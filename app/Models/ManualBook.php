@@ -15,11 +15,72 @@ class ManualBook extends Model
     public const VISIBILITY_SELECTED = 'selected';
 
     /**
-     * Batas ukuran unggahan dalam kilobyte (satuan rule `max` Laravel).
-     * Dipakai controller untuk validasi dan view untuk penjaga sisi klien,
-     * supaya angkanya tidak pernah beda antara keduanya.
+     * Batas yang kita inginkan, dalam kilobyte (satuan rule `max` Laravel).
+     * Batas sesungguhnya belum tentu sebesar ini — lihat maxUploadKb().
      */
     public const MAX_FILE_KB = 51200;
+
+    /** Sisihkan ruang untuk field non-file di dalam body POST. */
+    private const POST_OVERHEAD_KB = 512;
+
+    /**
+     * Batas unggahan efektif: yang terkecil antara MAX_FILE_KB, post_max_size,
+     * dan upload_max_filesize milik server.
+     *
+     * Wajib dihitung, bukan dipatok: kalau batas aplikasi melebihi batas PHP,
+     * ValidatePostSize melempar PostTooLargeException sebelum session dimulai,
+     * sehingga user cuma dapat halaman 413 tanpa pesan apa pun. Server produksi
+     * sering memakai default 8M sementara lokal jauh lebih besar.
+     */
+    public static function maxUploadKb(): int
+    {
+        $batas = [self::MAX_FILE_KB];
+
+        $postKb = self::iniKb('post_max_size');
+        if ($postKb !== null) {
+            $batas[] = $postKb - self::POST_OVERHEAD_KB;
+        }
+
+        $uploadKb = self::iniKb('upload_max_filesize');
+        if ($uploadKb !== null) {
+            $batas[] = $uploadKb;
+        }
+
+        return max(1, min($batas));
+    }
+
+    /** Baca direktif ini_get berukuran (contoh "8M", "100M") jadi kilobyte. */
+    private static function iniKb(string $direktif): ?int
+    {
+        $nilai = trim((string) ini_get($direktif));
+
+        // 0 atau kosong berarti tanpa batas.
+        if ($nilai === '' || $nilai === '0') {
+            return null;
+        }
+
+        $angka = (float) $nilai;
+        $satuan = strtolower(substr($nilai, -1));
+
+        $bytes = match ($satuan) {
+            'g' => $angka * 1024 * 1024 * 1024,
+            'm' => $angka * 1024 * 1024,
+            'k' => $angka * 1024,
+            default => $angka,
+        };
+
+        return $bytes <= 0 ? null : (int) ($bytes / 1024);
+    }
+
+    /** Label batas efektif untuk ditampilkan ke user, contoh "7 MB". */
+    public static function maxUploadLabel(): string
+    {
+        $kb = self::maxUploadKb();
+
+        return $kb >= 1024
+            ? rtrim(rtrim(number_format($kb / 1024, 1, '.', ''), '0'), '.') . ' MB'
+            : $kb . ' KB';
+    }
 
     public const VISIBILITIES = [
         self::VISIBILITY_ALL,

@@ -203,7 +203,7 @@ class ManualBookController extends Controller
             'file' => [
                 $fileRequired ? 'required' : 'nullable',
                 'file',
-                'max:' . ManualBook::MAX_FILE_KB,
+                'max:' . ManualBook::maxUploadKb(),
                 'extensions:' . implode(',', self::ALLOWED_EXTENSIONS),
             ],
             'visibility' => ['required', Rule::in(ManualBook::VISIBILITIES)],
@@ -211,7 +211,7 @@ class ManualBookController extends Controller
             'targets.*' => ['string', 'max:100'],
         ], [
             'file.required' => 'File manual book wajib diunggah.',
-            'file.max' => 'Ukuran file maksimal ' . (int) (ManualBook::MAX_FILE_KB / 1024) . ' MB.',
+            'file.max' => 'Ukuran file maksimal ' . ManualBook::maxUploadLabel() . '.',
             'file.extensions' => 'Format file harus salah satu dari: ' . implode(', ', self::ALLOWED_EXTENSIONS) . '.',
         ]);
     }

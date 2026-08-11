@@ -98,7 +98,7 @@
                 <template x-if="!fileDipilih">
                     <span class="mt-2 block">
                         <span class="block text-sm font-semibold text-slate-700">Klik untuk pilih file</span>
-                        <span class="mt-0.5 block text-xs text-slate-500">PDF, Word, Excel, atau PowerPoint · maksimal {{ (int) (ManualBook::MAX_FILE_KB / 1024) }} MB</span>
+                        <span class="mt-0.5 block text-xs text-slate-500">PDF, Word, Excel, atau PowerPoint · maksimal {{ ManualBook::maxUploadLabel() }}</span>
                     </span>
                 </template>
 

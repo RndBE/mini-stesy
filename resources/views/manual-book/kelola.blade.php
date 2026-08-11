@@ -38,7 +38,8 @@
         mode: 'create',
         form: {},
         fileDipilih: null,
-        maksKb: @js(ManualBook::MAX_FILE_KB),
+        maksKb: @js(ManualBook::maxUploadKb()),
+        maksLabel: @js(ManualBook::maxUploadLabel()),
         galatFile: null,
         hapusId: null,
         hapusJudul: '',
@@ -94,8 +95,8 @@
             const file = event.target.files[0] ?? null;
 
             if (file && file.size > this.maksKb * 1024) {
-                this.galatFile = 'Ukuran file maksimal ' + Math.round(this.maksKb / 1024)
-                    + ' MB. File yang dipilih ' + this.labelUkuran(file.size) + '.';
+                this.galatFile = 'Ukuran file maksimal ' + this.maksLabel
+                    + '. File yang dipilih ' + this.labelUkuran(file.size) + '.';
                 event.target.value = '';
                 this.fileDipilih = null;
                 return;
