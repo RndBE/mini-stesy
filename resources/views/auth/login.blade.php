@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-white">
-        <section class="relative overflow-hidden px-6 py-10 sm:px-12 lg:col-span-8">
+        <section class="relative hidden overflow-hidden px-6 py-10 sm:px-12 lg:col-span-8 lg:block">
 
             <div class="relative z-10 flex h-full flex-col bg-blue items-center">
 
