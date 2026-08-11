@@ -12,6 +12,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\ManualBookController;
 use App\Http\Controllers\DataMasukController;
 use App\Http\Controllers\TingkatSiagaAwlrController;
 use App\Http\Controllers\RekapDataController;
@@ -164,6 +165,22 @@ Route::middleware(['auth', 'permission:manage_profile'])->delete('/profile', [Pr
 
 Route::middleware(['auth'])->get('/download', [DownloadController::class, 'index'])->name('download.index');
 Route::middleware(['auth'])->get('/download/android/apk', [DownloadController::class, 'apk'])->name('download.android.apk');
+
+// Manual Book — halaman baca terbuka untuk semua user yang login,
+// pengelolaannya dibatasi permission manage_manual_book.
+Route::middleware(['auth', 'permission:manage_manual_book'])->group(function () {
+    Route::get('/manual-book/kelola', [ManualBookController::class, 'kelola'])->name('manual-book.kelola');
+    Route::post('/manual-book/kelola', [ManualBookController::class, 'store'])->name('manual-book.store');
+    Route::put('/manual-book/kelola/{manualBook}', [ManualBookController::class, 'update'])->whereNumber('manualBook')->name('manual-book.update');
+    Route::delete('/manual-book/kelola/{manualBook}', [ManualBookController::class, 'destroy'])->whereNumber('manualBook')->name('manual-book.destroy');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/manual-book', [ManualBookController::class, 'index'])->name('manual-book.index');
+    Route::get('/manual-book/{manualBook}/preview', [ManualBookController::class, 'preview'])->whereNumber('manualBook')->name('manual-book.preview');
+    Route::get('/manual-book/{manualBook}/download', [ManualBookController::class, 'download'])->whereNumber('manualBook')->name('manual-book.download');
+});
+
 Route::middleware(['auth'])->post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
 Route::middleware(['auth'])->post('/chatbot/stream', [ChatbotController::class, 'stream'])->name('chatbot.stream');
 

@@ -300,6 +300,10 @@ class AuditLogService
             return 'Download';
         }
 
+        if (Str::startsWith($name, 'manual-book.')) {
+            return 'Manual Book';
+        }
+
         if (Str::startsWith($name, 'audit-log.')) {
             return 'Audit Log';
         }
