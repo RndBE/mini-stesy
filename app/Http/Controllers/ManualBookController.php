@@ -22,9 +22,6 @@ class ManualBookController extends Controller
 
     private const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
 
-    /** Maksimal 50 MB — satuan rule `max` Laravel untuk file adalah kilobyte. */
-    private const MAX_FILE_KB = 51200;
-
     /**
      * Content-Type saat file disajikan dipaksa dari daftar ini, bukan dari MIME
      * kiriman pengunggah, supaya file tidak pernah tersaji sebagai HTML/script.
@@ -206,7 +203,7 @@ class ManualBookController extends Controller
             'file' => [
                 $fileRequired ? 'required' : 'nullable',
                 'file',
-                'max:' . self::MAX_FILE_KB,
+                'max:' . ManualBook::MAX_FILE_KB,
                 'extensions:' . implode(',', self::ALLOWED_EXTENSIONS),
             ],
             'visibility' => ['required', Rule::in(ManualBook::VISIBILITIES)],
@@ -214,7 +211,7 @@ class ManualBookController extends Controller
             'targets.*' => ['string', 'max:100'],
         ], [
             'file.required' => 'File manual book wajib diunggah.',
-            'file.max' => 'Ukuran file maksimal 50 MB.',
+            'file.max' => 'Ukuran file maksimal ' . (int) (ManualBook::MAX_FILE_KB / 1024) . ' MB.',
             'file.extensions' => 'Format file harus salah satu dari: ' . implode(', ', self::ALLOWED_EXTENSIONS) . '.',
         ]);
     }

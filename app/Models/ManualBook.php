@@ -14,6 +14,13 @@ class ManualBook extends Model
     public const VISIBILITY_ROLE = 'role';
     public const VISIBILITY_SELECTED = 'selected';
 
+    /**
+     * Batas ukuran unggahan dalam kilobyte (satuan rule `max` Laravel).
+     * Dipakai controller untuk validasi dan view untuk penjaga sisi klien,
+     * supaya angkanya tidak pernah beda antara keduanya.
+     */
+    public const MAX_FILE_KB = 51200;
+
     public const VISIBILITIES = [
         self::VISIBILITY_ALL,
         self::VISIBILITY_INSTANSI,

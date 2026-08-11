@@ -38,6 +38,8 @@
         mode: 'create',
         form: {},
         fileDipilih: null,
+        maksKb: @js(ManualBook::MAX_FILE_KB),
+        galatFile: null,
         hapusId: null,
         hapusJudul: '',
 
@@ -70,6 +72,7 @@
             this.mode = 'create';
             this.form = this.formKosong();
             this.fileDipilih = null;
+            this.galatFile = null;
             this.open = true;
         },
 
@@ -77,7 +80,29 @@
             this.mode = 'edit';
             this.form = { ...this.formKosong(), ...(this.books[id] ?? {}) };
             this.fileDipilih = null;
+            this.galatFile = null;
             this.open = true;
+        },
+
+        /**
+         * Tolak file kelebihan ukuran sebelum terkirim. Perlu di sisi klien
+         * karena kalau melewati post_max_size PHP, ValidatePostSize melempar
+         * error sebelum session dimulai sehingga pesan validasi tidak bisa
+         * ditampilkan di form.
+         */
+        pilihFile(event) {
+            const file = event.target.files[0] ?? null;
+
+            if (file && file.size > this.maksKb * 1024) {
+                this.galatFile = 'Ukuran file maksimal ' + Math.round(this.maksKb / 1024)
+                    + ' MB. File yang dipilih ' + this.labelUkuran(file.size) + '.';
+                event.target.value = '';
+                this.fileDipilih = null;
+                return;
+            }
+
+            this.galatFile = null;
+            this.fileDipilih = file;
         },
 
         /** Label ukuran file yang baru dipilih di dropzone. */

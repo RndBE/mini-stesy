@@ -88,7 +88,7 @@
                 class="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center transition hover:border-blue-400 hover:bg-blue-50">
                 <input type="file" name="file" class="sr-only" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
                     :required="mode === 'create'"
-                    @change="fileDipilih = $event.target.files[0] ?? null">
+                    @change="pilihFile($event)">
 
                 <svg class="h-7 w-7 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V8m0 0l-3 3m3-3l3 3" />
@@ -98,7 +98,7 @@
                 <template x-if="!fileDipilih">
                     <span class="mt-2 block">
                         <span class="block text-sm font-semibold text-slate-700">Klik untuk pilih file</span>
-                        <span class="mt-0.5 block text-xs text-slate-500">PDF, Word, Excel, atau PowerPoint · maksimal 50 MB</span>
+                        <span class="mt-0.5 block text-xs text-slate-500">PDF, Word, Excel, atau PowerPoint · maksimal {{ (int) (ManualBook::MAX_FILE_KB / 1024) }} MB</span>
                     </span>
                 </template>
 
@@ -114,6 +114,9 @@
                 PDF bisa dibaca langsung di browser, format lain akan terunduh.
                 <span x-show="mode === 'edit'" x-cloak>Biarkan kosong jika tidak ingin mengganti file.</span>
             </p>
+            {{-- Ditolak di sisi klien: file tidak pernah dikirim --}}
+            <p x-show="galatFile" x-cloak class="mt-1 text-xs text-red-600" x-text="galatFile"></p>
+
             @error('file')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
         </div>
 
