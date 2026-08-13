@@ -238,13 +238,21 @@ class AnalisaController extends Controller
             ->where('id_logger', $id_logger)
             ->whereNotNull($column);
 
+        // Gunakan perbandingan rentang (>= dan <), bukan whereDate/whereYear/whereMonth.
+        // Fungsi SQL pada kolom waktu membuat index (id_logger, waktu) tidak terpakai
+        // sehingga query berubah jadi full table scan.
         if ($range === 'day') {
-            $query->whereDate($timeColumn, $date);
+            $dayStart = date('Y-m-d', strtotime($date));
+            $query->where($timeColumn, '>=', $dayStart . ' 00:00:00')
+                ->where($timeColumn, '<', date('Y-m-d 00:00:00', strtotime('+1 day', strtotime($dayStart))));
         } elseif ($range === 'month') {
-            $query->whereYear($timeColumn, date('Y', strtotime($date)))
-                ->whereMonth($timeColumn, date('m', strtotime($date)));
+            $monthStart = date('Y-m-01', strtotime($date));
+            $query->where($timeColumn, '>=', $monthStart . ' 00:00:00')
+                ->where($timeColumn, '<', date('Y-m-01 00:00:00', strtotime('+1 month', strtotime($monthStart))));
         } elseif ($range === 'year') {
-            $query->whereYear($timeColumn, date('Y', strtotime($date)));
+            $yearStart = date('Y-01-01', strtotime($date));
+            $query->where($timeColumn, '>=', $yearStart . ' 00:00:00')
+                ->where($timeColumn, '<', date('Y-01-01 00:00:00', strtotime('+1 year', strtotime($yearStart))));
         } elseif ($range === 'custom') {
             // Handle custom range: date comes as "startDateTime,endDateTime"
             $dateRange = explode(',', $date);
@@ -255,10 +263,10 @@ class AnalisaController extends Controller
             }
         }
 
-        // Optimasi: Select hanya kolom yang dibutuhkan
-        $data = $query->select($timeColumn, $column)
-            ->orderBy($timeColumn, 'asc')
-            ->get();
+        // Agregasi dilakukan di database, bukan dengan menarik seluruh baris ke PHP.
+        // Rentang tahunan bisa berisi ratusan ribu baris; memuatnya ke Collection
+        // melewati memory_limit. Hasil per bucket identik dengan groupBy() lama.
+        $buckets = $this->fetchBuckets($query, $timeColumn, $column, $range, $tipeGraf, $isFault);
 
         $labels = [];
         $values = [];
@@ -268,22 +276,16 @@ class AnalisaController extends Controller
 
         if ($range === 'day') {
 
-            $grouped = $data->groupBy(function ($item) use ($timeColumn) {
-                // Ensure timeColumn exists on item
-                if (!isset($item->{$timeColumn})) return '00:00';
-                return date('H:00', strtotime($item->{$timeColumn}));
-            });
-
             for ($i = 0; $i < 24; $i++) {
                 $hour = sprintf('%02d:00', $i);
                 $labels[] = $hour;
 
-                $hourData = $grouped->get($hour, collect());
+                $bucket = $buckets[$hour] ?? null;
 
-                if ($hourData->isNotEmpty()) {
-                    $value = $this->aggregateValueFor($hourData, $column, $tipeGraf, $isFault);
-                    $min = $hourData->min($column);
-                    $max = $hourData->max($column);
+                if ($bucket) {
+                    $value = (float) $bucket->agg_val;
+                    $min = $bucket->min_val;
+                    $max = $bucket->max_val;
 
                     $values[] = round($value, 3);
                     $minValues[] = round($min, 3);
@@ -312,19 +314,15 @@ class AnalisaController extends Controller
 
             $daysInMonth = date('t', strtotime($date));
 
-            $grouped = $data->groupBy(function ($item) use ($timeColumn) {
-                return date('j', strtotime($item->{$timeColumn}));
-            });
-
             for ($i = 1; $i <= $daysInMonth; $i++) {
                 $labels[] = (string)$i;
 
-                $dayData = $grouped->get((string)$i, collect());
+                $bucket = $buckets[(string)$i] ?? null;
 
-                if ($dayData->isNotEmpty()) {
-                    $value = $this->aggregateValueFor($dayData, $column, $tipeGraf, $isFault);
-                    $min = $dayData->min($column);
-                    $max = $dayData->max($column);
+                if ($bucket) {
+                    $value = (float) $bucket->agg_val;
+                    $min = $bucket->min_val;
+                    $max = $bucket->max_val;
 
                     $values[] = round($value, 4);
                     $minValues[] = round($min, 4);
@@ -354,17 +352,13 @@ class AnalisaController extends Controller
         else if ($range === 'custom') { // CUSTOM RANGE
 
             // For custom range, show data grouped by hour
-            $grouped = $data->groupBy(function ($item) use ($timeColumn) {
-                return date('Y-m-d H:00', strtotime($item->{$timeColumn}));
-            });
-
-            foreach ($grouped as $dateKey => $dateData) {
+            foreach ($buckets as $dateKey => $bucket) {
                 $labels[] = date('d M Y, H:i', strtotime($dateKey));
 
-                if ($dateData->isNotEmpty()) {
-                    $value = $this->aggregateValueFor($dateData, $column, $tipeGraf, $isFault);
-                    $min = $dateData->min($column);
-                    $max = $dateData->max($column);
+                if ($bucket) {
+                    $value = (float) $bucket->agg_val;
+                    $min = $bucket->min_val;
+                    $max = $bucket->max_val;
 
                     $values[] = round($value, 4);
                     $minValues[] = round($min, 4);
@@ -393,20 +387,16 @@ class AnalisaController extends Controller
 
             $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
-            $grouped = $data->groupBy(function ($item) use ($timeColumn) {
-                return date('n', strtotime($item->{$timeColumn}));
-            });
-
             foreach ($monthNames as $idx => $mName) {
                 $monthNum = (string)($idx + 1);
                 $labels[] = $mName;
 
-                $monthData = $grouped->get($monthNum, collect());
+                $bucket = $buckets[$monthNum] ?? null;
 
-                if ($monthData->isNotEmpty()) {
-                    $value = $this->aggregateValueFor($monthData, $column, $tipeGraf, $isFault);
-                    $min = $monthData->min($column);
-                    $max = $monthData->max($column);
+                if ($bucket) {
+                    $value = (float) $bucket->agg_val;
+                    $min = $bucket->min_val;
+                    $max = $bucket->max_val;
 
                     $values[] = round($value, 4);
                     $minValues[] = round($min, 4);
@@ -636,6 +626,61 @@ class AnalisaController extends Controller
         $name = preg_replace('/\s+/', ' ', str_replace('_', ' ', trim($name)));
 
         return $name === 'curah hujan';
+    }
+
+    /**
+     * Hitung agregat per bucket langsung di database.
+     *
+     * Menggantikan pola lama "tarik semua baris lalu groupBy() di PHP". Bucket key
+     * dan fungsi agregasi sengaja dibuat menyamai perilaku groupBy() +
+     * aggregateValueFor() + Collection min/max, sehingga hasilnya identik.
+     *
+     * @return array<string, object> bucket key => baris berisi agg_val, min_val, max_val
+     */
+    private function fetchBuckets($query, string $timeColumn, string $column, string $range, string $tipeGraf, bool $isFault): array
+    {
+        // Nama kolom berasal dari konfigurasi DB, bukan input user, tapi tetap
+        // divalidasi karena dipakai dalam ekspresi SQL mentah.
+        foreach ([$timeColumn, $column] as $ident) {
+            if (!preg_match('/^[A-Za-z0-9_]+$/', $ident)) {
+                return [];
+            }
+        }
+
+        $time = "`{$timeColumn}`";
+        $col  = "`{$column}`";
+
+        // Samakan persis dengan kunci groupBy() lama.
+        $bucketExpr = match ($range) {
+            'day'    => "DATE_FORMAT({$time}, '%H:00')",           // date('H:00') -> 00:00..23:00
+            'month'  => "DAY({$time})",                            // date('j')    -> 1..31
+            'custom' => "DATE_FORMAT({$time}, '%Y-%m-%d %H:00')",  // date('Y-m-d H:00')
+            default  => "MONTH({$time})",                          // year: date('n') -> 1..12
+        };
+
+        // Samakan dengan aggregateValueFor(): fault = bitwise OR, bar = SUM, sisanya AVG.
+        // TRUNCATE sebelum CAST karena PHP (int) memotong desimal sedangkan
+        // CAST(... AS SIGNED) membulatkan.
+        if ($isFault) {
+            $aggExpr = "BIT_OR(CAST(TRUNCATE({$col}, 0) AS SIGNED))";
+        } elseif ($tipeGraf === 'bar') {
+            $aggExpr = "SUM({$col})";
+        } else {
+            $aggExpr = "AVG({$col})";
+        }
+
+        $rows = $query
+            ->selectRaw("{$bucketExpr} AS bucket, {$aggExpr} AS agg_val, MIN({$col}) AS min_val, MAX({$col}) AS max_val")
+            ->groupBy(DB::raw($bucketExpr))
+            ->orderBy(DB::raw($bucketExpr))
+            ->get();
+
+        $buckets = [];
+        foreach ($rows as $row) {
+            $buckets[(string) $row->bucket] = $row;
+        }
+
+        return $buckets;
     }
 
     private function aggregateValueFor($rows, string $column, string $tipeGraf, bool $isFault = false): float
