@@ -44,18 +44,8 @@ return new class extends Migration
             ['name' => 'Salinity', 'base' => 'salinity', 'unit' => 'PSU', 'column' => 'sensor7', 'icon' => 'icons/apms/soil_salinity.svg', 'group' => $sumurGroupId],
             ['name' => 'Curah Hujan', 'base' => 'hujan', 'unit' => 'mm', 'column' => 'sensor6', 'icon' => 'icons/apms/rainfall.svg', 'group' => $sumurGroupId],
             ['name' => 'Humidity Logger', 'base' => 'humidity_logger', 'unit' => '%', 'column' => 'sensor14', 'icon' => 'icons/beranda/humidity_online.svg', 'group' => $loggerGroupId],
-            ['name' => 'Battery Logger', 'base' => 'battery_logger', 'unit' => 'Volt', 'column' => 'sensor15',('base') . '.svg';
-            }
-
-            $parameterIds[$parameter['base']] = DB::table('list_parameter')->insertGetId([
-                'nama_parameter' => $parameter['name'],
-                'parameter_utama' => $parameter['base'],
-                'default_satuan' => $parameter['unit'],
-                'default_kolom_sensor' => $parameter['column'],
-                'icon_app' => $parameter['icon'],
-                'default_parameter_group_id' => $parameter['group'],
-               ('is_active') . true,
-               ('created_at') . $now,
+            ['name' => 'Battery Logger', 'base' => 'battery_logger', 'unit' => 'Volt', 'column' => 'sensor15', 'icon' => 'icons/beranda/battery_online.svg', 'group' => $loggerGroupId],
+            ['name' => 'Temperature Logger', 'base' => 'temperature_logger', 'unit' => 'C', 'column' => 'sensor16', 'icon' => 'icons/beranda/temper_online.svg', 'group' => $loggerGroupId],
         ];
 
         $parameterIds = [];
