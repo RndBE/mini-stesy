@@ -180,6 +180,7 @@ class DeviceController extends Controller
             'longitude'         => 'required|numeric',
             'sub_kategori'      => 'nullable|in:jiat,non_jiat,contact,non_contact',
             'jenis_sensor'      => 'nullable|in:ultrasonic,radar',
+            'jenis_pemasangan'  => 'nullable|in:sungai,v_notch',
             'has_pump'          => 'nullable|boolean',
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
@@ -188,6 +189,8 @@ class DeviceController extends Controller
             'tinggi_sensor'     => 'nullable|numeric',
             'elevasi_max'       => 'nullable|numeric',
             'elevasi_min'       => 'nullable|numeric',
+            'elevasi_apex'      => 'nullable|numeric',
+            'kedalaman_notch'   => 'nullable|numeric',
             'nama_logger'       => 'required|exists:t_logger,id_logger',
             'params'            => 'required|array|min:1',
             'params.*.nama_parameter' => 'required|string|max:255',
@@ -247,10 +250,13 @@ class DeviceController extends Controller
                             ['id_logger' => $logger->id_logger],
                             [
                                 'jenis_sensor'        => $validated['jenis_sensor'] ?? 'ultrasonic',
+                                'jenis_pemasangan'    => $validated['jenis_pemasangan'] ?? 'sungai',
                                 'jarak_sensor_ke_air' => (float) ($validated['jarak_sensor_ke_air'] ?? 0),
                                 'tinggi_sensor'       => (float) ($validated['tinggi_sensor'] ?? 0),
-                                'elevasi_max'         => isset($validated['elevasi_max']) ? (float) $validated['elevasi_max'] : null,
-                                'elevasi_min'         => isset($validated['elevasi_min']) ? (float) $validated['elevasi_min'] : null,
+                                'elevasi_max'         => $this->nullableNumber($validated['elevasi_max'] ?? null),
+                                'elevasi_min'         => $this->nullableNumber($validated['elevasi_min'] ?? null),
+                                'elevasi_apex'        => $this->nullableNumber($validated['elevasi_apex'] ?? null),
+                                'kedalaman_notch'     => $this->nullableNumber($validated['kedalaman_notch'] ?? null),
                             ]
                         );
                         Jiat_data::where('id_logger', $logger->id_logger)->delete();
@@ -337,6 +343,7 @@ class DeviceController extends Controller
             'longitude'         => 'nullable|numeric',
             'sub_kategori'      => 'nullable|in:jiat,non_jiat,contact,non_contact',
             'jenis_sensor'      => 'nullable|in:ultrasonic,radar',
+            'jenis_pemasangan'  => 'nullable|in:sungai,v_notch',
             'has_pump'          => 'nullable|boolean',
             'kedalaman_sumur'   => 'nullable|numeric',
             'kedalaman_sensor'  => 'nullable|numeric',
@@ -345,6 +352,8 @@ class DeviceController extends Controller
             'tinggi_sensor'     => 'nullable|numeric',
             'elevasi_max'       => 'nullable|numeric',
             'elevasi_min'       => 'nullable|numeric',
+            'elevasi_apex'      => 'nullable|numeric',
+            'kedalaman_notch'   => 'nullable|numeric',
             'params'                    => 'nullable|array',
             'params.*.id_param'         => 'nullable',
             'params.*.nama_parameter'   => 'required_with:params|string|max:255',
@@ -393,10 +402,13 @@ class DeviceController extends Controller
                     ['id_logger' => $logger->id_logger],
                     [
                         'jenis_sensor'        => $request->input('jenis_sensor', 'ultrasonic'),
+                        'jenis_pemasangan'    => $request->input('jenis_pemasangan', 'sungai'),
                         'jarak_sensor_ke_air' => (float) ($request->jarak_sensor_ke_air ?? 0),
                         'tinggi_sensor'       => (float) ($request->tinggi_sensor ?? 0),
-                        'elevasi_max'         => $request->elevasi_max !== null ? (float) $request->elevasi_max : null,
-                        'elevasi_min'         => $request->elevasi_min !== null ? (float) $request->elevasi_min : null,
+                        'elevasi_max'         => $this->nullableNumber($request->elevasi_max),
+                        'elevasi_min'         => $this->nullableNumber($request->elevasi_min),
+                        'elevasi_apex'        => $this->nullableNumber($request->elevasi_apex),
+                        'kedalaman_notch'     => $this->nullableNumber($request->kedalaman_notch),
                     ]
                 );
                 Jiat_data::where('id_logger', $logger->id_logger)->delete();
@@ -953,6 +965,16 @@ class DeviceController extends Controller
         }
 
         return $cache;
+    }
+
+    /**
+     * Field elevasi bersifat nullable dan "kosong" harus tersimpan NULL, bukan 0.
+     * Input form yang dikosongkan datang sebagai string kosong, dan (float) "" = 0.0,
+     * yang membuat "belum diset" tidak bisa dibedakan dari datum nol.
+     */
+    private function nullableNumber($value): ?float
+    {
+        return $value === null || $value === '' ? null : (float) $value;
     }
 
     private function isAwlrCategoryId($idKatlogger): bool

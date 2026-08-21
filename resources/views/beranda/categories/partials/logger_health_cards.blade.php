@@ -1,4 +1,4 @@
-<div class="grid grid-cols-3 gap-2 md:grid-cols-1 md:gap-2">
+<div class="{{ $gridClass ?? 'grid grid-cols-3 gap-2 md:grid-cols-1 md:gap-2' }}">
 @if ($pHumidity)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
         class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-300 px-2 py-2 sm:px-3 sm:py-2.5">

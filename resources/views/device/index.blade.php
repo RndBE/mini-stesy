@@ -540,6 +540,69 @@
                                                 </label>
                                             </div>
                                         </div>
+
+                                        <div x-show="addData.subKategori === 'non_jiat'" class="mt-4">
+                                            <h4 class="text-sm font-semibold text-gray-900 mb-3">Pemasangan</h4>
+                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="addData.jenis_pemasangan === 'sungai' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="jenis_pemasangan" value="sungai"
+                                                        x-model="addData.jenis_pemasangan"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Sungai / Saluran</span>
+                                                </label>
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="addData.jenis_pemasangan === 'v_notch' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="jenis_pemasangan" value="v_notch"
+                                                        x-model="addData.jenis_pemasangan"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Ambang V-Notch</span>
+                                                </label>
+                                            </div>
+
+                                            <div x-show="addData.jenis_pemasangan === 'v_notch'"
+                                                class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                <div>
+                                                    <label class="mb-2 block text-xs font-medium text-gray-700">Elevasi Apex
+                                                        (Dasar V, Datum Peil)</label>
+                                                    <div class="flex overflow-hidden rounded-lg border border-gray-300 bg-white">
+                                                        <input type="number" step="any" name="elevasi_apex"
+                                                            x-model="addData.elevasi_apex"
+                                                            class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                            placeholder="cth: 12.5">
+                                                        <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
+                                                    </div>
+                                                    <p class="mt-1 text-[11px] text-gray-500">Titik nol peil. Head H = TMA &minus; elevasi apex.</p>
+                                                </div>
+                                                <div>
+                                                    <label class="mb-2 block text-xs font-medium text-gray-700">Kedalaman Notch
+                                                        (Apex ke Crest)</label>
+                                                    <div class="flex overflow-hidden rounded-lg border border-gray-300 bg-white">
+                                                        <input type="number" step="any" name="kedalaman_notch"
+                                                            x-model="addData.kedalaman_notch"
+                                                            class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                            placeholder="cth: 0.5">
+                                                        <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
+                                                    </div>
+                                                    <p class="mt-1 text-[11px] text-gray-500">Cadangan saja. Dipakai kalau Elevasi Maks belum diset. Kosong = 0,5.</p>
+                                                </div>
+                                            </div>
+                                            <div x-show="addData.jenis_pemasangan === 'v_notch'"
+                                                class="mt-4 rounded-lg border border-sky-200 bg-sky-50 p-3">
+                                                <p class="mb-2 text-xs font-semibold text-sky-900">Petunjuk pengisian ambang v-notch</p>
+                                                <ul class="space-y-1 text-[11px] leading-relaxed text-slate-600">
+                                                    <li><strong>Satuan cm</strong>, dan semua elevasi dari satu datum yang sama (benchmark lokal atau elevasi laut).</li>
+                                                    <li><strong>Elevasi Apex</strong> &mdash; elevasi titik terbawah huruf V di plat ambang. Jadi titik nol peil; head H = TMA &minus; apex.</li>
+                                                    <li><strong>Elevasi Maks</strong> &mdash; elevasi tepi atas V (crest). Selisihnya dengan apex = kedalaman notch, dan itu yang menentukan skala peil.</li>
+                                                    <li><strong>Elevasi Min</strong> &mdash; batas bawah skala peil. Isi sama dengan apex kalau tak perlu menampilkan level di bawah apex.</li>
+                                                    <li><strong>Kedalaman Notch</strong> &mdash; cadangan saja. Kosongkan kalau Elevasi Maks sudah diisi.</li>
+                                                    <li><strong>Ketinggian Sensor</strong> &mdash; tinggi pemasangan transduser di atas apex. <strong>Jarak Sensor dengan Air</strong> &mdash; jarak nominal transduser ke muka air.</li>
+                                                </ul>
+                                                <p class="mt-2 text-[11px] text-slate-500">
+                                                    Contoh: apex di 12,5 dan crest di 13 &rarr; Apex <strong>12,5</strong> &middot; Maks <strong>13</strong> &middot; Min <strong>12,5</strong> &middot; Kedalaman Notch dikosongkan.
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <template x-if="addData.subKategori === 'jiat'">
@@ -631,7 +694,7 @@
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
                                                         placeholder="100">
                                                     <span
-                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
                                             </div>
                                             <div>
@@ -644,7 +707,7 @@
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
                                                         placeholder="60">
                                                     <span
-                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
                                             </div>
                                             <div>
@@ -657,8 +720,11 @@
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
                                                         placeholder="cth: 5.5">
                                                     <span
-                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
+                                                <p class="mt-1 text-[11px] text-amber-600" x-show="addData.jenis_pemasangan === 'v_notch'">
+                                                    Pemasangan v-notch: ini elevasi <strong>crest</strong> (tepi atas V), penentu skala peil.
+                                                </p>
                                             </div>
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700 mb-2">Elevasi Min
@@ -670,8 +736,11 @@
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
                                                         placeholder="cth: 0">
                                                     <span
-                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
+                                                <p class="mt-1 text-[11px] text-amber-600" x-show="addData.jenis_pemasangan === 'v_notch'">
+                                                    Pemasangan v-notch: batas bawah skala peil. Boleh di bawah apex, ruang gambarnya terbatas.
+                                                </p>
                                             </div>
                                         </div>
                                     </template>
@@ -947,6 +1016,69 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                 </label>
                                             </div>
                                         </div>
+
+                                        <div x-show="editData.subKategori === 'non_jiat'" class="mt-4">
+                                            <h4 class="text-sm font-semibold text-gray-900 mb-3">Pemasangan</h4>
+                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="editData.jenis_pemasangan === 'sungai' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="jenis_pemasangan" value="sungai"
+                                                        x-model="editData.jenis_pemasangan"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Sungai / Saluran</span>
+                                                </label>
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="editData.jenis_pemasangan === 'v_notch' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="jenis_pemasangan" value="v_notch"
+                                                        x-model="editData.jenis_pemasangan"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Ambang V-Notch</span>
+                                                </label>
+                                            </div>
+
+                                            <div x-show="editData.jenis_pemasangan === 'v_notch'"
+                                                class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                <div>
+                                                    <label class="mb-2 block text-xs font-medium text-gray-700">Elevasi Apex
+                                                        (Dasar V, Datum Peil)</label>
+                                                    <div class="flex overflow-hidden rounded-lg border border-gray-300 bg-white">
+                                                        <input type="number" step="any" name="elevasi_apex"
+                                                            x-model="editData.elevasi_apex"
+                                                            class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                            placeholder="cth: 12.5">
+                                                        <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
+                                                    </div>
+                                                    <p class="mt-1 text-[11px] text-gray-500">Titik nol peil. Head H = TMA &minus; elevasi apex.</p>
+                                                </div>
+                                                <div>
+                                                    <label class="mb-2 block text-xs font-medium text-gray-700">Kedalaman Notch
+                                                        (Apex ke Crest)</label>
+                                                    <div class="flex overflow-hidden rounded-lg border border-gray-300 bg-white">
+                                                        <input type="number" step="any" name="kedalaman_notch"
+                                                            x-model="editData.kedalaman_notch"
+                                                            class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                            placeholder="cth: 0.5">
+                                                        <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
+                                                    </div>
+                                                    <p class="mt-1 text-[11px] text-gray-500">Cadangan saja. Dipakai kalau Elevasi Maks belum diset. Kosong = 0,5.</p>
+                                                </div>
+                                            </div>
+                                            <div x-show="editData.jenis_pemasangan === 'v_notch'"
+                                                class="mt-4 rounded-lg border border-sky-200 bg-sky-50 p-3">
+                                                <p class="mb-2 text-xs font-semibold text-sky-900">Petunjuk pengisian ambang v-notch</p>
+                                                <ul class="space-y-1 text-[11px] leading-relaxed text-slate-600">
+                                                    <li><strong>Satuan cm</strong>, dan semua elevasi dari satu datum yang sama (benchmark lokal atau elevasi laut).</li>
+                                                    <li><strong>Elevasi Apex</strong> &mdash; elevasi titik terbawah huruf V di plat ambang. Jadi titik nol peil; head H = TMA &minus; apex.</li>
+                                                    <li><strong>Elevasi Maks</strong> &mdash; elevasi tepi atas V (crest). Selisihnya dengan apex = kedalaman notch, dan itu yang menentukan skala peil.</li>
+                                                    <li><strong>Elevasi Min</strong> &mdash; batas bawah skala peil. Isi sama dengan apex kalau tak perlu menampilkan level di bawah apex.</li>
+                                                    <li><strong>Kedalaman Notch</strong> &mdash; cadangan saja. Kosongkan kalau Elevasi Maks sudah diisi.</li>
+                                                    <li><strong>Ketinggian Sensor</strong> &mdash; tinggi pemasangan transduser di atas apex. <strong>Jarak Sensor dengan Air</strong> &mdash; jarak nominal transduser ke muka air.</li>
+                                                </ul>
+                                                <p class="mt-2 text-[11px] text-slate-500">
+                                                    Contoh: apex di 12,5 dan crest di 13 &rarr; Apex <strong>12,5</strong> &middot; Maks <strong>13</strong> &middot; Min <strong>12,5</strong> &middot; Kedalaman Notch dikosongkan.
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <template x-if="editData.subKategori === 'jiat'">
@@ -1022,7 +1154,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                     <input type="number" step="any" name="jarak_sensor_ke_air"
                                                         x-model="editData.jarak_sensor_ke_air"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
-                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
                                             </div>
                                             <div>
@@ -1031,7 +1163,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                     <input type="number" step="any" name="tinggi_sensor"
                                                         x-model="editData.tinggi_sensor"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
-                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
                                             </div>
                                             <div>
@@ -1041,8 +1173,11 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                         x-model="editData.elevasi_max"
                                                         placeholder="cth: 5.5"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
-                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
+                                                <p class="mt-1 text-[11px] text-amber-600" x-show="editData.jenis_pemasangan === 'v_notch'">
+                                                    Pemasangan v-notch: ini elevasi <strong>crest</strong> (tepi atas V), penentu skala peil.
+                                                </p>
                                             </div>
                                             <div>
                                                 <label class="block text-xs font-medium text-gray-700">Elevasi Min (Batas Bawah Peil)</label>
@@ -1051,8 +1186,11 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                         x-model="editData.elevasi_min"
                                                         placeholder="cth: 0"
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
-                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
+                                                <p class="mt-1 text-[11px] text-amber-600" x-show="editData.jenis_pemasangan === 'v_notch'">
+                                                    Pemasangan v-notch: batas bawah skala peil. Boleh di bawah apex, ruang gambarnya terbatas.
+                                                </p>
                                             </div>
                                         </div>
                                     </template>
@@ -1573,10 +1711,13 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     kedalaman_sensor: '',
                     kedalaman_pompa: '',
                     jenis_sensor: 'ultrasonic',
+                    jenis_pemasangan: 'sungai',
                     jarak_sensor_ke_air: '',
                     tinggi_sensor: '',
                     elevasi_max: '',
                     elevasi_min: '',
+                    elevasi_apex: '',
+                    kedalaman_notch: '',
                     // AFMR Contact
                     lebar_sungai: '',
                     kedalaman_rata: '',
@@ -1594,10 +1735,13 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     kedalaman_sensor: '',
                     kedalaman_pompa: '',
                     jenis_sensor: 'ultrasonic',
+                    jenis_pemasangan: 'sungai',
                     jarak_sensor_ke_air: '',
                     tinggi_sensor: '',
                     elevasi_max: '',
                     elevasi_min: '',
+                    elevasi_apex: '',
+                    kedalaman_notch: '',
                     selectedLogger: null,
                     id_katlogger: '',
                     sensorCount: 16,
@@ -1763,10 +1907,13 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         kedalaman_sensor: '',
                         kedalaman_pompa: '',
                         jenis_sensor: 'ultrasonic',
+                        jenis_pemasangan: 'sungai',
                         jarak_sensor_ke_air: '',
                         tinggi_sensor: '',
                         elevasi_max: '',
                         elevasi_min: '',
+                        elevasi_apex: '',
+                        kedalaman_notch: '',
                         selectedLogger: null,
                         id_katlogger: '',
                         sensorCount: 16,
@@ -1969,6 +2116,8 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                     return (this.apmsCategoryIds || []).map(id => Number(id)).includes(parsedId)
                 },
 
+                // Ganti pemasangan mengubah satuan input (sungai = m, v-notch = cm).
+                // Nilai fisiknya dipertahankan supaya angka tidak diam-diam berubah makna.
                 isAfmrKategori(kategoriId) {
                     const parsedId = Number(kategoriId)
                     if (Number.isNaN(parsedId) || !parsedId) return false
@@ -2303,10 +2452,13 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         kedalaman_sensor: device.jiat?.kedalaman_sensor ?? '',
                         kedalaman_pompa: device.jiat?.kedalaman_pompa ?? '',
                         jenis_sensor: device.nonjiat?.jenis_sensor === 'radar' ? 'radar' : 'ultrasonic',
+                        jenis_pemasangan: device.nonjiat?.jenis_pemasangan === 'v_notch' ? 'v_notch' : 'sungai',
                         jarak_sensor_ke_air: device.nonjiat?.jarak_sensor_ke_air != null ? parseFloat(device.nonjiat.jarak_sensor_ke_air) : (device.afmr_noncontact?.jarak_sensor_ke_air != null ? parseFloat(device.afmr_noncontact.jarak_sensor_ke_air) : ''),
                         tinggi_sensor: device.nonjiat?.tinggi_sensor != null ? parseFloat(device.nonjiat.tinggi_sensor) : (device.afmr_noncontact?.tinggi_sensor != null ? parseFloat(device.afmr_noncontact.tinggi_sensor) : ''),
                         elevasi_max: device.nonjiat?.elevasi_max != null ? parseFloat(device.nonjiat.elevasi_max) : (device.afmr_noncontact?.elevasi_max != null ? parseFloat(device.afmr_noncontact.elevasi_max) : ''),
                         elevasi_min: device.nonjiat?.elevasi_min != null ? parseFloat(device.nonjiat.elevasi_min) : (device.afmr_noncontact?.elevasi_min != null ? parseFloat(device.afmr_noncontact.elevasi_min) : ''),
+                        elevasi_apex: device.nonjiat?.elevasi_apex != null ? parseFloat(device.nonjiat.elevasi_apex) : '',
+                        kedalaman_notch: device.nonjiat?.kedalaman_notch != null ? parseFloat(device.nonjiat.kedalaman_notch) : '',
                         // AFMR sub_kategori detection
                         subKategori: device.nonjiat
                             ? 'non_jiat'

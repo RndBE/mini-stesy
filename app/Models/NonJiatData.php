@@ -13,10 +13,13 @@ class NonJiatData extends Model
     protected $fillable = [
         'id_logger',
         'jenis_sensor',
+        'jenis_pemasangan',
         'jarak_sensor_ke_air',
         'tinggi_sensor',
         'elevasi_max',
         'elevasi_min',
+        'elevasi_apex',
+        'kedalaman_notch',
     ];
 
     public function logger()
