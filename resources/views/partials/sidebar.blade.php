@@ -182,9 +182,15 @@
                 @if(auth()->check() && auth()->user()->isSuperAdmin())
                 <a href="{{ route('notifikasi.index') }}"
                     class="nav-link {{ request()->routeIs('notifikasi.*') ? 'is-active' : '' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="nav-ico h-5 w-5 flex-shrink-0 {{ request()->routeIs('notifikasi.*') ? 'brightness-0 invert' : 'text-slate-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                    </svg>
+                    @if(request()->routeIs('notifikasi.*'))
+                        <svg xmlns="http://www.w3.org/2000/svg" class="nav-ico h-5 w-5 flex-shrink-0 brightness-0 invert" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2.25A6.75 6.75 0 005.25 9v.75a8.217 8.217 0 01-2.119 5.52.75.75 0 00.298 1.206c1.544.57 3.16.99 4.831 1.243a3.75 3.75 0 107.48 0 24.583 24.583 0 004.83-1.244.75.75 0 00.298-1.205 8.217 8.217 0 01-2.118-5.52V9A6.75 6.75 0 0012 2.25zM9.75 18c0-.034 0-.067.002-.1a25.05 25.05 0 004.496 0l.002.1a2.25 2.25 0 11-4.5 0z"/>
+                        </svg>
+                    @else
+                        <svg xmlns="http://www.w3.org/2000/svg" class="nav-ico h-5 w-5 flex-shrink-0" style="color:#404040" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                    @endif
                     <span class="sidebar-text truncate">Kirim Notifikasi</span>
                 </a>
                 @endif
@@ -200,9 +206,15 @@
 
                 <a href="{{ route('manual-book.index') }}"
                     class="nav-link {{ request()->routeIs('manual-book.*') ? 'is-active' : '' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="nav-ico h-5 w-5 flex-shrink-0 {{ request()->routeIs('manual-book.*') ? 'brightness-0 invert' : 'text-slate-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                    </svg>
+                    @if(request()->routeIs('manual-book.*'))
+                        <svg xmlns="http://www.w3.org/2000/svg" class="nav-ico h-5 w-5 flex-shrink-0 brightness-0 invert" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.25 4.533A9.707 9.707 0 006 3a9.735 9.735 0 00-3.25.555.75.75 0 00-.5.707v14.25a.75.75 0 001 .707A8.237 8.237 0 016 18.75c1.995 0 3.823.707 5.25 1.886V4.533zM12.75 20.636A8.214 8.214 0 0118 18.75c.966 0 1.89.166 2.75.47a.75.75 0 001-.708V4.262a.75.75 0 00-.5-.707A9.735 9.735 0 0018 3a9.707 9.707 0 00-5.25 1.533v16.103z"/>
+                        </svg>
+                    @else
+                        <svg xmlns="http://www.w3.org/2000/svg" class="nav-ico h-5 w-5 flex-shrink-0" style="color:#404040" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    @endif
                     <span class="sidebar-text truncate">Manual Book</span>
                 </a>
 
