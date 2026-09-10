@@ -2,8 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Mini-STESY Integration API",
-    "version": "1.0.0",
-    "description": "API integrasi data logger Mini-STESY. Halaman dokumentasi ini bersifat internal, dan semua endpoint memerlukan HTTP Basic Authentication.\n\n---\n\n## Hak akses logger per user\n\nKredensial Basic Auth adalah akun `t_user` yang sama dengan akun web. **Kredensial yang dipakai menentukan logger mana yang bisa ditarik**, lewat scope `t_Logger::scopeForUser()`:\n\n| `level_user` | Logger yang bisa ditarik |\n|---|---|\n| `superadmin` | Semua logger di sistem |\n| `instansi_admin` / `admin` | Semua logger `instansi_id` miliknya **+** grant eksplisit di `user_logger_access` (boleh lintas instansi) |\n| `pegawai` / `user` | **Hanya** grant eksplisit di `user_logger_access` |\n\nKonsekuensinya:\n\n1. **`GET /api/integrasi/all_logger` adalah daftar hak akses kredensial itu.** Isinya persis logger yang boleh ditarik, tidak lebih.\n2. **`id_logger` di luar hak akses dijawab `404 Logger Tidak Terdaftar`**, sama persis dengan id yang memang tidak ada. Ini sengaja, supaya keberadaan logger milik instansi lain tidak bisa dipetakan dari luar.\n3. Akun berstatus `suspend` atau `non-aktif` ditolak `401` walau username dan password-nya masih benar.\n\nPemberian grant diatur dari web (menu Kelola User), bukan dari API ini. Untuk pihak luar, buat akun `pegawai` dan beri hanya logger yang perlu.\n\n---\n\n## Catatan pemakaian\n\n- Autentikasi stateless: tidak ada cookie atau session yang dibuat.\n- `koneksi_logger` bernilai `On` bila data terakhir kurang dari 60 menit lalu, di luar itu `Off`. Ambangnya sama dengan dashboard.\n- Endpoint riwayat mengembalikan **maksimal 300 baris** terbaru, terbaru dulu.\n- Endpoint rentang tanggal dibatasi **31 hari** per panggilan dan 5000 baris, karena membaca tabel histori produksi langsung.\n- Nilai sensor selalu berupa angka atau `null`. Bilangan bulat dikirim sebagai integer JSON (`2`, bukan `2.0`)."
+    "version": "1.0.0"
   },
   "servers": [
     { "url": "https://mini-stesy.monitoring4system.com", "description": "Production" },
@@ -163,7 +162,7 @@
       "BasicAuth": {
         "type": "http",
         "scheme": "basic",
-        "description": "Username dan password akun `t_user`. Kredensial menentukan logger mana yang bisa ditarik — lihat Hak akses logger per user. Kredensial tidak disimpan di halaman dokumentasi ini."
+        "description": "Username dan password akun `t_user`. Kredensial yang dipakai menentukan logger mana yang bisa ditarik. Kredensial tidak disimpan di halaman dokumentasi ini."
       }
     },
     "parameters": {

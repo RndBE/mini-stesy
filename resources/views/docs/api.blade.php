@@ -91,10 +91,9 @@
         <p class="docs-kicker">Beacon Engineering &middot; Telemetry Reference</p>
         <h1 class="docs-title">Mini-STESY Integration API</h1>
         <p class="docs-summary">
-            Tiga endpoint untuk menarik data logger. Baca dulu bagian
-            <strong>Hak akses logger per user</strong> di keterangan bawah &mdash; kredensial yang dipakai
-            menentukan logger mana yang bisa ditarik. Gunakan <strong>Authorize</strong> untuk mencoba
-            endpoint yang dilindungi Basic Auth.
+            Tiga endpoint untuk menarik data logger. Kredensial yang dipakai menentukan logger mana
+            yang bisa ditarik. Gunakan <strong>Authorize</strong> untuk mencoba endpoint yang
+            dilindungi Basic Auth.
         </p>
         <div class="docs-meta">
             <span>OpenAPI 3.0.3</span>

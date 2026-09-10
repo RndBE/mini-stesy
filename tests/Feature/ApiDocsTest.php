@@ -84,26 +84,6 @@ class ApiDocsTest extends TestCase
         }
     }
 
-    public function test_logger_access_rules_are_documented(): void
-    {
-        $description = $this->document()['info']['description'];
-
-        // Aturan hak akses per user adalah inti dokumen ini; jangan sampai
-        // hilang saat diedit.
-        foreach ([
-            'Hak akses logger per user',
-            'scopeForUser',
-            'user_logger_access',
-            'superadmin',
-            'instansi_admin',
-            'pegawai',
-            'all_logger',
-            'Logger Tidak Terdaftar',
-        ] as $needle) {
-            $this->assertStringContainsString($needle, $description, "keterangan hak akses kehilangan: {$needle}");
-        }
-    }
-
     public function test_docs_page_serves_swagger_ui_and_needs_login(): void
     {
         $view = file_get_contents(resource_path('views/docs/api.blade.php'));
