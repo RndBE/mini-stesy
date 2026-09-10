@@ -39,6 +39,12 @@ Route::get('/', function () {
 
 
 
+// Dokumentasi API (Swagger UI). Digembok `auth` karena mendokumentasikan juga
+// endpoint ingest alat yang tanpa autentikasi — hapus middleware bila mau publik.
+Route::view('/docs/api', 'docs.api')->middleware('auth')->name('docs.api');
+Route::get('/docs/api/openapi.json', fn () => response()->file(resource_path('docs/mini-stesy-openapi.json')))
+    ->middleware('auth')->name('docs.api.json');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified', 'permission:view_dashboard'])->name('dashboard');
