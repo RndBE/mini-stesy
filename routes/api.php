@@ -11,10 +11,21 @@ use App\Http\Controllers\Api\AnalisaApiController;
 use App\Http\Controllers\Api\BerandaApiController;
 use App\Http\Controllers\Api\FcmApiController;
 use App\Http\Controllers\Api\MobilePumpCommandController;
+use App\Http\Controllers\Api\IntegrasiController;
 
 // ─── Existing routes ───────────────────────────────────────────────────────────
 Route::post('/datamasuk', [DataMasukController::class, 'datamasuk']);
 Route::get('/ping-awlr', fn() => 'pong');
+
+// ─── API Integrasi ─────────────────────────────────────────────────────────────
+// Tiga endpoint untuk pihak luar menarik data logger, bentuknya mengikuti API
+// Sisda di be_jastir2. HTTP Basic Auth ke `t_user`: kredensial yang dipakai
+// menentukan logger mana yang terlihat (hak akses per user).
+Route::middleware('basic.integrasi')->prefix('integrasi')->group(function () {
+    Route::get('/',              [IntegrasiController::class, 'index']);
+    Route::get('/all_logger',    [IntegrasiController::class, 'allLogger']);
+    Route::get('/range_tanggal', [IntegrasiController::class, 'rangeTanggal']);
+});
 
 // ─── Mobile API v1 ─────────────────────────────────────────────────────────────
 Route::prefix('v1/mobile')->group(function () {

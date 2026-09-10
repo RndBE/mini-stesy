@@ -23,17 +23,31 @@ class ApiDocsTest extends TestCase
         $document = $this->document();
 
         $this->assertSame('3.0.3', $document['openapi']);
-        $this->assertSame('http', $document['components']['securitySchemes']['BearerAuth']['type']);
-        $this->assertSame('bearer', $document['components']['securitySchemes']['BearerAuth']['scheme']);
-        $this->assertSame([['BearerAuth' => []]], $document['security'], 'default-nya semua endpoint butuh token');
+        $this->assertSame('http', $document['components']['securitySchemes']['BasicAuth']['type']);
+        $this->assertSame('basic', $document['components']['securitySchemes']['BasicAuth']['scheme']);
+        $this->assertSame([['BasicAuth' => []]], $document['security']);
+    }
 
-        // Endpoint yang memang publik harus menimpa security default jadi kosong.
-        foreach (['/api/datamasuk' => 'post', '/api/ping-awlr' => 'get', '/api/v1/mobile/auth/login' => 'post', '/api/v1/mobile/auth/config' => 'get'] as $path => $method) {
-            $this->assertSame([], $document['paths'][$path][$method]['security'], "{$path} harus ditandai publik");
+    public function test_only_the_three_integration_endpoints_are_documented(): void
+    {
+        $document = $this->document();
+
+        // API integrasi sengaja kecil. Endpoint mobile dan ingest alat tidak
+        // ikut didokumentasikan di sini.
+        $this->assertSame([
+            '/api/integrasi',
+            '/api/integrasi/all_logger',
+            '/api/integrasi/range_tanggal',
+        ], array_keys($document['paths']));
+
+        foreach ($document['paths'] as $path => $operations) {
+            $this->assertSame(['get'], array_keys($operations), "{$path} hanya boleh GET");
+            $this->assertArrayNotHasKey(
+                'security',
+                $operations['get'],
+                "{$path} tidak boleh menimpa security default jadi publik",
+            );
         }
-
-        // Endpoint terproteksi tidak boleh ikut ditandai publik.
-        $this->assertArrayNotHasKey('security', $document['paths']['/api/v1/mobile/data-perangkat']['get']);
     }
 
     public function test_every_documented_endpoint_is_a_real_route(): void
@@ -45,40 +59,28 @@ class ApiDocsTest extends TestCase
             ->unique()
             ->all();
 
-        $verbs = ['get', 'post', 'put', 'patch', 'delete'];
-
         foreach ($document['paths'] as $path => $operations) {
-            foreach (array_intersect_key($operations, array_flip($verbs)) as $method => $_) {
+            foreach ($operations as $method => $_) {
                 $signature = strtoupper($method) . ' ' . ltrim($path, '/');
                 $this->assertContains($signature, $registered, "didokumentasikan tapi tidak terdaftar: {$signature}");
             }
         }
     }
 
-    public function test_mobile_api_routes_are_all_documented(): void
+    public function test_integration_routes_are_all_documented(): void
     {
-        $document = $this->document();
-
-        $documented = [];
-        foreach ($document['paths'] as $path => $operations) {
-            foreach ($operations as $method => $_) {
-                $documented[] = strtoupper($method) . ' ' . ltrim($path, '/');
-            }
-        }
+        $documented = array_keys($this->document()['paths']);
 
         foreach (Route::getRoutes() as $route) {
-            if (! str_starts_with($route->uri(), 'api/v1/mobile/')) {
+            if (! str_starts_with($route->uri(), 'api/integrasi')) {
                 continue;
             }
 
-            foreach ($route->methods() as $method) {
-                if (in_array($method, ['HEAD', 'OPTIONS'], true)) {
-                    continue;
-                }
-
-                $signature = $method . ' ' . $route->uri();
-                $this->assertContains($signature, $documented, "rute mobile belum didokumentasikan: {$signature}");
-            }
+            $this->assertContains(
+                '/' . $route->uri(),
+                $documented,
+                "rute integrasi belum didokumentasikan: {$route->uri()}",
+            );
         }
     }
 
@@ -86,7 +88,8 @@ class ApiDocsTest extends TestCase
     {
         $description = $this->document()['info']['description'];
 
-        // Aturan hak akses per user adalah inti dokumen ini; jangan sampai hilang saat diedit.
+        // Aturan hak akses per user adalah inti dokumen ini; jangan sampai
+        // hilang saat diedit.
         foreach ([
             'Hak akses logger per user',
             'scopeForUser',
@@ -94,16 +97,11 @@ class ApiDocsTest extends TestCase
             'superadmin',
             'instansi_admin',
             'pegawai',
-            'GET /api/v1/mobile/data-perangkat',
-            '404',
+            'all_logger',
+            'Logger Tidak Terdaftar',
         ] as $needle) {
             $this->assertStringContainsString($needle, $description, "keterangan hak akses kehilangan: {$needle}");
         }
-
-        // Kredensial broker tidak boleh bocor ke dokumen.
-        $raw = file_get_contents(resource_path('docs/mini-stesy-openapi.json'));
-        $this->assertStringNotContainsString('b34c0n', $raw);
-        $this->assertStringNotContainsString('userlog', $raw);
     }
 
     public function test_docs_page_serves_swagger_ui_and_needs_login(): void

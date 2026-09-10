@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <meta name="description" content="Dokumentasi interaktif Mini-STESY API">
-    <title>Mini-STESY API</title>
+    <title>Mini-STESY Integration API</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0/swagger-ui.css">
     <style>
@@ -89,11 +89,12 @@
 <body>
     <header class="docs-header">
         <p class="docs-kicker">Beacon Engineering &middot; Telemetry Reference</p>
-        <h1 class="docs-title">Mini-STESY API</h1>
+        <h1 class="docs-title">Mini-STESY Integration API</h1>
         <p class="docs-summary">
-            Endpoint mobile dan ingest alat. Baca dulu bagian <strong>Hak akses logger per user</strong> di
-            keterangan bawah &mdash; data yang dikembalikan setiap endpoint dibatasi logger milik user yang
-            memegang token. Pakai <strong>Authorize</strong> untuk menempelkan Bearer token hasil login.
+            Tiga endpoint untuk menarik data logger. Baca dulu bagian
+            <strong>Hak akses logger per user</strong> di keterangan bawah &mdash; kredensial yang dipakai
+            menentukan logger mana yang bisa ditarik. Gunakan <strong>Authorize</strong> untuk mencoba
+            endpoint yang dilindungi Basic Auth.
         </p>
         <div class="docs-meta">
             <span>OpenAPI 3.0.3</span>

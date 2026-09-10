@@ -1,768 +1,158 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Mini-STESY API",
+    "title": "Mini-STESY Integration API",
     "version": "1.0.0",
-    "description": "API telemetri Mini-STESY (AWLR / ARR / AFMR / AWGC / JIAT).\n\nAda dua kelompok endpoint:\n\n- **Mobile API v1** — prefix `/api/v1/mobile`, dipakai aplikasi mobile. Autentikasi Bearer token (Laravel Sanctum).\n- **Ingest alat** — `POST /api/datamasuk` dan `GET /api/ping-awlr`, dipanggil logger di lapangan. **Tanpa autentikasi.**\n\n---\n\n## Hak akses logger per user\n\nSemua endpoint mobile yang mengembalikan data logger difilter lewat scope `t_Logger::scopeForUser()`. Seorang user **hanya** melihat logger yang menjadi haknya:\n\n| `level_user` | Logger yang terlihat |\n|---|---|\n| `superadmin` | Semua logger di sistem, tanpa filter |\n| `instansi_admin` / `admin` | Semua logger dengan `instansi_id` yang sama dengan user, **ditambah** grant eksplisit di tabel `user_logger_access` (boleh lintas instansi) |\n| `pegawai` / `user` | **Hanya** grant eksplisit di `user_logger_access`. Tanpa grant → tidak melihat logger apa pun |\n| tanpa token | Tidak ada. Query dikunci `1 = 0` |\n\nKonsekuensi yang harus dipahami klien:\n\n1. **`GET /api/v1/mobile/data-perangkat` adalah daftar hak akses user yang sedang login.** Isinya persis himpunan logger yang boleh ia akses. Tidak ada endpoint terpisah untuk membaca hak akses — cukup panggil ini.\n2. **Logger di luar hak akses dijawab `404`, bukan `403`.** `id_logger` yang bukan hak user diperlakukan seperti tidak ada (`Device tidak ditemukan` / `Logger tidak ditemukan`). Ini sengaja, supaya keberadaan logger milik instansi lain tidak terbaca dari luar.\n3. `beranda/info`, `peta/points`, `realtime/devices`, dan `data-perangkat` hanya menghitung dan menampilkan logger dalam hak akses tersebut. Angka `total_count` / `online_count` di beranda **bukan** total sistem, tapi total milik user.\n\n### Cara hak akses diberikan\n\nDiatur dari web (menu Kelola User), bukan dari mobile API:\n\n- Grant eksplisit hanya berlaku untuk `pegawai` dan `instansi_admin`. Role lain di-`sync([])` — daftar grantnya selalu dikosongkan.\n- Akun `pegawai` **wajib** punya minimal 1 logger.\n- Hanya `superadmin` yang boleh memberi logger lintas instansi. Admin lain dibatasi pada logger instansinya sendiri.\n- Logger yang bisa diberikan seorang admin = irisan dari hak aksesnya sendiri dengan instansinya.\n\n---\n\n## Permission (RBAC) vs hak akses logger\n\nDua mekanisme berbeda, berjalan bersamaan:\n\n- **Hak akses logger** (`user_logger_access` + `level_user`) menentukan **baris data mana** yang terlihat. Berlaku di web **dan** mobile API.\n- **Permission RBAC** (tabel `permissions` / `role_permissions`, middleware `permission:`) menentukan **halaman/menu mana** yang boleh dibuka. Saat ini hanya dipakai di rute **web**.\n\nEndpoint mobile hanya memasang `auth:sanctum` + `CheckUserStatus`, jadi permission RBAC tidak diperiksa di mobile. Yang membatasi mobile adalah scope logger di atas.\n\nPermission bawaan seeder: `view_dashboard`, `view_beranda`, `view_peta_lokasi`, `view_realtime`, `view_device`, `manage_device`, `view_data_perangkat`, `manage_data_perangkat`, `manage_instansi`, `view_profile`, `manage_profile`, `logout`, `manage_logger`, `manage_user`, `manage_rbac`, `manage_manual_book`.\n\nDefault per role: `superadmin` = semua; `instansi_admin` = semua kecuali `manage_instansi`, `manage_rbac`, `manage_manual_book`; `pegawai` = hanya yang bersifat `view_*` plus `manage_profile` dan `logout`.\n\n---\n\n## Status akun\n\nMiddleware `CheckUserStatus` berjalan di semua endpoint mobile yang terproteksi. Status `suspend` atau `non-aktif` dijawab `403` — baik saat login maupun saat memakai token yang masih berlaku. Saat `maintenance_mode` aktif, hanya `superadmin` atau pemegang `manage_rbac` yang boleh login.\n\n## Token\n\nToken dari `POST /auth/login` berlaku **30 hari** (`expires_in` = 2592000 detik). Kirim sebagai `Authorization: Bearer <token>`."
+    "description": "API integrasi data logger Mini-STESY. Halaman dokumentasi ini bersifat internal, dan semua endpoint memerlukan HTTP Basic Authentication.\n\n---\n\n## Hak akses logger per user\n\nKredensial Basic Auth adalah akun `t_user` yang sama dengan akun web. **Kredensial yang dipakai menentukan logger mana yang bisa ditarik**, lewat scope `t_Logger::scopeForUser()`:\n\n| `level_user` | Logger yang bisa ditarik |\n|---|---|\n| `superadmin` | Semua logger di sistem |\n| `instansi_admin` / `admin` | Semua logger `instansi_id` miliknya **+** grant eksplisit di `user_logger_access` (boleh lintas instansi) |\n| `pegawai` / `user` | **Hanya** grant eksplisit di `user_logger_access` |\n\nKonsekuensinya:\n\n1. **`GET /api/integrasi/all_logger` adalah daftar hak akses kredensial itu.** Isinya persis logger yang boleh ditarik, tidak lebih.\n2. **`id_logger` di luar hak akses dijawab `404 Logger Tidak Terdaftar`**, sama persis dengan id yang memang tidak ada. Ini sengaja, supaya keberadaan logger milik instansi lain tidak bisa dipetakan dari luar.\n3. Akun berstatus `suspend` atau `non-aktif` ditolak `401` walau username dan password-nya masih benar.\n\nPemberian grant diatur dari web (menu Kelola User), bukan dari API ini. Untuk pihak luar, buat akun `pegawai` dan beri hanya logger yang perlu.\n\n---\n\n## Catatan pemakaian\n\n- Autentikasi stateless: tidak ada cookie atau session yang dibuat.\n- `koneksi_logger` bernilai `On` bila data terakhir kurang dari 60 menit lalu, di luar itu `Off`. Ambangnya sama dengan dashboard.\n- Endpoint riwayat mengembalikan **maksimal 300 baris** terbaru, terbaru dulu.\n- Endpoint rentang tanggal dibatasi **31 hari** per panggilan dan 5000 baris, karena membaca tabel histori produksi langsung.\n- Nilai sensor selalu berupa angka atau `null`. Bilangan bulat dikirim sebagai integer JSON (`2`, bukan `2.0`)."
   },
   "servers": [
     { "url": "https://mini-stesy.monitoring4system.com", "description": "Production" },
     { "url": "http://localhost:8000", "description": "Local development" }
   ],
   "tags": [
-    { "name": "Auth", "description": "Login, logout, profil user, konfigurasi aplikasi" },
-    { "name": "Beranda", "description": "Ringkasan instansi dan status monitoring milik user" },
-    { "name": "Peta", "description": "Titik logger berkoordinat beserta snapshot sensor" },
-    { "name": "Realtime", "description": "Daftar device, data 1 jam terakhir, dan konfigurasi MQTT" },
-    { "name": "Data Perangkat", "description": "Daftar dan detail logger yang boleh diakses user" },
-    { "name": "Analisa", "description": "Data historis sensor dengan filter tanggal dan parameter" },
-    { "name": "Kontrol Pompa", "description": "Perintah ON/OFF pompa JIAT lewat MQTT" },
-    { "name": "Chatbot", "description": "Tanya jawab data monitoring" },
-    { "name": "Notifikasi", "description": "Registrasi token FCM" },
-    { "name": "Ingest Alat", "description": "Endpoint publik yang dipanggil logger di lapangan" }
+    { "name": "Logger", "description": "Data historis dan snapshot logger" }
   ],
-  "security": [{ "BearerAuth": [] }],
+  "security": [{ "BasicAuth": [] }],
   "paths": {
-    "/api/v1/mobile/auth/login": {
-      "post": {
-        "tags": ["Auth"],
-        "summary": "Login dan ambil token",
-        "description": "Mencocokkan `username` dan `password` ke tabel `t_user`. Token Sanctum berlaku 30 hari.\n\nDitolak `403` bila akun `suspend` / `non-aktif`, atau bila `maintenance_mode` aktif dan user bukan `superadmin` / pemegang `manage_rbac`.",
-        "security": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/LoginRequest" },
-              "example": { "username": "pegawai", "password": "password" }
-            }
-          }
-        },
+    "/api/integrasi": {
+      "get": {
+        "tags": ["Logger"],
+        "summary": "Riwayat terbaru satu logger",
+        "description": "Maksimal 300 baris terakhir, terbaru dulu, beserta lokasi, jenis, dan status koneksi logger.\n\nHanya logger dalam hak akses kredensial yang dipakai. Selain itu dijawab `404 Logger Tidak Terdaftar`.",
+        "parameters": [{ "$ref": "#/components/parameters/IdLogger" }],
         "responses": {
           "200": {
-            "description": "Login berhasil",
+            "description": "Riwayat logger",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/LoginResponse" },
+                "schema": { "$ref": "#/components/schemas/Riwayat" },
                 "example": {
-                  "success": true,
-                  "message": "Login berhasil",
-                  "data": {
-                    "token": "42|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-                    "token_type": "Bearer",
-                    "expires_in": 2592000,
-                    "user": { "id_user": 3, "nama": "Pegawai", "username": "pegawai", "level_user": "pegawai" }
-                  }
+                  "status": true,
+                  "id_logger": "10371",
+                  "nama_lokasi": "Bendung Mojolaban",
+                  "jenis": "AWLR",
+                  "latitude": -7.797068,
+                  "longitude": 110.370529,
+                  "koneksi_logger": "On",
+                  "waktu_terakhir": "2026-09-10 09:30:00",
+                  "parameter": [
+                    { "nama_parameter": "Tinggi Muka Air", "satuan": "m", "kunci": "tinggi_muka_air" },
+                    { "nama_parameter": "Debit", "satuan": "m3/s", "kunci": "debit" }
+                  ],
+                  "jumlah_data": 2,
+                  "data": [
+                    { "waktu": "2026-09-10 09:30:00", "tinggi_muka_air": 1.35, "debit": 0.512 },
+                    { "waktu": "2026-09-10 09:20:00", "tinggi_muka_air": 1.32, "debit": 0.498 }
+                  ]
                 }
               }
             }
           },
-          "403": { "$ref": "#/components/responses/AkunDitolak" },
-          "422": { "$ref": "#/components/responses/ValidasiGagal" }
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/LoggerTidakTerdaftar" }
         }
       }
     },
-    "/api/v1/mobile/auth/config": {
+    "/api/integrasi/all_logger": {
       "get": {
-        "tags": ["Auth"],
-        "summary": "Konfigurasi aplikasi (force update)",
-        "description": "Publik, tidak butuh token. Dipakai splash screen untuk memeriksa versi minimum.",
-        "security": [],
+        "tags": ["Logger"],
+        "summary": "Snapshot seluruh logger yang boleh diakses",
+        "description": "Nilai terakhir setiap parameter untuk semua logger dalam hak akses kredensial yang dipakai, diurutkan `id_logger`.\n\n**Endpoint ini sekaligus daftar hak akses logger kredensial tersebut** — tidak ada endpoint terpisah untuk itu.",
         "responses": {
           "200": {
-            "description": "Konfigurasi aplikasi",
+            "description": "Snapshot semua logger",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "latest_app_version": { "type": "string", "example": "1.0.0" },
-                        "force_update": { "type": "boolean", "example": false },
-                        "update_url": { "type": "string", "example": "https://play.google.com/store/apps/details?id=com.ministesy.app" }
-                      }
+                "schema": { "$ref": "#/components/schemas/SnapshotSemua" },
+                "example": {
+                  "status": true,
+                  "jumlah_logger": 2,
+                  "data": [
+                    {
+                      "id_logger": "10364",
+                      "nama_lokasi": "Bendung Colo",
+                      "jenis": "AWLR",
+                      "latitude": -7.712345,
+                      "longitude": 110.812345,
+                      "koneksi_logger": "On",
+                      "waktu": "2026-09-10 09:45:00",
+                      "data": [
+                        { "nama_parameter": "Tinggi Muka Air", "satuan": "m", "nilai": 1.07 },
+                        { "nama_parameter": "Debit", "satuan": "m3/s", "nilai": 0.05 }
+                      ]
+                    },
+                    {
+                      "id_logger": "10371",
+                      "nama_lokasi": "Bendung Mojolaban",
+                      "jenis": "AWLR",
+                      "latitude": -7.797068,
+                      "longitude": 110.370529,
+                      "koneksi_logger": "Off",
+                      "waktu": "2026-09-10 06:10:00",
+                      "data": [
+                        { "nama_parameter": "Tinggi Muka Air", "satuan": "m", "nilai": 1.35 }
+                      ]
                     }
-                  }
+                  ]
                 }
               }
             }
-          }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
         }
       }
     },
-    "/api/v1/mobile/auth/logout": {
-      "post": {
-        "tags": ["Auth"],
-        "summary": "Cabut token yang sedang dipakai",
-        "description": "Hanya token pada request ini yang dihapus. Token di device lain tetap hidup.",
-        "responses": {
-          "200": { "$ref": "#/components/responses/PesanSukses" },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "403": { "$ref": "#/components/responses/AkunDitolak" }
-        }
-      }
-    },
-    "/api/v1/mobile/auth/me": {
+    "/api/integrasi/range_tanggal": {
       "get": {
-        "tags": ["Auth"],
-        "summary": "Profil user yang sedang login",
-        "description": "Mengembalikan identitas dan `level_user`. **Tidak** memuat daftar logger — untuk hak akses logger pakai `GET /api/v1/mobile/data-perangkat`.",
-        "responses": {
-          "200": {
-            "description": "Profil user",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "data": { "$ref": "#/components/schemas/UserRingkas" }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "403": { "$ref": "#/components/responses/AkunDitolak" }
-        }
-      }
-    },
-    "/api/v1/mobile/fcm/register": {
-      "post": {
-        "tags": ["Notifikasi"],
-        "summary": "Daftarkan token FCM device",
-        "description": "Disimpan ke tabel `fcm_tokens` dengan `fcm_token` sebagai kunci unik, dan diikat ke user yang sedang login. Notifikasi hanya dikirim untuk logger dalam hak akses user tersebut.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["fcm_token"],
-                "properties": {
-                  "fcm_token": { "type": "string" },
-                  "device_name": { "type": "string", "nullable": true, "example": "Samsung A54" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "$ref": "#/components/responses/PesanSukses" },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "422": { "$ref": "#/components/responses/ValidasiGagal" }
-        }
-      }
-    },
-    "/api/v1/mobile/beranda/info": {
-      "get": {
-        "tags": ["Beranda"],
-        "summary": "Ringkasan beranda",
-        "description": "Info instansi, identitas user, hitungan online/offline, dan daftar kategori logger.\n\n**Cakupan data mengikuti hak akses logger user.** `monitoring.total_count` adalah jumlah logger milik user, bukan jumlah logger di sistem. `kategori_list` hanya memuat kategori yang benar-benar dimiliki user, sehingga menu di mobile ikut menyusut sesuai hak akses.\n\nLogger dihitung `online` bila data terakhirnya kurang dari 60 menit yang lalu.",
-        "responses": {
-          "200": {
-            "description": "Ringkasan beranda",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "data": { "$ref": "#/components/schemas/BerandaInfo" }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "403": { "$ref": "#/components/responses/AkunDitolak" }
-        }
-      }
-    },
-    "/api/v1/mobile/peta/points": {
-      "get": {
-        "tags": ["Peta"],
-        "summary": "Titik logger untuk peta",
-        "description": "Semua logger dalam hak akses user yang punya `idlokasi` **dan** koordinat lengkap. Logger tanpa lat/lng dibuang dari hasil.\n\nSetiap titik membawa snapshot sensor terbaru, status online/offline, `arr_state` hasil klasifikasi threshold hujan, data instalasi (JIAT / non-JIAT / AFMR), dan foto dokumentasi.",
-        "responses": {
-          "200": {
-            "description": "Daftar titik",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/PetaPoint" } },
-                    "meta": {
-                      "type": "object",
-                      "properties": {
-                        "total": { "type": "integer" },
-                        "generated_at": { "type": "string", "format": "date-time" }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "403": { "$ref": "#/components/responses/AkunDitolak" }
-        }
-      }
-    },
-    "/api/v1/mobile/realtime/devices": {
-      "get": {
-        "tags": ["Realtime"],
-        "summary": "Daftar device + status + konfigurasi MQTT",
-        "description": "Logger dalam hak akses user, diurutkan `LoggerDisplayOrder`. Respons sekaligus membawa `mqtt` supaya klien tidak perlu memanggil `mqtt-config` terpisah.",
-        "responses": {
-          "200": {
-            "description": "Daftar device",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/RealtimeDevice" } },
-                    "mqtt": { "$ref": "#/components/schemas/MqttConfig" },
-                    "meta": { "type": "object", "properties": { "total": { "type": "integer" } } }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "403": { "$ref": "#/components/responses/AkunDitolak" }
-        }
-      }
-    },
-    "/api/v1/mobile/realtime/data/{id}": {
-      "get": {
-        "tags": ["Realtime"],
-        "summary": "Data sensor 1 jam terakhir untuk satu logger",
-        "description": "Rentang default: `REALTIME_HISTORY_MINUTES` (60) menit ke belakang sampai `REALTIME_FUTURE_GRACE_MINUTES` (15) menit ke depan — toleransi jam alat yang meleset. Maksimal 2000 baris, terbaru dulu.\n\nBila tabel utama kosong, sistem mencoba tabel pasangannya (`t_s16_*` ↔ `t_s19_*`) pada shard yang sama, dan `device.tabel_main` di respons memberitahu tabel mana yang akhirnya dipakai.\n\n**Logger di luar hak akses user dijawab `404`.**",
-        "parameters": [{ "$ref": "#/components/parameters/IdLogger" }],
-        "responses": {
-          "200": {
-            "description": "Data realtime",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/RealtimeDataResponse" }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "403": { "$ref": "#/components/responses/AkunDitolak" },
-          "404": { "$ref": "#/components/responses/LoggerTidakDitemukan" },
-          "500": {
-            "description": "Gagal membaca tabel sensor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean", "example": false },
-                    "message": { "type": "string", "example": "Error ambil data: ..." },
-                    "params": { "type": "array", "items": { "$ref": "#/components/schemas/ParameterSensor" } },
-                    "data": { "type": "array", "items": {} }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/mobile/realtime/mqtt-config": {
-      "get": {
-        "tags": ["Realtime"],
-        "summary": "Konfigurasi broker MQTT",
-        "description": "Kredensial broker **kontrol pompa** (`mqtt.beacontelemetry.com`), bukan broker data realtime. Nilai `user` / `pass` di contoh disamarkan; respons sebenarnya memuat kredensial asli, jadi jangan di-log atau di-cache di penyimpanan yang bisa dibaca aplikasi lain.",
-        "responses": {
-          "200": {
-            "description": "Konfigurasi MQTT",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "data": { "$ref": "#/components/schemas/MqttConfig" }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" }
-        }
-      }
-    },
-    "/api/v1/mobile/pump/command": {
-      "post": {
-        "tags": ["Kontrol Pompa"],
-        "summary": "Perintah pompa JIAT (get / on / off)",
-        "description": "Hanya untuk logger yang punya data JIAT dengan `has_pump = true` **dan** berada dalam hak akses user. Selain itu dijawab `403 Logger ini tidak memiliki fitur kontrol pompa.` — pesan yang sama dipakai untuk logger di luar hak akses, jadi tidak bisa dipakai memetakan logger milik instansi lain.\n\n`action = on|off` menambah syarat wajib: `control_pin` (dicek terhadap PIN instansi), `latitude`, `longitude`, dan `location_permission_status = granted`. `action = get` hanya membaca status dan tidak butuh PIN maupun lokasi.\n\nSetiap percobaan `on`/`off` dicatat ke `pump_control_logs` beserta koordinat pengirim, termasuk percobaan yang gagal PIN.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/PumpCommandRequest" },
-              "example": {
-                "id_logger": "10371",
-                "action": "on",
-                "control_pin": "123456",
-                "latitude": -7.797068,
-                "longitude": 110.370529,
-                "location_permission_status": "granted"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Perintah diterima logger",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "message": { "type": "string", "example": "Pump ON" },
-                    "pump": {
-                      "type": "object",
-                      "properties": {
-                        "status": { "type": "string", "example": "OK" },
-                        "state": { "type": "integer", "example": 1, "description": "1 = ON, 0 = OFF, -1 = tidak diketahui" },
-                        "msg": { "type": "string" }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "403": {
-            "description": "Bukan logger pompa, di luar hak akses, PIN belum dikonfigurasi, atau PIN salah",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PesanGagal" },
-                "examples": {
-                  "bukan_pompa": { "value": { "success": false, "message": "Logger ini tidak memiliki fitur kontrol pompa." } },
-                  "pin_salah": { "value": { "success": false, "message": "PIN kontrol tidak sesuai." } },
-                  "pin_belum_ada": { "value": { "success": false, "message": "PIN kontrol belum dikonfigurasi untuk instansi ini." } }
-                }
-              }
-            }
-          },
-          "422": { "$ref": "#/components/responses/ValidasiGagal" },
-          "504": {
-            "description": "Broker MQTT tidak terhubung, logger menolak, atau tidak menjawab sampai batas waktu. Kode HTTP mengikuti jenis kegagalan.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean", "example": false },
-                    "message": { "type": "string" },
-                    "step": { "type": "string", "example": "timeout", "description": "mqtt_connect | logger_error | timeout" },
-                    "pump": { "type": "object", "nullable": true }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/mobile/data-perangkat": {
-      "get": {
-        "tags": ["Data Perangkat"],
-        "summary": "Daftar logger yang boleh diakses user",
-        "description": "**Ini adalah daftar hak akses logger user yang sedang login.** Isinya persis himpunan yang dihasilkan `scopeForUser`: semua logger untuk `superadmin`, logger instansi + grant untuk `instansi_admin`, dan hanya grant eksplisit untuk `pegawai`. Tidak ada endpoint lain yang perlu dipanggil untuk mengetahui hak akses.\n\nFilter opsional `kategori` (cocok pada `nama_kategori` secara `like`, atau `kode` persis dalam huruf besar) dan `id_katlogger`.",
-        "parameters": [
-          {
-            "name": "kategori",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string" },
-            "example": "AWLR",
-            "description": "Nama kategori (pencocokan `like`) atau kode kategori (persis, huruf besar)"
-          },
-          {
-            "name": "id_katlogger",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "integer" },
-            "example": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Daftar logger",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/Perangkat" } },
-                    "meta": {
-                      "type": "object",
-                      "properties": {
-                        "total": { "type": "integer" },
-                        "kategori": { "type": "string", "nullable": true }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "403": { "$ref": "#/components/responses/AkunDitolak" }
-        }
-      },
-      "post": {
-        "tags": ["Data Perangkat"],
-        "summary": "Tambah entri logger",
-        "description": "Membuat baris baru di `t_logger`.\n\n> **Catatan implementasi:** endpoint ini belum memeriksa permission maupun instansi, dan tidak mengisi `instansi_id`. Setiap user dengan token yang sah bisa memanggilnya, dan logger yang tercipta belum terikat instansi mana pun sehingga hanya `superadmin` yang akan melihatnya. Pembuatan logger sebaiknya lewat web (`manage_device`).",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["nama_logger", "id_katlogger"],
-                "properties": {
-                  "nama_logger": { "type": "string", "maxLength": 255 },
-                  "id_katlogger": { "type": "integer" },
-                  "tabel_main": { "type": "string", "nullable": true, "example": "t_s19_01" },
-                  "sensor_count": { "type": "integer", "nullable": true, "enum": [16, 19] }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Berhasil dibuat",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "message": { "type": "string", "example": "Device berhasil ditambahkan" },
-                    "data": { "type": "object", "properties": { "id_logger": { "type": "string", "nullable": true } } }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "422": { "$ref": "#/components/responses/ValidasiGagal" }
-        }
-      }
-    },
-    "/api/v1/mobile/data-perangkat/{id}": {
-      "get": {
-        "tags": ["Data Perangkat"],
-        "summary": "Detail satu logger",
-        "description": "Sama seperti daftar, ditambah blok `jiat` dan `nonjiat`. **Logger di luar hak akses user dijawab `404`.**",
-        "parameters": [{ "$ref": "#/components/parameters/IdLogger" }],
-        "responses": {
-          "200": {
-            "description": "Detail logger",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "data": { "$ref": "#/components/schemas/PerangkatDetail" }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "404": { "$ref": "#/components/responses/LoggerTidakDitemukan" }
-        }
-      },
-      "put": {
-        "tags": ["Data Perangkat"],
-        "summary": "Ubah entri logger",
-        "description": "Hanya logger dalam hak akses user yang bisa diubah; lainnya `404`. Kirim hanya field yang ingin diubah.",
-        "parameters": [{ "$ref": "#/components/parameters/IdLogger" }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "nama_logger": { "type": "string", "maxLength": 255 },
-                  "id_katlogger": { "type": "integer" },
-                  "tabel_main": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "$ref": "#/components/responses/PesanSukses" },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "404": { "$ref": "#/components/responses/LoggerTidakDitemukan" },
-          "422": { "$ref": "#/components/responses/ValidasiGagal" }
-        }
-      }
-    },
-    "/api/v1/mobile/analisa/{id}": {
-      "get": {
-        "tags": ["Analisa"],
-        "summary": "Info logger dan parameter yang bisa dianalisa",
-        "description": "Dipakai untuk membangun pilihan parameter sebelum menarik data historis. **Logger di luar hak akses user dijawab `404`.**",
-        "parameters": [{ "$ref": "#/components/parameters/IdLogger" }],
-        "responses": {
-          "200": {
-            "description": "Info logger",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "data": { "$ref": "#/components/schemas/AnalisaInfo" }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "404": { "$ref": "#/components/responses/LoggerTidakDitemukan" }
-        }
-      }
-    },
-    "/api/v1/mobile/analisa/{id}/data": {
-      "get": {
-        "tags": ["Analisa"],
-        "summary": "Data historis sensor",
-        "description": "Data diurutkan `waktu` menurun dan dipaginasi. Tanpa `parameter`, semua `kolom_sensor` milik logger dikembalikan; dengan `parameter`, hanya satu kolom yang cocok (dicocokkan ke `nama_parameter`, `kolom_sensor`, atau `parameter_utama` setelah dinormalkan).\n\n**Logger di luar hak akses user dijawab `404`.**",
+        "tags": ["Logger"],
+        "summary": "Riwayat logger berdasarkan rentang tanggal",
+        "description": "Bentuk responsnya sama dengan `GET /api/integrasi`, hanya rentang waktunya yang ditentukan pemanggil. `awal` dibaca dari pukul 00:00 dan `akhir` sampai 23:59:59.\n\nRentang maksimal **31 hari** dan 5000 baris per panggilan. Lebih lebar dari itu dijawab `422`.",
         "parameters": [
           { "$ref": "#/components/parameters/IdLogger" },
           {
-            "name": "from",
+            "name": "awal",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": { "type": "string", "format": "date" },
-            "description": "Tanggal awal `Y-m-d`. Default 7 hari lalu. Dibaca dari awal hari.",
+            "description": "Tanggal awal, format `Y-m-d`",
             "example": "2026-09-01"
           },
           {
-            "name": "to",
+            "name": "akhir",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": { "type": "string", "format": "date" },
-            "description": "Tanggal akhir `Y-m-d`. Default hari ini. Dibaca sampai akhir hari.",
+            "description": "Tanggal akhir, format `Y-m-d`. Tidak boleh lebih awal dari `awal`.",
             "example": "2026-09-10"
-          },
-          {
-            "name": "parameter",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string" },
-            "description": "Nama parameter, kolom sensor, atau parameter utama. Nilai yang tidak cocok diabaikan (semua kolom dikembalikan).",
-            "example": "Tinggi Muka Air"
-          },
-          {
-            "name": "per_page",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "integer", "default": 200, "maximum": 1000 }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "integer", "default": 1, "minimum": 1 }
           }
         ],
         "responses": {
           "200": {
-            "description": "Data historis",
+            "description": "Riwayat logger pada rentang tanggal",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/AnalisaDataResponse" }
-              }
+              "application/json": { "schema": { "$ref": "#/components/schemas/Riwayat" } }
             }
           },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "404": { "$ref": "#/components/responses/LoggerTidakDitemukan" },
-          "500": { "$ref": "#/components/responses/GagalBacaData" }
-        }
-      }
-    },
-    "/api/v1/mobile/chatbot/ask": {
-      "post": {
-        "tags": ["Chatbot"],
-        "summary": "Tanya data monitoring (balasan sekali jadi)",
-        "description": "Jawaban chatbot dibatasi 1600 karakter. Data monitoring yang dibaca chatbot juga mengikuti hak akses logger user yang bertanya.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/ChatbotRequest" },
-              "example": { "message": "TMA Bendung Copong sekarang berapa?" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Balasan chatbot",
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/LoggerTidakTerdaftar" },
+          "422": {
+            "description": "Rentang lebih dari 31 hari, tanggal tidak valid, atau `akhir` lebih awal dari `awal`",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "reply": { "type": "string" },
-                    "source": { "type": "string", "description": "Asal jawaban (mis. data monitoring atau model bahasa)" },
-                    "configured": { "type": "boolean", "description": "false bila kredensial model belum diatur di server" },
-                    "chart": { "type": "object", "nullable": true, "description": "Data grafik pendukung bila pertanyaan menghasilkan seri waktu" }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "422": { "$ref": "#/components/responses/ValidasiGagal" }
-        }
-      }
-    },
-    "/api/v1/mobile/chatbot/stream": {
-      "post": {
-        "tags": ["Chatbot"],
-        "summary": "Tanya data monitoring (streaming SSE)",
-        "description": "Body sama dengan `/chatbot/ask`. Respons berupa `text/event-stream`; setiap potongan dikirim sebagai `event: <nama>` diikuti `data: <json>`.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/ChatbotRequest" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Aliran server-sent events",
-            "content": {
-              "text/event-stream": {
-                "schema": { "type": "string" },
-                "example": "event: delta\ndata: {\"text\":\"TMA \"}\n\nevent: done\ndata: {\"source\":\"monitoring\"}\n\n"
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/BelumLogin" },
-          "422": { "$ref": "#/components/responses/ValidasiGagal" }
-        }
-      }
-    },
-    "/api/datamasuk": {
-      "post": {
-        "tags": ["Ingest Alat"],
-        "summary": "Kiriman data dari logger lapangan",
-        "description": "**Tanpa autentikasi** — dipanggil firmware alat. Tidak memakai hak akses logger; siapa pun yang tahu `id_alat` bisa mengirim data untuk logger itu.\n\nWaktu boleh dikirim sebagai `waktu`, atau sebagai gabungan `hari`+`jam` / `tanggal`+`jam`. Nilai sensor boleh flat (`sensor1=1.23`) maupun bersarang (`sensor1[nilai]=1.23`).\n\nSatu kiriman ditulis ke tabel histori (`t_s16_*` / `t_s19_*` / `t_s50_*`) dan tabel snapshot (`temp_s*_latest`). Sensor yang tidak dikirim diisi dari snapshot sebelumnya, lalu sisanya diisi `0` agar tidak melanggar `NOT NULL`. Setelah tersimpan, data diteruskan ke `AWLR_FORWARD_URL` bila diset, dan dipublikasikan ke MQTT dengan topik `id_logger`.",
-        "security": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": { "$ref": "#/components/schemas/DatamasukRequest" },
-              "example": {
-                "id_alat": "10371",
-                "hari": "2026-09-10",
-                "jam": "08:00:00",
-                "sensor1": "1.234",
-                "sensor2": "0.512"
-              }
-            },
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/DatamasukRequest" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Data tersimpan",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "table_main": { "type": "string", "example": "t_s19_01" },
-                    "table_temp": { "type": "string", "example": "temp_s19_latest" },
-                    "forward": {
-                      "type": "object",
-                      "properties": {
-                        "enabled": { "type": "boolean" },
-                        "ok": { "type": "boolean", "nullable": true },
-                        "error": { "type": "string", "nullable": true }
-                      }
-                    },
-                    "mqtt": {
-                      "type": "object",
-                      "properties": {
-                        "ok": { "type": "boolean", "nullable": true },
-                        "error": { "type": "string", "nullable": true },
-                        "topic": { "type": "string" },
-                        "debug": { "type": "object", "description": "Ringkasan konfigurasi broker untuk penelusuran masalah" }
-                      }
+                "examples": {
+                  "terlalu_lebar": {
+                    "value": { "status": false, "pesan": "Rentang tanggal maksimal 31 hari." }
+                  },
+                  "format_salah": {
+                    "value": {
+                      "message": "The awal field must match the format Y-m-d.",
+                      "errors": { "awal": ["The awal field must match the format Y-m-d."] }
                     }
                   }
-                }
+                },
+                "schema": { "type": "object" }
               }
             }
-          },
-          "400": {
-            "description": "`id_alat` atau `waktu` tidak ada, atau format waktu tidak valid",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PesanGagal" },
-                "examples": {
-                  "wajib": { "value": { "success": false, "message": "id_alat dan waktu wajib" } },
-                  "format": { "value": { "success": false, "message": "Format waktu tidak valid" } }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "`id_alat` tidak terdaftar di `t_logger`",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PesanGagal" },
-                "example": { "success": false, "message": "Logger tidak ditemukan" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/ping-awlr": {
-      "get": {
-        "tags": ["Ingest Alat"],
-        "summary": "Uji jangkauan endpoint",
-        "description": "Membalas teks `pong`. Tanpa autentikasi, dipakai alat untuk memastikan jalur ke server hidup.",
-        "security": [],
-        "responses": {
-          "200": {
-            "description": "pong",
-            "content": { "text/plain": { "schema": { "type": "string", "example": "pong" } } }
           }
         }
       }
@@ -770,526 +160,131 @@
   },
   "components": {
     "securitySchemes": {
-      "BearerAuth": {
+      "BasicAuth": {
         "type": "http",
-        "scheme": "bearer",
-        "description": "Token dari `POST /api/v1/mobile/auth/login`, dikirim sebagai `Authorization: Bearer <token>`. Berlaku 30 hari. Token tidak disimpan di halaman dokumentasi ini."
+        "scheme": "basic",
+        "description": "Username dan password akun `t_user`. Kredensial menentukan logger mana yang bisa ditarik — lihat Hak akses logger per user. Kredensial tidak disimpan di halaman dokumentasi ini."
       }
     },
     "parameters": {
       "IdLogger": {
-        "name": "id",
-        "in": "path",
+        "name": "id_logger",
+        "in": "query",
         "required": true,
         "schema": { "type": "string" },
-        "description": "`id_logger` pada tabel `t_logger`. Logger di luar hak akses user dijawab `404`.",
+        "description": "`id_logger` pada tabel `t_logger`. Di luar hak akses kredensial dijawab `404`.",
         "example": "10371"
       }
     },
     "responses": {
-      "PesanSukses": {
-        "description": "Berhasil",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "success": { "type": "boolean", "example": true },
-                "message": { "type": "string" }
-              }
-            }
+      "Unauthorized": {
+        "description": "Kredensial tidak ada, salah, atau akunnya `suspend` / `non-aktif`",
+        "headers": {
+          "WWW-Authenticate": {
+            "schema": { "type": "string", "example": "Basic realm=\"Mini-STESY Integrasi\"" }
           }
-        }
-      },
-      "BelumLogin": {
-        "description": "Token tidak ada, salah, atau sudah kedaluwarsa",
+        },
         "content": {
           "application/json": {
-            "schema": { "type": "object", "properties": { "message": { "type": "string", "example": "Unauthenticated." } } }
-          }
-        }
-      },
-      "AkunDitolak": {
-        "description": "Akun `suspend` / `non-aktif`, atau server sedang `maintenance_mode`",
-        "content": {
-          "application/json": {
-            "schema": { "$ref": "#/components/schemas/PesanGagal" },
+            "schema": { "$ref": "#/components/schemas/Gagal" },
             "examples": {
-              "suspend": { "value": { "success": false, "message": "Akun Anda telah ditangguhkan (suspend). Alasan: ..." } },
-              "non_aktif": { "value": { "success": false, "message": "Akun Anda saat ini non-aktif. Silakan hubungi Administrator untuk mengaktifkan kembali." } },
-              "maintenance": { "value": { "success": false, "message": "maintenance: Server sedang dalam perbaikan." } }
+              "kredensial": { "value": { "status": false, "pesan": "Kredensial tidak valid." } },
+              "nonaktif": { "value": { "status": false, "pesan": "Akun tidak aktif. Hubungi Administrator." } }
             }
           }
         }
       },
-      "LoggerTidakDitemukan": {
-        "description": "Logger tidak ada **atau** berada di luar hak akses logger user. Kedua sebab memberi respons yang sama.",
+      "LoggerTidakTerdaftar": {
+        "description": "`id_logger` tidak ada **atau** di luar hak akses kredensial. Kedua sebab memberi respons yang sama.",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/PesanGagal" },
-            "example": { "success": false, "message": "Device tidak ditemukan" }
-          }
-        }
-      },
-      "ValidasiGagal": {
-        "description": "Validasi gagal",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": { "type": "string" },
-                "errors": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } }
-              }
-            },
-            "example": { "message": "Username atau password salah.", "errors": { "username": ["Username atau password salah."] } }
-          }
-        }
-      },
-      "GagalBacaData": {
-        "description": "Gagal membaca tabel sensor",
-        "content": {
-          "application/json": {
-            "schema": { "$ref": "#/components/schemas/PesanGagal" },
-            "example": { "success": false, "message": "Error ambil data: ..." }
+            "schema": { "$ref": "#/components/schemas/Gagal" },
+            "example": { "status": false, "pesan": "Logger Tidak Terdaftar" }
           }
         }
       }
     },
     "schemas": {
-      "PesanGagal": {
+      "Gagal": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean", "example": false },
-          "message": { "type": "string" }
+          "status": { "type": "boolean", "example": false },
+          "pesan": { "type": "string" }
         }
       },
-      "LoginRequest": {
+      "ParameterRiwayat": {
         "type": "object",
-        "required": ["username", "password"],
+        "description": "Keterangan kolom yang muncul di setiap baris `data`",
         "properties": {
-          "username": { "type": "string" },
-          "password": { "type": "string", "format": "password" }
-        }
-      },
-      "UserRingkas": {
-        "type": "object",
-        "description": "Identitas user. `level_user` menentukan cakupan hak akses logger — lihat penjelasan di bagian atas dokumen.",
-        "properties": {
-          "id_user": { "type": "integer", "example": 3 },
-          "nama": { "type": "string", "example": "Pegawai" },
-          "username": { "type": "string", "example": "pegawai" },
-          "level_user": {
-            "type": "string",
-            "example": "pegawai",
-            "description": "`superadmin` = semua logger; `instansi_admin` / `admin` = logger instansinya + grant eksplisit; `pegawai` / `user` = hanya grant eksplisit"
-          }
-        }
-      },
-      "LoginResponse": {
-        "type": "object",
-        "properties": {
-          "success": { "type": "boolean" },
-          "message": { "type": "string" },
-          "data": {
-            "type": "object",
-            "properties": {
-              "token": { "type": "string" },
-              "token_type": { "type": "string", "example": "Bearer" },
-              "expires_in": { "type": "integer", "example": 2592000, "description": "Detik. 30 hari." },
-              "user": { "$ref": "#/components/schemas/UserRingkas" }
-            }
-          }
-        }
-      },
-      "BerandaInfo": {
-        "type": "object",
-        "properties": {
-          "user": { "$ref": "#/components/schemas/UserRingkas" },
-          "instansi": {
-            "type": "object",
-            "nullable": true,
-            "description": "null bila user tidak terikat instansi",
-            "properties": {
-              "nama": { "type": "string" },
-              "judul_mobile": { "type": "string", "nullable": true },
-              "alamat": { "type": "string", "nullable": true },
-              "telp": { "type": "string", "nullable": true },
-              "logo": { "type": "string", "nullable": true, "description": "URL penuh" },
-              "logo_mobile": { "type": "string", "nullable": true }
-            }
-          },
-          "header_title": { "type": "string", "description": "`judul_mobile` instansi bila ada, jika tidak `Telemetri <nama instansi>`" },
-          "monitoring": {
-            "type": "object",
-            "description": "Hitungan **hanya** atas logger dalam hak akses user. Batas online: data terakhir kurang dari 60 menit lalu.",
-            "properties": {
-              "is_live": { "type": "boolean" },
-              "online_count": { "type": "integer" },
-              "offline_count": { "type": "integer" },
-              "total_count": { "type": "integer" }
-            }
-          },
-          "kategori_list": {
-            "type": "array",
-            "description": "Kategori yang benar-benar dimiliki user, dipakai menyusun menu",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id_katlogger": { "type": "integer" },
-                "nama_kategori": { "type": "string", "example": "AWLR" },
-                "kode": { "type": "string", "nullable": true }
-              }
-            }
-          },
-          "tanggal": { "type": "string", "example": "Kamis, 10 September 2026" },
-          "generated_at": { "type": "string", "format": "date-time" }
-        }
-      },
-      "SensorData": {
-        "type": "object",
-        "description": "Nilai sensor terbaru, dibulatkan 3 desimal. Kunci yang mungkin muncul: `tma`, `debit`, `curah_hujan`, `curah_hujan_per_jam`, `curah_hujan_harian`, `elevasi_muka_air`, `elevasi_sensor`, `flow_velocity`, `flowrate`, `totalizer_1`, `totalizer_2`, `pressure_1`, `pressure_2`, `flowmeter_battery`, `fault`, `jarak_sensor`, `muka_air_tanah`, `kecepatan_angin`, `arah_angin`, `kecerahan`, `arah_cahaya`, `temperature`, `tekanan_udara`, `humidity`, `luas_penampang_basah`, `orp`, `ph_air`, `suhu_air`, `conductivity`, `salinity`, `turbidity`, `tds`. Kunci yang tidak dikonfigurasi pada logger bernilai `null`.",
-        "additionalProperties": { "type": "number", "nullable": true }
-      },
-      "ParameterRingkas": {
-        "type": "object",
-        "properties": {
-          "nama": { "type": "string", "example": "Tinggi Muka Air" },
+          "nama_parameter": { "type": "string", "example": "Tinggi Muka Air" },
           "satuan": { "type": "string", "nullable": true, "example": "m" },
-          "nilai": { "type": "number", "nullable": true },
-          "key": { "type": "string", "example": "sensor1" },
-          "parameter_utama": { "type": "string", "nullable": true, "example": "tma" },
-          "icon_app": { "type": "string", "nullable": true, "description": "URL ikon" }
+          "kunci": {
+            "type": "string",
+            "example": "tinggi_muka_air",
+            "description": "Nama field parameter ini di dalam baris `data`. Diturunkan dari `nama_parameter`; bila ada dua parameter bernama sama, kolom sensornya ikut disisipkan agar tidak saling menimpa."
+          }
         }
       },
-      "ParameterSensor": {
-        "type": "object",
-        "description": "Baris mentah tabel `parameter_sensor`",
-        "properties": {
-          "id_param": { "type": "integer" },
-          "logger_id": { "type": "string" },
-          "nama_parameter": { "type": "string" },
-          "kolom_sensor": { "type": "string", "example": "sensor1" },
-          "satuan": { "type": "string" },
-          "tipe_graf": { "type": "string", "nullable": true, "example": "line" },
-          "icon_app": { "type": "string", "nullable": true },
-          "debit_awlr": { "type": "string", "nullable": true },
-          "parameter_utama": { "type": "string", "nullable": true },
-          "parameter_group_id": { "type": "integer", "nullable": true }
-        }
-      },
-      "PetaPoint": {
+      "Riwayat": {
         "type": "object",
         "properties": {
-          "id_logger": { "type": "string" },
-          "nama_logger": { "type": "string" },
-          "nama_lokasi": { "type": "string", "nullable": true },
-          "lat": { "type": "number" },
-          "lng": { "type": "number" },
-          "kategori": { "type": "string", "nullable": true, "example": "AWLR" },
-          "arr_state": { "type": "string", "nullable": true, "description": "Hasil klasifikasi threshold hujan, mis. `tidak_hujan`, `hujan_ringan`, `koneksi_terputus`" },
-          "status": { "type": "string", "enum": ["online", "offline"] },
-          "last_time": { "type": "string", "nullable": true, "format": "date-time" },
-          "no_seluler": { "type": "string", "nullable": true },
-          "sensor_count": { "type": "integer" },
-          "informasi": {
-            "type": "object",
-            "nullable": true,
-            "properties": {
-              "seri_logger": { "type": "string", "nullable": true },
-              "serial_number": { "type": "string", "nullable": true },
-              "awal_kontrak": { "type": "string", "nullable": true },
-              "garansi": { "type": "string", "nullable": true },
-              "imei": { "type": "string", "nullable": true },
-              "nama_pic": { "type": "string", "nullable": true },
-              "no_pic": { "type": "string", "nullable": true }
-            }
-          },
-          "dokumentasi": { "type": "array", "items": { "type": "string" }, "description": "URL foto pos" },
-          "logger_health": {
-            "type": "object",
-            "properties": {
-              "humidity": { "type": "number", "nullable": true, "description": "%Rh, 1 desimal" },
-              "battery": { "type": "number", "nullable": true, "description": "Volt, 2 desimal" },
-              "temp": { "type": "number", "nullable": true, "description": "°C, 1 desimal" }
-            }
-          },
-          "sensor_data": { "$ref": "#/components/schemas/SensorData" },
-          "sub_kategori": {
+          "status": { "type": "boolean", "example": true },
+          "id_logger": { "type": "string", "example": "10371" },
+          "nama_lokasi": {
             "type": "string",
             "nullable": true,
-            "description": "`jiat` / `non_jiat` untuk AWLR, `contact` / `non_contact` untuk AFMR",
-            "enum": ["jiat", "non_jiat", "contact", "non_contact", null]
+            "description": "Nama pos dari `t_lokasi`, jatuh ke `nama_logger` bila lokasinya belum diisi"
           },
-          "parameters_list": { "type": "array", "items": { "$ref": "#/components/schemas/ParameterRingkas" } },
-          "jiat_data": {
-            "type": "object",
-            "nullable": true,
-            "properties": {
-              "kedalaman_sumur": { "type": "number", "nullable": true },
-              "kedalaman_sensor": { "type": "number", "nullable": true },
-              "kedalaman_pompa": { "type": "number", "nullable": true },
-              "has_pump": { "type": "boolean", "description": "Prasyarat endpoint kontrol pompa" }
-            }
+          "jenis": { "type": "string", "nullable": true, "example": "AWLR", "description": "Nama kategori logger" },
+          "latitude": { "type": "number", "nullable": true },
+          "longitude": { "type": "number", "nullable": true },
+          "koneksi_logger": {
+            "type": "string",
+            "enum": ["On", "Off"],
+            "description": "`On` bila data terakhir kurang dari 60 menit lalu"
           },
-          "nonjiat_data": {
-            "type": "object",
-            "nullable": true,
-            "properties": {
-              "jenis_sensor": { "type": "string", "nullable": true },
-              "elevasi_min": { "type": "number", "nullable": true },
-              "elevasi_max": { "type": "number", "nullable": true },
-              "tinggi_sensor": { "type": "number", "nullable": true },
-              "jarak_sensor_ke_air": { "type": "number", "nullable": true }
-            }
-          }
-        }
-      },
-      "MqttConfig": {
-        "type": "object",
-        "description": "Broker kontrol pompa. Nilai contoh disamarkan.",
-        "properties": {
-          "broker": { "type": "string", "example": "mqtt.beacontelemetry.com" },
-          "port": { "type": "integer", "example": 8083 },
-          "path": { "type": "string", "example": "/mqtt" },
-          "user": { "type": "string", "example": "***" },
-          "pass": { "type": "string", "example": "***" },
-          "use_ssl": { "type": "boolean", "example": true }
-        }
-      },
-      "RealtimeDevice": {
-        "type": "object",
-        "properties": {
-          "id_logger": { "type": "string" },
-          "nama_logger": { "type": "string" },
-          "nama_lokasi": { "type": "string", "nullable": true },
-          "kategori": { "type": "string", "nullable": true },
-          "tabel_main": { "type": "string", "nullable": true },
-          "status": { "type": "string", "enum": ["online", "offline"] },
-          "last_time": { "type": "string", "nullable": true, "format": "date-time" },
-          "selisih_menit": { "type": "integer", "nullable": true },
-          "params_count": { "type": "integer" }
-        }
-      },
-      "RealtimeDataResponse": {
-        "type": "object",
-        "properties": {
-          "success": { "type": "boolean" },
-          "device": {
-            "type": "object",
-            "properties": {
-              "id_logger": { "type": "string" },
-              "nama_logger": { "type": "string" },
-              "tabel_main": { "type": "string", "description": "Tabel yang benar-benar dipakai, bisa berbeda dari `t_logger.tabel_main` bila terjadi fallback" }
-            }
-          },
-          "params": { "type": "array", "items": { "$ref": "#/components/schemas/ParameterSensor" } },
+          "waktu_terakhir": { "type": "string", "nullable": true, "example": "2026-09-10 09:30:00" },
+          "parameter": { "type": "array", "items": { "$ref": "#/components/schemas/ParameterRiwayat" } },
+          "jumlah_data": { "type": "integer", "example": 2 },
           "data": {
             "type": "array",
-            "description": "Baris mentah tabel sensor. Selalu ada `id_logger` dan `waktu`; kolom lain bernama `sensor1`..`sensorN` sesuai keluarga tabel.",
-            "items": { "type": "object", "additionalProperties": true }
-          },
-          "last_update": { "type": "string", "nullable": true, "format": "date-time" },
-          "mqtt": { "$ref": "#/components/schemas/MqttConfig" },
-          "meta": {
-            "type": "object",
-            "properties": {
-              "from": { "type": "string", "format": "date-time" },
-              "to": { "type": "string", "format": "date-time" },
-              "count": { "type": "integer" }
-            }
-          }
-        }
-      },
-      "Perangkat": {
-        "type": "object",
-        "properties": {
-          "id_logger": { "type": "string" },
-          "nama_logger": { "type": "string" },
-          "id_katlogger": { "type": "integer", "nullable": true },
-          "kategori": { "type": "string", "nullable": true },
-          "tabel_main": { "type": "string", "nullable": true },
-          "sensor_count": { "type": "integer" },
-          "status": { "type": "string", "enum": ["online", "offline"] },
-          "last_time": { "type": "string", "nullable": true, "format": "date-time" },
-          "lokasi": {
-            "type": "object",
-            "properties": {
-              "nama_lokasi": { "type": "string", "nullable": true },
-              "alamat": { "type": "string", "nullable": true },
-              "latitude": { "type": "number", "nullable": true },
-              "longitude": { "type": "number", "nullable": true }
-            }
-          },
-          "params": {
-            "type": "array",
+            "description": "Terbaru dulu. Setiap baris berisi `waktu` ditambah satu field per parameter, memakai `kunci` dari daftar `parameter`.",
             "items": {
               "type": "object",
-              "properties": {
-                "id_param": { "type": "integer" },
-                "nama_parameter": { "type": "string" },
-                "kolom_sensor": { "type": "string" },
-                "satuan": { "type": "string", "nullable": true },
-                "parameter_group_id": { "type": "integer", "nullable": true }
-              }
+              "properties": { "waktu": { "type": "string", "example": "2026-09-10 09:30:00" } },
+              "additionalProperties": { "type": "number", "nullable": true }
             }
           }
         }
       },
-      "PerangkatDetail": {
-        "allOf": [
-          { "$ref": "#/components/schemas/Perangkat" },
-          {
-            "type": "object",
-            "properties": {
-              "jiat": {
-                "type": "object",
-                "nullable": true,
-                "properties": {
-                  "kedalaman_sumur": { "type": "number", "nullable": true },
-                  "kedalaman_pompa": { "type": "number", "nullable": true },
-                  "kedalaman_sensor": { "type": "number", "nullable": true },
-                  "has_pump": { "type": "boolean" }
-                }
-              },
-              "nonjiat": {
-                "type": "object",
-                "nullable": true,
-                "properties": {
-                  "id": { "type": "integer" },
-                  "jenis_sensor": { "type": "string", "nullable": true },
-                  "jarak_sensor_ke_air": { "type": "number", "nullable": true },
-                  "tinggi_sensor": { "type": "number", "nullable": true }
-                }
-              }
-            }
-          }
-        ]
-      },
-      "AnalisaInfo": {
+      "SnapshotSemua": {
         "type": "object",
         "properties": {
-          "id_logger": { "type": "string" },
-          "nama_logger": { "type": "string" },
-          "kategori": { "type": "string", "nullable": true },
+          "status": { "type": "boolean", "example": true },
+          "jumlah_logger": { "type": "integer", "example": 2 },
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/SnapshotLogger" } }
+        }
+      },
+      "SnapshotLogger": {
+        "type": "object",
+        "properties": {
+          "id_logger": { "type": "string", "example": "10371" },
           "nama_lokasi": { "type": "string", "nullable": true },
-          "tabel_main": { "type": "string", "nullable": true },
-          "params": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id_param": { "type": "integer" },
-                "nama_parameter": { "type": "string" },
-                "parameter_utama": { "type": "string", "nullable": true },
-                "kolom_sensor": { "type": "string" },
-                "satuan": { "type": "string", "nullable": true },
-                "tipe_graf": { "type": "string", "example": "line" },
-                "icon_app": { "type": "string", "nullable": true }
-              }
-            }
-          }
-        }
-      },
-      "AnalisaDataResponse": {
-        "type": "object",
-        "properties": {
-          "success": { "type": "boolean" },
+          "jenis": { "type": "string", "nullable": true, "example": "AWLR" },
+          "latitude": { "type": "number", "nullable": true },
+          "longitude": { "type": "number", "nullable": true },
+          "koneksi_logger": { "type": "string", "enum": ["On", "Off"] },
+          "waktu": { "type": "string", "nullable": true, "description": "Waktu snapshot terakhir, `null` bila logger belum pernah mengirim data" },
           "data": {
             "type": "array",
-            "description": "Setiap baris berisi `waktu` ditambah kolom sensor yang diminta",
-            "items": {
-              "type": "object",
-              "properties": { "waktu": { "type": "string", "format": "date-time" } },
-              "additionalProperties": true
-            }
-          },
-          "params": {
-            "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "nama_parameter": { "type": "string" },
-                "parameter_utama": { "type": "string", "nullable": true },
-                "kolom_sensor": { "type": "string" },
-                "satuan": { "type": "string", "nullable": true },
-                "tipe_graf": { "type": "string" },
-                "icon_app": { "type": "string", "nullable": true }
+                "nama_parameter": { "type": "string", "example": "Tinggi Muka Air" },
+                "satuan": { "type": "string", "nullable": true, "example": "m" },
+                "nilai": { "type": "number", "nullable": true, "example": 1.35 }
               }
             }
-          },
-          "meta": {
-            "type": "object",
-            "properties": {
-              "id_logger": { "type": "string" },
-              "tabel": { "type": "string" },
-              "from": { "type": "string", "format": "date-time" },
-              "to": { "type": "string", "format": "date-time" },
-              "total": { "type": "integer" },
-              "per_page": { "type": "integer" },
-              "page": { "type": "integer" },
-              "last_page": { "type": "integer" }
-            }
-          }
-        }
-      },
-      "PumpCommandRequest": {
-        "type": "object",
-        "required": ["id_logger", "action"],
-        "properties": {
-          "id_logger": { "type": "string" },
-          "action": { "type": "string", "enum": ["get", "on", "off"] },
-          "control_pin": { "type": "string", "maxLength": 32, "description": "Wajib untuk `on` / `off`. Dicek terhadap PIN kontrol instansi pemilik logger." },
-          "latitude": { "type": "number", "minimum": -90, "maximum": 90, "description": "Wajib untuk `on` / `off`. Dicatat di log kontrol." },
-          "longitude": { "type": "number", "minimum": -180, "maximum": 180, "description": "Wajib untuk `on` / `off`." },
-          "location_permission_status": { "type": "string", "enum": ["granted"], "description": "Wajib untuk `on` / `off`. Nilai selain `granted` ditolak." }
-        }
-      },
-      "ChatbotRequest": {
-        "type": "object",
-        "required": ["message"],
-        "properties": {
-          "message": { "type": "string", "minLength": 2, "maxLength": 700 },
-          "messages": {
-            "type": "array",
-            "maxItems": 12,
-            "description": "Riwayat percakapan sebelumnya",
-            "items": {
-              "type": "object",
-              "required": ["role"],
-              "properties": {
-                "role": { "type": "string", "enum": ["user", "assistant"] },
-                "text": { "type": "string", "nullable": true, "maxLength": 700 }
-              }
-            }
-          }
-        }
-      },
-      "DatamasukRequest": {
-        "type": "object",
-        "description": "`id_alat` boleh diganti `id_logger` atau `code_logger`. Waktu boleh `waktu`, atau `hari`+`jam`, atau `tanggal`+`jam`. Jumlah slot sensor mengikuti keluarga tabel logger (16, 19, atau 50).",
-        "properties": {
-          "id_alat": { "type": "string", "example": "10371" },
-          "id_logger": { "type": "string", "description": "Alias `id_alat`" },
-          "code_logger": { "type": "string", "description": "Alias `id_alat`" },
-          "waktu": { "type": "string", "example": "2026-09-10 08:00:00" },
-          "hari": { "type": "string", "example": "2026-09-10", "description": "Dipakai bersama `jam`" },
-          "tanggal": { "type": "string", "example": "2026-09-10", "description": "Alias `hari`" },
-          "jam": { "type": "string", "example": "08:00:00" },
-          "sensor1": {
-            "description": "Nilai sensor. Boleh flat (`\"1.234\"`) atau bersarang (`{\"nama\":\"TMA\",\"nilai\":1.234,\"satuan\":\"m\"}`). Slot berikutnya `sensor2`, `sensor3`, dan seterusnya.",
-            "oneOf": [
-              { "type": "string" },
-              { "type": "number" },
-              {
-                "type": "object",
-                "properties": {
-                  "nama": { "type": "string" },
-                  "nilai": { "type": "number", "nullable": true },
-                  "satuan": { "type": "string" }
-                }
-              }
-            ]
           }
         }
       }
