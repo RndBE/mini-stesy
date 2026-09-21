@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Validation\Rule;
 
 class DeviceController extends Controller
 {
@@ -145,7 +146,10 @@ class DeviceController extends Controller
      */
     public function create()
     {
-        $instansis = Instansi::orderBy('nama')->get();
+        $instansis = Instansi::query()
+            ->forUser(auth()->user())
+            ->orderBy('nama')
+            ->get();
 
         $loggers = t_Logger::query()
             ->forUser(auth()->user())
@@ -619,6 +623,20 @@ class DeviceController extends Controller
         ]);
     }
 
+    /**
+     * Aturan validasi instansi_id yang menghormati peran: superadmin bebas
+     * memilih instansi mana pun, peran lain terkunci pada instansinya sendiri.
+     */
+    private function instansiIdRule(): array
+    {
+        $allowed = Instansi::query()
+            ->forUser(auth()->user())
+            ->pluck('id')
+            ->all();
+
+        return ['required', Rule::in($allowed)];
+    }
+
     public function dataPerangkat()
     {
         $devices = t_Logger::query()
@@ -659,7 +677,10 @@ class DeviceController extends Controller
             });
 
         $kategoris = Kategori_logger::orderBy('nama_kategori')->get();
-        $instansis = Instansi::orderBy('nama')->get();
+        $instansis = Instansi::query()
+            ->forUser(auth()->user())
+            ->orderBy('nama')
+            ->get();
 
         return view('device.data_perangkat', [
             'title' => 'Data Perangkat',
@@ -675,7 +696,7 @@ class DeviceController extends Controller
             'id_logger'          => 'required|string|max:15|unique:t_logger,id_logger',
             'nama_logger'        => 'required|string|max:255',
             'id_katlogger'       => 'nullable|exists:kategori_logger,id_katlogger',
-            'instansi_id'        => 'required|exists:instansi,id',
+            'instansi_id'        => $this->instansiIdRule(),
             'seri'               => 'nullable|string|max:255',
             'serial_number'      => 'nullable|string|max:255',
             'sensor_type'        => 'nullable|string|max:255',
@@ -730,7 +751,7 @@ class DeviceController extends Controller
         $validated = $request->validate([
             'nama_logger'        => 'required|string|max:255',
             'id_katlogger'       => 'nullable|exists:kategori_logger,id_katlogger',
-            'instansi_id'        => 'required|exists:instansi,id',
+            'instansi_id'        => $this->instansiIdRule(),
             'seri'               => 'nullable|string|max:255',
             'serial_number'      => 'nullable|string|max:255',
             'sensor_type'        => 'nullable|string|max:255',

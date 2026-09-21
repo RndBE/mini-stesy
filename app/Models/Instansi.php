@@ -36,6 +36,23 @@ class Instansi extends Model
         'control_pin_updated_at' => 'datetime',
     ];
 
+    /**
+     * Superadmin melihat semua instansi; peran lain (instansi_admin, pegawai)
+     * hanya instansi miliknya sendiri.
+     */
+    public function scopeForUser($query, $user)
+    {
+        if (!$user) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if (method_exists($user, 'isSuperAdmin') ? $user->isSuperAdmin() : ($user->level_user === 'superadmin')) {
+            return $query;
+        }
+
+        return $query->where('id', $user->instansi_id);
+    }
+
     public function users()
     {
         return $this->hasMany(t_User::class, 'instansi_id', 'id');
