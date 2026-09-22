@@ -584,7 +584,7 @@
                                                             placeholder="cth: 0.5">
                                                         <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                     </div>
-                                                    <p class="mt-1 text-[11px] text-gray-500">Cadangan saja. Dipakai kalau Elevasi Maks belum diset. Kosong = 0,5.</p>
+                                                    <p class="mt-1 text-[11px] text-gray-500">Jarak apex ke crest. Menentukan tinggi air di takik pada ilustrasi. Kosong = 0,5.</p>
                                                 </div>
                                             </div>
                                             <div x-show="addData.jenis_pemasangan === 'v_notch'"
@@ -593,9 +593,9 @@
                                                 <ul class="space-y-1 text-[11px] leading-relaxed text-slate-600">
                                                     <li><strong>Satuan cm</strong>, dan semua elevasi dari satu datum yang sama (benchmark lokal atau elevasi laut).</li>
                                                     <li><strong>Elevasi Apex</strong> &mdash; elevasi titik terbawah huruf V di plat ambang. Jadi titik nol peil; head H = TMA &minus; apex.</li>
-                                                    <li><strong>Elevasi Maks</strong> &mdash; elevasi tepi atas V (crest). Selisihnya dengan apex = kedalaman notch, dan itu yang menentukan skala peil.</li>
+                                                    <li><strong>Elevasi Maks</strong> &mdash; batas atas papan peil. Angka teratas pada papan di ilustrasi mengikuti isian ini.</li>
                                                     <li><strong>Elevasi Min</strong> &mdash; batas bawah skala peil. Isi sama dengan apex kalau tak perlu menampilkan level di bawah apex.</li>
-                                                    <li><strong>Kedalaman Notch</strong> &mdash; cadangan saja. Kosongkan kalau Elevasi Maks sudah diisi.</li>
+                                                    <li><strong>Kedalaman Notch</strong> &mdash; apex ke crest. Dipakai menggambar air di takik, bukan skala peil. Kosong = 0,5.</li>
                                                     <li><strong>Ketinggian Sensor</strong> &mdash; tinggi pemasangan transduser di atas apex. <strong>Jarak Sensor dengan Air</strong> &mdash; jarak nominal transduser ke muka air.</li>
                                                 </ul>
                                                 <p class="mt-2 text-[11px] text-slate-500">
@@ -723,7 +723,7 @@
                                                         class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
                                                 <p class="mt-1 text-[11px] text-amber-600" x-show="addData.jenis_pemasangan === 'v_notch'">
-                                                    Pemasangan v-notch: ini elevasi <strong>crest</strong> (tepi atas V), penentu skala peil.
+                                                    Pemasangan v-notch: batas atas papan peil, jadi angka teratas papan di ilustrasi.
                                                 </p>
                                             </div>
                                             <div>
@@ -739,7 +739,7 @@
                                                         class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
                                                 <p class="mt-1 text-[11px] text-amber-600" x-show="addData.jenis_pemasangan === 'v_notch'">
-                                                    Pemasangan v-notch: batas bawah skala peil. Boleh di bawah apex, ruang gambarnya terbatas.
+                                                    Pemasangan v-notch: batas bawah papan peil, jadi angka terbawah papan di ilustrasi.
                                                 </p>
                                             </div>
                                         </div>
@@ -1060,7 +1060,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                             placeholder="cth: 0.5">
                                                         <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                     </div>
-                                                    <p class="mt-1 text-[11px] text-gray-500">Cadangan saja. Dipakai kalau Elevasi Maks belum diset. Kosong = 0,5.</p>
+                                                    <p class="mt-1 text-[11px] text-gray-500">Jarak apex ke crest. Menentukan tinggi air di takik pada ilustrasi. Kosong = 0,5.</p>
                                                 </div>
                                             </div>
                                             <div x-show="editData.jenis_pemasangan === 'v_notch'"
@@ -1069,9 +1069,9 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                 <ul class="space-y-1 text-[11px] leading-relaxed text-slate-600">
                                                     <li><strong>Satuan cm</strong>, dan semua elevasi dari satu datum yang sama (benchmark lokal atau elevasi laut).</li>
                                                     <li><strong>Elevasi Apex</strong> &mdash; elevasi titik terbawah huruf V di plat ambang. Jadi titik nol peil; head H = TMA &minus; apex.</li>
-                                                    <li><strong>Elevasi Maks</strong> &mdash; elevasi tepi atas V (crest). Selisihnya dengan apex = kedalaman notch, dan itu yang menentukan skala peil.</li>
+                                                    <li><strong>Elevasi Maks</strong> &mdash; batas atas papan peil. Angka teratas pada papan di ilustrasi mengikuti isian ini.</li>
                                                     <li><strong>Elevasi Min</strong> &mdash; batas bawah skala peil. Isi sama dengan apex kalau tak perlu menampilkan level di bawah apex.</li>
-                                                    <li><strong>Kedalaman Notch</strong> &mdash; cadangan saja. Kosongkan kalau Elevasi Maks sudah diisi.</li>
+                                                    <li><strong>Kedalaman Notch</strong> &mdash; apex ke crest. Dipakai menggambar air di takik, bukan skala peil. Kosong = 0,5.</li>
                                                     <li><strong>Ketinggian Sensor</strong> &mdash; tinggi pemasangan transduser di atas apex. <strong>Jarak Sensor dengan Air</strong> &mdash; jarak nominal transduser ke muka air.</li>
                                                 </ul>
                                                 <p class="mt-2 text-[11px] text-slate-500">
@@ -1176,7 +1176,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                     <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
                                                 <p class="mt-1 text-[11px] text-amber-600" x-show="editData.jenis_pemasangan === 'v_notch'">
-                                                    Pemasangan v-notch: ini elevasi <strong>crest</strong> (tepi atas V), penentu skala peil.
+                                                    Pemasangan v-notch: batas atas papan peil, jadi angka teratas papan di ilustrasi.
                                                 </p>
                                             </div>
                                             <div>
@@ -1189,7 +1189,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                     <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
                                                 <p class="mt-1 text-[11px] text-amber-600" x-show="editData.jenis_pemasangan === 'v_notch'">
-                                                    Pemasangan v-notch: batas bawah skala peil. Boleh di bawah apex, ruang gambarnya terbatas.
+                                                    Pemasangan v-notch: batas bawah papan peil, jadi angka terbawah papan di ilustrasi.
                                                 </p>
                                             </div>
                                         </div>
