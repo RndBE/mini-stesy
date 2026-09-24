@@ -80,4 +80,21 @@ class ProviderClientStreamTest extends TestCase
         $this->assertNull($result, 'stream() must return null for non-2xx responses');
         $this->assertFalse($called, 'onToken must never be called on error response');
     }
+
+    public function test_stream_via_router_sends_max_tokens(): void
+    {
+        config([
+            'services.ai_chatbot.endpoint' => 'https://router.be-stesy.cloud/v1/chat/completions',
+            'services.ai_chatbot.key'      => 'k',
+            'services.ai_chatbot.model'    => 'Chatbot',
+        ]);
+
+        Http::fake(['*' => Http::response("data: [DONE]\n\n", 200)]);
+
+        app(ProviderClient::class)->stream([['role' => 'user', 'content' => 'hi']], fn () => null);
+
+        Http::assertSent(fn ($req) => $req['max_tokens'] === 2000
+            && $req['stream'] === true
+            && ! array_key_exists('max_completion_tokens', $req->data()));
+    }
 }

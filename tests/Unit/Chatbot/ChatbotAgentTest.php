@@ -50,6 +50,37 @@ class ChatbotAgentTest extends TestCase
         $this->assertStringContainsString('3 logger offline', $out['reply']);
     }
 
+    public function test_ask_uses_system_role_and_sends_reasoning_back_on_pass_two(): void
+    {
+        $registry = new ToolRegistry();
+        $registry->register(new class implements ChatbotTool {
+            public function name(): string { return 'list_loggers'; }
+            public function schema(): array { return ['type' => 'function', 'function' => ['name' => 'list_loggers']]; }
+            public function run(array $a, t_User $u): array { return ['text' => '{"offline_count":3}']; }
+        });
+
+        $provider = Mockery::mock(ProviderClient::class);
+        $provider->shouldReceive('configured')->andReturnTrue();
+        // Pass-1 (with tools): system prompt must use the "system" role
+        $provider->shouldReceive('chat')->once()
+            ->with(Mockery::on(fn ($m) => $m[0]['role'] === 'system'), Mockery::any())
+            ->andReturn([
+                'content' => '',
+                'reasoning_content' => 'Perlu cek logger offline.',
+                'tool_calls' => [['id' => 'c1', 'type' => 'function', 'function' => ['name' => 'list_loggers', 'arguments' => '{}']]],
+            ]);
+        // Pass-2 (no tools): assistant tool-call message must carry reasoning_content back
+        $provider->shouldReceive('chat')->once()
+            ->with(Mockery::on(fn ($m) => (collect($m)->firstWhere('role', 'assistant')['reasoning_content'] ?? null) === 'Perlu cek logger offline.'))
+            ->andReturn(['content' => 'Ada 3 logger offline.']);
+
+        $agent = $this->makeAgent($provider, $registry);
+        $out = $agent->ask(t_User::factory()->make(), 'berapa yang offline?');
+
+        $this->assertSame('ai', $out['source']);
+        $this->assertStringContainsString('3 logger offline', $out['reply']);
+    }
+
     public function test_ask_falls_back_when_ai_returns_empty_content(): void
     {
         $provider = Mockery::mock(ProviderClient::class);

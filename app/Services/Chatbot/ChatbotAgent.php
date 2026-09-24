@@ -179,8 +179,9 @@ class ChatbotAgent
     private function seedMessages(t_User $user, string $message, array $turns): array
     {
         $light = $this->context->lightContext($user);
+        // "system", not "developer": DeepSeek rejects the developer role, OpenAI treats system the same way.
         return array_merge(
-            [['role' => 'developer', 'content' => $this->persona->systemPrompt($light)]],
+            [['role' => 'system', 'content' => $this->persona->systemPrompt($light)]],
             $this->context->history($turns),
             [['role' => 'user', 'content' => $message]],
         );
@@ -188,11 +189,16 @@ class ChatbotAgent
 
     private function assistantToolCallMessage(array $first): array
     {
-        return [
+        $message = [
             'role' => 'assistant',
             'content' => $first['content'] ?? null,
             'tool_calls' => $first['tool_calls'],
         ];
+        // DeepSeek thinking mode answers 400 on pass-2 unless the reasoning is sent back.
+        if (! empty($first['reasoning_content'])) {
+            $message['reasoning_content'] = $first['reasoning_content'];
+        }
+        return $message;
     }
 
     /**

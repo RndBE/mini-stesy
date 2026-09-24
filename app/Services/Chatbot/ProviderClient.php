@@ -17,8 +17,10 @@ class ProviderClient
         try {
             $payload = [
                 'model' => config('services.ai_chatbot.model'),
-                'max_completion_tokens' => 2000,
+                $this->tokenField() => 2000,
                 'messages' => $messages,
+                // Must be explicit: without it 9router appends "data: [DONE]" after the JSON body.
+                'stream' => false,
             ];
             if ($tools) { $payload['tools'] = $tools; $payload['tool_choice'] = 'auto'; }
 
@@ -34,7 +36,7 @@ class ProviderClient
         try {
             $res = $this->request()->withOptions(['stream'=>true])->post(
                 config('services.ai_chatbot.endpoint'),
-                ['model'=>config('services.ai_chatbot.model'),'max_completion_tokens'=>2000,'messages'=>$messages,'stream'=>true]
+                ['model'=>config('services.ai_chatbot.model'),$this->tokenField()=>2000,'messages'=>$messages,'stream'=>true]
             );
             if (! $res->successful()) { report(new \RuntimeException('Chatbot stream error: '.$res->status())); return null; }
 
@@ -57,10 +59,17 @@ class ProviderClient
         } catch (\Throwable $e) { report($e); return null; }
     }
 
+    // OpenAI GPT-5 rejects max_tokens; DeepSeek (behind the 9router "Chatbot" combo) rejects max_completion_tokens.
+    private function tokenField(): string
+    {
+        $host = parse_url((string) config('services.ai_chatbot.endpoint'), PHP_URL_HOST);
+        return $host === 'api.openai.com' ? 'max_completion_tokens' : 'max_tokens';
+    }
+
     private function request()
     {
         $verify = filter_var(config('services.ai_chatbot.verify_ssl', true), FILTER_VALIDATE_BOOL);
-        $req = Http::timeout(25)->withToken(config('services.ai_chatbot.key'))->acceptJson();
+        $req = Http::timeout(60)->withToken(config('services.ai_chatbot.key'))->acceptJson();
         return $verify ? $req : $req->withoutVerifying();
     }
 }
