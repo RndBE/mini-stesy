@@ -1679,7 +1679,7 @@
                                 </button>
 
                                 <div id="dpPanel"
-                                    class="fixed w-[320px] rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-[9999] hidden">
+                                    class="absolute w-[320px] rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-[9999] hidden">
                                     <div class="flex items-center justify-between gap-2">
                                         <button type="button" id="dpPrev"
                                             class="h-8 w-8 rounded-lg border border-slate-50 hover:bg-slate-50 flex items-center justify-center">
@@ -1770,7 +1770,7 @@
                                 <input type="hidden" id="monthInput" value="{{ date('Y-m') }}" />
 
                                 <div id="mpPanel"
-                                    class="fixed w-[320px] rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-[9999] hidden">
+                                    class="absolute w-[320px] rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-[9999] hidden">
                                     <div class="flex items-center justify-center">
                                         <div class="relative">
                                             <button type="button" id="mpYearBtn"
@@ -1813,7 +1813,7 @@
                                 <input type="hidden" id="yearInput" value="{{ date('Y') }}" />
 
                                 <div id="ypPanel"
-                                    class="fixed w-[320px] rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-[9999] hidden">
+                                    class="absolute w-[320px] rounded-xl border border-slate-200 bg-white shadow-lg p-3 z-[9999] hidden">
                                     <div class="flex items-center justify-between">
                                         <button type="button" id="ypPrev"
                                             class="h-8 w-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center">
@@ -1853,7 +1853,7 @@
                                 <input type="hidden" id="endDateTime" value="{{ date('Y-m-d\T23:59') }}">
 
                                 <div id="rpPanel"
-                                    class="fixed w-[640px] rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-[9999] hidden">
+                                    class="absolute w-[640px] rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-[9999] hidden">
                                     <div class="flex items-center gap-3">
                                         <div class="flex-1">
                                             <div id="rpStartBox"
@@ -3847,11 +3847,16 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            function positionPanel(anchorWrap, panel) {
-                // Portal the panel to <body> so position:fixed resolves against the
-                // viewport (not a transformed ancestor like .control-deck) and it sits
-                // at the root stacking context instead of being trapped behind the chart card.
+            // Panels placed by positionPanel (panel -> anchor), so open ones can follow their input.
+            const anchoredPanels = new Map();
+
+            function positionPanel(anchorWrap, panel, keepSide = false) {
+                // Portal the panel to <body> so it escapes transformed ancestors like .control-deck
+                // and sits at the root stacking context instead of being trapped behind the chart card.
+                // It is positioned absolute in document coordinates, so page scroll carries it along
+                // with its input instead of leaving it pinned to the viewport.
                 if (panel.parentElement !== document.body) document.body.appendChild(panel);
+                anchoredPanels.set(panel, anchorWrap);
                 const rect = anchorWrap.getBoundingClientRect();
                 const wasHidden = panel.classList.contains('hidden');
                 if (wasHidden) {
@@ -3864,21 +3869,42 @@
                     panel.classList.add('hidden');
                     panel.style.visibility = '';
                 }
-                const winW = window.innerWidth;
+                // clientWidth excludes the scrollbar; an absolute panel under it would add a horizontal scroll.
+                const winW = document.documentElement.clientWidth;
                 const winH = window.innerHeight;
-                let top = rect.bottom + 8;
                 let left = rect.left;
                 if (left + panelWidth > winW - 8) {
                     left = winW - panelWidth - 8;
                 }
                 if (left < 8) left = 8;
-                if (top + panelH > winH - 8) {
-                    top = rect.top - panelH - 8;
-                    if (top < 8) top = 8;
-                }
-                panel.style.top = top + 'px';
-                panel.style.left = left + 'px';
+                const fitsBelow = rect.bottom + 8 + panelH <= winH - 8;
+                const fitsAbove = rect.top - panelH - 8 >= 8;
+                // Prefer below. While following a scroll, stay on the current side as long as it still
+                // fits so the panel doesn't flip back and forth.
+                const above = keepSide && panel.dataset.side === 'above' ? fitsAbove || !fitsBelow : !fitsBelow;
+                panel.dataset.side = above ? 'above' : 'below';
+                const top = above ? Math.max(8, rect.top - panelH - 8) : rect.bottom + 8;
+                panel.style.top = (top + window.scrollY) + 'px';
+                panel.style.left = (left + window.scrollX) + 'px';
             }
+
+            let followFrame = 0;
+
+            function followAnchors() {
+                if (followFrame) return;
+                followFrame = requestAnimationFrame(() => {
+                    followFrame = 0;
+                    anchoredPanels.forEach((anchorWrap, panel) => {
+                        if (!panel.classList.contains('hidden')) positionPanel(anchorWrap, panel, true);
+                    });
+                });
+            }
+            // Capture phase also catches scrolling inside containers, not just the window.
+            window.addEventListener('scroll', followAnchors, {
+                capture: true,
+                passive: true
+            });
+            window.addEventListener('resize', followAnchors);
             const wrap = document.getElementById('dpWrap')
             const input = document.getElementById('dateInput')
             const btn = document.getElementById('dpBtn')
@@ -3929,9 +3955,9 @@
 
                 function openPanel() {
                     panel.classList.remove('hidden')
-                    positionPanel(wrap, panel)
                     closeMenus()
                     render()
+                    positionPanel(wrap, panel)
                 }
 
                 function closePanel() {
@@ -3942,9 +3968,9 @@
                 function togglePanel() {
                     panel.classList.toggle('hidden')
                     if (!panel.classList.contains('hidden')) {
-                        positionPanel(wrap, panel)
                         closeMenus()
                         render()
+                        positionPanel(wrap, panel)
                     }
                 }
 
@@ -4177,17 +4203,17 @@
 
                 function openPanel() {
                     panel.classList.remove('hidden')
-                    positionPanel(wrap, panel)
                     yearMenu.classList.add('hidden')
                     renderGrid()
+                    positionPanel(wrap, panel)
                 }
 
                 btn.addEventListener('click', () => {
                     panel.classList.toggle('hidden')
                     if (!panel.classList.contains('hidden')) {
-                        positionPanel(wrap, panel)
                         yearMenu.classList.add('hidden')
                         renderGrid()
+                        positionPanel(wrap, panel)
                     }
                 })
 
@@ -4541,9 +4567,9 @@
 
                 function openPanel() {
                     panel.classList.remove('hidden')
-                    positionPanel(wrap, panel)
                     closeMenus()
                     render()
+                    positionPanel(wrap, panel)
                 }
 
                 function closePanel() {
