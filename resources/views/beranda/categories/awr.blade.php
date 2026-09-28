@@ -159,7 +159,7 @@
     @endphp
 
     <div class="px-4 py-3 space-y-3">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="card-split-pair grid grid-cols-1 md:grid-cols-2 gap-4">
 @if (($awrValues['kecepatan_angin']['param'] ?? null) || ($awrValues['arah_angin']['param'] ?? null))
 <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
                 <div class="text-sm font-semibold text-slate-700 mb-3">Angin</div>
@@ -178,11 +178,11 @@
                             <img src="{{ asset($awrValues['kecepatan_angin']['icon']) }}" onerror="this.style.display='none'"
                                 class="h-8 w-8 flex-shrink-0 object-contain" alt="Kecepatan Angin">
                             <div class="leading-tight min-w-0">
-                                <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase">KECEPATAN
+                                <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">KECEPATAN
                                     ANGIN</div>
                                 <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
                                     {{ $dispKecepatan }}<span
-                                        class="text-[10px] font-bold text-slate-400 ml-0.5">Km/h</span>
+                                        class="text-[11px] font-bold text-slate-400 ml-0.5">Km/h</span>
                                 </div>
                             </div>
                         </a>
@@ -193,11 +193,11 @@
                             <img src="{{ asset($awrValues['arah_angin']['icon']) }}" onerror="this.style.display='none'"
                                 class="h-8 w-8 flex-shrink-0 object-contain" alt="Arah Angin">
                             <div class="leading-tight min-w-0">
-                                <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase">ARAH ANGIN
+                                <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">ARAH ANGIN
                                 </div>
                                 <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
                                     {{ $dispArahAngin }}<span
-                                        class="text-[10px] font-bold text-slate-400 ml-0.5">°</span>
+                                        class="text-[11px] font-bold text-slate-400 ml-0.5">°</span>
                                 </div>
                             </div>
                         </a>
@@ -212,7 +212,7 @@
                     <div class="text-sm font-semibold text-slate-700 mb-3">Hujan</div>
                     <div class="grid grid-cols-2 gap-3">
 <div class="relative overflow-hidden rounded-xl border px-3 py-3 text-center">
-                            <div class="text-[10px] font-semibold tracking-wide text-slate-700 uppercase">AKUMULASI
+                            <div class="text-[11px] font-semibold tracking-wide text-slate-700 uppercase">AKUMULASI
                                 HARIAN</div>
                             <img src="{{ asset('klasifikasi_hujan/' . $stateHarian . '.png') }}"
                                 onerror="this.onerror=null;this.src='{{ $defaultRainIcon }}';" alt="Hujan Harian"
@@ -222,12 +222,12 @@
                                 class="text-2xl font-extrabold text-slate-900 whitespace-nowrap {{ $muted ? 'opacity-60' : '' }}">
                                 {{ $dispAkuHarian }}<span class="text-xs font-semibold ml-1">mm</span>
                             </div>
-                            <div class="text-[10px] font-semibold uppercase {{ $muted ? 'opacity-60' : '' }}">
+                            <div class="text-[11px] font-semibold uppercase {{ $muted ? 'opacity-60' : '' }}">
                                 {{ $statusHarian !== '-' ? strtoupper($statusHarian) : 'TIDAK ADA DATA' }}
                             </div>
                         </div>
 <div class="relative overflow-hidden rounded-xl border px-3 py-3 text-center">
-                            <div class="text-[10px] font-semibold tracking-wide text-slate-700 uppercase">AKUMULASI 1
+                            <div class="text-[11px] font-semibold tracking-wide text-slate-700 uppercase">AKUMULASI 1
                                 JAM</div>
                             <img src="{{ asset('klasifikasi_hujan/' . $statePerJam . '.png') }}"
                                 onerror="this.onerror=null;this.src='{{ $defaultRainIcon }}';" alt="Hujan Per Jam"
@@ -237,7 +237,7 @@
                                 class="text-2xl font-extrabold text-slate-900 whitespace-nowrap {{ $muted ? 'opacity-60' : '' }}">
                                 {{ $dispAkuPerJam }}<span class="text-xs font-semibold ml-1">mm</span>
                             </div>
-                            <div class="text-[10px] font-semibold uppercase {{ $muted ? 'opacity-60' : '' }}">
+                            <div class="text-[11px] font-semibold uppercase {{ $muted ? 'opacity-60' : '' }}">
                                 {{ $statusPerJam !== '-' ? strtoupper($statusPerJam) : 'TIDAK ADA DATA' }}
                             </div>
                         </div>
@@ -254,10 +254,10 @@
                             <img src="{{ asset($awrValues['kecerahan']['icon']) }}" onerror="this.style.display='none'"
                                 class="h-9 w-9 flex-shrink-0 object-contain" alt="Kecerahan">
                             <div class="leading-tight min-w-0">
-                                <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase">KECERAHAN
+                                <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">KECERAHAN
                                 </div>
                                 <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                    {{ $dispKecerahan }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">K
+                                    {{ $dispKecerahan }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">K
                                         Lux</span>
                                 </div>
                             </div>
@@ -269,10 +269,10 @@
                             <img src="{{ asset($awrValues['arah_cahaya']['icon']) }}" onerror="this.style.display='none'"
                                 class="h-9 w-9 flex-shrink-0 object-contain" alt="Arah Cahaya">
                             <div class="leading-tight min-w-0">
-                                <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase">ARAH</div>
+                                <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">ARAH</div>
                                 <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
                                     {{ $dispArahCahaya }}<span
-                                        class="text-[10px] font-bold text-slate-400 ml-0.5">°</span>
+                                        class="text-[11px] font-bold text-slate-400 ml-0.5">°</span>
                                 </div>
                             </div>
                         </a>
@@ -286,7 +286,7 @@
 @if (($awrValues['temperatur']['param'] ?? null) || ($awrValues['tekanan_udara']['param'] ?? null) || ($awrValues['kelembaban']['param'] ?? null))
 <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
             <div class="text-sm font-semibold text-slate-700 mb-3">Udara</div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="card-autofit grid grid-cols-1 sm:grid-cols-3 gap-3">
                 @if ($awrValues['temperatur']['param'])
                 <a href="{{ $awrRoute('temperatur') }}"
                     class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 hover:shadow-md hover:border-orange-300 transition-all {{ $muted ? 'grayscale opacity-70' : '' }}">
@@ -294,10 +294,10 @@
                         onerror="this.style.display='none'" class="h-9 w-9 flex-shrink-0 object-contain"
                         alt="Temperatur">
                     <div class="leading-tight min-w-0">
-                        <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">
+                        <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             TEMPERATUR</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $dispTemperatur }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
+                            {{ $dispTemperatur }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">°C</span>
                         </div>
                     </div>
                 </a>
@@ -308,10 +308,10 @@
                     <img src="{{ asset($awrValues['tekanan_udara']['icon']) }}" onerror="this.style.display='none'"
                         class="h-9 w-9 flex-shrink-0 object-contain" alt="Tekanan Udara">
                     <div class="leading-tight min-w-0">
-                        <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">TEKANAN
+                        <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">TEKANAN
                             UDARA</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $dispTekanan }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">hPa</span>
+                            {{ $dispTekanan }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">hPa</span>
                         </div>
                     </div>
                 </a>
@@ -323,10 +323,10 @@
                         onerror="this.style.display='none'" class="h-9 w-9 flex-shrink-0 object-contain"
                         alt="Kelembaban">
                     <div class="leading-tight min-w-0">
-                        <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">
+                        <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             KELEMBABAN</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ $dispKelembaban }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">%</span>
+                            {{ $dispKelembaban }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">%</span>
                         </div>
                     </div>
                 </a>
@@ -338,7 +338,7 @@
         @if ($pHumidity || $pBattery || $pTemp)
         <div class="rounded-xl border border-slate-200 px-4 py-3 bg-white">
             <div class="text-sm font-semibold text-slate-700 mb-3">Logger</div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div class="card-autofit grid grid-cols-1 sm:grid-cols-3 gap-2">
 @if ($pHumidity)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
                     class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 shadow-sm transition-all hover:shadow-md hover:border-blue-300">
@@ -348,10 +348,10 @@
                             alt="Humidity" class="h-full w-full object-cover {{ $iconClass }}">
                     </div>
                     <div class="leading-tight min-w-0">
-                        <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">
+                        <div class="text-[11px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             HUMIDITY</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">%</span>
+                            {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">%</span>
                         </div>
                     </div>
                 </a>
@@ -365,10 +365,10 @@
                             alt="Battery" class="h-full w-full object-cover {{ $iconClass }}">
                     </div>
                     <div class="leading-tight min-w-0">
-                        <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">
+                        <div class="text-[11px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             BATTERY</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">V</span>
+                            {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">V</span>
                         </div>
                     </div>
                 </a>
@@ -382,10 +382,10 @@
                             alt="Temperature" class="h-full w-full object-cover {{ $iconClass }}">
                     </div>
                     <div class="leading-tight min-w-0">
-                        <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">
+                        <div class="text-[11px] font-semibold tracking-wider text-slate-400 uppercase truncate">
                             TEMPERATURE</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
+                            {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">°C</span>
                         </div>
                     </div>
                 </a>

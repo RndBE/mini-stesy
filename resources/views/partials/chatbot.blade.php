@@ -26,7 +26,7 @@
                     </div>
                     <div class="flex min-w-0 items-center gap-3">
                         <h2 class="truncate text-lg font-extrabold tracking-tight">STESY Assistant</h2>
-                        <span class="inline-flex items-center gap-1.5 rounded-full bg-[#303481] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-[#303481] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
                             <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-white/70"></span>
                             Beta
                         </span>
@@ -85,7 +85,7 @@
                                                 <div class="relative h-[230px] w-full">
                                                     <canvas :id="'stesy-chart-' + message.id"></canvas>
                                                 </div>
-                                                <p class="mt-2 text-[11px] font-medium text-slate-400"
+                                                <p class="mt-2 text-[12px] font-medium text-slate-400"
                                                    x-text="message.chart.agg + ' per ' + (message.chart.granularity === 'hourly' ? 'jam' : 'hari') + ' • satuan ' + (message.chart.unit || '-')"></p>
                                             </div>
                                         </div>
@@ -104,7 +104,7 @@
                                     >
                                         <button
                                             type="button"
-                                            class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-slate-500 transition duration-300 hover:bg-white hover:text-[#303481] active:scale-[0.97]"
+                                            class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold text-slate-500 transition duration-300 hover:bg-white hover:text-[#303481] active:scale-[0.97]"
                                             @click="copyMessage(message)"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -171,7 +171,7 @@
             </div>
 
             <form class="shrink-0 bg-slate-50 px-5 py-4" @submit.prevent="ask(input)">
-                <label for="stesy-chatbot-input" class="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Pesan</label>
+                <label for="stesy-chatbot-input" class="mb-2 block text-[12px] font-bold uppercase tracking-[0.18em] text-slate-500">Pesan</label>
                 <div class="flex min-h-[72px] items-center gap-3 rounded-[1.35rem] border border-[#303481]/20 bg-white px-4 py-2 shadow-[0_16px_42px_-30px_rgba(48,52,129,0.45),inset_0_1px_0_rgba(255,255,255,0.9)] transition duration-300 focus-within:border-[#303481] focus-within:shadow-[0_18px_48px_-32px_rgba(48,52,129,0.68),inset_0_1px_0_rgba(255,255,255,0.9)]">
                     <textarea
                         id="stesy-chatbot-input"

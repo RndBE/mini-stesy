@@ -1,5 +1,5 @@
 <header class="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-2">
-    <div class="flex items-center gap-2">
+    <div class="flex min-w-0 items-center gap-2">
         @auth
             <button type="button" onclick="toggleMainSidebar()" aria-label="Open sidebar"
                 class="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 lg:hidden">
@@ -9,9 +9,9 @@
                 </svg>
             </button>
         @endauth
-        <div class="text-xl sm:text-xl font-extrabold tracking-tight text-slate-900" x-text="pageTitle"></div>
+        <div class="truncate text-lg sm:text-xl font-extrabold tracking-tight text-slate-900" x-text="pageTitle"></div>
     </div>
-    <div class="flex items-center gap-3 sm:gap-4">
+    <div class="flex shrink-0 items-center gap-3 sm:gap-4">
         @php
             $currentUser = auth()->user();
             $namaUser = $currentUser?->nama ?? ($currentUser?->username ?? 'User');
@@ -44,7 +44,7 @@
 
         @auth
             <div class="text-right hidden sm:block">
-                <div class="text-[11px] font-semibold tracking-wider text-slate-500">
+                <div class="text-[12px] font-semibold tracking-wider text-slate-500">
                     {{ $namaUser }}
                 </div>
                 <div class="text-sm font-semibold text-slate-800">

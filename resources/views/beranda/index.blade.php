@@ -117,6 +117,64 @@
         .beranda-logger-grid > * {
             content-visibility: auto;
             contain-intrinsic-size: 460px;
+            container-type: inline-size;
+        }
+
+        /* Card inner layouts use viewport breakpoints (md:, lg:), but in the 2-column
+           grid a card is only about half the screen wide. These rules look at the
+           card's own width instead (container queries), so nothing gets squeezed. */
+
+        /* Tile grids: as many columns as fit, never narrower than 9rem. */
+        .beranda-logger-grid .card-autofit {
+            grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)) !important;
+        }
+
+        @container (max-width: 700px) {
+            /* Illustration | measurement column: stack the column under the
+               illustration and lay its tiles out in a row. */
+            .card-split-main,
+            .card-split-side {
+                grid-column: 1 / -1 !important;
+            }
+
+            .card-split-main {
+                border-right-width: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            .card-split-side {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+                gap: .75rem;
+            }
+
+            .card-split-side > * {
+                margin-top: 0 !important;
+            }
+
+            .card-split-side > :not(a) {
+                grid-column: 1 / -1;
+            }
+
+            /* Two side-by-side sections (e.g. Data Logger | Curah Hujan): one per row. */
+            .card-split-pair {
+                grid-template-columns: minmax(0, 1fr) !important;
+            }
+        }
+
+        /* Measurement tiles: let the text shrink and wrap the unit under the value
+           instead of overflowing the tile. */
+        .beranda-logger-grid a {
+            overflow-wrap: break-word;
+        }
+
+        .beranda-logger-grid a.flex > :last-child {
+            min-width: 0;
+        }
+
+        .beranda-logger-grid a .items-baseline {
+            flex-wrap: wrap;
+            column-gap: .25rem;
         }
     </style>
 
@@ -168,7 +226,7 @@
                     </div>
                 </div>
 
-                <div class="beranda-logger-grid grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div class="beranda-logger-grid grid grid-cols-1 gap-6 xl:grid-cols-2">
                     @foreach ($loggerItems as $lg)
                         @php
                             $latest = $lg->temp;

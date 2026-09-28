@@ -86,7 +86,7 @@
                     'showWellHeading' => false,
                 ])
 
-                <div class="col-span-12 space-y-2 md:col-span-4">
+                <div class="card-split-side col-span-12 space-y-2 md:col-span-4">
                     @foreach ($apmsMeasurements as $measurement)
                         @php
                             $analysisUrl = $measurement['param']
@@ -105,7 +105,7 @@
                                     onerror="this.onerror=null;this.style.display='none';">
                             </span>
                             <span class="min-w-0 flex-1">
-                                <span class="block text-balance text-[10px] font-semibold uppercase leading-tight text-slate-500">
+                                <span class="block text-balance text-[11px] font-semibold uppercase leading-tight text-slate-500">
                                     {{ $measurement['label'] }}
                                 </span>
                                 <span class="mt-0.5 flex min-w-0 items-baseline gap-1.5">
@@ -121,7 +121,7 @@
             </div>
         </section>
 
-        <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div class="card-split-pair grid grid-cols-1 gap-5 lg:grid-cols-2">
             @if ($pHumidity || $pBattery || $pTemp)
                 <section>
                     <h3 class="mb-3 text-balance text-base font-semibold text-slate-800">Data Logger</h3>

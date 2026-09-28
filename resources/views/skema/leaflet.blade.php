@@ -59,7 +59,7 @@
     <div id="info-panel" class="hidden absolute top-4 right-4 overflow-hidden" style="width: 320px; border-radius: 8px; z-index: 1000;">
         <!-- Header -->
         <div class="panel-header flex justify-between items-center px-4 py-2.5">
-            <span class="text-[11px] font-bold tracking-widest uppercase">Detail Lokasi</span>
+            <span class="text-[12px] font-bold tracking-widest uppercase">Detail Lokasi</span>
             <button id="close-info" class="text-slate-500 hover:text-slate-800 transition-colors text-xl leading-none">&times;</button>
         </div>
         
@@ -67,7 +67,7 @@
         <div class="panel-title-block px-4 py-3.5 flex relative overflow-hidden group">
             <div class="neon-bar absolute left-0 top-0 bottom-0 w-1"></div>
             <div class="pl-2 relative z-10 w-full">
-                <div class="text-[11px] mb-1 font-semibold text-[#38bdf8] uppercase tracking-wider" id="info-type">Tipe</div>
+                <div class="text-[12px] mb-1 font-semibold text-[#38bdf8] uppercase tracking-wider" id="info-type">Tipe</div>
                 <div class="text-lg font-extrabold tracking-tight truncate" id="info-name">Nama Lokasi</div>
             </div>
         </div>
@@ -154,7 +154,7 @@
                                 <div class="flex justify-between items-center px-4 py-3 border-b border-slate-800/80 text-slate-400">
                                     <span class="text-xs font-medium text-slate-600">Luas Area</span>
                                     <div>
-                                        <span class="font-bold text-[#38bdf8] text-base">${props.luas_ha}</span> <span class="text-[10px]">Ha.</span>
+                                        <span class="font-bold text-[#38bdf8] text-base">${props.luas_ha}</span> <span class="text-[11px]">Ha.</span>
                                     </div>
                                 </div>`;
                             }

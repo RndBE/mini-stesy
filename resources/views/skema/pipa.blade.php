@@ -235,7 +235,7 @@
             background: linear-gradient(180deg, rgba(238, 240, 251, .84), rgba(255, 255, 255, .96));
         }
         .pc-eyebrow {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 500;
             line-height: 1;
             letter-spacing: .12em;
@@ -267,7 +267,7 @@
             border-radius: 999px;
             background: #ecfdf5;
             color: #047857;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 500;
             letter-spacing: .06em;
             text-transform: uppercase;
@@ -407,7 +407,7 @@
             background: linear-gradient(180deg, rgba(238, 240, 251, .9), rgba(255, 255, 255, .96));
         }
         .pe-eyebrow {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 700;
             line-height: 1;
             letter-spacing: .12em;
@@ -442,7 +442,7 @@
         .pe-field { display: flex; flex-direction: column; gap: 5px; }
         .pe-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .pe-label-txt {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 700;
             letter-spacing: .08em;
             text-transform: uppercase;
@@ -473,7 +473,7 @@
             border-color: #5257a3;
             box-shadow: 0 0 0 3px rgba(48, 52, 129, .18);
         }
-        .pe-hint { font-size: 10px; line-height: 1.35; color: #94a3b8; }
+        .pe-hint { font-size: 11px; line-height: 1.35; color: #94a3b8; }
 
         .pe-posbar {
             display: flex;
@@ -541,7 +541,7 @@
             align-items: center;
             gap: 7px;
             padding: 10px 15px;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 800;
             letter-spacing: .14em;
             text-transform: uppercase;
@@ -600,7 +600,7 @@
         }
         /* Baris agregat (tanpa titik warna) diselaraskan dengan baris ber-titik. */
         .pl-name-nodot { padding-left: 20px; color: #64748b; }
-        .pl-unit { font-size: 10px; font-weight: 600; color: #94a3b8; margin-left: 3px; }
+        .pl-unit { font-size: 11px; font-weight: 600; color: #94a3b8; margin-left: 3px; }
         /* Bar persentase online */
         .pl-bar-wrap {
             display: flex;
@@ -629,9 +629,18 @@
 
         #btn-legend-toggle,
         .pipa-mobile-sheet-handle,
-        .reset-mobile-label {
+        .reset-mobile-label,
+        .manage-mobile-label {
             display: none;
         }
+
+        #btn-manage.is-managing {
+            background: #303481;
+            border-color: #303481;
+            color: #fff;
+        }
+
+        #btn-manage.is-managing:hover { background: #262a6b; }
 
         @media (max-width: 639px) {
             #pipa-shell {
@@ -647,8 +656,12 @@
             #pipa-left-controls {
                 top: .5rem;
                 left: .75rem;
-                max-width: calc(100vw - 7.25rem);
+                max-width: calc(100% - 5rem);
                 gap: .5rem;
+            }
+
+            #pipa-left-controls.has-manage {
+                max-width: calc(100% - 8rem);
             }
 
             #pipa-scheme-switcher {
@@ -719,11 +732,13 @@
                 justify-content: center;
             }
 
-            .reset-desktop-label {
+            .reset-desktop-label,
+            .manage-desktop-label {
                 display: none;
             }
 
-            .reset-mobile-label {
+            .reset-mobile-label,
+            .manage-mobile-label {
                 display: inline;
             }
 
@@ -829,7 +844,8 @@
             $__debit = (float) $__loggers->sum('flowrate');
             $__pct = $__total > 0 ? (int) round($__online / $__total * 100) : 0;
         @endphp
-        <div id="pipa-left-controls" class="absolute top-2 left-4 z-40 flex flex-col items-start gap-6">
+        <div id="pipa-left-controls"
+            class="absolute top-2 left-4 z-40 flex flex-col items-start gap-6 {{ !empty($canManage) ? 'has-manage' : '' }}">
             <div id="pipa-scheme-switcher" class="inline-flex rounded-xl bg-white/90 backdrop-blur border border-slate-200 shadow-lg p-1">
                 @foreach ($schemeList as $s)
                     @if ($s['available'])
@@ -842,7 +858,7 @@
                         <span title="Artwork belum tersedia"
                             class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-300 cursor-not-allowed">
                             {{ $s['name'] }}
-                            <span class="ml-1 text-[8px] uppercase tracking-wide">soon</span>
+                            <span class="ml-1 text-[10px] uppercase tracking-wide">soon</span>
                         </span>
                     @endif
                 @endforeach
@@ -896,9 +912,13 @@
                 <span class="reset-desktop-label">Reset Tampilan</span>
             </button>
             @if (!empty($canManage))
-                <button type="button" id="btn-manage"
+                <button type="button" id="btn-manage" aria-pressed="false" aria-label="Kelola titik"
                     class="rounded-lg bg-white/90 backdrop-blur border border-slate-200 shadow px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
-                    Kelola Titik: <span id="manage-state">Off</span>
+                    <svg class="manage-mobile-label" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 21s-6.5-5.4-6.5-10a6.5 6.5 0 0 1 13 0c0 4.6-6.5 10-6.5 10Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9.5 11h5M12 8.5v5" stroke-linecap="round"/>
+                    </svg>
+                    <span class="manage-desktop-label">Kelola Titik: <span id="manage-state">Off</span></span>
                 </button>
             @endif
         </div>
@@ -1717,6 +1737,8 @@
                 managing = on;
                 viewport.classList.toggle('managing', on);
                 manageState.textContent = on ? 'On' : 'Off';
+                btnManage.classList.toggle('is-managing', on);
+                btnManage.setAttribute('aria-pressed', on ? 'true' : 'false');
                 manageHint.classList.toggle('hidden', !on);
                 if (on) { hideCallout(); loadLoggers(); } else closeEditor();
                 scheduleLabelLayout();

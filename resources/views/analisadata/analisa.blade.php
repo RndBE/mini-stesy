@@ -165,7 +165,7 @@
 
         .station-eyebrow {
             font-family: var(--mono);
-            font-size: 10px;
+            font-size: 11px;
             letter-spacing: .18em;
             text-transform: uppercase;
             color: #7d81b8;
@@ -297,7 +297,7 @@
             padding: 12px 16px;
             border-bottom: 1px dashed #d9deee;
             font-family: var(--mono);
-            font-size: 10.5px;
+            font-size: 11px;
             letter-spacing: .22em;
             text-transform: uppercase;
             color: var(--deck-muted);
@@ -318,7 +318,7 @@
         .deck-label {
             display: block;
             font-family: var(--mono);
-            font-size: 10.5px;
+            font-size: 11px;
             letter-spacing: .14em;
             text-transform: uppercase;
             color: var(--deck-muted);
@@ -435,7 +435,7 @@
             background: transparent;
             color: var(--deck-muted);
             font-family: var(--mono);
-            font-size: 10.5px;
+            font-size: 11px;
             font-weight: 700;
             letter-spacing: .08em;
             text-transform: uppercase;
@@ -805,7 +805,7 @@
             align-items: center;
             gap: 8px;
             font-family: var(--mono);
-            font-size: 10px;
+            font-size: 11px;
             letter-spacing: .2em;
             text-transform: uppercase;
             color: #9094c5;
@@ -872,7 +872,7 @@
             color: var(--analysis-header-text);
             border-bottom: 1px solid var(--hairline);
             font-family: var(--mono);
-            font-size: 10.5px;
+            font-size: 11px;
             font-weight: 600;
             letter-spacing: .14em;
             text-transform: uppercase;
@@ -918,7 +918,7 @@
 
         #infoPanel .info-label {
             font-family: var(--mono);
-            font-size: 10px;
+            font-size: 11px;
             letter-spacing: .14em;
             color: #9094c5;
         }
@@ -1496,7 +1496,7 @@
                                                  :class="pumpRunning ? 'border-amber-700/60' : 'border-cyan-900/50'">
                                                 <div class="w-1.5 h-1.5 rounded-full mr-1.5 transition-all duration-500"
                                                      :class="pumpRunning ? 'bg-amber-400 shadow-[0_0_5px_#f59e0b] animate-[pump-flicker_0.7s_ease-in-out_infinite]' : pumpState === 'on' ? 'bg-[#00f8ff] shadow-[0_0_5px_#00f8ff] animate-pulse' : 'bg-slate-500'"></div>
-                                                <span class="text-[9px] font-bold tracking-widest uppercase transition-colors duration-500 mt-0.5"
+                                                <span class="text-[10px] font-bold tracking-widest uppercase transition-colors duration-500 mt-0.5"
                                                       :class="pumpRunning ? 'text-amber-300' : pumpState === 'on' ? 'text-cyan-300' : 'text-slate-400'"
                                                       x-text="pumpRunning ? (pumpTargetState === 'on' ? 'Starting' : 'Stopping') : pumpState === 'on' ? 'Running' : 'Standby'"></span>
                                             </div>
@@ -1561,7 +1561,7 @@
                                                     x-text="pumpRunning ? 'Menjalankan urutan simulasi koneksi...' : 'Seluruh tahap operasional pompa telah selesai.'"></p>
                                             </div>
                                             <div class="text-right">
-                                                <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Overall Progress</p>
+                                                <p class="text-[12px] font-semibold uppercase tracking-wide text-slate-400">Overall Progress</p>
                                                 <p class="mt-1 text-sm font-semibold text-slate-700" x-text="`${pumpPercent()}%`"></p>
                                             </div>
                                         </div>

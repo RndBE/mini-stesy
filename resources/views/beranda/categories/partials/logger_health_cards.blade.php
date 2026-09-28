@@ -1,4 +1,4 @@
-<div class="{{ $gridClass ?? 'grid grid-cols-3 gap-2 md:grid-cols-1 md:gap-2' }}">
+<div class="card-autofit {{ $gridClass ?? 'grid grid-cols-3 gap-2 md:grid-cols-1 md:gap-2' }}">
 @if ($pHumidity)
 <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $pHumidity ? '?parameter=' . urlencode($pHumidity->nama_parameter) : '' }}"
         class="block rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-300 px-2 py-2 sm:px-3 sm:py-2.5">
@@ -8,9 +8,9 @@
                     alt="Humidity" class="h-full w-full object-cover {{ $iconClass }}">
             </div>
             <div class="leading-tight text-center md:text-left">
-                <div class="text-[8px] sm:text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate overflow-hidden">Humidity</div>
+                <div class="text-[10px] sm:text-[11px] font-semibold tracking-wider text-slate-400 uppercase truncate overflow-hidden">Humidity</div>
                 <div class="text-sm sm:text-base md:text-xl font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                    {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">%</span>
+                    {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[11px] sm:text-xs font-bold text-slate-400 ml-0.5">%</span>
                 </div>
             </div>
         </div>
@@ -25,9 +25,9 @@
                     alt="Battery" class="h-full w-full object-cover {{ $iconClass }}">
             </div>
             <div class="leading-tight text-center md:text-left min-w-0 w-full">
-                <div class="text-[8px] sm:text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate overflow-hidden">Battery</div>
+                <div class="text-[10px] sm:text-[11px] font-semibold tracking-wider text-slate-400 uppercase truncate overflow-hidden">Battery</div>
                 <div class="text-sm sm:text-base md:text-xl font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                    {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">V</span>
+                    {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[11px] sm:text-xs font-bold text-slate-400 ml-0.5">V</span>
                 </div>
             </div>
         </div>
@@ -42,9 +42,9 @@
                     alt="Temperature" class="h-full w-full object-cover {{ $iconClass }}">
             </div>
             <div class="leading-tight text-center md:text-left min-w-0 w-full overflow-hidden">
-                <div class="text-[8px] sm:text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
+                <div class="text-[10px] sm:text-[11px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
                 <div class="text-sm sm:text-base md:text-xl font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                    {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[10px] sm:text-xs font-bold text-slate-400 ml-0.5">°C</span>
+                    {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[11px] sm:text-xs font-bold text-slate-400 ml-0.5">°C</span>
                 </div>
             </div>
         </div>

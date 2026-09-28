@@ -171,7 +171,7 @@
                     </svg>
 
                     @if ($rvOutOfRange)
-                        <p class="text-[11px] leading-snug text-amber-600">
+                        <p class="text-[12px] leading-snug text-amber-600">
                             Bacaan {{ $rvFmt($rvTmaRaw) }} di luar rentang elevasi
                             {{ $rvFmt($rvScaleMin) }}–{{ $rvFmt($rvScaleMax) }}; gambar air berhenti di
                             {{ $rvOverBank ? 'puncak tanggul' : 'dasar saluran' }}, garis peil tetap mengikuti

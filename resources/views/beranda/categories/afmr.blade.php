@@ -27,17 +27,17 @@
             @if ($pTotalizer1 || $pTotalizer2 || $pPressure1 || $pPressure2)
             <div>
                 <div class="text-sm font-bold text-slate-800 mb-3">Data Pengukuran</div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-[repeat(auto-fit,minmax(11.5rem,1fr))] gap-3">
 
                     @if ($pTotalizer1)
                     <a href="{{ route('analisa.index', $lg->id_logger) }}?parameter={{ urlencode($pTotalizer1->nama_parameter) }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-sky-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
                             <img src="{{ asset('icons/afmr/totalizer_debit.svg') }}" alt="Totalizer" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
-                        <div>
-                            <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pTotalizer1->nama_parameter }}</div>
-                            <div class="flex items-baseline gap-1 mt-0.5">
-                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($totalizer1) ? \App\Support\DisplayFormat::ukur($totalizer1, 2) : '-' }}</span>
+                        <div class="min-w-0">
+                            <div class="truncate text-[10px] font-bold uppercase tracking-widest text-slate-500">{{ $pTotalizer1->nama_parameter }}</div>
+                            <div class="flex flex-wrap items-baseline gap-x-1 mt-0.5">
+                                <span class="text-lg font-extrabold text-slate-900 [overflow-wrap:anywhere]">{{ is_numeric($totalizer1) ? \App\Support\DisplayFormat::ukur($totalizer1, 2) : '-' }}</span>
                                 <span class="text-xs font-semibold text-slate-500">{{ $pTotalizer1->satuan }}</span>
                             </div>
                         </div>
@@ -49,10 +49,10 @@
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
                             <img src="{{ asset('icons/afmr/totalizer_debit.svg') }}" alt="Totalizer 2" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
-                        <div>
-                            <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pTotalizer2->nama_parameter }}</div>
-                            <div class="flex items-baseline gap-1 mt-0.5">
-                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($totalizer2) ? \App\Support\DisplayFormat::ukur($totalizer2, 2) : '-' }}</span>
+                        <div class="min-w-0">
+                            <div class="truncate text-[10px] font-bold uppercase tracking-widest text-slate-500">{{ $pTotalizer2->nama_parameter }}</div>
+                            <div class="flex flex-wrap items-baseline gap-x-1 mt-0.5">
+                                <span class="text-lg font-extrabold text-slate-900 [overflow-wrap:anywhere]">{{ is_numeric($totalizer2) ? \App\Support\DisplayFormat::ukur($totalizer2, 2) : '-' }}</span>
                                 <span class="text-xs font-semibold text-slate-500">{{ $pTotalizer2->satuan }}</span>
                             </div>
                         </div>
@@ -64,10 +64,10 @@
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
                             <img src="{{ asset('icons/afmr/sensor_prv.svg') }}" alt="Pressure 1" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
-                        <div>
-                            <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pPressure1->nama_parameter }}</div>
-                            <div class="flex items-baseline gap-1 mt-0.5">
-                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($pressure1) ? \App\Support\DisplayFormat::ukur($pressure1, 2) : '-' }}</span>
+                        <div class="min-w-0">
+                            <div class="truncate text-[10px] font-bold uppercase tracking-widest text-slate-500">{{ $pPressure1->nama_parameter }}</div>
+                            <div class="flex flex-wrap items-baseline gap-x-1 mt-0.5">
+                                <span class="text-lg font-extrabold text-slate-900 [overflow-wrap:anywhere]">{{ is_numeric($pressure1) ? \App\Support\DisplayFormat::ukur($pressure1, 2) : '-' }}</span>
                                 <span class="text-xs font-semibold text-slate-500">{{ $pPressure1->satuan }}</span>
                             </div>
                         </div>
@@ -79,10 +79,10 @@
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
                             <img src="{{ asset('icons/afmr/sensor_prv.svg') }}" alt="Pressure 2" class="h-6 w-6 object-contain" onerror="this.style.display='none'">
                         </div>
-                        <div>
-                            <div class="text-[9px] font-bold uppercase tracking-widest text-slate-500">{{ $pPressure2->nama_parameter }}</div>
-                            <div class="flex items-baseline gap-1 mt-0.5">
-                                <span class="text-lg font-extrabold text-slate-900">{{ is_numeric($pressure2) ? \App\Support\DisplayFormat::ukur($pressure2, 2) : '-' }}</span>
+                        <div class="min-w-0">
+                            <div class="truncate text-[10px] font-bold uppercase tracking-widest text-slate-500">{{ $pPressure2->nama_parameter }}</div>
+                            <div class="flex flex-wrap items-baseline gap-x-1 mt-0.5">
+                                <span class="text-lg font-extrabold text-slate-900 [overflow-wrap:anywhere]">{{ is_numeric($pressure2) ? \App\Support\DisplayFormat::ukur($pressure2, 2) : '-' }}</span>
                                 <span class="text-xs font-semibold text-slate-500">{{ $pPressure2->satuan }}</span>
                             </div>
                         </div>
@@ -96,15 +96,15 @@
             @if ($pFmBattery || $pFault)
             <div>
                 <div class="text-sm font-bold text-slate-800 mb-3">Status Alat</div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-[repeat(auto-fit,minmax(11.5rem,1fr))] gap-3">
                     @if ($pFmBattery)
                     <a href="{{ route('analisa.index', $lg->id_logger) }}?parameter={{ urlencode($pFmBattery->nama_parameter) }}" class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 bg-white shadow-sm hover:shadow-md hover:border-green-300 transition-all {{ $isOnline ? '' : 'grayscale opacity-70' }}">
                         <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-slate-100 bg-slate-50">
                             <img src="{{ asset($paramIconPath($pFmBattery, 'icons/beranda/battery_online.svg')) }}" alt="Flowmeter Battery" class="h-5 w-5 object-contain" onerror="this.style.display='none'">
                         </div>
-                        <div>
-                            <div class="text-[8px] font-bold uppercase tracking-widest text-slate-500">{{ $pFmBattery->nama_parameter }}</div>
-                            <div class="text-base font-extrabold text-slate-900">{{ \App\Support\DisplayFormat::ukur($fmBattery ?? '-') }}<span class="text-[9px] font-bold text-slate-500 ml-1">{{ $pFmBattery->satuan }}</span></div>
+                        <div class="min-w-0">
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500">{{ $pFmBattery->nama_parameter }}</div>
+                            <div class="text-base font-extrabold text-slate-900">{{ \App\Support\DisplayFormat::ukur($fmBattery ?? '-') }}<span class="text-[10px] font-bold text-slate-500 ml-1">{{ $pFmBattery->satuan }}</span></div>
                         </div>
                     </a>
                     @endif
@@ -123,12 +123,12 @@
                         <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-slate-100 bg-slate-50">
                             <img src="{{ asset('icons/afmr/fault_wm.svg') }}" alt="Fault" class="h-5 w-5 object-contain" onerror="this.style.display='none'">
                         </div>
-                        <div class="relative group">
-                            <div class="text-[8px] font-bold uppercase tracking-widest text-slate-500">{{ $pFault->nama_parameter }}</div>
+                        <div class="relative group min-w-0">
+                            <div class="truncate text-[10px] font-bold uppercase tracking-widest text-slate-500">{{ $pFault->nama_parameter }}</div>
                             <div class="text-base font-extrabold {{ $faultOk ? 'text-emerald-700' : 'text-rose-700' }}">{{ $faultLabel }}</div>
                             @if(!empty($faultDetail))
-                            <div class="pointer-events-none absolute left-0 bottom-full z-50 mb-2 hidden w-max max-w-[220px] rounded-lg bg-slate-800 px-3 py-2 text-left text-[11px] font-medium leading-snug text-white shadow-xl group-hover:block">
-                                <div class="mb-1 text-[9px] font-bold uppercase tracking-widest text-rose-300">{{ $faultLabel }}</div>
+                            <div class="pointer-events-none absolute left-0 bottom-full z-50 mb-2 hidden w-max max-w-[220px] rounded-lg bg-slate-800 px-3 py-2 text-left text-[12px] font-medium leading-snug text-white shadow-xl group-hover:block">
+                                <div class="mb-1 text-[10px] font-bold uppercase tracking-widest text-rose-300">{{ $faultLabel }}</div>
                                 @foreach($faultDetail as $w)
                                 <div class="flex items-start gap-1.5"><span class="text-rose-300">&#9888;</span><span>{{ $w }}</span></div>
                                 @endforeach
@@ -163,9 +163,9 @@
                             alt="Humidity" class="h-full w-full object-cover {{ $iconClass }}">
                     </div>
                     <div class="leading-tight min-w-0">
-                        <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Humidity</div>
+                        <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">Humidity</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">{{ $pHumidity->satuan }}</span>
+                            {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">{{ $pHumidity->satuan }}</span>
                         </div>
                     </div>
                 </div>
@@ -180,9 +180,9 @@
                             alt="Battery" class="h-full w-full object-cover {{ $iconClass }}">
                     </div>
                     <div class="leading-tight min-w-0">
-                        <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Battery</div>
+                        <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">Battery</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">{{ $pBattery->satuan }}</span>
+                            {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">{{ $pBattery->satuan }}</span>
                         </div>
                     </div>
                 </div>
@@ -197,9 +197,9 @@
                             alt="Temperature" class="h-full w-full object-cover {{ $iconClass }}">
                     </div>
                     <div class="leading-tight min-w-0">
-                        <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
+                        <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
                         <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                            {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">{{ $pTemp->satuan }}</span>
+                            {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">{{ $pTemp->satuan }}</span>
                         </div>
                     </div>
                 </div>
@@ -212,7 +212,7 @@
 @else
 <div class="p-5 space-y-4">
 <div class="grid grid-cols-12 gap-4">
-<div class="col-span-12 md:col-span-9 space-y-3 md:border-r md:border-slate-200 md:pr-2">
+<div class="card-split-main col-span-12 md:col-span-9 space-y-3 md:border-r md:border-slate-200 md:pr-2">
                 @php
                     $afmrScaleMin = 0;
                     $afmrScaleMax = (is_numeric($elevSensor) && (float)$elevSensor > 0)
@@ -331,8 +331,8 @@
 
             </div>
 @if ($pLuas || $pAfmrDebit || $pFlowVelocity)
-<div class="col-span-12 md:col-span-3 flex flex-col justify-start gap-2">
-                <div class="text-sm font-semibold text-slate-700">Data Pengukuran</div>
+<div class="card-split-side col-span-12 md:col-span-3 flex flex-col justify-start gap-2">
+                <div class="card-split-title text-sm font-semibold text-slate-700">Data Pengukuran</div>
 @if ($pLuas)
 @php
                     $luasUrl = $pLuas
@@ -347,7 +347,7 @@
                             onerror="this.style.display='none'">
                     </div>
                     <div>
-                        <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400">Luas Penampang Basah</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Luas Penampang Basah</div>
                         <div class="flex items-baseline gap-1">
                             <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                                 {{ is_numeric($luasPenampang) ? \App\Support\DisplayFormat::ukur($luasPenampang, 2) : '-' }}
@@ -371,7 +371,7 @@
                             onerror="this.style.display='none'">
                     </div>
                     <div>
-                        <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400">Debit</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Debit</div>
                         <div class="flex items-baseline gap-1">
                             <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                                 {{ is_numeric($afmrDebit) ? \App\Support\DisplayFormat::ukur($afmrDebit, 2) : '-' }}
@@ -396,9 +396,9 @@
                     </div>
                     <div>
                         <div class="flex items-center gap-1">
-                            <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400">Flow Velocity</div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Flow Velocity</div>
                             @if($isOnline)
-                                <span class="text-[7px] font-bold px-1 py-0.5 rounded bg-sky-100 text-sky-600 uppercase tracking-wide">Live</span>
+                                <span class="text-[10px] font-bold px-1 py-0.5 rounded bg-sky-100 text-sky-600 uppercase tracking-wide">Live</span>
                             @endif
                         </div>
                         <div class="flex items-baseline gap-1">
@@ -430,7 +430,7 @@
                         onerror="this.style.display='none'">
                 </div>
                 <div class="min-w-0 overflow-hidden">
-                    <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400 truncate">Elevasi Muka Air</div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate">Elevasi Muka Air</div>
                     <div class="flex items-baseline gap-1">
                         <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                             {{ is_numeric($elevMukaAir) ? \App\Support\DisplayFormat::ukur($elevMukaAir, 3) : '-' }}
@@ -455,7 +455,7 @@
                         onerror="this.style.display='none'">
                 </div>
                 <div class="min-w-0 overflow-hidden">
-                    <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400 truncate">Elevasi Sensor</div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate">Elevasi Sensor</div>
                     <div class="flex items-baseline gap-1">
                         <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                             {{ is_numeric($elevSensor) ? \App\Support\DisplayFormat::ukur($elevSensor, 3) : '-' }}
@@ -480,7 +480,7 @@
                         onerror="this.style.display='none'">
                 </div>
                 <div class="min-w-0 overflow-hidden">
-                    <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400 truncate">Jarak Sensor</div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate">Jarak Sensor</div>
                     <div class="flex items-baseline gap-1">
                         <span class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">
                             {{ is_numeric($jarakSensor) ? \App\Support\DisplayFormat::ukur($jarakSensor, 2) : '-' }}
@@ -505,9 +505,9 @@
                                 alt="Humidity" class="h-full w-full object-cover {{ $iconClass }}">
                         </div>
                         <div class="leading-tight min-w-0">
-                            <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Humidity</div>
+                            <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">Humidity</div>
                             <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">%</span>
+                                {{ \App\Support\DisplayFormat::ukur($humidity ?? '-') }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">%</span>
                             </div>
                         </div>
                     </div>
@@ -522,9 +522,9 @@
                                 alt="Battery" class="h-full w-full object-cover {{ $iconClass }}">
                         </div>
                         <div class="leading-tight min-w-0">
-                            <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Battery</div>
+                            <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">Battery</div>
                             <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">Volt</span>
+                                {{ \App\Support\DisplayFormat::ukur($battery ?? '-') }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">Volt</span>
                             </div>
                         </div>
                     </div>
@@ -539,9 +539,9 @@
                                 alt="Temperature" class="h-full w-full object-cover {{ $iconClass }}">
                         </div>
                         <div class="leading-tight min-w-0">
-                            <div class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
+                            <div class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase truncate">Temperature</div>
                             <div class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">
-                                {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[10px] font-bold text-slate-400 ml-0.5">°C</span>
+                                {{ \App\Support\DisplayFormat::ukur($temp ?? '-') }}<span class="text-[11px] font-bold text-slate-400 ml-0.5">°C</span>
                             </div>
                         </div>
                     </div>

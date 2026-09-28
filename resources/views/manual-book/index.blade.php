@@ -228,7 +228,7 @@
                         @endif
 
                         <span class="mt-1.5 flex items-center gap-1.5">
-                            <span class="rounded {{ $gaya['badge'] }} px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+                            <span class="rounded {{ $gaya['badge'] }} px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide">
                                 {{ $book->fileExtension() }}
                             </span>
                             <span class="truncate text-xs text-slate-400">
@@ -283,7 +283,7 @@
                                 <div class="min-w-0">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <h3 class="text-lg font-bold leading-snug text-slate-900" x-text="aktif.judul"></h3>
-                                        <span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                                        <span class="rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide"
                                             :class="aktif.badge" x-text="aktif.format"></span>
                                     </div>
                                     {{-- Tetap text-sm (14px) supaya beda dari baris meta yang

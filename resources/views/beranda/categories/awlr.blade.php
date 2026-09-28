@@ -8,7 +8,7 @@
 
             @php $jiatHasPump = (bool) ($lg?->jiat?->has_pump); @endphp
             @if ($pHumidity || $pBattery || $pTemp || $jiatHasPump)
-            <div class="col-span-12 md:col-span-4 space-y-4">
+            <div class="card-split-side col-span-12 md:col-span-4 space-y-4">
                 @if ($pHumidity || $pBattery || $pTemp)
                 <div class="space-y-3">
                     <div class="text-md font-semibold text-slate-700">Parameter Logger</div>
@@ -39,7 +39,7 @@
         @endphp
 <div class="p-5 space-y-4">
 <div class="grid grid-cols-12 gap-4">
-<div class="col-span-12 {{ $nonJiatMount === 'v_notch' ? 'md:col-span-8' : 'md:col-span-9' }} space-y-3 md:border-r md:border-slate-200 md:pr-4">
+<div class="card-split-main col-span-12 {{ $nonJiatMount === 'v_notch' ? 'md:col-span-8' : 'md:col-span-9' }} space-y-3 md:border-r md:border-slate-200 md:pr-4">
                     @if ($nonJiatMount === 'v_notch')
                         @include('beranda.categories.partials.vnotch_weir')
                     @else
@@ -48,8 +48,8 @@
 
                 </div>
 @if ($pTma || $pDebit || $pHumidity || $pBattery || $pTemp)
-<div class="col-span-12 {{ $nonJiatMount === 'v_notch' ? 'md:col-span-4' : 'md:col-span-3' }} flex flex-col justify-start gap-2">
-                    <div class="text-sm font-semibold text-slate-700">Data Pengukuran</div>
+<div class="card-split-side col-span-12 {{ $nonJiatMount === 'v_notch' ? 'md:col-span-4' : 'md:col-span-3' }} flex flex-col justify-start gap-2">
+                    <div class="card-split-title text-sm font-semibold text-slate-700">Data Pengukuran</div>
 @if ($pTma)
 @php
                         $tmaAnalisaUrl = $pTma
@@ -66,7 +66,7 @@
                                 onerror="this.style.display='none';this.parentElement.innerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' class=\'h-5 w-5 text-sky-500\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10\'/></svg>'">
                         </div>
                         <div>
-                            <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400">Tinggi Muka Air
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Tinggi Muka Air
                             </div>
                             <div class="flex items-baseline gap-1">
                                 <span
@@ -96,7 +96,7 @@
                                 onerror="this.style.display='none';this.parentElement.innerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' class=\'h-5 w-5 text-indigo-500\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M13 10V3L4 14h7v7l9-11h-7z\'/></svg>'">
                         </div>
                         <div>
-                            <div class="text-[8px] font-bold uppercase tracking-widest text-slate-400">Debit</div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Debit</div>
                             <div class="flex items-baseline gap-1">
                                 <span
                                     class="text-lg font-extrabold {{ $isOnline ? 'text-slate-900' : 'text-slate-400' }}">

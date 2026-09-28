@@ -45,7 +45,7 @@
             </div>
         </div>
     </div>
-    <div class="flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold {{ $timeClass }}">
+    <div class="flex items-center gap-2 rounded-full px-3 py-1 text-[12px] font-semibold {{ $timeClass }}">
         <span class="h-2 w-2 rounded-full {{ $dotClass }}"></span>
         <span>{{ $waktu }}</span>
     </div>

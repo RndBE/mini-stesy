@@ -20,7 +20,7 @@
                             <div class="flex items-center gap-3">
                                 <div class="font-semibold text-slate-900">Aplikasi Android</div>
                                 <span
-                                    class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700">V
+                                    class="px-2 py-0.5 rounded-full text-[12px] font-semibold bg-slate-100 text-slate-700">V
                                     {{ $downloads['android']['version'] }}</span>
                             </div>
 
@@ -65,7 +65,7 @@
                             <div class="flex items-center gap-3">
                                 <div class="font-semibold text-slate-900">Aplikasi iOS</div>
                                 <span
-                                    class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700">V
+                                    class="px-2 py-0.5 rounded-full text-[12px] font-semibold bg-slate-100 text-slate-700">V
                                     {{ $downloads['ios']['version'] }}</span>
                             </div>
 

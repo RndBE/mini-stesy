@@ -9,7 +9,7 @@
             showConfirm: false
         }">
             <h1 class="text-lg font-extrabold tracking-tight text-slate-900 sm:text-xl">Ubah Kata Sandi Anda.</h1>
-            <p class="mt-1.5 text-[11px] text-slate-700 sm:text-xs">Pastikan kata sandi baru Anda kuat dan belum pernah digunakan sebelumnya.
+            <p class="mt-1.5 text-[12px] text-slate-700 sm:text-xs">Pastikan kata sandi baru Anda kuat dan belum pernah digunakan sebelumnya.
             </p>
 
             @if (session('status') === 'password-updated')
@@ -81,7 +81,7 @@
                             </svg>
                         </button>
                     </div>
-                    <div class="mt-1.5 flex items-center gap-2 text-[11px] text-slate-700 sm:text-xs">
+                    <div class="mt-1.5 flex items-center gap-2 text-[12px] text-slate-700 sm:text-xs">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-900" fill="currentColor"
                             viewBox="0 0 20 20">
                             <path fill-rule="evenodd"

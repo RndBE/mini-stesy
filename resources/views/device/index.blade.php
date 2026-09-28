@@ -572,7 +572,7 @@
                                                             placeholder="cth: 12.5">
                                                         <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                     </div>
-                                                    <p class="mt-1 text-[11px] text-gray-500">Titik nol peil. Head H = TMA &minus; elevasi apex.</p>
+                                                    <p class="mt-1 text-[12px] text-gray-500">Titik nol peil. Head H = TMA &minus; elevasi apex.</p>
                                                 </div>
                                                 <div>
                                                     <label class="mb-2 block text-xs font-medium text-gray-700">Kedalaman Notch
@@ -584,13 +584,13 @@
                                                             placeholder="cth: 0.5">
                                                         <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                     </div>
-                                                    <p class="mt-1 text-[11px] text-gray-500">Jarak apex ke crest. Menentukan tinggi air di takik pada ilustrasi. Kosong = 0,5.</p>
+                                                    <p class="mt-1 text-[12px] text-gray-500">Jarak apex ke crest. Menentukan tinggi air di takik pada ilustrasi. Kosong = 0,5.</p>
                                                 </div>
                                             </div>
                                             <div x-show="addData.jenis_pemasangan === 'v_notch'"
                                                 class="mt-4 rounded-lg border border-sky-200 bg-sky-50 p-3">
                                                 <p class="mb-2 text-xs font-semibold text-sky-900">Petunjuk pengisian ambang v-notch</p>
-                                                <ul class="space-y-1 text-[11px] leading-relaxed text-slate-600">
+                                                <ul class="space-y-1 text-[12px] leading-relaxed text-slate-600">
                                                     <li><strong>Satuan cm</strong>, dan semua elevasi dari satu datum yang sama (benchmark lokal atau elevasi laut).</li>
                                                     <li><strong>Elevasi Apex</strong> &mdash; elevasi titik terbawah huruf V di plat ambang. Jadi titik nol peil; head H = TMA &minus; apex.</li>
                                                     <li><strong>Elevasi Maks</strong> &mdash; batas atas papan peil. Angka teratas pada papan di ilustrasi mengikuti isian ini.</li>
@@ -598,7 +598,7 @@
                                                     <li><strong>Kedalaman Notch</strong> &mdash; apex ke crest. Dipakai menggambar air di takik, bukan skala peil. Kosong = 0,5.</li>
                                                     <li><strong>Ketinggian Sensor</strong> &mdash; tinggi pemasangan transduser di atas apex. <strong>Jarak Sensor dengan Air</strong> &mdash; jarak nominal transduser ke muka air.</li>
                                                 </ul>
-                                                <p class="mt-2 text-[11px] text-slate-500">
+                                                <p class="mt-2 text-[12px] text-slate-500">
                                                     Contoh: apex di 12,5 dan crest di 13 &rarr; Apex <strong>12,5</strong> &middot; Maks <strong>13</strong> &middot; Min <strong>12,5</strong> &middot; Kedalaman Notch dikosongkan.
                                                 </p>
                                             </div>
@@ -655,7 +655,7 @@
                                                     <div class="flex flex-col">
                                                         <span class="text-sm font-bold text-slate-800 flex items-center gap-2">
                                                             Kontrol Pump
-                                                            <span class="hidden sm:inline-flex text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full transition-colors duration-300"
+                                                            <span class="hidden sm:inline-flex text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full transition-colors duration-300"
                                                                 :class="addData.has_pump ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'"
                                                                 x-text="addData.has_pump ? 'Aktif' : 'Nonaktif'">
                                                             </span>
@@ -722,7 +722,7 @@
                                                     <span
                                                         class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
-                                                <p class="mt-1 text-[11px] text-amber-600" x-show="addData.jenis_pemasangan === 'v_notch'">
+                                                <p class="mt-1 text-[12px] text-amber-600" x-show="addData.jenis_pemasangan === 'v_notch'">
                                                     Pemasangan v-notch: batas atas papan peil, jadi angka teratas papan di ilustrasi.
                                                 </p>
                                             </div>
@@ -738,7 +738,7 @@
                                                     <span
                                                         class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
-                                                <p class="mt-1 text-[11px] text-amber-600" x-show="addData.jenis_pemasangan === 'v_notch'">
+                                                <p class="mt-1 text-[12px] text-amber-600" x-show="addData.jenis_pemasangan === 'v_notch'">
                                                     Pemasangan v-notch: batas bawah papan peil, jadi angka terbawah papan di ilustrasi.
                                                 </p>
                                             </div>
@@ -823,11 +823,11 @@
                                                 <input type="hidden" :name="'params[' + index + '][icon_app]'"
                                                     x-model="param.icon_app">
 <div class="flex items-center justify-between mb-2 sm:mb-0 sm:justify-center sm:pt-2">
-                                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold sm:w-4 sm:h-4" x-text="index + 1"></span>
-                                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-400 sm:hidden">Parameter <span x-text="index + 1"></span></p>
+                                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[11px] font-bold sm:w-4 sm:h-4" x-text="index + 1"></span>
+                                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 sm:hidden">Parameter <span x-text="index + 1"></span></p>
                                                 </div>
 <div class="space-y-1">
-                                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Nama Parameter</p>
+                                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Nama Parameter</p>
                                                     <select x-model="param.list_parameter_id"
                                                         @change="applyListParameterToParamRow(param, addSensorOptions)"
                                                         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 focus:border-indigo-500 focus:ring-indigo-500">
@@ -844,7 +844,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                 </div>
 <div class="mt-2 grid grid-cols-2 gap-2 sm:contents">
                                                     <div>
-                                                        <p class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Kolom Sensor</p>
+                                                        <p class="mb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Kolom Sensor</p>
                                                         <select :name="'params[' + index + '][kolom_sensor]'"
                                                             x-model="param.kolom_sensor" required
                                                             class="w-full rounded-lg border border-gray-300 px-2 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
@@ -855,7 +855,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                         </select>
                                                     </div>
                                                     <div>
-                                                        <p class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Satuan</p>
+                                                        <p class="mb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Satuan</p>
                                                         <input :name="'params[' + index + '][satuan]'" x-model="param.satuan"
                                                             type="text" placeholder="cth: m"
                                                             class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
@@ -1048,7 +1048,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                             placeholder="cth: 12.5">
                                                         <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                     </div>
-                                                    <p class="mt-1 text-[11px] text-gray-500">Titik nol peil. Head H = TMA &minus; elevasi apex.</p>
+                                                    <p class="mt-1 text-[12px] text-gray-500">Titik nol peil. Head H = TMA &minus; elevasi apex.</p>
                                                 </div>
                                                 <div>
                                                     <label class="mb-2 block text-xs font-medium text-gray-700">Kedalaman Notch
@@ -1060,13 +1060,13 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                             placeholder="cth: 0.5">
                                                         <span class="flex items-center border-l border-gray-300 bg-gray-50 px-3 text-sm text-gray-700"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                     </div>
-                                                    <p class="mt-1 text-[11px] text-gray-500">Jarak apex ke crest. Menentukan tinggi air di takik pada ilustrasi. Kosong = 0,5.</p>
+                                                    <p class="mt-1 text-[12px] text-gray-500">Jarak apex ke crest. Menentukan tinggi air di takik pada ilustrasi. Kosong = 0,5.</p>
                                                 </div>
                                             </div>
                                             <div x-show="editData.jenis_pemasangan === 'v_notch'"
                                                 class="mt-4 rounded-lg border border-sky-200 bg-sky-50 p-3">
                                                 <p class="mb-2 text-xs font-semibold text-sky-900">Petunjuk pengisian ambang v-notch</p>
-                                                <ul class="space-y-1 text-[11px] leading-relaxed text-slate-600">
+                                                <ul class="space-y-1 text-[12px] leading-relaxed text-slate-600">
                                                     <li><strong>Satuan cm</strong>, dan semua elevasi dari satu datum yang sama (benchmark lokal atau elevasi laut).</li>
                                                     <li><strong>Elevasi Apex</strong> &mdash; elevasi titik terbawah huruf V di plat ambang. Jadi titik nol peil; head H = TMA &minus; apex.</li>
                                                     <li><strong>Elevasi Maks</strong> &mdash; batas atas papan peil. Angka teratas pada papan di ilustrasi mengikuti isian ini.</li>
@@ -1074,7 +1074,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                     <li><strong>Kedalaman Notch</strong> &mdash; apex ke crest. Dipakai menggambar air di takik, bukan skala peil. Kosong = 0,5.</li>
                                                     <li><strong>Ketinggian Sensor</strong> &mdash; tinggi pemasangan transduser di atas apex. <strong>Jarak Sensor dengan Air</strong> &mdash; jarak nominal transduser ke muka air.</li>
                                                 </ul>
-                                                <p class="mt-2 text-[11px] text-slate-500">
+                                                <p class="mt-2 text-[12px] text-slate-500">
                                                     Contoh: apex di 12,5 dan crest di 13 &rarr; Apex <strong>12,5</strong> &middot; Maks <strong>13</strong> &middot; Min <strong>12,5</strong> &middot; Kedalaman Notch dikosongkan.
                                                 </p>
                                             </div>
@@ -1119,7 +1119,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                     <div class="flex flex-col">
                                                         <span class="text-sm font-bold text-slate-800 flex items-center gap-2">
                                                             Kontrol Pump
-                                                            <span class="hidden sm:inline-flex text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full transition-colors duration-300"
+                                                            <span class="hidden sm:inline-flex text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full transition-colors duration-300"
                                                                 :class="editData.has_pump ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'"
                                                                 x-text="editData.has_pump ? 'Aktif' : 'Nonaktif'">
                                                             </span>
@@ -1175,7 +1175,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
                                                     <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
-                                                <p class="mt-1 text-[11px] text-amber-600" x-show="editData.jenis_pemasangan === 'v_notch'">
+                                                <p class="mt-1 text-[12px] text-amber-600" x-show="editData.jenis_pemasangan === 'v_notch'">
                                                     Pemasangan v-notch: batas atas papan peil, jadi angka teratas papan di ilustrasi.
                                                 </p>
                                             </div>
@@ -1188,7 +1188,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                         class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
                                                     <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
-                                                <p class="mt-1 text-[11px] text-amber-600" x-show="editData.jenis_pemasangan === 'v_notch'">
+                                                <p class="mt-1 text-[12px] text-amber-600" x-show="editData.jenis_pemasangan === 'v_notch'">
                                                     Pemasangan v-notch: batas bawah papan peil, jadi angka terbawah papan di ilustrasi.
                                                 </p>
                                             </div>
@@ -1376,10 +1376,10 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                         </button>
                                                     </div>
                                                     <div class="flex justify-center pb-1">
-                                                        <button x-show="!f.foto_utama" type="button" @click.prevent="setUtama(f.id)" class="bg-white/90 text-slate-800 text-[10px] font-bold px-2 py-1 rounded shadow hover:bg-white transition-colors">Jadikan Utama</button>
+                                                        <button x-show="!f.foto_utama" type="button" @click.prevent="setUtama(f.id)" class="bg-white/90 text-slate-800 text-[11px] font-bold px-2 py-1 rounded shadow hover:bg-white transition-colors">Jadikan Utama</button>
                                                     </div>
                                                 </div>
-                                                <div x-show="f.foto_utama" class="absolute bottom-2 left-2 bg-indigo-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow">
+                                                <div x-show="f.foto_utama" class="absolute bottom-2 left-2 bg-indigo-500 text-white text-[11px] font-bold px-1.5 py-0.5 rounded shadow">
                                                     Utama
                                                 </div>
                                             </div>
@@ -1421,11 +1421,11 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                 <input type="hidden" :name="'params[' + index + '][icon_app]'"
                                                     x-model="param.icon_app">
 <div class="flex items-center justify-between mb-2 sm:mb-0 sm:justify-center sm:pt-2">
-                                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold sm:w-4 sm:h-4" x-text="index + 1"></span>
-<p class="text-[10px] font-semibold uppercase tracking-wide text-gray-400 sm:hidden">Parameter <span x-text="index + 1"></span></p>
+                                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[11px] font-bold sm:w-4 sm:h-4" x-text="index + 1"></span>
+<p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 sm:hidden">Parameter <span x-text="index + 1"></span></p>
                                                 </div>
 <div class="space-y-1">
-                                                    <p class="text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Nama Parameter</p>
+                                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Nama Parameter</p>
                                                     <select x-model="param.list_parameter_id"
                                                         @change="applyListParameterToParamRow(param, editSensorOptions)"
                                                         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 focus:border-indigo-500 focus:ring-indigo-500">
@@ -1442,7 +1442,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                 </div>
 <div class="mt-2 grid grid-cols-2 gap-2 sm:contents">
                                                     <div>
-                                                        <p class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Kolom Sensor</p>
+                                                        <p class="mb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Kolom Sensor</p>
                                                         <select :name="'params[' + index + '][kolom_sensor]'"
                                                             x-model="param.kolom_sensor"
                                                             class="w-full rounded-lg border border-gray-300 px-2 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">
@@ -1454,7 +1454,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                         </select>
                                                     </div>
                                                     <div>
-                                                        <p class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Satuan</p>
+                                                        <p class="mb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-500 sm:hidden">Satuan</p>
                                                         <input :name="'params[' + index + '][satuan]'" x-model="param.satuan"
                                                             placeholder="cth: m"
                                                             class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-indigo-500 focus:ring-indigo-500">

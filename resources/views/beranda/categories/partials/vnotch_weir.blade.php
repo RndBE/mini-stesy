@@ -307,24 +307,24 @@
                 </svg>
 
 @if ($vnScaleBad)
-    <p class="text-[11px] text-amber-600">
+    <p class="text-[12px] text-amber-600">
         Elevasi Maks (Batas Atas Peil) harus lebih besar dari Elevasi Min — skala papan dipakai seadanya.
         Perbaiki di Data Perangkat.
     </p>
 @elseif ($vnMaxMissing)
-    <p class="text-[11px] text-amber-600">
+    <p class="text-[12px] text-amber-600">
         Elevasi Maks (Batas Atas Peil) belum diset — batas atas papan memakai apex + kedalaman notch.
         Atur di Data Perangkat.
     </p>
 @endif
 @if ($vnClipped)
-    <p class="text-[11px] text-amber-600">
+    <p class="text-[12px] text-amber-600">
         TMA {{ $vnFmt($vnLevelElev) }} {{ $vnUnit }} di luar rentang papan
         {{ $vnFmt($vnScaleBot) }}–{{ $vnFmt($vnScaleTop) }} {{ $vnUnit }} — garis muka air dijepit di batas.
     </p>
 @endif
 @if ($vnApexElev === null)
-    <p class="text-[11px] text-amber-600">
+    <p class="text-[12px] text-amber-600">
         Elevasi apex belum diset — nilai TMA dibaca langsung sebagai head, tinggi air di ambang bisa meleset.
         Atur di Data Perangkat.
     </p>

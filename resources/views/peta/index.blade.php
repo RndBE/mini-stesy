@@ -646,7 +646,7 @@ background: rgba(0, 0, 0, 0.28);
                                         <span class="h-2 w-2 rounded-full {{ $dotCls }}"></span>
                                         {{ $statusLabel }}
                                     </div>
-                                    <div class="text-[10px] text-slate-500">
+                                    <div class="text-[11px] text-slate-500">
                                         {{ $point['last_time'] ? \Carbon\Carbon::parse($point['last_time'])->format('Y-m-d H:i') : '-' }}
                                     </div>
                                 </div>
@@ -677,7 +677,7 @@ background: rgba(0, 0, 0, 0.28);
                                                 <div class="text-center py-0.5">
                                                     <div class="text-sm font-bold text-slate-900"
                                                         @if(!empty($param['fault_detail'])) title="{{ implode(', ', $param['fault_detail']) }}" @endif>{{ $param['display_value'] ?? '-' }}</div>
-                                                    <div class="text-[10px] text-slate-500">{{ $param['nama'] ?? '-' }}</div>
+                                                    <div class="text-[11px] text-slate-500">{{ $param['nama'] ?? '-' }}</div>
                                                 </div>
                                             @endforeach
                                         </div>

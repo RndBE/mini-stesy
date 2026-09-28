@@ -14,7 +14,7 @@
                 <div>
                     <div class="flex items-center gap-2 flex-wrap">
                         <h1 class="text-lg font-bold text-white leading-tight">Pos AWLR Sungai Brantas</h1>
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-400/30 text-blue-100 border border-blue-300/30">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[12px] font-semibold bg-blue-400/30 text-blue-100 border border-blue-300/30">
                             AWLR – Non JIAT
                         </span>
                     </div>
@@ -93,7 +93,7 @@
             <div class="mt-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                 <div class="h-full bg-emerald-400 rounded-full" style="width: 78%"></div>
             </div>
-            <p class="mt-1 text-[11px] text-slate-400">12.4 V</p>
+            <p class="mt-1 text-[12px] text-slate-400">12.4 V</p>
         </div>
 <div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
             <div class="flex items-center justify-between mb-2">
@@ -110,7 +110,7 @@
                     <div class="flex-1 rounded-sm {{ $loop->index < 4 ? 'bg-blue-400' : 'bg-slate-200' }}" style="height: {{ $h * 2 }}px"></div>
                 @endforeach
             </div>
-            <p class="mt-1 text-[11px] text-slate-400">Kuat · 4G</p>
+            <p class="mt-1 text-[12px] text-slate-400">Kuat · 4G</p>
         </div>
 <div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
             <div class="flex items-center justify-between mb-2">
@@ -126,7 +126,7 @@
             <div class="mt-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                 <div class="h-full bg-violet-400 rounded-full" style="width: 75%"></div>
             </div>
-            <p class="mt-1 text-[11px] text-slate-400">1 sensor nonaktif</p>
+            <p class="mt-1 text-[12px] text-slate-400">1 sensor nonaktif</p>
         </div>
 <div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
             <div class="flex items-center justify-between mb-2">
@@ -139,7 +139,7 @@
                 </div>
             </div>
             <p class="text-2xl font-bold text-slate-900">15<span class="text-sm font-semibold text-slate-400 ml-0.5">mnt</span></p>
-            <p class="mt-3 text-[11px] text-slate-400">Kirim data setiap 15 menit</p>
+            <p class="mt-3 text-[12px] text-slate-400">Kirim data setiap 15 menit</p>
         </div>
 <div class="bg-white rounded-xl border border-slate-200 px-4 py-3 shadow-sm">
             <div class="flex items-center justify-between mb-2">
@@ -152,7 +152,7 @@
                 </div>
             </div>
             <p class="text-xl font-bold text-slate-900 font-mono">v2.4.1</p>
-            <span class="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">
+            <span class="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700">
                 <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 8 8">
                     <circle cx="4" cy="4" r="3"/>
                 </svg>
@@ -163,7 +163,7 @@
 <div class="flex gap-4 items-start">
 <div class="flex-shrink-0 w-44 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="px-3 py-2.5 border-b border-slate-100">
-                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Pengaturan</p>
+                <p class="text-[11px] font-bold uppercase tracking-widest text-slate-400">Pengaturan</p>
             </div>
             <nav class="p-2 space-y-0.5">
                 @php
@@ -271,7 +271,7 @@
                                 <tr class="hover:bg-slate-50 transition-colors">
                                     <td class="px-5 py-3.5">
                                         <div class="flex items-center gap-2">
-                                            <span class="inline-flex w-5 h-5 rounded-full items-center justify-center text-[10px] font-bold
+                                            <span class="inline-flex w-5 h-5 rounded-full items-center justify-center text-[11px] font-bold
                                                 {{ $sensor['active'] ? 'bg-[#303481]/10 text-[#303481]' : 'bg-slate-100 text-slate-400' }}">{{ $i + 1 }}</span>
                                             <span class="font-semibold text-slate-800">{{ $sensor['name'] }}</span>
                                         </div>
@@ -427,7 +427,7 @@
                                         class="flex-1 border-0 px-3 py-2.5 text-sm text-slate-800 focus:ring-0 outline-none">
                                     <span class="flex items-center border-l border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-500">%</span>
                                 </div>
-                                <p class="text-[11px] text-slate-400">Logger akan berhenti kirim data di bawah batas ini</p>
+                                <p class="text-[12px] text-slate-400">Logger akan berhenti kirim data di bawah batas ini</p>
                             </div>
                         </div>
 

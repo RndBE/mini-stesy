@@ -57,11 +57,11 @@
 
         {{-- Pompa & Kelistrikan --}}
         @if ($hasElec)
-        <div class="col-span-12 {{ $elecSpan }}">
+        <div class="card-split-main col-span-12 {{ $elecSpan }}">
             <div class="mb-2 text-md font-semibold text-slate-700">
                 Pompa &amp; Kelistrikan
             </div>
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div class="card-autofit grid grid-cols-1 gap-3 sm:grid-cols-3">
                 @foreach ($phases as $ph)
                     @php
                         $vBase = 'voltage_' . $ph['key'];
@@ -81,17 +81,17 @@
                         </div>
                         <div class="grid grid-cols-2 divide-x divide-slate-100 sm:block sm:divide-x-0 sm:divide-y">
                             <div class="flex flex-col items-center gap-1 px-3 py-2.5 text-center sm:flex-row sm:justify-between sm:text-left">
-                                <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Voltage</span>
+                                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Voltage</span>
                                 <span class="flex min-w-0 flex-wrap items-baseline justify-center gap-x-1 sm:justify-start">
                                     <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($vBase) }}</span>
-                                    <span class="text-[10px] font-bold text-slate-400">{{ $unitP($vBase) ?: 'V' }}</span>
+                                    <span class="text-[11px] font-bold text-slate-400">{{ $unitP($vBase) ?: 'V' }}</span>
                                 </span>
                             </div>
                             <div class="flex flex-col items-center gap-1 px-3 py-2.5 text-center sm:flex-row sm:justify-between sm:text-left">
-                                <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Ampere</span>
+                                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Ampere</span>
                                 <span class="flex min-w-0 flex-wrap items-baseline justify-center gap-x-1 sm:justify-start">
                                     <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($aBase) }}</span>
-                                    <span class="text-[10px] font-bold text-slate-400">{{ $unitP($aBase) ?: 'A' }}</span>
+                                    <span class="text-[11px] font-bold text-slate-400">{{ $unitP($aBase) ?: 'A' }}</span>
                                 </span>
                             </div>
                         </div>
@@ -103,11 +103,11 @@
 
         {{-- Kualitas Air --}}
         @if ($hasQual)
-        <div class="col-span-12 {{ $qualSpan }}">
+        <div class="card-split-side col-span-12 {{ $qualSpan }}">
             <div class="mb-2 text-md font-semibold text-slate-700">
                 Kualitas Air
             </div>
-            <div class="grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-1">
+            <div class="card-autofit grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-1">
                 @foreach ($qual as $q)
                     @if ($hasP($q['base']))
                     <a href="{{ $linkP($q['base']) }}"
@@ -116,14 +116,14 @@
                             @if ($q['icon'])
                                 <img src="{{ asset($q['icon']) }}" alt="{{ $q['label'] }}" class="h-6 w-6 object-contain {{ $iconClass ?? '' }}">
                             @else
-                                <span class="text-[11px] font-black">NH₃</span>
+                                <span class="text-[12px] font-black">NH₃</span>
                             @endif
                         </span>
                         <div class="min-w-0 leading-tight">
-                            <div class="truncate text-[10px] font-semibold uppercase tracking-wider text-slate-400">{{ $q['label'] }}</div>
+                            <div class="truncate text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ $q['label'] }}</div>
                             <div class="flex items-baseline gap-1">
                                 <span class="text-lg font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP($q['base']) }}</span>
-                                <span class="text-[10px] font-bold text-slate-400">{{ $unitP($q['base']) ?: $q['unit'] }}</span>
+                                <span class="text-[11px] font-bold text-slate-400">{{ $unitP($q['base']) ?: $q['unit'] }}</span>
                             </div>
                         </div>
                     </a>

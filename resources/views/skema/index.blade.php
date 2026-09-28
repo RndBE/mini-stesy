@@ -12,13 +12,13 @@
                 <div class="flex items-center gap-2">
                     
                     <span id="panel-type-badge"
-                        class="text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full bg-slate-700 text-slate-400">DSS</span>
-                    <span class="text-slate-300 text-[11px] font-bold tracking-widest uppercase">Informasi Panel</span>
+                        class="text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full bg-slate-700 text-slate-400">DSS</span>
+                    <span class="text-slate-300 text-[12px] font-bold tracking-widest uppercase">Informasi Panel</span>
                 </div>
                 <div class="flex items-center gap-2">
 
                     <span id="panel-status-dot" class="hidden w-2 h-2 rounded-full bg-slate-500"></span>
-                    <span id="panel-status-text" class="hidden text-[9px] text-slate-500 font-semibold"></span>
+                    <span id="panel-status-text" class="hidden text-[10px] text-slate-500 font-semibold"></span>
                     <button id="close-info"
                         class="text-slate-400 hover:text-white transition-colors text-xl leading-none">&times;</button>
                 </div>
@@ -29,7 +29,7 @@
                 <div id="panel-left-accent"
                     class="absolute left-0 top-0 bottom-0 w-1 bg-[#0ea5e9] shadow-[0_0_10px_#0ea5e9]"></div>
                 <div class="pl-2 relative z-10 w-full">
-                    <div class="text-[11px] mb-1 font-semibold text-[#38bdf8] uppercase tracking-wider" id="info-source">
+                    <div class="text-[12px] mb-1 font-semibold text-[#38bdf8] uppercase tracking-wider" id="info-source">
                         Saluran Irigasi</div>
                     <div class="text-lg font-extrabold tracking-tight text-white drop-shadow-md truncate" id="info-title">-
                     </div>
@@ -43,22 +43,22 @@
 <div id="panel-statistik-wrap" class="hidden">
                         <div class="flex justify-between items-center px-4 py-3 border-b border-slate-800/80 text-slate-400">
                             <span class="text-xs font-medium">Luas Area Layanan</span>
-                            <div><span class="font-bold text-[#38bdf8] text-base" id="panel-luas-area">-</span> <span class="text-[10px]">Ha.</span></div>
+                            <div><span class="font-bold text-[#38bdf8] text-base" id="panel-luas-area">-</span> <span class="text-[11px]">Ha.</span></div>
                         </div>
                         <div class="px-4 py-2.5 border-b border-slate-800/80 text-slate-400 text-xs">
                             <div class="flex justify-between items-center mb-1.5">
                                 <span>Kebutuhan Air Irigasi</span>
-                                <span class="text-slate-300 font-mono"><span id="panel-kb-irigasi">0</span> <span class="text-[9px] text-slate-500">lt/dt</span></span>
+                                <span class="text-slate-300 font-mono"><span id="panel-kb-irigasi">0</span> <span class="text-[10px] text-slate-500">lt/dt</span></span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span>Nilai kehilangan 0.20%</span>
-                                <span class="text-slate-300 font-mono"><span id="panel-kb-kehilangan">0</span> <span class="text-[9px] text-slate-500">lt/dt</span></span>
+                                <span class="text-slate-300 font-mono"><span id="panel-kb-kehilangan">0</span> <span class="text-[10px] text-slate-500">lt/dt</span></span>
                             </div>
                         </div>
                         <div class="px-4 py-2.5 border-b border-slate-800/80 text-slate-400 text-xs">
                             <div class="flex justify-between items-center mb-1.5">
                                 <span class="text-slate-300">Total Kebutuhan Air</span>
-                                <span class="text-white font-mono font-medium"><span id="panel-kb-total">0</span> <span class="text-[9px] text-slate-500">lt/dt</span></span>
+                                <span class="text-white font-mono font-medium"><span id="panel-kb-total">0</span> <span class="text-[10px] text-slate-500">lt/dt</span></span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span>Faktor K</span>
@@ -69,7 +69,7 @@
 <div id="panel-awlr-wrap" class="hidden px-4 py-4 border-b border-slate-800/80 text-center relative overflow-hidden">
                         <div class="absolute inset-0 bg-gradient-to-b from-fuchsia-900/10 to-transparent"></div>
                         <div class="relative z-10 w-full">
-                            <div class="text-[9px] font-bold text-fuchsia-400 uppercase tracking-widest mb-1.5 flex items-center justify-center gap-1">
+                            <div class="text-[10px] font-bold text-fuchsia-400 uppercase tracking-widest mb-1.5 flex items-center justify-center gap-1">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                                 Sensor Tinggi Muka Air
                             </div>
@@ -77,93 +77,93 @@
                                 <span class="font-black text-4xl text-fuchsia-300 drop-shadow-[0_0_8px_rgba(217,70,239,0.5)]" id="panel-awlr-tma">-</span>
                                 <span class="text-sm font-semibold text-fuchsia-500">cm</span>
                             </div>
-                            <div id="panel-awlr-status" class="mt-3 inline-flex px-3 py-1 rounded-sm text-[10px] font-black tracking-widest uppercase mb-4"></div>
+                            <div id="panel-awlr-status" class="mt-3 inline-flex px-3 py-1 rounded-sm text-[11px] font-black tracking-widest uppercase mb-4"></div>
 <div class="mt-2 w-full h-28 relative bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 shadow-inner">
                                 <div id="awlr-chart-loading" class="absolute inset-0 flex items-center justify-center hidden bg-slate-900/80 z-20 rounded-lg backdrop-blur-sm">
-                                    <span class="text-[10px] text-fuchsia-400 animate-pulse font-bold tracking-widest uppercase">Memuat Grafik...</span>
+                                    <span class="text-[11px] text-fuchsia-400 animate-pulse font-bold tracking-widest uppercase">Memuat Grafik...</span>
                                 </div>
                                 <canvas id="awlr-chart" class="w-full h-full"></canvas>
                             </div>
                         </div>
                     </div>
 <div id="panel-saluran-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
-                        <div class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Saluran</div>
+                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Saluran</div>
                         <div id="panel-saluran-name" class="text-xs font-semibold text-slate-200"></div>
-                        <div id="panel-elevasi-val" class="text-[9px] text-slate-400 mt-0.5"></div>
+                        <div id="panel-elevasi-val" class="text-[10px] text-slate-400 mt-0.5"></div>
                     </div>
 <div id="panel-tma-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
                         <div class="grid grid-cols-3 gap-2">
                             <div class="text-center">
-                                <div class="text-[9px] font-bold text-sky-400 uppercase tracking-wide mb-1">TMA Hulu</div>
+                                <div class="text-[10px] font-bold text-sky-400 uppercase tracking-wide mb-1">TMA Hulu</div>
                                 <div class="text-lg font-black text-sky-300 leading-none"><span id="panel-tma-hulu">-</span></div>
-                                <div class="text-[9px] text-slate-500 mt-0.5">cm</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">cm</div>
                             </div>
                             <div class="text-center border-l border-r border-slate-700">
-                                <div class="text-[9px] font-bold text-violet-400 uppercase tracking-wide mb-1">Selisih</div>
+                                <div class="text-[10px] font-bold text-violet-400 uppercase tracking-wide mb-1">Selisih</div>
                                 <div class="text-lg font-black text-violet-300 leading-none"><span id="panel-tma-selisih">-</span></div>
-                                <div class="text-[9px] text-slate-500 mt-0.5">cm</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">cm</div>
                             </div>
                             <div class="text-center">
-                                <div class="text-[9px] font-bold text-cyan-400 uppercase tracking-wide mb-1">TMA Hilir</div>
+                                <div class="text-[10px] font-bold text-cyan-400 uppercase tracking-wide mb-1">TMA Hilir</div>
                                 <div class="text-lg font-black text-cyan-300 leading-none"><span id="panel-tma-hilir">-</span></div>
-                                <div class="text-[9px] text-slate-500 mt-0.5">cm</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">cm</div>
                             </div>
                         </div>
                     </div>
 <div id="panel-debit-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
                         <div class="flex justify-between items-baseline mb-2">
-                            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Debit Aktual</span>
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Debit Aktual</span>
                             <div>
                                 <span class="font-black text-xl text-[#0ea5e9] drop-shadow-[0_0_5px_#0ea5e9]" id="panel-debit-val">0</span>
-                                <span class="text-[10px] text-slate-500"> m³/dtk</span>
+                                <span class="text-[11px] text-slate-500"> m³/dtk</span>
                             </div>
                         </div>
                         <div class="flex justify-between items-baseline mb-1.5">
-                            <span class="text-[9px] text-slate-300">Kapasitas Rencana</span>
+                            <span class="text-[10px] text-slate-300">Kapasitas Rencana</span>
                             <span class="text-xs text-slate-300 font-mono"><span id="panel-kapasitas-val">-</span> m³/dtk</span>
                         </div>
 <div class="w-full bg-slate-700 rounded-full h-1.5 mb-1">
                             <div id="panel-debit-bar" class="h-1.5 rounded-full bg-emerald-400 transition-all duration-500" style="width:0%"></div>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-[9px] text-slate-300">Tingkat Pemenuhan</span>
-                            <span id="panel-debit-pct" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-400">-</span>
+                            <span class="text-[10px] text-slate-300">Tingkat Pemenuhan</span>
+                            <span id="panel-debit-pct" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-400">-</span>
                         </div>
                     </div>
 <div id="panel-wb-wrap" class="hidden px-4 py-3 border-b border-slate-800/80 bg-slate-900/40">
-                        <div class="text-[9px] font-bold text-orange-400 border-b border-orange-900/30 pb-1 mb-2 uppercase tracking-widest flex items-center gap-1.5">
+                        <div class="text-[10px] font-bold text-orange-400 border-b border-orange-900/30 pb-1 mb-2 uppercase tracking-widest flex items-center gap-1.5">
                             📊  Simulasi Kinerja (Water Balance)
                         </div>
                         <div class="grid grid-cols-2 gap-3 mb-2">
                             <div class="bg-slate-800/70 p-1.5 rounded border border-slate-700/50">
-                                <span class="block text-[9px] text-slate-400 mb-0.5">Q Perintah</span>
-                                <span class="font-mono text-sm text-slate-200"><span id="panel-wb-perintah">0</span> <span class="text-[9px] text-slate-500">m³/s</span></span>
+                                <span class="block text-[10px] text-slate-400 mb-0.5">Q Perintah</span>
+                                <span class="font-mono text-sm text-slate-200"><span id="panel-wb-perintah">0</span> <span class="text-[10px] text-slate-500">m³/s</span></span>
                             </div>
                             <div class="bg-slate-800/70 p-1.5 rounded border border-emerald-900/30">
-                                <span class="block text-[9px] text-emerald-500/80 mb-0.5">Q Terukur</span>
-                                <span class="font-mono text-sm text-emerald-400"><span id="panel-wb-terukur">0</span> <span class="text-[9px] text-emerald-700">m³/s</span></span>
+                                <span class="block text-[10px] text-emerald-500/80 mb-0.5">Q Terukur</span>
+                                <span class="font-mono text-sm text-emerald-400"><span id="panel-wb-terukur">0</span> <span class="text-[10px] text-emerald-700">m³/s</span></span>
                             </div>
                         </div>
                         <div class="flex flex-col gap-1.5 p-2 bg-slate-800/40 rounded border border-slate-800">
                             <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400">Error Deviasi</span>
+                                <span class="text-[11px] text-slate-400">Error Deviasi</span>
                                 <span class="font-mono text-xs font-bold" id="panel-wb-err-parent"><span id="panel-wb-err-val">0</span> m³/s (<span id="panel-wb-err-pct">0</span>%)</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400">Selisih Vol. (1 Jam)</span>
+                                <span class="text-[11px] text-slate-400">Selisih Vol. (1 Jam)</span>
                                 <span class="font-mono text-xs font-bold" id="panel-wb-vol-parent"><span id="panel-wb-vol">0</span> m³</span>
                             </div>
-                            <div id="panel-wb-status" class="mt-1.5 px-2 py-1.5 rounded text-[10px] font-bold tracking-wider uppercase text-center border">
+                            <div id="panel-wb-status" class="mt-1.5 px-2 py-1.5 rounded text-[11px] font-bold tracking-wider uppercase text-center border">
                                 STABIL
                             </div>
                         </div>
                     </div>
 <div id="panel-gates-wrap" class="hidden px-4 py-2.5 border-b border-slate-800/80">
-                        <div class="text-[9px] font-bold text-slate-300 uppercase tracking-widest mb-2">Status Pintu Air</div>
+                        <div class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-2">Status Pintu Air</div>
                         <div id="panel-gates-list" class="space-y-1.5"></div>
                     </div>
 <div id="panel-destinations-wrap" class="px-4 pt-2.5 pb-4 text-slate-400 text-xs bg-slate-900 border-b border-slate-800/80">
-                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Menuju Selanjutnya</div>
+                        <div class="text-[11px] text-slate-500 uppercase tracking-widest mb-2">Menuju Selanjutnya</div>
                         <div id="panel-destinations-list" class="space-y-1.5"></div>
                     </div>
 
@@ -194,7 +194,7 @@
         <div id="asbuilt-map-layer" class="absolute inset-0 hidden bg-slate-950" style="z-index: 35;">
             <div class="absolute left-4 right-4 top-4 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-slate-950/90 px-4 py-3 shadow-xl backdrop-blur-md" style="z-index: 2;">
                 <div class="min-w-0">
-                    <div class="text-[10px] font-bold uppercase tracking-[0.24em] text-cyan-300">Peta As Built</div>
+                    <div class="text-[11px] font-bold uppercase tracking-[0.24em] text-cyan-300">Peta As Built</div>
                     <div class="truncate text-sm font-extrabold tracking-tight text-white sm:text-base">
                         As Built Drawing Leuwigoong AMS19A Buku 1 - Halaman 17
                     </div>
@@ -216,7 +216,7 @@
         <!-- Panel Legenda Warna Status -->
         <div id="legend-panel" class="absolute bottom-6 right-6 bg-[#1e293b]/95 shadow-2xl shadow-black/50 border border-slate-700/60 rounded-lg overflow-hidden backdrop-blur-md" style="z-index: 40; width: 220px;">
             <div class="px-3 py-2 bg-slate-800 border-b border-slate-700/80 flex items-center justify-between">
-                <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Keterangan Aliran</span>
+                <span class="text-[11px] font-bold text-slate-300 uppercase tracking-widest">Keterangan Aliran</span>
                 <button onclick="document.getElementById('legend-content').classList.toggle('hidden')" class="text-slate-400 hover:text-white transition-colors text-xs p-1">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
@@ -226,35 +226,35 @@
                     <div class="w-3 h-3 rounded-full bg-[#d946ef] shadow-[0_0_8px_#d946ef]"></div>
                     <div class="flex flex-col">
                         <span class="text-xs font-bold text-slate-200 leading-none mb-0.5">Meluap (Banjir)</span>
-                        <span class="text-[9px] text-slate-500 font-mono">> 134% kapasitas</span>
+                        <span class="text-[10px] text-slate-500 font-mono">> 134% kapasitas</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-2.5">
                     <div class="w-3 h-3 rounded-full bg-[#ea580c] shadow-[0_0_8px_#ea580c]"></div>
                     <div class="flex flex-col">
                         <span class="text-xs font-bold text-slate-200 leading-none mb-0.5">Deras (Siaga)</span>
-                        <span class="text-[9px] text-slate-500 font-mono">101% - 134% kapasitas</span>
+                        <span class="text-[10px] text-slate-500 font-mono">101% - 134% kapasitas</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-2.5">
                     <div class="w-3 h-3 rounded-full bg-[#0ea5e9] shadow-[0_0_8px_#0ea5e9]"></div>
                     <div class="flex flex-col">
                         <span class="text-xs font-bold text-slate-200 leading-none mb-0.5">Normal (Stabil)</span>
-                        <span class="text-[9px] text-slate-500 font-mono">50% - 100% kapasitas</span>
+                        <span class="text-[10px] text-slate-500 font-mono">50% - 100% kapasitas</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-2.5">
                     <div class="w-3 h-3 rounded-full bg-[#b45309] shadow-[0_0_8px_#b45309]"></div>
                     <div class="flex flex-col">
                         <span class="text-xs font-bold text-slate-200 leading-none mb-0.5">Surut (Kritis)</span>
-                        <span class="text-[9px] text-slate-500 font-mono">1% - 49% kapasitas</span>
+                        <span class="text-[10px] text-slate-500 font-mono">1% - 49% kapasitas</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-2.5">
                     <div class="w-3 h-3 rounded-full bg-slate-600 border border-slate-500 border-dashed bg-transparent"></div>
                     <div class="flex flex-col">
                         <span class="text-xs font-bold text-slate-400 leading-none mb-0.5">Kering / Terputus</span>
-                        <span class="text-[9px] text-slate-500 font-mono">Tidak ada aliran (0%)</span>
+                        <span class="text-[10px] text-slate-500 font-mono">Tidak ada aliran (0%)</span>
                     </div>
                 </div>
             </div>
@@ -263,11 +263,11 @@
         <!-- Status Bar Koneksi API (kanan atas) -->
         <div id="api-status-bar" class="absolute top-4 right-4 flex items-center gap-2 bg-[#1e293b]/90 border border-slate-700/60 rounded-full px-3 py-1.5 shadow-lg backdrop-blur-md" style="z-index: 45;">
             <span id="api-status-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
-            <span id="api-status-text" class="text-[10px] font-semibold text-slate-400">Menghubungkan...</span>
+            <span id="api-status-text" class="text-[11px] font-semibold text-slate-400">Menghubungkan...</span>
             <span class="text-slate-700">|</span>
-            <span class="text-[10px] text-slate-500">Update: <span id="api-last-update" class="text-slate-400 font-mono">-</span></span>
+            <span class="text-[11px] text-slate-500">Update: <span id="api-last-update" class="text-slate-400 font-mono">-</span></span>
             <span class="text-slate-700">|</span>
-            <span class="text-[10px] text-slate-500">Aktif: <span id="api-node-count" class="text-emerald-400 font-mono font-bold">-</span> node</span>
+            <span class="text-[11px] text-slate-500">Aktif: <span id="api-node-count" class="text-emerald-400 font-mono font-bold">-</span> node</span>
         </div>
 
         <!-- Tombol Preview Peta As Built -->
@@ -569,11 +569,11 @@
                     if (isOnline) {
                         dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
                         text.textContent = 'ONLINE';
-                        text.className = 'text-[9px] text-emerald-400 font-semibold';
+                        text.className = 'text-[10px] text-emerald-400 font-semibold';
                     } else {
                         dot.className = 'w-2 h-2 rounded-full bg-red-500';
                         text.textContent = 'OFFLINE';
-                        text.className = 'text-[9px] text-red-400 font-semibold';
+                        text.className = 'text-[10px] text-red-400 font-semibold';
                     }
                 };
                 const animateNumber = (elementId, newValue, isFloat = false, formatFn = null) => {
@@ -636,7 +636,7 @@
                     }
                     const badge = document.getElementById('panel-type-badge');
                     badge.textContent = 'DSS';
-                        badge.className = 'text-[9px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full bg-cyan-900/80 text-cyan-300 border border-cyan-500/50 shadow-[0_0_8px_rgba(6,182,212,0.3)]';
+                        badge.className = 'text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full bg-cyan-900/80 text-cyan-300 border border-cyan-500/50 shadow-[0_0_8px_rgba(6,182,212,0.3)]';
                     document.getElementById('panel-page-main').classList.remove('hidden');
                     const infoAreaEl = document.getElementById('info-area');
                     if (infoAreaEl) infoAreaEl.textContent = '-';
@@ -665,11 +665,11 @@
                         const stsBadge = document.getElementById('panel-awlr-status');
                         
                         if (node.status === 'overflow' || (node.status_siaga && node.status_siaga.toLowerCase().includes('banjir'))) {
-                            stsBadge.className = 'mt-3 inline-flex px-3 py-1 rounded-sm text-[10px] font-black tracking-widest uppercase bg-red-900/60 text-red-400 border border-red-700/50 shadow-[0_0_8px_rgba(239,68,68,0.4)]';
+                            stsBadge.className = 'mt-3 inline-flex px-3 py-1 rounded-sm text-[11px] font-black tracking-widest uppercase bg-red-900/60 text-red-400 border border-red-700/50 shadow-[0_0_8px_rgba(239,68,68,0.4)]';
                         } else if (node.status === 'high' || (node.status_siaga && node.status_siaga.toLowerCase().includes('siaga'))) {
-                            stsBadge.className = 'mt-3 inline-flex px-3 py-1 rounded-sm text-[10px] font-black tracking-widest uppercase bg-yellow-900/60 text-yellow-400 border border-yellow-700/50 shadow-[0_0_8px_rgba(234,179,8,0.4)]';
+                            stsBadge.className = 'mt-3 inline-flex px-3 py-1 rounded-sm text-[11px] font-black tracking-widest uppercase bg-yellow-900/60 text-yellow-400 border border-yellow-700/50 shadow-[0_0_8px_rgba(234,179,8,0.4)]';
                         } else {
-                            stsBadge.className = 'mt-3 inline-flex px-3 py-1 rounded-sm text-[10px] font-black tracking-widest uppercase bg-emerald-900/60 text-emerald-400 border border-emerald-700/50 shadow-[0_0_8px_rgba(16,185,129,0.4)]';
+                            stsBadge.className = 'mt-3 inline-flex px-3 py-1 rounded-sm text-[11px] font-black tracking-widest uppercase bg-emerald-900/60 text-emerald-400 border border-emerald-700/50 shadow-[0_0_8px_rgba(16,185,129,0.4)]';
                         }
                         
                         stsBadge.textContent = node.status_siaga ? node.status_siaga.toUpperCase() : 'NORMAL';
@@ -703,15 +703,15 @@
                         let suffix = '';
                         if (pct >= 80) {
                             barEl.className = 'h-1.5 rounded-full bg-emerald-400 transition-all duration-500 ease-out';
-                            pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-400';
+                            pctEl.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-400';
                             suffix = ' — Normal';
                         } else if (pct >= 50) {
                             barEl.className = 'h-1.5 rounded-full bg-yellow-400 transition-all duration-500 ease-out';
-                            pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-yellow-900/60 text-yellow-400';
+                            pctEl.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-yellow-900/60 text-yellow-400';
                             suffix = ' — Kurang';
                         } else {
                             barEl.className = 'h-1.5 rounded-full bg-red-500 transition-all duration-500 ease-out';
-                            pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-900/60 text-red-400';
+                            pctEl.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-900/60 text-red-400';
                             suffix = ' — Kritis';
                         }
                         animateNumber('panel-debit-pct', pct, false, (val) => `${val}%${suffix}`);
@@ -739,11 +739,11 @@
                         const statEl = document.getElementById('panel-wb-status');
                         statEl.textContent = node.panel_wb_status;
                         if(node.panel_wb_status === 'Stabil' || node.panel_wb_status === 'Mendekati target') {
-                            statEl.className = 'mt-1.5 px-2 py-1.5 rounded text-[10px] font-bold tracking-wider uppercase text-center bg-emerald-900/30 text-emerald-400 border border-emerald-800/50';
+                            statEl.className = 'mt-1.5 px-2 py-1.5 rounded text-[11px] font-bold tracking-wider uppercase text-center bg-emerald-900/30 text-emerald-400 border border-emerald-800/50';
                         } else if(node.panel_wb_status === 'Kurang aliran') {
-                            statEl.className = 'mt-1.5 px-2 py-1.5 rounded text-[10px] font-bold tracking-wider uppercase text-center bg-rose-900/30 text-rose-400 border border-rose-800/50';
+                            statEl.className = 'mt-1.5 px-2 py-1.5 rounded text-[11px] font-bold tracking-wider uppercase text-center bg-rose-900/30 text-rose-400 border border-rose-800/50';
                         } else {
-                            statEl.className = 'mt-1.5 px-2 py-1.5 rounded text-[10px] font-bold tracking-wider uppercase text-center bg-amber-900/30 text-amber-500 border border-amber-800/50';
+                            statEl.className = 'mt-1.5 px-2 py-1.5 rounded text-[11px] font-bold tracking-wider uppercase text-center bg-amber-900/30 text-amber-500 border border-amber-800/50';
                         }
                         
                         if (wbWrap) wbWrap.classList.remove('hidden');
@@ -762,10 +762,10 @@
                             const row = document.createElement('div');
                             row.className = 'flex items-center justify-between py-1 px-2 rounded border ' + gateColor;
                             row.innerHTML = `
-                                <span class="text-[10px] font-semibold">${g.name}</span>
+                                <span class="text-[11px] font-semibold">${g.name}</span>
                                 <div class="text-right">
                                     <span class="text-xs font-black">${bukaan} cm</span>
-                                    <span class="text-[9px] ml-1 opacity-70">(${pctGate}%)</span>
+                                    <span class="text-[10px] ml-1 opacity-70">(${pctGate}%)</span>
                                 </div>`;
                             gatesList.appendChild(row);
                         });
@@ -816,9 +816,9 @@
                                     <span class="w-1.5 h-1.5 rounded-full bg-[#0ea5e9] flex-shrink-0 shadow-[0_0_4px_#0ea5e9]"></span>
                                     <div class="flex-1 min-w-0">
                                         <div class="font-semibold text-slate-100 truncate">${displayName}</div>
-                                        ${saluran ? `<div class="text-[9px] text-slate-500 truncate">${saluran}</div>` : ''}
+                                        ${saluran ? `<div class="text-[10px] text-slate-500 truncate">${saluran}</div>` : ''}
                                     </div>
-                                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border flex-shrink-0 ${typeBadge.cls}">${typeBadge.txt}</span>
+                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border flex-shrink-0 ${typeBadge.cls}">${typeBadge.txt}</span>
                                 `;
 
                                 row.addEventListener('click', () => {
@@ -932,15 +932,15 @@
                                         let suffix = '';
                                         if (pct >= 80) {
                                             if (barEl) barEl.className = 'h-1.5 rounded-full bg-emerald-400 transition-all duration-500 ease-out';
-                                            if (pctEl) pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-400';
+                                            if (pctEl) pctEl.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-400';
                                             suffix = ' — Normal';
                                         } else if (pct >= 50) {
                                             if (barEl) barEl.className = 'h-1.5 rounded-full bg-yellow-400 transition-all duration-500 ease-out';
-                                            if (pctEl) pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-yellow-900/60 text-yellow-400';
+                                            if (pctEl) pctEl.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-yellow-900/60 text-yellow-400';
                                             suffix = ' — Kurang';
                                         } else {
                                             if (barEl) barEl.className = 'h-1.5 rounded-full bg-red-500 transition-all duration-500 ease-out';
-                                            if (pctEl) pctEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-900/60 text-red-400';
+                                            if (pctEl) pctEl.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-900/60 text-red-400';
                                             suffix = ' — Kritis';
                                         }
                                         if (pctEl) animateNumber('panel-debit-pct', pct, false, (val) => `${val}%${suffix}`);
@@ -957,7 +957,7 @@
                                         };
                                         const stsBadge = document.getElementById('panel-awlr-status');
                                         if (stsBadge) {
-                                            stsBadge.className = 'mt-3 inline-flex px-3 py-1 rounded-sm text-[10px] font-black tracking-widest uppercase border ' +
+                                            stsBadge.className = 'mt-3 inline-flex px-3 py-1 rounded-sm text-[11px] font-black tracking-widest uppercase border ' +
                                                 (classBySiaga[siaga] || classBySiaga['Normal']);
                                             stsBadge.textContent = siaga;
                                         }
@@ -972,7 +972,7 @@
                                             let gateColor = pctGate > 0 ? 'text-emerald-400 bg-emerald-900/50 border-emerald-700/50' : 'text-red-400 bg-red-900/50 border-red-700/50';
                                             const row = document.createElement('div');
                                             row.className = 'flex items-center justify-between py-1 px-2 rounded border ' + gateColor;
-                                            row.innerHTML = `<span class="text-[10px] font-semibold">${g.name}</span><div class="text-right"><span class="text-xs font-black">${bukaan} cm</span><span class="text-[9px] ml-1 opacity-70">(${pctGate}%)</span></div>`;
+                                            row.innerHTML = `<span class="text-[11px] font-semibold">${g.name}</span><div class="text-right"><span class="text-xs font-black">${bukaan} cm</span><span class="text-[10px] ml-1 opacity-70">(${pctGate}%)</span></div>`;
                                             gatesList.appendChild(row);
                                         });
                                     }

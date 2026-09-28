@@ -48,11 +48,11 @@
         ];
     @endphp
 
-    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <div class="card-autofit grid grid-cols-1 gap-3 sm:grid-cols-2">
         @foreach ($rainCards as $rainCard)
             <a href="{{ $rainAnalysisUrl }}" title="Lihat analisa curah hujan"
                 class="group flex min-h-56 flex-col items-center overflow-hidden rounded-xl border border-slate-200 bg-white px-4 py-4 text-center shadow-sm hover:border-slate-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 {{ $desktopCardClass ?? '' }} {{ $muted ? 'grayscale opacity-70' : '' }}">
-                <span class="text-balance text-[10px] font-semibold uppercase text-slate-600 sm:text-xs">
+                <span class="text-balance text-[11px] font-semibold uppercase text-slate-600 sm:text-xs">
                     {{ $rainCard['label'] }}
                 </span>
 
@@ -67,7 +67,7 @@
                     {{ $rainCard['value'] }}
                     <span class="text-xs font-semibold text-slate-500 sm:text-sm">mm</span>
                 </span>
-                <span class="mt-1 line-clamp-2 text-[9px] font-medium uppercase text-slate-500 sm:text-[10px]">
+                <span class="mt-1 line-clamp-2 text-[10px] font-medium uppercase text-slate-500 sm:text-[11px]">
                     {{ $rainCard['status'] }}
                 </span>
             </a>

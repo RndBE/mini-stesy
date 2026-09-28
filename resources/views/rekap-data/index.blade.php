@@ -273,7 +273,7 @@
                                                         :style="`width: ${Math.min(100, day.pct)}%`">
                                                     </div>
                                                 </div>
-                                                <span class="text-[10px] text-slate-500 leading-tight">
+                                                <span class="text-[11px] text-slate-500 leading-tight">
                                                     <span x-text="day.count.toLocaleString('id-ID')"></span>/<span x-text="day.expected.toLocaleString('id-ID')"></span>
                                                 </span>
                                             </button>
@@ -370,7 +370,7 @@
                                             <span class="block text-xs text-slate-500"
                                                 x-text="`${selectedProjectLoggerCount(group)}/${group.loggers.length} lokasi dipilih`"></span>
                                         </span>
-                                        <span class="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-500 ring-1 ring-slate-200">Project</span>
+                                        <span class="rounded-full bg-white px-2 py-0.5 text-[12px] font-semibold text-slate-500 ring-1 ring-slate-200">Project</span>
                                         <svg class="h-4 w-4 flex-shrink-0 text-slate-400 transition-transform"
                                             :class="isProjectGroupOpen(group) ? 'rotate-180' : ''"
                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1164,11 +1164,11 @@
                     const circle = document.createElement('div');
                     circle.textContent = String(d);
                     if (isS || isE) {
-                        circle.className = 'relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-[11px] bg-[#303481] text-white font-bold';
+                        circle.className = 'relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-[12px] bg-[#303481] text-white font-bold';
                     } else if (inRg) {
-                        circle.className = 'relative z-10 w-8 h-8 flex items-center justify-center text-[11px] text-slate-700';
+                        circle.className = 'relative z-10 w-8 h-8 flex items-center justify-center text-[12px] text-slate-700';
                     } else {
-                        circle.className = 'relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-[11px] text-slate-700 hover:bg-slate-100';
+                        circle.className = 'relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-[12px] text-slate-700 hover:bg-slate-100';
                     }
                     wrapper.appendChild(circle);
 

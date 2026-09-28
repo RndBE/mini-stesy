@@ -36,6 +36,9 @@
 
         <div id="mainContent" class="flex min-h-screen w-full flex-col transition-all duration-300"
             style="{{ auth()->check() ? 'margin-left: 16rem; width: calc(100% - 16rem);' : 'margin-left: 0; width: 100%;' }}">
+            @auth
+                <script>initMainSidebarState();</script>
+            @endauth
             @include('partials.topbar')
 @php
                 $contentPaddingClass = request()->routeIs('peta.*') || request()->routeIs('skema-irigasi.*') ? '' : 'p-4';

@@ -3,7 +3,7 @@
                 $showWellHeading = $showWellHeading ?? true;
             @endphp
 
-            <div class="col-span-12 md:col-span-8 space-y-3 md:border-r md:border-slate-200 md:pr-2">
+            <div class="card-split-main col-span-12 md:col-span-8 space-y-3 md:border-r md:border-slate-200 md:pr-2">
                 @if ($showWellHeading)
                     <div class="text-md font-semibold text-slate-700">Data Sumur</div>
                 @endif
@@ -389,7 +389,7 @@
                             <div style="position:absolute; left:0; top:{{ $datAirY }}px; width:{{ $cW }}px; z-index:60;"
                                 class="rounded-lg border-2 px-2 py-1.5 {{ $isOnline ? 'border-stone-400 bg-stone-200' : 'border-slate-300 bg-slate-100 grayscale' }}">
                                 <div
-                                    class="text-[9px] font-bold uppercase tracking-wide {{ $isOnline ? 'text-stone-700' : 'text-slate-500' }}">
+                                    class="text-[10px] font-bold uppercase tracking-wide {{ $isOnline ? 'text-stone-700' : 'text-slate-500' }}">
                                     DATA AIR TANAH</div>
                                 <div class="flex items-baseline gap-1">
                                     <span
@@ -400,7 +400,7 @@
 <div style="position:absolute; left:0; top:{{ $elevSensY }}px; width:{{ $cW }}px; z-index:60;"
                                 class="rounded-lg border-2 px-2 py-1.5 {{ $isOnline ? 'border-rose-300 bg-rose-50' : 'border-slate-300 bg-slate-100 grayscale' }}">
                                 <div
-                                    class="text-[9px] font-bold uppercase tracking-wide {{ $isOnline ? 'text-rose-700' : 'text-slate-500' }}">
+                                    class="text-[10px] font-bold uppercase tracking-wide {{ $isOnline ? 'text-rose-700' : 'text-slate-500' }}">
                                     ELEVASI SENSOR</div>
                                 <div class="flex items-baseline gap-1">
                                     <span
@@ -412,7 +412,7 @@
                                 style="position:absolute; right:0; top:{{ $mukaAirY }}px; width:{{ $cW }}px; z-index:60;"
                                 class="block rounded-lg border-2 px-2 py-1.5 transition-all hover:scale-105 hover:shadow-md {{ $isOnline ? 'border-sky-300 bg-sky-50 hover:border-sky-400' : 'border-slate-300 bg-slate-100 grayscale hover:shadow-sm' }}">
                                 <div
-                                    class="text-[9px] font-bold uppercase tracking-wide {{ $isOnline ? 'text-sky-700' : 'text-slate-500' }}">
+                                    class="text-[10px] font-bold uppercase tracking-wide {{ $isOnline ? 'text-sky-700' : 'text-slate-500' }}">
                                     MUKA AIR TANAH</div>
                                 <div class="flex items-baseline gap-1">
                                     <span
@@ -424,7 +424,7 @@
 <div style="position:absolute; right:0; top:{{ $elevPompaY }}px; width:{{ $cW }}px; z-index:60;"
                                 class="rounded-lg border-2 px-2 py-1.5 {{ $isOnline ? 'border-amber-300 bg-amber-50' : 'border-slate-300 bg-slate-100 grayscale' }}">
                                 <div
-                                    class="text-[9px] font-bold uppercase tracking-wide {{ $isOnline ? 'text-amber-700' : 'text-slate-500' }}">
+                                    class="text-[10px] font-bold uppercase tracking-wide {{ $isOnline ? 'text-amber-700' : 'text-slate-500' }}">
                                     ELEVASI POMPA</div>
                                 <div class="flex items-baseline gap-1">
                                     <span

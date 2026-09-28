@@ -42,7 +42,7 @@
     @endphp
 
     <div class="grid grid-cols-12 gap-4 p-5">
-        <div class="col-span-12 md:col-span-8">
+        <div class="card-split-main col-span-12 md:col-span-8">
             <div class="mb-3 text-md font-semibold text-slate-700">Data Parameter</div>
 
             @if ($metrics->isEmpty())
@@ -50,11 +50,11 @@
                     Belum ada parameter terkonfigurasi untuk logger ini.
                 </div>
             @else
-                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div class="card-autofit grid grid-cols-1 gap-3 sm:grid-cols-2">
                     @foreach ($metrics as $metric)
                         <a href="{{ route('analisa.index', $lg->id_logger) }}{{ $metric['linkParam'] ? '?parameter=' . urlencode($metric['linkParam']) : '' }}"
                             class="block rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:border-indigo-300 hover:shadow-md">
-                            <div class="text-[11px] font-semibold tracking-wide text-slate-500">
+                            <div class="text-[12px] font-semibold tracking-wide text-slate-500">
                                 {{ strtoupper($metric['label']) }}</div>
                             <div class="mt-1 text-2xl font-bold text-slate-900">
                                 {{ \App\Support\DisplayFormat::ukur($metric['value'] ?? '-') }}
@@ -66,17 +66,17 @@
             @endif
         </div>
 
-        <div class="col-span-12 md:col-span-4 space-y-3">
+        <div class="card-split-side col-span-12 md:col-span-4 space-y-3">
             <div class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-                <div class="text-[11px] font-semibold text-slate-500">Kategori</div>
+                <div class="text-[12px] font-semibold text-slate-500">Kategori</div>
                 <div class="mt-1 text-sm font-semibold text-slate-900">{{ $lg->kategori?->nama_kategori ?? '-' }}</div>
             </div>
             <div class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-                <div class="text-[11px] font-semibold text-slate-500">Lokasi</div>
+                <div class="text-[12px] font-semibold text-slate-500">Lokasi</div>
                 <div class="mt-1 text-sm font-semibold text-slate-900">{{ $lg->lokasi?->nama_lokasi ?? '-' }}</div>
             </div>
             <div class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-                <div class="text-[11px] font-semibold text-slate-500">ID Logger</div>
+                <div class="text-[12px] font-semibold text-slate-500">ID Logger</div>
                 <div class="mt-1 text-sm font-semibold text-slate-900">{{ $lg->id_logger }}</div>
             </div>
         </div>

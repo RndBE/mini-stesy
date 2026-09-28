@@ -245,7 +245,7 @@
                 </button>
             </form>
 
-            <div class="mt-3 px-3 text-[11px] text-slate-400 sidebar-footer">© Beacon Engineering {{ now()->year }}
+            <div class="mt-3 px-3 text-[12px] text-slate-400 sidebar-footer">© Beacon Engineering {{ now()->year }}
             </div>
         </div>
     </div>
@@ -591,13 +591,25 @@
         syncSidebarBackdrop();
     }
 
+    // Below 1366px (e.g. 1280x720 screens, or zoomed in) the full 16rem sidebar leaves too little room for content,
+    // so collapse it to the icon rail by default.
+    const SIDEBAR_WIDE_MIN = 1366;
+
+    function isCompactDesktop() {
+        return window.innerWidth >= 1024 && window.innerWidth < SIDEBAR_WIDE_MIN;
+    }
+
     function toggleMainSidebar() {
         const sidebar = document.getElementById('mainSidebar');
         if (!sidebar) return;
 
         sidebar.classList.toggle('collapsed');
         applySidebarLayout();
-        localStorage.setItem('sidebarCollapsed', String(sidebar.classList.contains('collapsed')));
+        // Only remember the choice on wide screens; on compact desktops (1024-1365px,
+        // e.g. 1280x720) the sidebar collapses automatically.
+        if (!isCompactDesktop()) {
+            localStorage.setItem('sidebarCollapsed', String(sidebar.classList.contains('collapsed')));
+        }
         if (typeof map !== 'undefined') {
             const dur = 320, step = 16;
             let t = 0;
@@ -609,18 +621,19 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    // Called inline right after #mainContent opens (layouts/app.blade.php) so the
+    // correct width applies before first paint, and again on DOMContentLoaded.
+    function initMainSidebarState() {
         const isMobile = window.innerWidth < 1024;
         const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
         const isSkemaIrigasi = {{ request()->routeIs('skema-irigasi.*') ? 'true' : 'false' }};
 
         const sidebar = document.getElementById('mainSidebar');
         const mainContent = document.getElementById('mainContent');
-        const backdrop = document.getElementById('sidebarBackdrop');
 
         if (!sidebar || !mainContent) return;
 
-        if (isMobile) {
+        if (isMobile || isCompactDesktop()) {
             sidebar.classList.add('collapsed');
         } else if (isSkemaIrigasi) {
             sidebar.classList.add('collapsed');
@@ -631,8 +644,15 @@
         }
 
         applySidebarLayout();
+    }
 
-        if (backdrop) {
+    document.addEventListener('DOMContentLoaded', function() {
+        initMainSidebarState();
+
+        const sidebar = document.getElementById('mainSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        if (sidebar && backdrop) {
             backdrop.addEventListener('click', function() {
                 const isMobileNow = window.innerWidth < 1024;
                 if (!isMobileNow) return;
@@ -643,13 +663,28 @@
         }
     });
 
+    // Track which size band we're in so the sidebar only auto-adjusts when crossing
+    // a breakpoint (browser zoom in/out also fires resize), not on every resize event.
+    function sidebarBand() {
+        if (window.innerWidth < 1024) return 'mobile';
+        return window.innerWidth < SIDEBAR_WIDE_MIN ? 'compact' : 'wide';
+    }
+    let lastSidebarBand = sidebarBand();
+
     window.addEventListener('resize', function() {
-        const isMobile = window.innerWidth < 1024;
         const sidebar = document.getElementById('mainSidebar');
         if (!sidebar) return;
 
-        if (isMobile) {
-            sidebar.classList.add('collapsed');
+        const band = sidebarBand();
+        if (band !== lastSidebarBand) {
+            if (band === 'mobile' || band === 'compact') {
+                sidebar.classList.add('collapsed');
+            } else {
+                const isSkemaIrigasi = {{ request()->routeIs('skema-irigasi.*') ? 'true' : 'false' }};
+                const keepCollapsed = isSkemaIrigasi || localStorage.getItem('sidebarCollapsed') === 'true';
+                sidebar.classList.toggle('collapsed', keepCollapsed);
+            }
+            lastSidebarBand = band;
         }
 
         applySidebarLayout();

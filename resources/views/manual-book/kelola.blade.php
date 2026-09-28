@@ -183,7 +183,7 @@
                             </td>
 
                             <td class="whitespace-nowrap px-4 py-3">
-                                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold uppercase text-slate-700">{{ $book->fileExtension() }}</span>
+                                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[12px] font-semibold uppercase text-slate-700">{{ $book->fileExtension() }}</span>
                                 <span class="ml-1 text-xs text-slate-500">{{ $book->fileSizeLabel() }}</span>
                             </td>
 

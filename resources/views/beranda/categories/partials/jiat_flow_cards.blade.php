@@ -36,7 +36,7 @@
         class="group block overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-cyan-50/80 to-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-md {{ $muted ? 'grayscale' : '' }}">
         <div class="flex items-center justify-between px-4 py-3">
             <div>
-                <div class="text-[10px] font-bold uppercase tracking-wider text-cyan-700/70">Flow Rate</div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-cyan-700/70">Flow Rate</div>
                 <div class="mt-0.5 flex items-baseline gap-1">
                     <span class="text-2xl font-extrabold tracking-tight text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP('flow_rate') }}</span>
                     <span class="text-xs font-bold text-slate-400">{{ $unitP('flow_rate') ?: 'm³/h' }}</span>
@@ -53,10 +53,10 @@
     <a href="{{ $linkP('flow_rate_signal') }}"
         class="block rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-md {{ $muted ? 'grayscale' : '' }}">
         <div class="flex items-center justify-between">
-            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Flow Rate Signal</div>
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Flow Rate Signal</div>
             <div class="flex items-baseline gap-1">
                 <span class="text-base font-extrabold text-slate-900 {{ $muted ? 'opacity-60' : '' }}">{{ $valP('flow_rate_signal') }}</span>
-                <span class="text-[11px] font-bold text-slate-400">{{ $unitP('flow_rate_signal') ?: '%' }}</span>
+                <span class="text-[12px] font-bold text-slate-400">{{ $unitP('flow_rate_signal') ?: '%' }}</span>
             </div>
         </div>
         @if ($sigPct !== null)

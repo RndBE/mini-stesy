@@ -53,10 +53,10 @@
                 <h2 class="text-lg font-bold text-slate-800 mb-4">Panel Kontrol</h2>
 @if(isset($node['saluran']))
                 <div class="mb-4 bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-2">
-                    <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-wide">Saluran</p>
+                    <p class="text-[11px] font-bold text-indigo-500 uppercase tracking-wide">Saluran</p>
                     <p class="text-sm font-semibold text-indigo-900 leading-tight mt-0.5">{{ $node['saluran'] }}</p>
                     @if(isset($node['elevasi_m']))
-                    <p class="text-[10px] text-indigo-400 mt-1">Elevasi: {{ \App\Support\DisplayFormat::ukur($node['elevasi_m'] ?? '-') }} m dpl</p>
+                    <p class="text-[11px] text-indigo-400 mt-1">Elevasi: {{ \App\Support\DisplayFormat::ukur($node['elevasi_m'] ?? '-') }} m dpl</p>
                     @endif
                 </div>
                 @endif
@@ -64,30 +64,30 @@
                 <div class="grid grid-cols-2 gap-2 mb-5">
                     @if(isset($node['tma_hulu_cm']))
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-                        <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wide">TMA Hulu</p>
+                        <p class="text-[11px] font-bold text-blue-500 uppercase tracking-wide">TMA Hulu</p>
                         <p class="text-xl font-bold text-blue-800 leading-none mt-1">{{ \App\Support\DisplayFormat::ukur($node['tma_hulu_cm'] ?? '-') }}</p>
-                        <p class="text-[10px] text-blue-400 mt-0.5">cm</p>
+                        <p class="text-[11px] text-blue-400 mt-0.5">cm</p>
                     </div>
                     @endif
                     @if(isset($node['tma_hilir_cm']))
                     <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-3 text-center">
-                        <p class="text-[10px] font-bold text-cyan-500 uppercase tracking-wide">TMA Hilir</p>
+                        <p class="text-[11px] font-bold text-cyan-500 uppercase tracking-wide">TMA Hilir</p>
                         <p class="text-xl font-bold text-cyan-800 leading-none mt-1">{{ \App\Support\DisplayFormat::ukur($node['tma_hilir_cm'] ?? '-') }}</p>
-                        <p class="text-[10px] text-cyan-400 mt-0.5">cm</p>
+                        <p class="text-[11px] text-cyan-400 mt-0.5">cm</p>
                     </div>
                     @endif
                     @if(isset($node['debit_m3s']))
                     <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-center col-span-1">
-                        <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-wide">Debit</p>
+                        <p class="text-[11px] font-bold text-emerald-500 uppercase tracking-wide">Debit</p>
                         <p class="text-xl font-bold text-emerald-800 leading-none mt-1">{{ \App\Support\DisplayFormat::ukur($node['debit_m3s'], 2) }}</p>
-                        <p class="text-[10px] text-emerald-400 mt-0.5">m³/dtk</p>
+                        <p class="text-[11px] text-emerald-400 mt-0.5">m³/dtk</p>
                     </div>
                     @endif
                     @if(isset($node['kapasitas_m3s']))
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center col-span-1">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Kapasitas</p>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Kapasitas</p>
                         <p class="text-xl font-bold text-slate-700 leading-none mt-1">{{ number_format($node['kapasitas_m3s'], 2) }}</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">m³/dtk</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">m³/dtk</p>
                     </div>
                     @endif
                 </div>
@@ -111,7 +111,7 @@
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="font-bold text-slate-700 text-sm">Bukaan Pintu Saat Ini</h3>
                         @if(isset($node['last_time']))
-                        <span class="text-[10px] font-bold text-green-600 font-mono bg-green-50 px-2 py-1 rounded">{{ $node['last_time'] }}</span>
+                        <span class="text-[11px] font-bold text-green-600 font-mono bg-green-50 px-2 py-1 rounded">{{ $node['last_time'] }}</span>
                         @endif
                     </div>
                     <div class="bg-white border border-slate-200 rounded-lg p-3 text-center shadow-sm">
@@ -185,7 +185,7 @@
                     </div>
 <div class="px-6 pt-4">
                         <div class="flex items-center justify-between mb-1.5">
-                            <span class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Overall Progress</span>
+                            <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Overall Progress</span>
                             <span class="text-xs font-bold"
                                   :class="workflowSuccess && !workflowRunning ? 'text-emerald-600' : 'text-slate-700'"
                                   x-text="`${workflowPercent()}%`"></span>
@@ -258,9 +258,9 @@
                 <div class="flex items-center justify-between w-full mb-8">
                     <h3 class="font-bold text-slate-800" x-text="selectedGateName"></h3>
                     <div class="flex gap-1.5">
-                        <span class="w-4 h-4 rounded-full bg-red-500 text-[9px] text-white flex items-center justify-center font-bold">R</span>
-                        <span class="w-4 h-4 rounded-full bg-yellow-400 text-[9px] text-white flex items-center justify-center font-bold">S</span>
-                        <span class="w-4 h-4 rounded-full bg-green-500 text-[9px] text-white flex items-center justify-center font-bold">T</span>
+                        <span class="w-4 h-4 rounded-full bg-red-500 text-[10px] text-white flex items-center justify-center font-bold">R</span>
+                        <span class="w-4 h-4 rounded-full bg-yellow-400 text-[10px] text-white flex items-center justify-center font-bold">S</span>
+                        <span class="w-4 h-4 rounded-full bg-green-500 text-[10px] text-white flex items-center justify-center font-bold">T</span>
                     </div>
                 </div>
 
