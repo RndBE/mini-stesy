@@ -87,6 +87,8 @@ class IntegrasiApiTest extends TestCase
             $table->string('id_logger', 15);
             $table->dateTime('waktu');
             $table->double('sensor1')->nullable();
+            // Kolom kedua untuk parameter fault di uji agregat.
+            $table->double('sensor2')->nullable();
         });
 
         Schema::create('temp_s16_latest', function (Blueprint $table) {
@@ -441,5 +443,161 @@ class IntegrasiApiTest extends TestCase
         $this->getJson('/api/integrasi/range_tanggal?id_logger=L1&awal=2026-08-31&akhir=2026-08-01', $this->basic('pegawai'))
             ->assertStatus(422)
             ->assertJsonValidationErrors('akhir');
+    }
+
+    // ── Agregat ─────────────────────────────────────────────────────────────
+
+    public function test_agregat_meringkas_per_jam_terlama_dulu(): void
+    {
+        $instansi = $this->instansi('A');
+        $pegawai = $this->user('pegawai', 'pegawai', $instansi);
+        $this->logger('L1', $instansi, 'Pos Satu');
+        $this->grant($pegawai, 'L1');
+
+        $this->bacaan('L1', '2026-09-09 08:05:00', 1.0, latest: false);
+        $this->bacaan('L1', '2026-09-09 08:35:00', 3.0, latest: false);
+        $this->bacaan('L1', '2026-09-09 09:10:00', 5.0, latest: false);
+        $this->bacaan('L1', '2026-09-10 09:30:00', 9.0);
+
+        $response = $this->getJson(
+            '/api/integrasi/agregat?id_logger=L1&awal=2026-09-09&akhir=2026-09-09&interval=1h',
+            $this->basic('pegawai'),
+        )->assertOk();
+
+        $response->assertJson([
+            'status' => true,
+            'id_logger' => 'L1',
+            'koneksi_logger' => 'On',
+            'interval' => '1h',
+            'awal' => '2026-09-09 00:00:00',
+            'akhir' => '2026-09-09 23:59:59',
+            'jumlah_bucket' => 2,
+            'parameter' => [
+                ['nama_parameter' => 'Tinggi Muka Air', 'satuan' => 'm', 'kunci' => 'tinggi_muka_air', 'agregasi' => 'rata_min_maks'],
+            ],
+        ]);
+
+        // Bacaan 10 September di luar rentang, jam tanpa data tidak muncul.
+        $this->assertSame(['2026-09-09 08:00:00', '2026-09-09 09:00:00'], $response->json('data.*.waktu'));
+        $this->assertSame([2, 1], $response->json('data.*.jumlah_data'));
+        $this->assertEquals(['rata' => 2.0, 'min' => 1.0, 'maks' => 3.0], $response->json('data.0.tinggi_muka_air'));
+    }
+
+    public function test_agregat_lima_menit_dan_harian(): void
+    {
+        $instansi = $this->instansi('A');
+        $pegawai = $this->user('pegawai', 'pegawai', $instansi);
+        $this->logger('L1', $instansi, 'Pos Satu');
+        $this->grant($pegawai, 'L1');
+
+        $this->bacaan('L1', '2026-09-09 08:03:00', 1.0, latest: false);
+        $this->bacaan('L1', '2026-09-09 08:04:00', 2.0, latest: false);
+        $this->bacaan('L1', '2026-09-09 08:07:00', 6.0);
+
+        $limaMenit = $this->getJson(
+            '/api/integrasi/agregat?id_logger=L1&awal=2026-09-09&akhir=2026-09-09&interval=5m',
+            $this->basic('pegawai'),
+        )->assertOk();
+
+        $this->assertSame(['2026-09-09 08:00:00', '2026-09-09 08:05:00'], $limaMenit->json('data.*.waktu'));
+        $this->assertSame([2, 1], $limaMenit->json('data.*.jumlah_data'));
+
+        $harian = $this->getJson(
+            '/api/integrasi/agregat?id_logger=L1&awal=2026-09-09&akhir=2026-09-09&interval=1d',
+            $this->basic('pegawai'),
+        )->assertOk();
+
+        $this->assertSame(['2026-09-09 00:00:00'], $harian->json('data.*.waktu'));
+        $this->assertSame(3, $harian->json('data.0.jumlah_data'));
+        $this->assertEquals(['rata' => 3.0, 'min' => 1.0, 'maks' => 6.0], $harian->json('data.0.tinggi_muka_air'));
+    }
+
+    public function test_agregat_menggabungkan_fault_dengan_bitwise_or(): void
+    {
+        $instansi = $this->instansi('A');
+        $pegawai = $this->user('pegawai', 'pegawai', $instansi);
+        $this->logger('L1', $instansi, 'Pos Satu');
+        $this->grant($pegawai, 'L1');
+
+        DB::table('parameter_sensor')->insert([
+            'logger_id' => 'L1', 'nama_parameter' => 'Fault', 'kolom_sensor' => 'sensor2', 'satuan' => null,
+        ]);
+
+        // Bit 11 (empty pipe) dan bit 1 (insulation) muncul di jam yang sama.
+        foreach ([['08:10:00', 0], ['08:20:00', 1024], ['08:30:00', 1], ['09:00:00', 0]] as [$jam, $fault]) {
+            DB::table('t_s16_01')->insert([
+                'id_logger' => 'L1', 'waktu' => "2026-09-09 {$jam}", 'sensor1' => 1.0, 'sensor2' => $fault,
+            ]);
+        }
+
+        $response = $this->getJson(
+            '/api/integrasi/agregat?id_logger=L1&awal=2026-09-09&akhir=2026-09-09&interval=1h',
+            $this->basic('pegawai'),
+        )->assertOk();
+
+        $response->assertJson([
+            'parameter' => [
+                ['kunci' => 'tinggi_muka_air', 'agregasi' => 'rata_min_maks'],
+                ['kunci' => 'fault', 'agregasi' => 'bit_or'],
+            ],
+        ]);
+        $this->assertSame(['bit_or' => 1025], $response->json('data.0.fault'));
+        $this->assertSame(['bit_or' => 0], $response->json('data.1.fault'));
+    }
+
+    public function test_agregat_membatasi_rentang_per_interval(): void
+    {
+        $instansi = $this->instansi('A');
+        $pegawai = $this->user('pegawai', 'pegawai', $instansi);
+        $this->logger('L1', $instansi, 'Pos Satu');
+        $this->grant($pegawai, 'L1');
+
+        $this->getJson(
+            '/api/integrasi/agregat?id_logger=L1&awal=2026-09-01&akhir=2026-09-07&interval=5m',
+            $this->basic('pegawai'),
+        )->assertOk();
+
+        $this->getJson(
+            '/api/integrasi/agregat?id_logger=L1&awal=2026-09-01&akhir=2026-09-08&interval=5m',
+            $this->basic('pegawai'),
+        )
+            ->assertStatus(422)
+            ->assertJson(['status' => false, 'pesan' => 'Rentang tanggal maksimal 7 hari untuk interval 5m.']);
+
+        // Rentang yang sama lolos dengan interval lebih kasar.
+        $this->getJson(
+            '/api/integrasi/agregat?id_logger=L1&awal=2026-06-10&akhir=2026-09-09&interval=1h',
+            $this->basic('pegawai'),
+        )->assertOk();
+    }
+
+    public function test_agregat_wajib_interval_yang_dikenal(): void
+    {
+        $instansi = $this->instansi('A');
+        $this->user('pegawai', 'pegawai', $instansi);
+
+        $this->getJson('/api/integrasi/agregat?id_logger=L1&awal=2026-09-09&akhir=2026-09-09&interval=2h', $this->basic('pegawai'))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('interval');
+
+        $this->getJson('/api/integrasi/agregat?id_logger=L1&awal=2026-09-09&akhir=2026-09-09', $this->basic('pegawai'))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('interval');
+    }
+
+    public function test_agregat_logger_di_luar_hak_akses_dijawab_tidak_terdaftar(): void
+    {
+        $instansi = $this->instansi('A');
+        $pegawai = $this->user('pegawai', 'pegawai', $instansi);
+        $this->logger('L1', $instansi, 'Pos Satu');
+        $this->logger('L2', $instansi, 'Pos Dua');
+        $this->grant($pegawai, 'L1');
+
+        $this->getJson(
+            '/api/integrasi/agregat?id_logger=L2&awal=2026-09-09&akhir=2026-09-09&interval=1h',
+            $this->basic('pegawai'),
+        )
+            ->assertStatus(404)
+            ->assertJson(['status' => false, 'pesan' => 'Logger Tidak Terdaftar']);
     }
 }

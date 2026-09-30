@@ -4,16 +4,20 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\t_Logger;
+use App\Support\FaultStatus;
 use App\Support\SensorFamily;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 /**
- * API integrasi Mini-STESY: tiga endpoint untuk pihak luar menarik data
- * logger, mengikuti bentuk API Sisda di be_jastir2.
+ * API integrasi Mini-STESY: endpoint untuk pihak luar menarik data logger.
+ * Tiga yang pertama mengikuti bentuk API Sisda di be_jastir2; `agregat`
+ * menambahkan riwayat yang sudah diringkas per bucket waktu.
  *
  * Bedanya dengan Sisda: autentikasinya per user (Basic Auth ke `t_user`),
  * bukan satu kredensial bersama, sehingga cakupan data tiap pemanggil
@@ -32,6 +36,15 @@ class IntegrasiController extends Controller
 
     /** Data lebih lama dari ini membuat logger dianggap terputus. */
     private const AMBANG_ONLINE_MENIT = 60;
+
+    /** Interval bucket yang dilayani endpoint agregat, dalam menit. */
+    private const INTERVAL_MENIT = ['5m' => 5, '15m' => 15, '1h' => 60, '1d' => 1440];
+
+    /**
+     * Rentang terlebar per interval, dalam hari, supaya satu panggilan tidak
+     * melebihi ±3000 bucket.
+     */
+    private const MAKS_HARI_AGREGAT = ['5m' => 7, '15m' => 31, '1h' => 92, '1d' => 366];
 
     /**
      * GET /api/integrasi?id_logger=...
@@ -124,6 +137,128 @@ class IntegrasiController extends Controller
     }
 
     /**
+     * GET /api/integrasi/agregat?id_logger=...&awal=Y-m-d&akhir=Y-m-d&interval=1h
+     * Riwayat satu logger yang diringkas per bucket waktu, terlama dulu:
+     * rata-rata, minimum dan maksimum tiap parameter, plus jumlah baris per
+     * bucket (dipakai pemanggil untuk menghitung kelengkapan data). Parameter
+     * fault digabung dengan bitwise OR, sama seperti halaman Analisa.
+     */
+    public function agregat(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'id_logger' => ['required', 'string'],
+            'awal'      => ['required', 'date_format:Y-m-d'],
+            'akhir'     => ['required', 'date_format:Y-m-d', 'after_or_equal:awal'],
+            'interval'  => ['required', Rule::in(array_keys(self::INTERVAL_MENIT))],
+        ]);
+
+        $interval = $validated['interval'];
+        $awal     = Carbon::parse($validated['awal'])->startOfDay();
+        $akhir    = Carbon::parse($validated['akhir'])->endOfDay();
+        $maksHari = self::MAKS_HARI_AGREGAT[$interval];
+
+        // Agregasinya jalan di tabel histori produksi: interval kecil hanya
+        // untuk rentang pendek.
+        if ($awal->diffInDays($akhir) >= $maksHari) {
+            return response()->json([
+                'status' => false,
+                'pesan'  => "Rentang tanggal maksimal {$maksHari} hari untuk interval {$interval}.",
+            ], 422);
+        }
+
+        $logger = $this->cariLogger($request);
+
+        if (! $logger) {
+            return $this->tidakTerdaftar();
+        }
+
+        $tabel = $this->tabelUtama($logger);
+
+        // Kolom masuk ke ekspresi SQL mentah, jadi hanya yang benar-benar ada
+        // di tabel dan bernama aman.
+        $kolomAda  = array_flip(Schema::getColumnListing($tabel));
+        $parameter = array_values(array_filter(
+            $this->parameter($logger),
+            fn (array $p) => isset($kolomAda[$p['kolom']]) && preg_match('/^[A-Za-z0-9_]+$/', $p['kolom'])
+        ));
+
+        $bucket = $this->ekspresiBucket(self::INTERVAL_MENIT[$interval]);
+        $pilih  = ["{$bucket} AS bucket", 'COUNT(*) AS jumlah_data'];
+
+        foreach ($parameter as $i => $p) {
+            $kolom   = "`{$p['kolom']}`";
+            $pilih[] = $p['fault']
+                // Nilai unik per bucket lalu di-OR di PHP: BIT_OR tidak ada di SQLite.
+                ? "GROUP_CONCAT(DISTINCT {$kolom}) AS f{$i}"
+                : "AVG({$kolom}) AS rata{$i}, MIN({$kolom}) AS min{$i}, MAX({$kolom}) AS maks{$i}";
+        }
+
+        $baris = DB::table($tabel)
+            ->selectRaw(implode(', ', $pilih))
+            ->where('id_logger', $logger->id_logger)
+            ->whereBetween('waktu', [$awal, $akhir])
+            ->groupBy(DB::raw($bucket))
+            ->orderBy(DB::raw($bucket))
+            ->get();
+
+        $data = $baris->map(function (object $row) use ($parameter) {
+            $item = ['waktu' => (string) $row->bucket, 'jumlah_data' => (int) $row->jumlah_data];
+
+            foreach ($parameter as $i => $p) {
+                if ($p['fault']) {
+                    $nilai = $row->{"f{$i}"} ?? null;
+                    $item[$p['kunci']] = ['bit_or' => $nilai === null ? null : FaultStatus::combine(explode(',', (string) $nilai))];
+                    continue;
+                }
+
+                $item[$p['kunci']] = [
+                    'rata' => $this->angka($row->{"rata{$i}"} ?? null),
+                    'min'  => $this->angka($row->{"min{$i}"} ?? null),
+                    'maks' => $this->angka($row->{"maks{$i}"} ?? null),
+                ];
+            }
+
+            return $item;
+        })->values();
+
+        return response()->json($this->identitas($logger) + [
+            'interval'      => $interval,
+            'awal'          => $awal->format('Y-m-d H:i:s'),
+            'akhir'         => $akhir->format('Y-m-d H:i:s'),
+            'parameter'     => array_map(fn (array $p) => [
+                'nama_parameter' => $p['nama_parameter'],
+                'satuan'         => $p['satuan'],
+                'kunci'          => $p['kunci'],
+                'agregasi'       => $p['fault'] ? 'bit_or' : 'rata_min_maks',
+            ], $parameter),
+            'jumlah_bucket' => $data->count(),
+            'data'          => $data,
+        ]);
+    }
+
+    /**
+     * Awal bucket sebagai teks `Y-m-d H:i:s`. Kolom `waktu` sudah disimpan
+     * dalam waktu lokal, jadi bucket harian mulai dari tengah malam WIB.
+     * SQLite hanya dipakai test; produksi MySQL.
+     */
+    private function ekspresiBucket(int $menit): string
+    {
+        $sqlite = DB::connection()->getDriverName() === 'sqlite';
+
+        if ($menit >= 1440) {
+            return $sqlite ? "strftime('%Y-%m-%d 00:00:00', waktu)" : "DATE_FORMAT(waktu, '%Y-%m-%d 00:00:00')";
+        }
+
+        if ($menit >= 60) {
+            return $sqlite ? "strftime('%Y-%m-%d %H:00:00', waktu)" : "DATE_FORMAT(waktu, '%Y-%m-%d %H:00:00')";
+        }
+
+        return $sqlite
+            ? "strftime('%Y-%m-%d %H:', waktu) || printf('%02d', (CAST(strftime('%M', waktu) AS INTEGER) / {$menit}) * {$menit}) || ':00'"
+            : "CONCAT(DATE_FORMAT(waktu, '%Y-%m-%d %H:'), LPAD(FLOOR(MINUTE(waktu) / {$menit}) * {$menit}, 2, '0'), ':00')";
+    }
+
+    /**
      * Logger yang diminta, disaring hak akses pemanggil. Logger milik orang
      * lain mengembalikan null, sama seperti id yang tidak terdaftar.
      */
@@ -147,7 +282,7 @@ class IntegrasiController extends Controller
      * Nama parameter yang kembar dibedakan dengan kolom sensornya supaya
      * tidak saling menimpa di keluaran.
      *
-     * @return array<int, array{kunci: string, kolom: string, nama_parameter: string, satuan: ?string}>
+     * @return array<int, array{kunci: string, kolom: string, nama_parameter: string, satuan: ?string, fault: bool}>
      */
     private function parameter(t_Logger $logger): array
     {
@@ -173,6 +308,7 @@ class IntegrasiController extends Controller
                 'kolom'          => $kolom,
                 'nama_parameter' => (string) $p->nama_parameter,
                 'satuan'         => $p->satuan,
+                'fault'          => FaultStatus::isFaultParam($p),
             ];
         }
 
@@ -247,11 +383,27 @@ class IntegrasiController extends Controller
         return [$selisih < self::AMBANG_ONLINE_MENIT ? 'On' : 'Off', $waktu];
     }
 
+    /** Kepala respons riwayat dan agregat: identitas logger dan status koneksinya. */
+    private function identitas(t_Logger $logger): array
+    {
+        [$koneksi, $waktuTerakhir] = $this->koneksi($logger);
+
+        return [
+            'status'         => true,
+            'id_logger'      => $logger->id_logger,
+            'nama_lokasi'    => $logger->nama_pos,
+            'jenis'          => $logger->kategori?->nama_kategori,
+            'latitude'       => $this->angka($logger->lokasi?->latitude),
+            'longitude'      => $this->angka($logger->lokasi?->longitude),
+            'koneksi_logger' => $koneksi,
+            'waktu_terakhir' => $waktuTerakhir,
+        ];
+    }
+
     /** @param \Illuminate\Support\Collection<int, object> $baris */
     private function bungkusRiwayat(t_Logger $logger, $baris): array
     {
         $parameter = $this->parameter($logger);
-        [$koneksi, $waktuTerakhir] = $this->koneksi($logger);
 
         $data = $baris->map(function (object $row) use ($parameter) {
             $item = ['waktu' => $row->waktu ?? null];
@@ -263,15 +415,7 @@ class IntegrasiController extends Controller
             return $item;
         })->values();
 
-        return [
-            'status'         => true,
-            'id_logger'      => $logger->id_logger,
-            'nama_lokasi'    => $logger->nama_pos,
-            'jenis'          => $logger->kategori?->nama_kategori,
-            'latitude'       => $this->angka($logger->lokasi?->latitude),
-            'longitude'      => $this->angka($logger->lokasi?->longitude),
-            'koneksi_logger' => $koneksi,
-            'waktu_terakhir' => $waktuTerakhir,
+        return $this->identitas($logger) + [
             'parameter'      => array_map(fn (array $p) => [
                 'nama_parameter' => $p['nama_parameter'],
                 'satuan'         => $p['satuan'],

@@ -18,13 +18,15 @@ Route::post('/datamasuk', [DataMasukController::class, 'datamasuk']);
 Route::get('/ping-awlr', fn() => 'pong');
 
 // ─── API Integrasi ─────────────────────────────────────────────────────────────
-// Tiga endpoint untuk pihak luar menarik data logger, bentuknya mengikuti API
-// Sisda di be_jastir2. HTTP Basic Auth ke `t_user`: kredensial yang dipakai
-// menentukan logger mana yang terlihat (hak akses per user).
+// Endpoint untuk pihak luar menarik data logger. Tiga yang pertama mengikuti
+// API Sisda di be_jastir2; `agregat` memberi riwayat yang diringkas per bucket.
+// HTTP Basic Auth ke `t_user`: kredensial yang dipakai menentukan logger mana
+// yang terlihat (hak akses per user).
 Route::middleware('basic.integrasi')->prefix('integrasi')->group(function () {
     Route::get('/',              [IntegrasiController::class, 'index']);
     Route::get('/all_logger',    [IntegrasiController::class, 'allLogger']);
     Route::get('/range_tanggal', [IntegrasiController::class, 'rangeTanggal']);
+    Route::get('/agregat',       [IntegrasiController::class, 'agregat']);
 });
 
 // ─── Mobile API v1 ─────────────────────────────────────────────────────────────

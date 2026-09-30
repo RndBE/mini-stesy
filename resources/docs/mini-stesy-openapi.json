@@ -155,6 +155,69 @@
           }
         }
       }
+    },
+    "/api/integrasi/agregat": {
+      "get": {
+        "tags": ["Logger"],
+        "summary": "Riwayat logger yang diringkas per bucket waktu",
+        "description": "Ringkasan riwayat satu logger per bucket `5m`, `15m`, `1h` atau `1d`, terlama dulu. Tiap bucket membawa `jumlah_data` (banyak baris mentah di dalamnya, dipakai menghitung kelengkapan data) dan satu objek per parameter: `rata` / `min` / `maks`, atau `bit_or` untuk parameter fault (gabungan semua bit peringatan dalam bucket itu). Bucket tanpa data tidak dikirim.\n\n`awal` dibaca dari pukul 00:00 dan `akhir` sampai 23:59:59, waktu lokal. Rentang maksimal per interval: `5m` 7 hari, `15m` 31 hari, `1h` 92 hari, `1d` 366 hari. Lebih lebar dari itu dijawab `422`.",
+        "parameters": [
+          { "$ref": "#/components/parameters/IdLogger" },
+          {
+            "name": "awal",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "format": "date" },
+            "description": "Tanggal awal, format `Y-m-d`",
+            "example": "2026-09-01"
+          },
+          {
+            "name": "akhir",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "format": "date" },
+            "description": "Tanggal akhir, format `Y-m-d`. Tidak boleh lebih awal dari `awal`.",
+            "example": "2026-09-07"
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "enum": ["5m", "15m", "1h", "1d"] },
+            "description": "Lebar bucket",
+            "example": "1h"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ringkasan riwayat per bucket",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Agregat" } }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/LoggerTidakTerdaftar" },
+          "422": {
+            "description": "Rentang melebihi batas interval, tanggal tidak valid, atau interval tidak dikenal",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "terlalu_lebar": {
+                    "value": { "status": false, "pesan": "Rentang tanggal maksimal 7 hari untuk interval 5m." }
+                  },
+                  "interval_salah": {
+                    "value": {
+                      "message": "The selected interval is invalid.",
+                      "errors": { "interval": ["The selected interval is invalid."] }
+                    }
+                  }
+                },
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -252,6 +315,58 @@
               "type": "object",
               "properties": { "waktu": { "type": "string", "example": "2026-09-10 09:30:00" } },
               "additionalProperties": { "type": "number", "nullable": true }
+            }
+          }
+        }
+      },
+      "ParameterAgregat": {
+        "type": "object",
+        "description": "Keterangan objek per parameter di setiap bucket `data`",
+        "properties": {
+          "nama_parameter": { "type": "string", "example": "Flowrate" },
+          "satuan": { "type": "string", "nullable": true, "example": "liter/s" },
+          "kunci": { "type": "string", "example": "flowrate", "description": "Nama field parameter ini di dalam bucket `data`, sama dengan kunci di `GET /api/integrasi`" },
+          "agregasi": {
+            "type": "string",
+            "enum": ["rata_min_maks", "bit_or"],
+            "description": "`bit_or` untuk parameter fault, `rata_min_maks` untuk yang lain"
+          }
+        }
+      },
+      "Agregat": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "boolean", "example": true },
+          "id_logger": { "type": "string", "example": "10377" },
+          "nama_lokasi": { "type": "string", "nullable": true },
+          "jenis": { "type": "string", "nullable": true, "example": "AFMR" },
+          "latitude": { "type": "number", "nullable": true },
+          "longitude": { "type": "number", "nullable": true },
+          "koneksi_logger": { "type": "string", "enum": ["On", "Off"] },
+          "waktu_terakhir": { "type": "string", "nullable": true, "example": "2026-09-10 09:30:00" },
+          "interval": { "type": "string", "enum": ["5m", "15m", "1h", "1d"], "example": "1h" },
+          "awal": { "type": "string", "example": "2026-09-01 00:00:00" },
+          "akhir": { "type": "string", "example": "2026-09-07 23:59:59" },
+          "parameter": { "type": "array", "items": { "$ref": "#/components/schemas/ParameterAgregat" } },
+          "jumlah_bucket": { "type": "integer", "example": 168 },
+          "data": {
+            "type": "array",
+            "description": "Terlama dulu. Setiap bucket berisi `waktu` (awal bucket), `jumlah_data`, lalu satu objek per parameter memakai `kunci` dari daftar `parameter`.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "waktu": { "type": "string", "example": "2026-09-01 08:00:00" },
+                "jumlah_data": { "type": "integer", "example": 60 }
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "rata": { "type": "number", "nullable": true, "example": 42.7 },
+                  "min": { "type": "number", "nullable": true, "example": 39.1 },
+                  "maks": { "type": "number", "nullable": true, "example": 47.3 },
+                  "bit_or": { "type": "integer", "nullable": true, "example": 0 }
+                }
+              }
             }
           }
         }

@@ -28,7 +28,7 @@ class ApiDocsTest extends TestCase
         $this->assertSame([['BasicAuth' => []]], $document['security']);
     }
 
-    public function test_only_the_three_integration_endpoints_are_documented(): void
+    public function test_only_the_integration_endpoints_are_documented(): void
     {
         $document = $this->document();
 
@@ -38,6 +38,7 @@ class ApiDocsTest extends TestCase
             '/api/integrasi',
             '/api/integrasi/all_logger',
             '/api/integrasi/range_tanggal',
+            '/api/integrasi/agregat',
         ], array_keys($document['paths']));
 
         foreach ($document['paths'] as $path => $operations) {
