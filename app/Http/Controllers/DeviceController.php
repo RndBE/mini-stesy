@@ -665,6 +665,7 @@ class DeviceController extends Controller
                     'serial_number' => $d->informasi ? $d->informasi->serial_number : '-',
                     'sensor_type' => $d->informasi ? $d->informasi->sensor : '-',
                     'no_hp' => $d->informasi ? $d->informasi->no_pic : '-',
+                    'nosell' => $d->informasi ? $d->informasi->nosell : '-',
                     'tanggal_pemasangan' => $d->informasi ? $d->informasi->tanggal_pemasangan : '-',
                     'masa_garansi' => $d->informasi ? $d->informasi->garansi : '-',
                     'nama_penjaga' => $d->informasi ? $d->informasi->nama_pic : '-',
@@ -701,6 +702,7 @@ class DeviceController extends Controller
             'serial_number'      => 'nullable|string|max:255',
             'sensor_type'        => 'nullable|string|max:255',
             'no_hp'              => 'nullable|string|max:20',
+            'nosell'             => 'nullable|string|max:15',
             'tanggal_pemasangan' => 'nullable|date',
             'masa_garansi'       => 'nullable|date',
             'nama_penjaga'       => 'nullable|string|max:255',
@@ -733,6 +735,7 @@ class DeviceController extends Controller
                 'serial_number' => $request->serial_number,
                 'sensor' => $request->sensor_type,
                 'no_pic' => $request->no_hp,
+                'nosell' => $request->nosell,
                 'nama_pic' => $request->nama_penjaga,
                 'tanggal_pemasangan' => $request->tanggal_pemasangan,
                 'garansi' => $request->masa_garansi,
@@ -756,6 +759,7 @@ class DeviceController extends Controller
             'serial_number'      => 'nullable|string|max:255',
             'sensor_type'        => 'nullable|string|max:255',
             'no_hp'              => 'nullable|string|max:20',
+            'nosell'             => 'nullable|string|max:15',
             'tanggal_pemasangan' => 'nullable|date',
             'masa_garansi'       => 'nullable|date',
             'nama_penjaga'       => 'nullable|string|max:255',
@@ -795,6 +799,7 @@ class DeviceController extends Controller
         $informasi->serial_number      = $validated['serial_number'] ?? null;
         $informasi->sensor             = $validated['sensor_type'] ?? null;
         $informasi->no_pic             = $validated['no_hp'] ?? null;
+        $informasi->nosell             = $validated['nosell'] ?? null;
         $informasi->nama_pic           = $validated['nama_penjaga'] ?? null;
         $informasi->tanggal_pemasangan = $validated['tanggal_pemasangan'] ?? null;
         $informasi->garansi            = $validated['masa_garansi'] ?? null;

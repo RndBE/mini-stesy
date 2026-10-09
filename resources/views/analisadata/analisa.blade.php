@@ -1220,7 +1220,7 @@
             </div>
             <div class="info-item mb-2 pb-1">
                 <div class="info-label">No. Seluler</div>
-                <div class="info-value">{{ $logger->no_seluler ?? '-' }}</div>
+                <div class="info-value">{{ $logger->informasi->nosell ?? '-' }}</div>
             </div>
             <div class="info-item mb-2 pb-1">
                 <div class="info-label">Nama Penjaga</div>

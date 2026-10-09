@@ -249,7 +249,7 @@
                                 <img src="{{ asset('icons/gear_icon.svg') }}" class="h-5 w-5">
                                 <p class="text-base font-bold text-slate-900">Informasi Operasional</p>
                             </div>
-                            <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-4 sm:gap-6">
+                            <div class="grid grid-cols-2 gap-3 px-4 py-4 sm:grid-cols-3 sm:gap-6">
                                 <div>
                                     <p class="text-xs uppercase tracking-wide text-slate-400">Sensor</p>
                                     <p class="mt-1 text-sm font-bold text-slate-900"
@@ -258,6 +258,10 @@
                                 <div>
                                     <p class="text-xs uppercase tracking-wide text-slate-400">IMEI</p>
                                     <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.imei || '-'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs uppercase tracking-wide text-slate-400">No. Seluler</p>
+                                    <p class="mt-1 text-sm font-bold text-slate-900" x-text="detailData.nosell || '-'"></p>
                                 </div>
                                 <div>
                                     <p class="text-xs uppercase tracking-wide text-slate-400">Tanggal Pemasangan</p>
@@ -461,7 +465,7 @@
                             <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-4">Informasi Operasional</h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <div>
+                                    <div class="sm:col-span-2">
                                         <label for="create_sensor_type"
                                             class="block text-xs font-medium text-gray-700">Sensor</label>
                                         <input type="text" name="sensor_type" id="create_sensor_type"
@@ -471,6 +475,13 @@
                                         <label for="create_imei"
                                             class="block text-xs font-medium text-gray-700">IMEI</label>
                                         <input type="text" name="imei" id="create_imei"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                    </div>
+                                    <div>
+                                        <label for="create_nosell" class="block text-xs font-medium text-gray-700">No.
+                                            Seluler</label>
+                                        <input type="tel" name="nosell" id="create_nosell" maxlength="15"
+                                            placeholder="+62..."
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
                                     </div>
                                     <div>
@@ -701,7 +712,7 @@
                             <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-4">Informasi Operasional</h4>
                                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <div>
+                                    <div class="sm:col-span-2">
                                         <label for="sensor_type"
                                             class="block text-xs font-medium text-gray-700">Sensor</label>
                                         <input type="text" name="sensor_type" id="sensor_type"
@@ -711,6 +722,13 @@
                                     <div>
                                         <label for="imei" class="block text-xs font-medium text-gray-700">IMEI</label>
                                         <input type="text" name="imei" id="imei" x-model="formData.imei"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                    </div>
+                                    <div>
+                                        <label for="nosell" class="block text-xs font-medium text-gray-700">No.
+                                            Seluler</label>
+                                        <input type="tel" name="nosell" id="nosell" maxlength="15"
+                                            x-model="formData.nosell" placeholder="+62..."
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
                                     </div>
                                     <div>
@@ -795,6 +813,7 @@
                     serial_number: '-',
                     sensor_type: '-',
                     imei: '-',
+                    nosell: '-',
                     tanggal_pemasangan: '-',
                     masa_garansi: '-',
                     nama_penjaga: '-',
@@ -814,6 +833,7 @@
                     nama_penjaga: '',
                     jumlah_sensor: '',
                     imei: '',
+                    nosell: '',
                 },
                 updateUrl: '',
 
@@ -977,6 +997,7 @@
                         serial_number: device.serial_number || '-',
                         sensor_type: device.sensor_type || '-',
                         imei: device.imei || '-',
+                        nosell: device.nosell || '-',
                         tanggal_pemasangan: device.tanggal_pemasangan || '-',
                         masa_garansi: device.masa_garansi || '-',
                         nama_penjaga: device.nama_penjaga || '-',
@@ -1004,6 +1025,7 @@
                         nama_penjaga: '',
                         jumlah_sensor: '',
                         imei: '',
+                        nosell: '',
                         awal_kontrak: '',
                     };
                     this.showCreateModal = true;
@@ -1026,6 +1048,7 @@
                         nama_logger: device.nama_logger,
                         jumlah_sensor: device.jumlah_sensor,
                         imei: device.imei,
+                        nosell: device.nosell !== '-' ? device.nosell : '',
                         id_katlogger: device.id_katlogger,
                         instansi_id: device.instansi_id || '',
                         seri: device.seri !== '-' ? device.seri : '',

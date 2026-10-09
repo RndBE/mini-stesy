@@ -103,7 +103,7 @@ class PetaApiController extends Controller
                     'arr_state'   => $arrState,
                     'status'      => $status,
                     'last_time'   => $lastTime,
-                    'no_seluler'  => $l->no_seluler,
+                    'no_seluler'  => $l->informasi?->nosell,
                     'sensor_count' => $l->sensor_count ?? $l->params->count(),
                     'informasi'   => $l->informasi ? [
                         'seri_logger'   => $l->informasi->seri_logger,
