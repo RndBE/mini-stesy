@@ -1402,7 +1402,31 @@
                                     </svg>
                                 </button>
                             </div>
-<div class="space-y-2 px-6 py-5">
+<form x-show="!pumpUnlocked" x-cloak @submit.prevent="submitPumpPin()" class="space-y-4 px-6 py-6">
+                                <div class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                                    <svg class="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4" />
+                                    </svg>
+                                    <p class="text-sm text-amber-800">Masukkan PIN kontrol pompa instansi untuk membuka panel kontrol.</p>
+                                </div>
+                                <div>
+                                    <label for="pumpPinInput" class="mb-2 block text-sm font-semibold text-slate-900">PIN Kontrol Pompa</label>
+                                    <input id="pumpPinInput" type="password" x-ref="pumpPinInput" x-model="pumpPin"
+                                        inputmode="numeric" autocomplete="off" maxlength="32"
+                                        :disabled="pumpPinChecking"
+                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm tracking-widest focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-100 disabled:bg-slate-100"
+                                        placeholder="Masukkan PIN" />
+                                    <p x-show="pumpPinError" x-text="pumpPinError" class="mt-2 text-sm font-medium text-red-600"></p>
+                                </div>
+                                <div class="flex justify-end gap-2">
+                                    <button type="button" @click="closePumpModal()" :disabled="pumpPinChecking"
+                                        class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60">Batal</button>
+                                    <button type="submit" :disabled="pumpPinChecking || !pumpPin"
+                                        class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                        x-text="pumpPinChecking ? 'Memverifikasi...' : 'Buka Kontrol'"></button>
+                                </div>
+                            </form>
+<div x-show="pumpUnlocked" x-cloak class="space-y-2 px-6 py-5">
 <div class="grid grid-cols-1 gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
                                     <div>
                                         <p class="text-xs uppercase tracking-wide text-slate-400">Nama Pos</p>
@@ -4713,21 +4737,70 @@
                 pumpError: null,
                 pumpChecking: false,
                 pumpStatusReady: false,
+                pumpUnlocked: false,
+                pumpPin: '',
+                pumpPinError: null,
+                pumpPinChecking: false,
 
+                // Panel kontrol baru muncul setelah PIN instansi diverifikasi server.
                 openPumpModal() {
+                    this.pumpUnlocked = false
+                    this.pumpPin = ''
+                    this.pumpPinError = null
+                    this.pumpStatusReady = false
                     this.showPumpModal = true
-                    this.checkPumpStatus()
+                    this.$nextTick(() => this.$refs.pumpPinInput?.focus())
                 },
 
                 closePumpModal() {
-                    if (this.pumpRunning || this.pumpChecking) return
+                    if (this.pumpRunning || this.pumpChecking || this.pumpPinChecking) return
                     this.pumpTimers.forEach(t => clearTimeout(t))
                     this.pumpTimers = []
                     this.pumpWorkflowVisible = false
                     this.pumpSteps = []
                     this.pumpError = null
                     this.pumpStatusReady = false
+                    this.pumpUnlocked = false
+                    this.pumpPin = ''
+                    this.pumpPinError = null
                     this.showPumpModal = false
+                },
+
+                async submitPumpPin() {
+                    if (!this.pumpPin || this.pumpPinChecking) return
+                    this.pumpPinError = null
+                    this.pumpPinChecking = true
+                    try {
+                        const res = await fetch('{{ route("pump.verify-pin") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                id_logger: '{{ $logger->id_logger }}',
+                                control_pin: this.pumpPin,
+                            }),
+                        })
+                        const data = await res.json().catch(() => ({}))
+                        if (!res.ok) {
+                            this.pumpPin = ''
+                            this.pumpPinError = res.status === 429
+                                ? 'Terlalu banyak percobaan. Coba lagi sebentar lagi.'
+                                : (data.message || 'Gagal memverifikasi PIN.')
+                            this.$nextTick(() => this.$refs.pumpPinInput?.focus())
+                            return
+                        }
+                        this.pumpPin = ''
+                        this.pumpUnlocked = true
+                        this.checkPumpStatus()
+                    } catch (e) {
+                        console.error('Pump PIN verify error:', e)
+                        this.pumpPinError = 'Gagal memverifikasi PIN. Periksa koneksi lalu coba lagi.'
+                    } finally {
+                        this.pumpPinChecking = false
+                    }
                 },
 
                 // Cek status pompa via command GET sebelum kontrol diizinkan.
@@ -4823,8 +4896,16 @@
                         const data = await res.json()
 
                         if (!res.ok) {
-                            // Error: anggap pompa OFF, jangan tampilkan pesan.
                             this.resetPump()
+                            if (data.step === 'pin_required') {
+                                // Izin PIN kedaluwarsa: minta PIN lagi.
+                                this.pumpUnlocked = false
+                                this.pumpStatusReady = false
+                                this.pumpPinError = data.message
+                                this.$nextTick(() => this.$refs.pumpPinInput?.focus())
+                                return
+                            }
+                            // Error lain: anggap pompa OFF, jangan tampilkan pesan.
                             this.pumpState = 'off'
                             return
                         }

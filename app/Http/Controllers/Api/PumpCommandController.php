@@ -3,37 +3,103 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\PumpControlLog;
 use App\Models\t_Logger;
+use App\Services\PumpCommandException;
+use App\Services\PumpMqttCommandService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use PhpMqtt\Client\ConnectionSettings;
-use PhpMqtt\Client\MqttClient;
 
 /**
- * PumpCommandController
+ * PumpCommandController (web)
  *
- * Mengirim perintah kontrol pompa AWLR JIAT via MQTT dan menunggu respon logger.
+ * Kontrol pompa AWLR JIAT dari dashboard web via MQTT.
  *
- * Protocol:
- *   Publish ke logger  : sub_{id_logger}
- *   Subscribe balasan  : pub_{id_logger}
+ * Alur:
+ *   1. verifyPin  : user memasukkan PIN kontrol instansi (hash di tabel instansi).
+ *                   PIN benar -> sesi "terbuka" untuk logger itu selama UNLOCK_TTL detik.
+ *   2. command    : get/on/off. on/off hanya diizinkan bila sesi masih terbuka.
  *
- * Commands:
- *   GET status : {"GCM_PUMP": {"cmd": "GET", "id": 1}}
- *   SET ON     : {"GCM_PUMP": {"cmd": "SET", "id": 1, "state": 1}}
- *   SET OFF    : {"GCM_PUMP": {"cmd": "SET", "id": 1, "state": 0}}
- *
- * Response dari logger:
- *   {"GCM_PUMP": {"status": "OK", "id": 1, "slave": 2, "state": 1|0, "msg": "Pump ON|OFF"}}
+ * Protocol MQTT ada di PumpMqttCommandService.
  */
 class PumpCommandController extends Controller
 {
     /**
-     * Timeout menunggu balasan dari logger (detik).
+     * Lama izin kontrol setelah PIN benar (detik).
      */
-    private const SUBSCRIBE_TIMEOUT = 10;
+    private const UNLOCK_TTL = 300;
+
+    /**
+     * POST /api/pump/verify-pin
+     *
+     * Body:
+     *   id_logger   : string (required)
+     *   control_pin : string (required)
+     */
+    public function verifyPin(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id_logger'   => ['required', 'string'],
+            'control_pin' => ['required', 'string', 'max:32'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        $logger = $this->findPumpLogger($request, $request->input('id_logger'));
+
+        if (!$logger) {
+            return $this->noPumpResponse();
+        }
+
+        $instansi = $logger->instansi;
+
+        if (!$instansi || !$instansi->has_control_pin) {
+            $this->createControlLog(
+                $request,
+                $logger,
+                'unlock',
+                'pin_not_configured',
+                'PIN kontrol belum dikonfigurasi untuk instansi ini.',
+            );
+
+            return response()->json([
+                'success' => false,
+                'message' => 'PIN kontrol belum dikonfigurasi untuk instansi ini.',
+                'step'    => 'pin_not_configured',
+            ], 403);
+        }
+
+        if (!Hash::check((string) $request->input('control_pin'), (string) $instansi->control_pin_hash)) {
+            $this->createControlLog(
+                $request,
+                $logger,
+                'unlock',
+                'pin_failed',
+                'PIN kontrol tidak sesuai.',
+            );
+
+            return response()->json([
+                'success' => false,
+                'message' => 'PIN kontrol tidak sesuai.',
+                'step'    => 'pin_failed',
+            ], 403);
+        }
+
+        $request->session()->put($this->unlockKey($logger->id_logger), now()->addSeconds(self::UNLOCK_TTL)->timestamp);
+
+        return response()->json([
+            'success'    => true,
+            'message'    => 'PIN benar.',
+            'expires_in' => self::UNLOCK_TTL,
+        ]);
+    }
 
     /**
      * POST /api/pump/command
@@ -42,11 +108,11 @@ class PumpCommandController extends Controller
      *   id_logger : string (required)
      *   action    : "get" | "on" | "off" (required)
      */
-    public function command(Request $request)
+    public function command(Request $request, PumpMqttCommandService $pumpService)
     {
         $validator = Validator::make($request->all(), [
-            'id_logger' => 'required|string|exists:t_logger,id_logger',
-            'action'    => 'required|string|in:get,on,off',
+            'id_logger' => ['required', 'string'],
+            'action'    => ['required', 'string', 'in:get,on,off'],
         ]);
 
         if ($validator->fails()) {
@@ -60,209 +126,132 @@ class PumpCommandController extends Controller
         $idLogger = $request->input('id_logger');
         $action   = $request->input('action');
 
-        // Pastikan logger ini punya pompa (JIAT + has_pump)
-        $logger = t_Logger::with('jiat')->where('id_logger', $idLogger)->first();
+        // Pastikan user boleh mengakses logger ini dan logger punya pompa (JIAT + has_pump)
+        $logger = $this->findPumpLogger($request, $idLogger);
 
-        if (!$logger || !$logger->jiat || !$logger->jiat->has_pump) {
+        if (!$logger) {
+            return $this->noPumpResponse();
+        }
+
+        $isControl = in_array($action, ['on', 'off'], true);
+
+        if ($isControl && !$this->isUnlocked($request, $logger->id_logger)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Logger ini tidak memiliki fitur kontrol pompa.',
+                'message' => 'PIN kontrol diperlukan atau sudah kedaluwarsa. Masukkan PIN kembali.',
+                'step'    => 'pin_required',
             ], 403);
         }
 
-        // Build MQTT payload
-        $payload  = $this->buildPayload($action);
-        $pubTopic = "sub_{$idLogger}";  // Kirim perintah KE logger
-        $subTopic = "pub_{$idLogger}";  // Terima balasan DARI logger
-
-        $user = Auth::user();
-        Log::info("Pump command [{$action}] by {$user?->name} for logger {$idLogger}");
+        $log = $isControl
+            ? $this->createControlLog($request, $logger, $action, 'pending', 'Perintah kontrol dikirim ke logger.')
+            : null;
 
         try {
-            $mqtt = $this->createMqttClient();
+            $pump = $pumpService->send($idLogger, $action);
+        } catch (PumpCommandException $e) {
+            $log?->update([
+                'status'       => $this->statusForPumpException($e),
+                'message'      => $e->getMessage(),
+                'completed_at' => now(),
+                'metadata'     => array_merge(
+                    ['source' => 'web', 'step' => $e->step],
+                    $e->pump ? ['pump' => $e->pump] : [],
+                ),
+            ]);
 
-            // Subscribe dulu agar tidak miss balasan cepat
-            $response = null;
-
-            $mqtt->subscribe($subTopic, function (string $topic, string $message) use (&$response, $mqtt) {
-                Log::info("Pump response on {$topic}: {$message}");
-
-                $decoded = json_decode($message, true);
-
-                if (isset($decoded['GCM_PUMP'])) {
-                    $response = $decoded['GCM_PUMP'];
-                    $mqtt->interrupt();
-                } elseif (isset($decoded['AWLR_PUMP'])) {
-                    // Fallback untuk logger yang masih pakai protokol lama.
-                    $response = $decoded['AWLR_PUMP'];
-                    $mqtt->interrupt();
-                }
-            }, 1);
-
-            // Publish command ke logger
-            $mqtt->publish($pubTopic, json_encode($payload), 1);
-            Log::info("Pump command published to {$pubTopic}: " . json_encode($payload));
-
-            // Loop menunggu balasan dari logger
-            $mqtt->registerLoopEventHandler(function ($mqtt, float $elapsedTime) {
-                if ($elapsedTime >= self::SUBSCRIBE_TIMEOUT) {
-                    $mqtt->interrupt();
-                }
-            });
-
-            $mqtt->loop(true);
-            $mqtt->disconnect();
-
-        } catch (\Exception $e) {
-            Log::error("Pump MQTT error for logger {$idLogger}: " . $e->getMessage());
-
-            return response()->json([
+            $payload = [
                 'success' => false,
-                'message' => 'Gagal terhubung ke MQTT broker: ' . $e->getMessage(),
-                'step'    => 'mqtt_connect',
-            ], 503);
+                'message' => $e->getMessage(),
+                'step'    => $e->step,
+            ];
+
+            if ($e->pump) {
+                $payload['pump'] = $e->pump;
+            }
+
+            return response()->json($payload, $e->httpStatus);
         }
 
-        // Logger tidak merespons
-        if ($response === null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Logger tidak merespons dalam waktu yang ditentukan.',
-                'step'    => 'timeout',
-            ], 504);
-        }
-
-        // Logger merespons — evaluasi hasilnya
-        $pumpStatus = $response['status'] ?? 'UNKNOWN';
-        $pumpState  = (int) ($response['state'] ?? -1);
-        $pumpMsg    = $response['msg'] ?? '';
-
-        if ($pumpStatus !== 'OK') {
-            return response()->json([
-                'success' => false,
-                'message' => "Logger merespons dengan error: {$pumpMsg}",
-                'step'    => 'logger_error',
-                'pump'    => $response,
-            ], 502);
-        }
+        $log?->update([
+            'status'       => 'success',
+            'message'      => $pump['msg'] ?? null,
+            'completed_at' => now(),
+            'metadata'     => ['source' => 'web', 'pump' => $pump],
+        ]);
 
         return response()->json([
             'success' => true,
-            'message' => $pumpMsg ?: ($pumpState === 1 ? 'Pump ON' : 'Pump OFF'),
+            'message' => ($pump['msg'] ?? '') ?: ((int) ($pump['state'] ?? 0) === 1 ? 'Pump ON' : 'Pump OFF'),
             'pump'    => [
-                'status' => $pumpStatus,
-                'state'  => $pumpState,
-                'msg'    => $pumpMsg,
+                'status' => $pump['status'] ?? 'OK',
+                'state'  => (int) ($pump['state'] ?? -1),
+                'msg'    => $pump['msg'] ?? '',
             ],
         ]);
     }
 
-    /**
-     * Buat koneksi MQTT client dengan handling TLS/non-TLS dari .env.
-     */
-    private function createMqttClient(): MqttClient
+    private function findPumpLogger(Request $request, string $idLogger): ?t_Logger
     {
-        $config = config('mqtt-client.connections.default');
+        $logger = t_Logger::query()
+            ->forUser($request->user())
+            ->with(['jiat', 'instansi'])
+            ->where('id_logger', $idLogger)
+            ->first();
 
-        $host     = $config['host'] ?? 'mqtt.beacontelemetry.com';
-        $port     = (int) ($config['port'] ?? 8883);
-        $clientId = $config['client_id'] ?? ('pump_ctrl_' . uniqid());
-
-        $connSettings = $config['connection_settings'] ?? [];
-        $tlsConfig    = $connSettings['tls'] ?? [];
-        $authConfig   = $connSettings['auth'] ?? [];
-
-        $username = $authConfig['username'] ?? env('MQTT_USER', 'userlog');
-        $password = $authConfig['password'] ?? env('MQTT_PASS', 'b34c0n');
-
-        $tlsEnabled = (bool) ($tlsConfig['enabled'] ?? true);
-
-        $settings = (new ConnectionSettings)
-            ->setUsername($username)
-            ->setPassword($password)
-            ->setConnectTimeout((int) ($connSettings['connect_timeout'] ?? 5))
-            ->setSocketTimeout((int) ($connSettings['socket_timeout'] ?? 3))
-            ->setKeepAliveInterval((int) ($connSettings['keep_alive_interval'] ?? 10));
-
-        if ($tlsEnabled) {
-            $caFile     = $tlsConfig['ca_file'] ?? null;
-            $verifyPeer = true;
-
-            if ($caFile && !is_file($caFile)) {
-                $systemCa = $this->findSystemCaFile();
-                if ($systemCa) {
-                    $caFile = $systemCa;
-                } else {
-                    $caFile     = null;
-                    $verifyPeer = false;
-                }
-            }
-
-            $settings = $settings->setUseTls(true)
-                ->setTlsVerifyPeer($verifyPeer)
-                ->setTlsVerifyPeerName($verifyPeer);
-
-            if ($caFile && is_file($caFile)) {
-                $settings = $settings->setTlsCertificateAuthorityFile($caFile);
-            }
-
-            if (!$verifyPeer) {
-                $settings = $settings->setTlsSelfSignedAllowed(true);
-            }
-        }
-
-        $mqtt = new MqttClient($host, $port, $clientId, MqttClient::MQTT_3_1_1);
-        $mqtt->connect($settings, (bool) ($config['use_clean_session'] ?? true));
-
-        return $mqtt;
+        return ($logger && $logger->jiat && $logger->jiat->has_pump) ? $logger : null;
     }
 
-    /**
-     * Cari CA bundle system (macOS / Linux).
-     */
-    private function findSystemCaFile(): ?string
+    private function noPumpResponse()
     {
-        $candidates = [];
+        return response()->json([
+            'success' => false,
+            'message' => 'Logger ini tidak memiliki fitur kontrol pompa.',
+        ], 403);
+    }
 
-        if (function_exists('openssl_get_cert_locations')) {
-            $loc = openssl_get_cert_locations();
-            if (!empty($loc['default_cert_file'])) {
-                $candidates[] = $loc['default_cert_file'];
-            }
-        }
+    private function unlockKey(string $idLogger): string
+    {
+        return "pump_control_unlock.{$idLogger}";
+    }
 
-        $candidates = array_merge($candidates, [
-            '/etc/ssl/certs/ca-certificates.crt',
-            '/etc/pki/tls/certs/ca-bundle.crt',
-            '/etc/ssl/cert.pem',
-            '/usr/local/etc/openssl/cert.pem',
-            '/opt/homebrew/etc/openssl/cert.pem',
+    private function isUnlocked(Request $request, string $idLogger): bool
+    {
+        $expiresAt = (int) $request->session()->get($this->unlockKey($idLogger), 0);
+
+        return $expiresAt > now()->timestamp;
+    }
+
+    private function createControlLog(
+        Request $request,
+        t_Logger $logger,
+        string $action,
+        string $status,
+        ?string $message = null,
+    ): PumpControlLog {
+        $now = now();
+        $completed = $status !== 'pending';
+
+        return PumpControlLog::create([
+            'user_id'      => $request->user()?->id_user,
+            'instansi_id'  => $logger->instansi_id,
+            'id_logger'    => $logger->id_logger,
+            'action'       => $action,
+            'status'       => $status,
+            'message'      => $message,
+            'requested_at' => $now,
+            'completed_at' => $completed ? $now : null,
+            'metadata'     => ['source' => 'web'],
         ]);
-
-        foreach ($candidates as $path) {
-            if (is_file($path)) {
-                return $path;
-            }
-        }
-
-        return null;
     }
 
-    /**
-     * Build MQTT payload sesuai protocol.
-     */
-    private function buildPayload(string $action): array
+    private function statusForPumpException(PumpCommandException $e): string
     {
-        return match ($action) {
-            'get' => [
-                'GCM_PUMP' => ['cmd' => 'GET', 'id' => 1],
-            ],
-            'on' => [
-                'GCM_PUMP' => ['cmd' => 'SET', 'id' => 1, 'state' => 1],
-            ],
-            'off' => [
-                'GCM_PUMP' => ['cmd' => 'SET', 'id' => 1, 'state' => 0],
-            ],
+        return match ($e->step) {
+            'mqtt_connect' => 'mqtt_failed',
+            'logger_error' => 'logger_error',
+            'timeout'      => 'timeout',
+            default        => 'failed',
         };
     }
 }

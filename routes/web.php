@@ -106,6 +106,8 @@ Route::post('/api/awgc/confirm/{commandId}', [AwgcCommandController::class, 'con
 
 // Perintah kontrol pompa AWLR JIAT via MQTT
 Route::middleware(['auth'])->post('/api/pump/command', [PumpCommandController::class, 'command'])->name('pump.command');
+// Verifikasi PIN kontrol (hash di tabel instansi) sebelum perintah on/off diizinkan
+Route::middleware(['auth', 'throttle:6,1'])->post('/api/pump/verify-pin', [PumpCommandController::class, 'verifyPin'])->name('pump.verify-pin');
 
 Route::middleware(['auth', 'permission:view_audit_log'])->get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 // Route::middleware(['auth'])->post('/audit-log/client-export', [AuditLogController::class, 'clientExport'])->name('audit-log.client-export');
