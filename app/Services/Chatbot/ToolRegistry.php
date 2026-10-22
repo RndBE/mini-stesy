@@ -28,6 +28,16 @@ class ToolRegistry
             return ['text' => "Tool \"{$name}\" tidak tersedia."];
         }
 
+        // Models sometimes name the argument after the id they were given; every tool takes "logger".
+        if (! isset($args['logger'])) {
+            foreach (['logger_id', 'id_logger'] as $alias) {
+                if (isset($args[$alias])) {
+                    $args['logger'] = (string) $args[$alias];
+                    break;
+                }
+            }
+        }
+
         try {
             return $tool->run($args, $user);
         } catch (\Throwable $e) {

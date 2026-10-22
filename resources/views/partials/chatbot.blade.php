@@ -176,6 +176,7 @@
                     <textarea
                         id="stesy-chatbot-input"
                         x-model="input"
+                        @keydown.enter="if (!$event.shiftKey && !$event.isComposing) { $event.preventDefault(); ask(input); }"
                         rows="1"
                         class="max-h-28 min-h-10 flex-1 resize-none border-0 bg-transparent px-0 py-2 text-sm leading-6 text-slate-800 placeholder:text-slate-400 focus:ring-0"
                         placeholder="Tulis pertanyaan..."

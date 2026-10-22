@@ -27,7 +27,10 @@ class ProviderClient
             $res = $this->request()->post(config('services.ai_chatbot.endpoint'), $payload);
             if (! $res->successful()) { report(new \RuntimeException('Chatbot provider error: '.$res->body())); return null; }
 
-            return data_get($res->json(), 'choices.0.message');
+            $message = data_get($res->json(), 'choices.0.message');
+
+            // DeepSeek may leak its DSML tool-call markup into content instead of tool_calls.
+            return is_array($message) ? DsmlToolCalls::normalize($message, $tools !== []) : $message;
         } catch (\Throwable $e) { report($e); return null; }
     }
 
@@ -40,7 +43,7 @@ class ProviderClient
             );
             if (! $res->successful()) { report(new \RuntimeException('Chatbot stream error: '.$res->status())); return null; }
 
-            $full = '';
+            $filter = new DsmlStreamFilter($onToken);
             $body = $res->toPsrResponse()->getBody();
             $buffer = '';
             while (! $body->eof()) {
@@ -52,10 +55,11 @@ class ProviderClient
                     $data = trim(substr($line, 5));
                     if ($data === '' || $data === '[DONE]') { continue; }
                     $delta = data_get(json_decode($data, true), 'choices.0.delta.content');
-                    if (is_string($delta) && $delta !== '') { $full .= $delta; $onToken($delta); }
+                    if (is_string($delta) && $delta !== '') { $filter->push($delta); }
                 }
             }
-            return $full;
+            $filter->flush();
+            return $filter->emitted();
         } catch (\Throwable $e) { report($e); return null; }
     }
 
