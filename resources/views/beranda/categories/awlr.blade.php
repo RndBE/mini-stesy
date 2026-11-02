@@ -37,6 +37,8 @@
             if ($isTransducer) {
                 $nonJiatMount = 'sungai';
             }
+            // Kartu logger di kolom samping (di bawah Data Pengukuran): v-notch dan bendungan.
+            $loggerInSide = $nonJiatMount === 'v_notch' || $isTransducer;
 
             // Nilai apa adanya; yang berbeda hanya label satuannya.
             $tmaShow     = is_numeric($tma) ? (float) $tma : null;
@@ -45,7 +47,7 @@
         @endphp
 <div class="p-5 space-y-4">
 <div class="grid grid-cols-12 gap-4">
-<div class="card-split-main col-span-12 {{ $nonJiatMount === 'v_notch' ? 'md:col-span-8' : 'md:col-span-9' }} space-y-3 md:border-r md:border-slate-200 md:pr-4">
+<div class="card-split-main col-span-12 {{ $loggerInSide ? 'md:col-span-8' : 'md:col-span-9' }} space-y-3 md:border-r md:border-slate-200 md:pr-4">
                     @if ($isTransducer)
                         @include('beranda.categories.partials.dam_transducer')
                     @elseif ($nonJiatMount === 'v_notch')
@@ -56,7 +58,7 @@
 
                 </div>
 @if ($pTma || $pDebit || $pHumidity || $pBattery || $pTemp)
-<div class="card-split-side col-span-12 {{ $nonJiatMount === 'v_notch' ? 'md:col-span-4' : 'md:col-span-3' }} flex flex-col justify-start gap-2">
+<div class="card-split-side col-span-12 {{ $loggerInSide ? 'md:col-span-4' : 'md:col-span-3' }} flex flex-col justify-start gap-2">
                     <div class="card-split-title text-sm font-semibold text-slate-700">Data Pengukuran</div>
 @if ($pTma)
 @php
@@ -115,7 +117,7 @@
                         </div>
                     </a>
 @endif
-@if ($nonJiatMount === 'v_notch' && ($pHumidity || $pBattery || $pTemp))
+@if ($loggerInSide && ($pHumidity || $pBattery || $pTemp))
                     <div class="mt-1 space-y-2 border-t border-slate-100 pt-3">
                         <div class="text-sm font-semibold text-slate-700">Parameter Logger</div>
                         @include('beranda.categories.partials.logger_health_cards')
@@ -124,7 +126,7 @@
                 </div>
 @endif
             </div>
-@if ($nonJiatMount !== 'v_notch' && ($pHumidity || $pBattery || $pTemp))
+@if (!$loggerInSide && ($pHumidity || $pBattery || $pTemp))
             <div class="border-t border-slate-100 pt-3">
                 <div class="text-sm font-semibold text-slate-700 mb-2">Logger</div>
                 @include('beranda.categories.partials.logger_health_cards', ['gridClass' => 'grid grid-cols-3 gap-2'])

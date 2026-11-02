@@ -42,7 +42,6 @@
     // Sensor hanya bisa bergeser sepanjang pipa: y 70..230 pada kanvas (artwork asli di y 217).
     $dmSensorYRaw = $dmEs !== null ? $dmYOf($dmEs) : 217.0;
     $dmSensorY    = min(230.0, max(70.0, $dmSensorYRaw));
-    $dmSensorOut  = $dmEs !== null && abs($dmSensorY - $dmSensorYRaw) > 0.01;
     // Pipa miring 60°: geser sepanjang pipa sebesar d menggeser kanvas (0,5d ; 0,866d).
     $dmDelta   = round(($dmSensorY - 217.0) / 0.866, 3);
     $dmSensorX = round(158.934 + 0.5 * $dmDelta, 3);
@@ -203,12 +202,6 @@
     <p class="text-[12px] leading-snug text-amber-600">
         Bacaan {{ $dmFmt($dmTmaRaw) }} di luar rentang elevasi {{ $dmFmt($dmMin) }}–{{ $dmFmt($dmMax) }};
         gambar air berhenti di ujung papan duga, nilai di kotak tetap mengikuti bacaan.
-    </p>
-@endif
-@if ($dmSensorOut)
-    <p class="text-[12px] leading-snug text-amber-600">
-        Kedalaman sensor {{ $dmFmt($dmKed) }} di luar jangkauan gambar pipa atau papan duga; posisi sensor
-        pada gambar dijepit, angka di kotak tetap sesuai isian.
     </p>
 @endif
 @if ($dmKed === null)
