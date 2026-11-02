@@ -32,6 +32,12 @@
                 ? 'v_notch'
                 : 'sungai';
 
+            // Sensor transduser: ilustrasi bendungan, menggantikan ilustrasi sungai/v-notch.
+            $isTransducer = ($lg->nonjiat?->jenis_sensor ?? null) === 'transduser';
+            if ($isTransducer) {
+                $nonJiatMount = 'sungai';
+            }
+
             // Nilai apa adanya; yang berbeda hanya label satuannya.
             $tmaShow     = is_numeric($tma) ? (float) $tma : null;
             $tmaShowUnit = $nonJiatMount === 'v_notch' ? 'cm' : ($pTma?->satuan ?: 'm');
@@ -40,7 +46,9 @@
 <div class="p-5 space-y-4">
 <div class="grid grid-cols-12 gap-4">
 <div class="card-split-main col-span-12 {{ $nonJiatMount === 'v_notch' ? 'md:col-span-8' : 'md:col-span-9' }} space-y-3 md:border-r md:border-slate-200 md:pr-4">
-                    @if ($nonJiatMount === 'v_notch')
+                    @if ($isTransducer)
+                        @include('beranda.categories.partials.dam_transducer')
+                    @elseif ($nonJiatMount === 'v_notch')
                         @include('beranda.categories.partials.vnotch_weir')
                     @else
                         @include('beranda.categories.partials.river_channel')

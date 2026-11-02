@@ -523,7 +523,7 @@
 
                                         <div x-show="addData.subKategori === 'non_jiat'">
                                             <h4 class="text-sm font-semibold text-gray-900 mb-3">Jenis Sensor</h4>
-                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                                                 <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
                                                     :class="addData.jenis_sensor === 'ultrasonic' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
                                                     <input type="radio" name="jenis_sensor" value="ultrasonic"
@@ -538,10 +538,18 @@
                                                         class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
                                                     <span class="text-sm font-semibold">Radar</span>
                                                 </label>
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="addData.jenis_sensor === 'transduser' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="jenis_sensor" value="transduser"
+                                                        x-model="addData.jenis_sensor"
+                                                        @change="addData.jenis_pemasangan = 'sungai'"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Transduser</span>
+                                                </label>
                                             </div>
                                         </div>
 
-                                        <div x-show="addData.subKategori === 'non_jiat'" class="mt-4">
+                                        <div x-show="addData.subKategori === 'non_jiat' && addData.jenis_sensor !== 'transduser'" class="mt-4">
                                             <h4 class="text-sm font-semibold text-gray-900 mb-3">Pemasangan</h4>
                                             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                                 <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
@@ -684,7 +692,7 @@
 
                                     <template x-if="addData.subKategori === 'non_jiat'">
                                         <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
+                                            <div x-show="addData.jenis_sensor !== 'transduser'">
                                                 <label class="block text-xs font-medium text-gray-700 mb-2">Jarak Sensor
                                                     dengan Air</label>
                                                 <div
@@ -697,7 +705,21 @@
                                                         class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="addData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
                                             </div>
-                                            <div>
+                                            <div x-show="addData.jenis_sensor === 'transduser'">
+                                                <label class="block text-xs font-medium text-gray-700 mb-2">Kedalaman Sensor
+                                                    (dari Puncak)</label>
+                                                <div
+                                                    class="flex rounded-lg border border-gray-300 overflow-hidden bg-white">
+                                                    <input type="number" step="any" name="kedalaman_sensor"
+                                                        x-model="addData.kedalaman_sensor"
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0"
+                                                        placeholder="cth: 14.2">
+                                                    <span
+                                                        class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                </div>
+                                                <p class="mt-1 text-[12px] text-gray-500">Jarak dari puncak bendungan (Elevasi Maks) turun ke sensor. Menentukan posisi sensor pada ilustrasi.</p>
+                                            </div>
+                                            <div x-show="addData.jenis_sensor !== 'transduser'">
                                                 <label class="block text-xs font-medium text-gray-700 mb-2">Ketinggian
                                                     Sensor</label>
                                                 <div
@@ -999,7 +1021,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
 
                                         <div x-show="editData.subKategori === 'non_jiat'">
                                             <h4 class="text-sm font-semibold text-gray-900 mb-3">Jenis Sensor</h4>
-                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                                                 <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
                                                     :class="editData.jenis_sensor === 'ultrasonic' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
                                                     <input type="radio" name="jenis_sensor" value="ultrasonic"
@@ -1014,10 +1036,18 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                         class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
                                                     <span class="text-sm font-semibold">Radar</span>
                                                 </label>
+                                                <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
+                                                    :class="editData.jenis_sensor === 'transduser' ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm ring-1 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/40'">
+                                                    <input type="radio" name="jenis_sensor" value="transduser"
+                                                        x-model="editData.jenis_sensor"
+                                                        @change="editData.jenis_pemasangan = 'sungai'"
+                                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                    <span class="text-sm font-semibold">Transduser</span>
+                                                </label>
                                             </div>
                                         </div>
 
-                                        <div x-show="editData.subKategori === 'non_jiat'" class="mt-4">
+                                        <div x-show="editData.subKategori === 'non_jiat' && editData.jenis_sensor !== 'transduser'" class="mt-4">
                                             <h4 class="text-sm font-semibold text-gray-900 mb-3">Pemasangan</h4>
                                             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                                 <label class="flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 text-sm transition duration-150"
@@ -1148,7 +1178,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
 
                                     <template x-if="editData.subKategori === 'non_jiat'">
                                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                            <div>
+                                            <div x-show="editData.jenis_sensor !== 'transduser'">
                                                 <label class="block text-xs font-medium text-gray-700">Jarak Sensor dengan Air</label>
                                                 <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
                                                     <input type="number" step="any" name="jarak_sensor_ke_air"
@@ -1157,7 +1187,18 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                                                     <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50"><span x-text="editData.jenis_pemasangan === 'v_notch' ? 'cm' : 'm'">m</span></span>
                                                 </div>
                                             </div>
-                                            <div>
+                                            <div x-show="editData.jenis_sensor === 'transduser'">
+                                                <label class="block text-xs font-medium text-gray-700">Kedalaman Sensor (dari Puncak)</label>
+                                                <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
+                                                    <input type="number" step="any" name="kedalaman_sensor"
+                                                        x-model="editData.kedalaman_sensor"
+                                                        placeholder="cth: 14.2"
+                                                        class="w-full border-0 px-3 py-2 text-sm text-gray-800 focus:ring-0">
+                                                    <span class="flex items-center border-l border-gray-300 px-3 text-sm text-gray-700 bg-gray-50">m</span>
+                                                </div>
+                                                <p class="mt-1 text-[12px] text-gray-500">Jarak dari puncak bendungan (Elevasi Maks) turun ke sensor. Menentukan posisi sensor pada ilustrasi.</p>
+                                            </div>
+                                            <div x-show="editData.jenis_sensor !== 'transduser'">
                                                 <label class="block text-xs font-medium text-gray-700">Ketinggian Sensor</label>
                                                 <div class="mt-1 flex rounded-md border border-gray-300 overflow-hidden">
                                                     <input type="number" step="any" name="tinggi_sensor"
@@ -2213,7 +2254,7 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         kedalaman_pompa: hasJiat && jiat.kedalaman_pompa !== null ?
                             `${jiat.kedalaman_pompa} m` : '-',
                         jenis_sensor: device?.nonjiat?.jenis_sensor ?? '',
-                        jenis_sensor_label: device?.nonjiat?.jenis_sensor === 'radar' ? 'Radar' : (isNonJiat ? 'Ultrasonic' : '-'),
+                        jenis_sensor_label: device?.nonjiat?.jenis_sensor === 'radar' ? 'Radar' : (device?.nonjiat?.jenis_sensor === 'transduser' ? 'Transduser' : (isNonJiat ? 'Ultrasonic' : '-')),
                         jarak_sensor_ke_air: device?.nonjiat?.jarak_sensor_ke_air != null ? parseFloat(device.nonjiat.jarak_sensor_ke_air) : null,
                         tinggi_sensor: device?.nonjiat?.tinggi_sensor != null ? parseFloat(device.nonjiat.tinggi_sensor) : null,
                         params: Array.isArray(device?.params) ? device.params : []
@@ -2449,9 +2490,9 @@ x-text="lp.parameter_utama? `${(lp.nama_parameter || '').replaceAll('_',' ')} ($
                         latitude: device.lokasi?.latitude ?? '',
                         longitude: device.lokasi?.longitude ?? '',
                         kedalaman_sumur: device.jiat?.kedalaman_sumur ?? '',
-                        kedalaman_sensor: device.jiat?.kedalaman_sensor ?? '',
+                        kedalaman_sensor: device.jiat?.kedalaman_sensor ?? device.nonjiat?.kedalaman_sensor ?? '',
                         kedalaman_pompa: device.jiat?.kedalaman_pompa ?? '',
-                        jenis_sensor: device.nonjiat?.jenis_sensor === 'radar' ? 'radar' : 'ultrasonic',
+                        jenis_sensor: ['radar', 'transduser'].includes(device.nonjiat?.jenis_sensor) ? device.nonjiat.jenis_sensor : 'ultrasonic',
                         jenis_pemasangan: device.nonjiat?.jenis_pemasangan === 'v_notch' ? 'v_notch' : 'sungai',
                         jarak_sensor_ke_air: device.nonjiat?.jarak_sensor_ke_air != null ? parseFloat(device.nonjiat.jarak_sensor_ke_air) : (device.afmr_noncontact?.jarak_sensor_ke_air != null ? parseFloat(device.afmr_noncontact.jarak_sensor_ke_air) : ''),
                         tinggi_sensor: device.nonjiat?.tinggi_sensor != null ? parseFloat(device.nonjiat.tinggi_sensor) : (device.afmr_noncontact?.tinggi_sensor != null ? parseFloat(device.afmr_noncontact.tinggi_sensor) : ''),

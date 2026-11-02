@@ -16,6 +16,7 @@ class NonJiatData extends Model
         'jenis_pemasangan',
         'jarak_sensor_ke_air',
         'tinggi_sensor',
+        'kedalaman_sensor',
         'elevasi_max',
         'elevasi_min',
         'elevasi_apex',
