@@ -120,6 +120,21 @@
             container-type: inline-size;
         }
 
+        /* Masonry: tinggi card mengikuti isinya, card berikutnya naik mengisi kolom yang
+           lebih pendek. Baris grid setinggi 1px dan tiap card mengambil span sebesar tingginya
+           (dihitung script di bawah), jadi urutan tetap kiri-kanan per baris. Hanya aktif kalau
+           script jalan (.is-masonry); tanpa script grid biasa. content-visibility dimatikan
+           karena tinggi card di luar layar harus akurat supaya span-nya benar. */
+        .beranda-logger-grid.is-masonry {
+            grid-auto-rows: 1px;
+            row-gap: 0;
+        }
+
+        .beranda-logger-grid.is-masonry > * {
+            align-self: start;
+            content-visibility: visible;
+        }
+
         /* Card inner layouts use viewport breakpoints (md:, lg:), but in the 2-column
            grid a card is only about half the screen wide. These rules look at the
            card's own width instead (container queries), so nothing gets squeezed. */
@@ -472,4 +487,38 @@
             </div>
         @endforelse
     </div>
+
+    <script>
+        // Masonry untuk .beranda-logger-grid: span baris = tinggi card + jarak antar baris (1.5rem).
+        (function () {
+            const grids = document.querySelectorAll('.beranda-logger-grid');
+            if (!grids.length || typeof ResizeObserver === 'undefined') return;
+
+            const rowGap = 24;
+            const layout = (grid) => {
+                if (!grid.offsetParent) return; // section disembunyikan filter kategori
+                for (const card of grid.children) {
+                    const height = card.getBoundingClientRect().height;
+                    if (height > 0) card.style.gridRowEnd = 'span ' + Math.ceil(height + rowGap);
+                }
+            };
+
+            grids.forEach((grid) => {
+                let queued = false;
+                const schedule = () => {
+                    if (queued) return;
+                    queued = true;
+                    requestAnimationFrame(() => {
+                        queued = false;
+                        layout(grid);
+                    });
+                };
+                const observer = new ResizeObserver(schedule);
+                for (const card of grid.children) observer.observe(card);
+                observer.observe(grid);
+                grid.classList.add('is-masonry');
+                schedule();
+            });
+        })();
+    </script>
 @endsection

@@ -98,7 +98,8 @@
     $dmUid        = $lg->id_logger;
 @endphp
 
-<svg viewBox="0 0 347 281" fill="none" xmlns="http://www.w3.org/2000/svg" role="img"
+{{-- viewBox dipotong ke isi gambar (x 8..330, y 29..272) supaya tidak ada ruang kosong di atas/bawah. --}}
+<svg viewBox="8 29 322 243" fill="none" xmlns="http://www.w3.org/2000/svg" role="img"
     aria-label="Ilustrasi bendungan dengan sensor transduser"
     class="mx-auto h-auto w-full max-w-[460px] {{ $muted ? 'grayscale opacity-70' : '' }}">
     <defs>
